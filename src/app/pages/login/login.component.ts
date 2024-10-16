@@ -44,7 +44,7 @@ export class LoginComponent {
         // Guardar userId en sessionStorage
         sessionStorage.setItem('userId', user.uid);
         // Redirigir a la página de dashboard
-        this._router.navigate(['/dashboard']);
+        this._router.navigate(['/admin/planificar/responsabilidad']);
 
       }).catch(error => {
 

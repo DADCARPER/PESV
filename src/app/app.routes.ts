@@ -12,7 +12,8 @@ import { LandingComponent } from './views/landing/landing.component';
 import { ProfileComponent } from './views/profile/profile.component';
 import { AuthComponent } from './layouts/auth/auth.component';
 import { RegisterComponent } from './views/auth/register/register.component';
-import { LoginComponent } from './views/auth/login/login.component';
+import { LoginComponent } from './pages/login/login.component';
+
 
 import { AdminComponent } from './layouts/admin/admin.component';
 
@@ -77,6 +78,7 @@ export const routes: Routes = [
 
   // Rutas protegidas (se requieren permisos con authGuard)
   { path: 'dashboard1', component: DashboardComponent, canActivate: [authGuard] },
+  { path: 'login1', component: LoginComponent, canActivate: [authGuard] },
   { path: 'actuar', component: ActuarComponent, canActivate: [authGuard] },
   { path: 'hacer', component: HacerComponent, canActivate: [authGuard] },
   { path: 'planear', component: PlanearComponent, canActivate: [authGuard] },
