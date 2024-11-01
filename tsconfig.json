@@ -22,7 +22,8 @@
     "lib": [
       "ES2022",
       "dom"
-    ]
+    ],
+    "typeRoots": ["node_modules/@types", "src"]  // Agregar aquí las rutas de tipos
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

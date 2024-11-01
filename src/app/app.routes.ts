@@ -10,6 +10,7 @@ import { VerificarComponent } from './pages/verificar/verificar.component';
 import { IndexComponent } from './views/index/index.component';
 import { LandingComponent } from './views/landing/landing.component';
 import { ProfileComponent } from './views/profile/profile.component';
+
 import { AuthComponent } from './layouts/auth/auth.component';
 import { RegisterComponent } from './views/auth/register/register.component';
 import { LoginComponent } from './pages/login/login.component';
@@ -33,6 +34,8 @@ import { EncuestasComponent } from './views/admin/planificar/diagnostico/encuest
 import { EvidenciasComponent } from './views/admin/planificar/diagnostico/evidencias/evidencias.component';
 import { ProgramasComponent } from './views/admin/planificar/programas/programas.component';
 import { MatrizLegalComponent } from './views/admin/planificar/matriz-legal/matriz-legal.component';
+import { InicioComponent } from './views/admin/inicio/inicio.component';
+import { LiderDelPesvComponent } from './views/admin/planificar/responsabilidad/lider-del-pesv/lider-del-pesv.component';
 
 
 // Rutas principales
@@ -53,10 +56,12 @@ export const routes: Routes = [
     path: "admin",
     component: AdminComponent,
     children: [
+      
       { path: "dashboard", component: DashboardComponent },
 
       { path: "planificar", component: PlanificarComponent },
       { path: "planificar/responsabilidad", component: ResponsabilidadComponent },
+      { path: "planificar/responsabilidad/liderdelpesv", component: LiderDelPesvComponent },
       { path: "planificar/evaluacion", component: EvaluacionComponent },
       { path: "planificar/diagnostico", component: DiagnosticoComponent },
       { path: "planificar/diagnostico/sociodemografia", component: SociodemografiaComponent },
@@ -77,6 +82,7 @@ export const routes: Routes = [
   },
 
   // Rutas protegidas (se requieren permisos con authGuard)
+  { path: "starting", component: InicioComponent, canActivate: [authGuard] },
   { path: 'dashboard1', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'login1', component: LoginComponent, canActivate: [authGuard] },
   { path: 'actuar', component: ActuarComponent, canActivate: [authGuard] },

@@ -1,0 +1,389 @@
+<div class="flex flex-wrap">
+  <div class="w-full">
+    
+    <div class="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">
+      <div class="px-7 pb-5 flex-auto">
+        <div class="tab-content tab-space">
+          <div *ngIf="openTab === 1" >
+
+            <h1 data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" class="text-5xl font-normal leading-normal mt-0 mb-2 text-blueGray-700">Bienvenido Vitrinaweb</h1><br>
+      
+            <div style="text-align: justify;">
+            <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300">
+              En el marco de la Ley 1503 de 2011, las organizaciones en Colombia tienen el compromiso de promover la seguridad vial como parte de su responsabilidad social. Este enfoque implica que las empresas fomenten hábitos y conductas seguras en sus colaboradores, ya sea que se desplacen como peatones, pasajeros, ciclistas, motociclistas o conductores.
+            </p><br>
+            <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="500">
+              El <strong>Plan Estratégico de Seguridad Vial (PESV)</strong> se presenta como una herramienta clave para gestionar los riesgos asociados a la seguridad vial, no solo dentro de las organizaciones, sino también en sus comunidades. Implementar un PESV efectivo contribuye a crear un entorno más seguro y responsable, alineado con los objetivos de sostenibilidad y bienestar de las personas.
+            </p><br>
+            <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="700">
+              A través del PESV, las empresas pueden reducir los accidentes de tránsito, proteger la vida de sus colaboradores y garantizar el cumplimiento de la normativa legal. Además, esta estrategia permite mejorar la reputación de las organizaciones, destacándose por su compromiso con la seguridad y el bienestar de sus empleados y las comunidades donde operan.
+            </p><br>
+            </div>
+            <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="900" (click)="toggleTabs(2)" class="text-amber-500 bg-transparent border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+              <i class="fas fa-arrow-right"></i> Siguiente
+            </button>
+
+          </div>
+          <form (ngSubmit)="onSubmit()">
+          <div *ngIf="openTab === 2">
+            <div class="container mt-5" style="text-align: center;">
+              
+              
+                <h6 data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" class="text-3xl font-normal leading-normal mt-0 mb-2 text-blueGray-800">
+                  Cuestionario de Categorización PESV
+                </h6>
+              
+                <!-- Pregunta 1 -->
+                <div class="flex flex-wrap" style="text-align: left;margin-top: 20px;margin-bottom: 20px;">
+                  <div class="w-full lg:w-6/12 px-4">
+                    <div data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300" class="relative w-full mb-3">
+                      <label class="text-lg block uppercase text-blueGray-600 font-bold mb-2">
+                        1. ¿Cuál es la principal actividad de su empresa?
+                      </label>
+                      <div>
+                        <label class="text-lg">
+                        <input
+                          type="radio"
+                          name="actividad"
+                          [(ngModel)]="form.actividad"
+                          value="transporte"
+                          class="mr-2"
+                          required
+                        /> Prestación de servicios de transporte terrestre automotor</label>
+                      </div>
+                      <div>
+                        <label class="text-lg">
+                        <input
+                          type="radio"
+                          name="actividad"
+                          [(ngModel)]="form.actividad"
+                          value="otra"
+                          class="mr-2"
+                          required
+                        /> Actividades no relacionadas con el transporte</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="500" [disabled]="!form.actividad" (click)="toggleTabs(3)" 
+                [ngClass]="{
+                  'text-blueGray-500 bg-transparent border-blueGray-500 hover:bg-blueGray-500': !form.actividad,
+                  'text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white': form.actividad }"
+                   class="border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+
+                <i class="fas fa-arrow-right"></i> Siguiente
+                </button>
+            
+
+            </div>
+          </div>
+          <div *ngIf="openTab === 3">
+            <!-- Pregunta 2 -->
+            <div class="flex flex-wrap" style="text-align: left;margin-top: 20px;margin-bottom: 20px;">
+              <div class="w-full lg:w-12/12 px-4">
+                <div class="relative w-full mb-3">
+                  <label data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" class="text-lg block uppercase text-blueGray-600 font-bold mb-2">
+                    2. ¿Cuantos vehículos se emplean para desarrollar la actividad económica de la organización?
+                  </label>
+                  <div data-aos="fade-right" data-aos-duration="1000" data-aos-delay="200">
+                    <label class="text-lg">
+                    <input
+                      type="radio"
+                      name="vehiculos"
+                      [(ngModel)]="form.vehiculos"
+                      value="0"
+                      class="mr-2"
+                      required
+                    /> Cero vehículos </label>
+                  </div>
+                  <div data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300">
+                    <label class="text-lg">
+                    <input
+                      type="radio"
+                      name="vehiculos"
+                      [(ngModel)]="form.vehiculos"
+                      value=10
+                      class="mr-2"
+                      required
+                    /> Menos de 11 vehículos </label>
+                  </div>
+                  <div data-aos="fade-right" data-aos-duration="1000" data-aos-delay="400">
+                    <label class="text-lg">
+                    <input
+                      type="radio"
+                      name="vehiculos"
+                      [(ngModel)]="form.vehiculos"
+                      value=18
+                      class="mr-2"
+                      required
+                    /> Entre 11 y 19 vehículos </label>
+                  </div>
+                  <div data-aos="fade-right" data-aos-duration="1000" data-aos-delay="500">
+                    <label class="text-lg">
+                    <input
+                      type="radio"
+                      name="vehiculos"
+                      [(ngModel)]="form.vehiculos"
+                      value=49
+                      class="mr-2"
+                      required
+                    /> Entre 20 y 50 vehículos </label>
+                  </div>
+                  <div data-aos="fade-right" data-aos-duration="1000" data-aos-delay="600">
+                    <label class="text-lg">
+                    <input
+                      type="radio"
+                      name="vehiculos"
+                      [(ngModel)]="form.vehiculos"
+                      value=99
+                      class="mr-2"
+                      required
+                    /> Entre 51 y 100 vehículos </label>
+                  </div>
+                  <div data-aos="fade-right" data-aos-duration="1000" data-aos-delay="700">
+                    <label class="text-lg">
+                    <input
+                      type="radio"
+                      name="vehiculos"
+                      [(ngModel)]="form.vehiculos"
+                      value=101
+                      class="mr-2"
+                      required
+                    /> Más de 100 vehículos </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="900" (click)="toggleTabs(2)" class="text-blueGray-500 bg-transparent border border-solid border-blueGray-500 hover:bg-blueGray-300 active:bg-blueGray-500 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+              <i class="fas fa-arrow-left"></i> Regresar
+            </button>
+
+            <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="700" [disabled]="!form.vehiculos" (click)="toggleTabs(4)" 
+                [ngClass]="{
+                  'text-blueGray-500 bg-transparent border-blueGray-500 hover:bg-blueGray-500': !form.vehiculos,
+                  'text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white': form.vehiculos }"
+                   class="border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+
+                <i class="fas fa-arrow-right"></i> Siguiente
+            </button>
+          
+          </div>
+          <div *ngIf="openTab === 4">
+            <!-- Pregunta 3 -->
+            <div class="flex flex-wrap" style="text-align: left;margin-top: 20px;margin-bottom: 20px;">
+              <div class="w-full lg:w-12/12 px-4">
+                <div class="relative w-full mb-3">
+                  <label data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" class="text-lg block uppercase text-blueGray-600 font-bold mb-2">
+                    3. ¿Su empresa contrata o administra conductores para operar vehículos?
+                  </label>
+                  <div data-aos="fade-right" data-aos-duration="1000" data-aos-delay="200">
+                    <label class="text-lg">
+                    <input
+                      type="radio"
+                      name="conductores"
+                      [(ngModel)]="form.conductores"
+                      value="si"
+                      class="mr-2"
+                      required
+                    /> Sí </label>
+                  </div>
+                  <div data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300">
+                    <label class="text-lg">
+                    <input
+                      type="radio"
+                      name="conductores"
+                      [(ngModel)]="form.conductores"
+                      (change)="form.numConductores = null"
+                      value="no"
+                      class="mr-2"
+                      required
+                    /> No </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <!-- Pregunta 4: Solo visible si la empresa contrata conductores -->
+            <div class="flex flex-wrap" *ngIf="form.conductores === 'si'" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" style="text-align: left;margin-top: 20px;margin-bottom: 20px;">
+              <div class="w-full lg:w-12/12 px-4">
+                <div class="relative w-full mb-3">
+                  <label class="text-lg block uppercase text-blueGray-600 font-bold mb-2">
+                    4. ¿Cuántos conductores son contratados o administrados?
+                  </label>
+                  <div>
+                    <label class="text-lg">
+                    <input
+                      type="radio"
+                      name="numConductores"
+                      [(ngModel)]="form.numConductores"
+                      value=1
+                      class="mr-2"
+                      required
+                    /> Menos de 2 conductores </label>
+                  </div>
+                  <div>
+                    <label class="text-lg">
+                    <input
+                      type="radio"
+                      name="numConductores"
+                      [(ngModel)]="form.numConductores"
+                      value=3
+                      class="mr-2"
+                      required
+                    /> Entre 2 y 19 conductores </label>
+                  </div>
+                  <div>
+                    <label class="text-lg">
+                    <input
+                      type="radio"
+                      name="numConductores"
+                      [(ngModel)]="form.numConductores"
+                      value=21
+                      class="mr-2"
+                      required
+                    /> Entre 20 y 50 conductores </label>
+                  </div>
+                  <div>
+                    <label class="text-lg">
+                    <input
+                      type="radio"
+                      name="numConductores"
+                      [(ngModel)]="form.numConductores"
+                      value=51
+                      class="mr-2"
+                      required
+                    /> Entre 50 y 100 conductores </label>
+                  </div>
+                  <div>
+                    <label class="text-lg">
+                    <input
+                      type="radio"
+                      name="numConductores"
+                      [(ngModel)]="form.numConductores"
+                      value=101
+                      class="mr-2"
+                      required
+                    /> Más de 100 conductores </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="400" (click)="toggleTabs(3)" class="text-blueGray-500 bg-transparent border border-solid border-blueGray-500 hover:bg-blueGray-300 active:bg-blueGray-500 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+              <i class="fas fa-arrow-left"></i> Regresar
+            </button>
+
+            <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="400" [disabled]="!form.conductores" (click)="toggleTabs(5)" 
+                [ngClass]="{
+                  'text-blueGray-500 bg-transparent border-blueGray-500 hover:bg-blueGray-500': !form.conductores,
+                  'text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white': form.conductores }"
+                   class="border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+
+                <i class="fas fa-arrow-right"></i> Siguiente
+            </button>
+          
+          </div>
+          <div *ngIf="openTab === 5">
+
+            <!-- Pregunta 5 -->
+            <div class="flex flex-wrap" style="text-align: left;margin-top: 20px;margin-bottom: 20px;">
+              <div class="w-full lg:w-12/12 px-4">
+                <div class="relative w-full mb-3">
+                  <label data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" class="text-lg block uppercase text-blueGray-600 font-bold mb-2">
+                    5. ¿Su empresa utiliza vehículos que pertenecen a terceros (alquiler, leasing, renting, etc.)?
+                  </label>
+                  <div data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300">
+                    <label class="text-lg">
+                    <input
+                      type="radio"
+                      name="vehiculosTerceros"
+                      [(ngModel)]="form.vehiculosTerceros"
+                      value="si"
+                      class="mr-2"
+                      required
+                    /> Sí </label>
+                  </div>
+                  <div data-aos="fade-right" data-aos-duration="1000" data-aos-delay="400">
+                    <label class="text-lg">
+                    <input
+                      type="radio"
+                      name="vehiculosTerceros"
+                      [(ngModel)]="form.vehiculosTerceros"
+                      value="no"
+                      class="mr-2"
+                      required
+                    /> No </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="600" (click)="toggleTabs(4)" class="text-blueGray-500 bg-transparent border border-solid border-blueGray-500 hover:bg-blueGray-300 active:bg-blueGray-500 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+              <i class="fas fa-arrow-left"></i> Regresar
+            </button>
+
+            <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="600" [disabled]="!form.vehiculosTerceros" (click)="toggleTabs(6)" 
+                [ngClass]="{
+                  'text-blueGray-500 bg-transparent border-blueGray-500 hover:bg-blueGray-500': !form.vehiculosTerceros,
+                  'text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white': form.vehiculosTerceros }"
+                   class="border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+
+                <i class="fas fa-arrow-right"></i> Siguiente
+            </button>
+
+          </div>
+          <div *ngIf="openTab === 6">
+
+            <!-- Mostrar resultado -->
+            <div *ngIf="resultado" class="mt-4 alert alert-info">
+              <h6 data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" class="text-3xl font-normal leading-normal mt-0 mb-2 text-blueGray-800">
+                {{ resultado }}
+              </h6>
+            </div>
+
+            <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="600" (click)="irdashboard()" class="text-blueGray-500 bg-transparent border border-solid border-blueGray-500 hover:bg-blueGray-300 active:bg-blueGray-500 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+              <i class="fas fa-cog"></i> Finalizar
+            </button>
+
+          </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- <ul class="flex mb-0 list-none flex-wrap pt-3 pb-4 flex-row">
+      <li class="-mb-px mr-2 last:mr-0 flex-auto text-center">
+        <a class="text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal" (click)="toggleTabs(1)" [ngClass]="{'text-lightBlue-600 bg-white': openTab !== 1, 'text-white bg-lightBlue-600': openTab === 1}">
+        <i class="fas fa-space-shuttle text-base mr-1"></i> Bienvenida
+        </a>
+      </li>
+      <li class="-mb-px mr-2 last:mr-0 flex-auto text-center">
+        <a class="text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal" (click)="toggleTabs(2)" [ngClass]="{'text-lightBlue-600 bg-white': openTab !== 2, 'text-white bg-lightBlue-600': openTab === 2}">
+        <i class="fas fa-cog text-base mr-1"></i> Settings
+        </a>
+      </li>
+      <li class="-mb-px mr-2 last:mr-0 flex-auto text-center">
+        <a class="text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal" (click)="toggleTabs(3)" [ngClass]="{'text-lightBlue-600 bg-white': openTab !== 3, 'text-white bg-lightBlue-600': openTab === 3}">
+        <i class="fas fa-briefcase text-base mr-1"></i> Options
+        </a>
+      </li>
+      <li class="-mb-px mr-2 last:mr-0 flex-auto text-center">
+        <a class="text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal" (click)="toggleTabs(4)" [ngClass]="{'text-lightBlue-600 bg-white': openTab !== 4, 'text-white bg-lightBlue-600': openTab === 4}">
+        <i class="fas fa-space-shuttle text-base mr-1"></i> Bienvenida
+        </a>
+      </li>
+      <li class="-mb-px mr-2 last:mr-0 flex-auto text-center">
+        <a class="text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal" (click)="toggleTabs(5)" [ngClass]="{'text-lightBlue-600 bg-white': openTab !== 5, 'text-white bg-lightBlue-600': openTab === 5}">
+        <i class="fas fa-cog text-base mr-1"></i> Settings
+        </a>
+      </li>
+      <li class="-mb-px mr-2 last:mr-0 flex-auto text-center">
+        <a class="text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal" (click)="toggleTabs(6)" [ngClass]="{'text-lightBlue-600 bg-white': openTab !== 6, 'text-white bg-lightBlue-600': openTab === 6}">
+        <i class="fas fa-briefcase text-base mr-1"></i> Options
+        </a>
+      </li>
+    </ul> -->
+  </div>
+</div>

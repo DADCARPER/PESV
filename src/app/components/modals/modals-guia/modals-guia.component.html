@@ -1,0 +1,40 @@
+<!-- Botón para abrir el modal -->
+<button (click)="abrirModal()" class="bg-blue-500 text-white px-4 py-2 rounded">Abrir Modal</button>
+
+<!-- Fondo oscuro -->
+<div *ngIf="mostrarModal" class="fixed inset-0 z-40 bg-black opacity-25"></div>
+
+<!-- Modal -->
+<div *ngIf="mostrarModal" (click)="cerrarModal()" class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex">
+  <div (click)="$event.stopPropagation()" [ngClass]="{
+      'max-w-sm': tamano === 'small',
+      'max-w-3xl': tamano === 'regular',
+      'max-w-6xl': tamano === 'large'
+    }" 
+    class="relative mx-auto my-6 bg-white rounded-lg shadow-lg">
+    
+    <!-- Título del modal -->
+    <div class="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+      <h3 class="text-2xl font-semibold">
+         {{ titulo }}
+      </h3>
+    </div>
+    
+    <!-- Contenido del modal -->
+    <div class="relative p-6 flex-auto">
+        <p class="text-sm text-blueGray-500">
+            {{ contenido }}
+        </p>
+    </div>
+    
+    <!--footer-->
+    <div class="flex items-center justify-end p-5 border-t border-solid border-blueGray-200 rounded-b">
+      <button class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" (click)="cerrarModal()">
+        Close
+      </button>
+      <button class="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" (click)="cerrarModal()">
+        Save Changes
+      </button>
+    </div>
+  </div>
+</div>

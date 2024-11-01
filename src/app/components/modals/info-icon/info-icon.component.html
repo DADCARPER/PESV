@@ -1,0 +1,12 @@
+<div class="relative inline-block">
+    <!-- Ícono de información -->
+    <i class="fas fa-info-circle text-amber-500 text-base cursor-pointer"
+        (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()"></i>
+
+    <!-- Modal con el texto de ayuda -->
+    <div *ngIf="showHelp" class="absolute bg-white text-black border border-gray-400 rounded-md p-2 z-50 break-words text-center" 
+            [ngStyle]="{ width: ancho }" style="top: 30px; left: 10px;">
+        {{ helpText }}
+    </div>
+</div>
+  

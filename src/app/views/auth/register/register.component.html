@@ -1,99 +1,56 @@
 <div class="container mx-auto px-4 h-full">
   <div class="flex content-center items-center justify-center h-full">
     <div class="w-full lg:w-6/12 px-4">
-      <div
-        class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-blueGray-200 border-0"
-      >
+      <div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-blueGray-200 border-0">
         <div class="rounded-t mb-0 px-6 py-6">
           <div class="text-center mb-3">
-            <h6 class="text-blueGray-500 text-sm font-bold">Sign up with</h6>
-          </div>
-          <div class="btn-wrapper text-center">
-            <button
-              class="bg-white active:bg-blueGray-50 text-blueGray-700 font-normal px-4 py-2 rounded outline-none focus:outline-none mr-2 mb-1 uppercase shadow hover:shadow-md inline-flex items-center font-bold text-xs ease-linear transition-all duration-150"
-              type="button"
-            >
-              <img alt="..." class="w-5 mr-1" src="assets/img/github.svg" />
-              Github
-            </button>
-            <button
-              class="bg-white active:bg-blueGray-50 text-blueGray-700 font-normal px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 uppercase shadow hover:shadow-md inline-flex items-center font-bold text-xs ease-linear transition-all duration-150"
-              type="button"
-            >
-              <img alt="..." class="w-5 mr-1" src="assets/img/google.svg" />
-              Google
-            </button>
+            <h4 class="text-blueGray-500 text-sm font-bold">Bienvenido nuevo usuario</h4>
           </div>
           <hr class="mt-6 border-b-1 border-blueGray-300" />
         </div>
         <div class="flex-auto px-4 lg:px-10 py-10 pt-0">
           <div class="text-blueGray-400 text-center mb-3 font-bold">
-            <small>Or sign up with credentials</small>
+            <small>Registra los datos del usuario que asignarás como administrador de la cuenta.</small>
           </div>
-          <form>
+          <form (ngSubmit)="onSubmit()">
             <div class="relative w-full mb-3">
-              <label
-                class="block uppercase text-blueGray-600 text-xs font-bold mb-2"
-                htmlFor="grid-password"
-              >
-                Name
-              </label>
-              <input
-                type="email"
-                class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                placeholder="Name"
-              />
+              <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">Nit de la empresa</label>
+              <input type="text" [(ngModel)]="user.nitEmpresa" name="nitEmpresa" class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full" placeholder="900000000" />
             </div>
-
             <div class="relative w-full mb-3">
-              <label
-                class="block uppercase text-blueGray-600 text-xs font-bold mb-2"
-                htmlFor="grid-password"
-              >
-                Email
-              </label>
-              <input
-                type="email"
-                class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                placeholder="Email"
-              />
+              <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">Nombre de la empresa</label>
+              <input type="text" [(ngModel)]="user.nombreEmpresa" name="nombreEmpresa" class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full" placeholder="Empresa" />
             </div>
-
             <div class="relative w-full mb-3">
-              <label
-                class="block uppercase text-blueGray-600 text-xs font-bold mb-2"
-                htmlFor="grid-password"
-              >
-                Password
-              </label>
-              <input
-                type="password"
-                class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                placeholder="Password"
-              />
+              <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">Nombre completo</label>
+              <input type="text" [(ngModel)]="user.nombreCompleto" name="nombreCompleto" class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full" placeholder="Nombre completo" />
             </div>
-
-            <div>
-              <label class="inline-flex items-center cursor-pointer">
-                <input
-                  id="customCheckLogin"
-                  type="checkbox"
-                  class="form-checkbox border-0 text-blueGray-700 ml-1 w-5 h-5 ease-linear transition-all duration-150 rounded"
-                />
-                <span class="ml-2 text-sm font-semibold text-blueGray-600">
-                  I agree with the
-                  <a href="javascript:void(0)" class="text-red-600">
-                    Privacy Policy
-                  </a>
-                </span>
-              </label>
+            <div class="relative w-full mb-3">
+              <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">Cargo en la empresa</label>
+              <input type="text" [(ngModel)]="user.cargoEmpresa" name="cargoEmpresa" class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full" placeholder="Cargo" />
             </div>
-
+            <div class="relative w-full mb-3">
+              <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">Teléfono celular</label>
+              <input type="text" [(ngModel)]="user.telefono" name="telefono" class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full" placeholder="318000000" />
+            </div>
+            <div class="relative w-full mb-3">
+              <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">Correo electrónico</label>
+              <input type="email" [(ngModel)]="user.email" name="email" class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full" placeholder="micorreo@gmail.com" />
+            </div>
+            <div class="relative w-full mb-3">
+              <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">Contraseña</label>
+              <input type="password" [(ngModel)]="user.password" name="password" class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full" placeholder="Contraseña mayor a 8 caracteres" />
+            </div>
+            <!-- <div class="relative w-full mb-3">
+              <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">Nivel de Acceso</label>
+              <select [(ngModel)]="user.nivelAcceso" name="nivelAcceso" class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150">
+                <option value="basico">Básico</option>
+                <option value="medio">Medio</option>
+                <option value="avanzado">Avanzado</option>
+              </select>
+            </div> -->
             <div class="text-center mt-6">
-              <button
-                class="bg-blueGray-800 text-white active:bg-blueGray-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 w-full ease-linear transition-all duration-150"
-                type="button"
-              >
+              <button class="bg-blueGray-800 text-white active:bg-blueGray-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg w-full" type="submit">
                 Create Account
               </button>
             </div>

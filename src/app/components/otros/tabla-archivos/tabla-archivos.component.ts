@@ -1,48 +1,29 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { TableDropdownComponent } from "../../dropdowns/table-dropdown/table-dropdown.component";
+import { ArchivoService, CategoriaAgrupada } from '../../../services/archivos.service'; // Asegúrate de importar bien tu servicio
+import { InfoIconComponent } from '../../modals/info-icon/info-icon.component';
+import { ModalsGuiaComponent } from "../../modals/modals-guia/modals-guia.component";
 
 @Component({
   selector: 'app-tabla-archivos',
   standalone: true,
-  imports: [CommonModule, TableDropdownComponent],
+  imports: [CommonModule, TableDropdownComponent, InfoIconComponent, ModalsGuiaComponent],
   templateUrl: './tabla-archivos.component.html',
   styleUrl: './tabla-archivos.component.css'
 })
 export class TablaArchivosComponent {
+  @Input() color: string = 'light'; // Definido de forma simple
 
-  @Input()
-  get color(): string {
-    return this._color;
-  }
-  set color(color: string) {
-    this._color = color !== 'light' && color !== 'dark' ? 'light' : color;
-  }
-  private _color = 'light';
+  private archivoService = inject(ArchivoService);
+  archivos: CategoriaAgrupada[] = []; // Aquí cargaremos los archivos filtrados y agrupados
 
-  // Array que contiene los datos de las filas de la tabla
-  archivos = [
-    {
-      categoria: 'LÍDER DEL PESV',
-      numArchivos: '0 / 1',
-      estado: 'Pendiente',
-      porcentaje: 60
-    },
-    {
-      categoria: 'DOCUMENTOS LEGALES',
-      numArchivos: '1 / 1',
-      estado: 'Completado',
-      porcentaje: 100
-    },
-    {
-      categoria: 'ACTAS DE REUNIÓN',
-      numArchivos: '2 / 4',
-      estado: 'En Proceso',
-      porcentaje: 50
+  async ngOnInit() {
+    try {
+      this.archivos = await this.archivoService.getArchivosUsuarioLogueado(); // Cargar archivos desde el servicio
+      console.log(this.archivos);  // Para depuración
+    } catch (error) {
+      console.error('Error al cargar archivos: ', error);
     }
-  ];
-
-  constructor() {}
-
-
+  }
 }

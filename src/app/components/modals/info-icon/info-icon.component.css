@@ -1,0 +1,51 @@
+.relative {
+    position: relative;
+  }
+  
+  .absolute {
+    position: absolute;
+  }
+  
+  .z-50 {
+    z-index: 50;
+  }
+  
+  .bg-white {
+    background-color: white;
+  }
+  
+  .text-black {
+    color: black;
+  }
+  
+  .border {
+    border-width: 1px;
+  }
+  
+  .p-2 {
+    padding: 0.5rem;
+  }
+  
+  .rounded-md {
+    border-radius: 0.375rem;
+  }
+  
+  /* Ajustar el tamaño del modal y su comportamiento */
+  .w-64 {
+    max-width: 20rem; /* Ancho máximo del modal */
+    /*width: auto; /* Permitir que el ancho se ajuste según el contenido */
+  }
+  
+  /* Para que el texto no se desborde */
+  .break-words {
+    word-wrap: break-word; /* Permite que el texto haga saltos de línea dentro del modal */
+    white-space: normal; /* Permite saltos de línea */
+  }
+  
+  /* Ajustar el espacio interno y evitar que el texto salga del borde */
+  .text-center {
+    text-align: left;
+    white-space: normal; /* Permitir saltos de línea */
+    overflow-wrap: break-word; /* Asegurar que palabras largas se ajusten */
+  }
+  

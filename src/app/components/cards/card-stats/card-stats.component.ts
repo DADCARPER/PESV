@@ -80,6 +80,8 @@ export class CardStatsComponent implements OnInit {
   }
   private _statIconColor = "bg-red-500";
 
+  @Input() noMarginTop: boolean = false; // Nuevo input para controlar el margen superior
+
   constructor() {}
 
   ngOnInit(): void {}

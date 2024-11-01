@@ -1,0 +1,9 @@
+/* Estilo base para la tarjeta */
+.card-menu {
+    transition: transform 0.3s ease; /* Animación suave */
+  }
+  
+  /* Efecto de aumento al pasar el mouse */
+  .card-menu:hover {
+    transform: scale(1.05); /* Aumenta un poco la tarjeta */
+  }
