@@ -84,7 +84,7 @@ export const routes: Routes = [
   // Rutas protegidas (se requieren permisos con authGuard)
   { path: "starting", component: InicioComponent, canActivate: [authGuard] },
   { path: 'dashboard1', component: DashboardComponent, canActivate: [authGuard] },
-  { path: 'login1', component: LoginComponent, canActivate: [authGuard] },
+  { path: 'login1', component: LoginComponent },
   { path: 'actuar', component: ActuarComponent, canActivate: [authGuard] },
   { path: 'hacer', component: HacerComponent, canActivate: [authGuard] },
   { path: 'planear', component: PlanearComponent, canActivate: [authGuard] },

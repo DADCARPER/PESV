@@ -228,26 +228,6 @@
                       </div>
                     </div>
                   </div>
-              
-                  <!-- Confirmación de Designación -->
-                  <div class="flex flex-wrap">
-                    <div class="w-full lg:w-6/12 px-4">
-                      <div class="relative w-full mb-3">
-                        <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">Confirmación de Designación</label>
-                        <input formControlName="confirmacionDesignacion" type="checkbox" />
-                        <small class="text-blueGray-600"> ¿Confirma la designación del líder para el PESV?</small>
-                        <div *ngIf="form.get('confirmacionDesignacion')?.invalid && form.get('confirmacionDesignacion')?.touched">
-                          <small class="text-red-500">Debe confirmar la designación</small>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-              
-                  <!-- Botón de enviar -->
-                  <button type="submit" class="bg-red-600 text-white font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150">
-                    Guardar
-                  </button>
-                 
 
                   <div class="flex justify-center">
                     <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="500"  (click)="toggleTabs(3)" 
@@ -495,12 +475,20 @@
                   <div class="flex flex-wrap">
                     <div class="w-full lg:w-12/12 px-4">
                       <div class="relative w-full mb-3">
+                        <label class="text-blueGray-600 text-sm">
                         <input type="checkbox" formControlName="confirmacionInformacion" class="mr-2" />
-                        <label class="text-blueGray-600 text-sm">Confirmo que toda la información proporcionada es correcta y completa.</label>
+                        Confirmo que toda la información proporcionada es correcta y completa.</label>
+                        <div *ngIf="form.get('confirmacionInformacion')?.invalid && form.get('confirmacionInformacion')?.touched">
+                          <small class="text-red-500">Este campo es obligatorio</small>
+                        </div>
                       </div>
                       <div class="relative w-full mb-3">
+                        <label class="text-blueGray-600 text-sm">
                         <input type="checkbox" formControlName="compromisoLider" class="mr-2" />
-                        <label class="text-blueGray-600 text-sm">Acepto las responsabilidades asignadas y me comprometo a cumplir con el Plan Estratégico de Seguridad Vial.</label>
+                        Acepto las responsabilidades asignadas y me comprometo a cumplir con el Plan Estratégico de Seguridad Vial.</label>
+                        <div *ngIf="form.get('compromisoLider')?.invalid && form.get('compromisoLider')?.touched">
+                          <small class="text-red-500">Este campo es obligatorio</small>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -534,12 +522,21 @@
                     </div>
                   </div>
 
+                  <!-- Botón de enviar -->
+                  <button type="submit" class="bg-red-600 text-white font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150">
+                    Guardar
+                  </button>
+
+                  
+
                 </div>
               </div>
   
               <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="600" (click)="toggleTabs(4)" class="text-blueGray-500 bg-transparent border border-solid border-blueGray-500 hover:bg-blueGray-300 active:bg-blueGray-500 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
                 <i class="fas fa-arrow-left"></i> Regresar
               </button>
+
+              <app-pdf-lider-pesv></app-pdf-lider-pesv>
   
   
   

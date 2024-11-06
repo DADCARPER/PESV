@@ -2,14 +2,14 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { LoginService } from '../../services/login.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule,ReactiveFormsModule],
+  imports: [CommonModule,ReactiveFormsModule,RouterLink],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
@@ -22,10 +22,12 @@ export class LoginComponent {
   private _router = inject(Router);
 
   constructor(private fb: FormBuilder) {
+    
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
+    
   }
 
   onSubmit() {
@@ -35,16 +37,19 @@ export class LoginComponent {
 
         const user = userCredential.user;
 
+        this._authService.llamoDatosEmpresa(user.uid);
         console.log('Inicio de sesión exitoso');
-        console.log(user.uid);
-        console.log(user.email);
-        console.log(user.displayName);
-        console.log(user.photoURL);
-        console.log(user.emailVerified);
+        
+        // console.log(user.uid);
+        // console.log(user.email);
+        // console.log(user.displayName);
+        // console.log(user.photoURL);
+        // console.log(user.emailVerified);
         // Guardar userId en sessionStorage
         sessionStorage.setItem('userId', user.uid);
+
         // Redirigir a la página de dashboard
-        this._router.navigate(['/admin/planificar/responsabilidad']);
+        this._router.navigate(['/starting']);
 
       }).catch(error => {
 

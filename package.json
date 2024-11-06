@@ -29,6 +29,7 @@
     "firebase": "^10.13.1",
     "lottie-web": "^5.12.2",
     "ngx-lottie": "^12.0.0",
+    "pdfmake": "^0.2.15",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"
@@ -41,6 +42,7 @@
     "@angular/cli": "^17.3.9",
     "@angular/compiler-cli": "^17.2.0",
     "@types/jasmine": "~5.1.0",
+    "@types/pdfmake": "^0.2.9",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",

@@ -19,8 +19,23 @@ export class RegistroComponent implements OnInit {
   private _archivo = inject(ArchivoService);
   private _router = inject(Router);
 
+  datosEmpresa:any;
 
   ngOnInit(): void {
+    //Tomo datos del sessionstorage
+    const objetoempresaDataString = sessionStorage.getItem('empresaData');
+
+    if (objetoempresaDataString) {
+      this.datosEmpresa = JSON.parse(objetoempresaDataString);
+    
+      // Ahora puedes acceder al campo email
+      console.log('Email:', this.datosEmpresa.email);
+    } else {
+      console.log('No hay datos de empresa almacenados en sessionStorage.');
+    }
+
+
+    // Referente a la animacion
     AOS.init({
       duration: 1000, // Duración de las animaciones en milisegundos
       once: false,    // Las animaciones se pueden volver a ejecutar
