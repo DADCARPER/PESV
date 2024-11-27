@@ -1,0 +1,17 @@
+<div class="card-menu p-6 border rounded-xl border-r-gray-200 dark:border-gray-300 cursor-pointer">
+    <a [routerLink]="linkvamos? linkvamos : null" class="block no-underline">
+        <div class="md:flex md:items-start  ">
+            <div class="text-white p-5 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full {{colorIcono}}">
+                <i class="{{tipoIcono}}"></i>
+            </div>
+
+            <div class="mt-4 md:mx-4 md:mt-0">
+                <h1 class="text-xl font-medium text-gray-700 capitalize dark:text-white">{{titulo}}</h1>
+
+                <p class="text-base mt-3 text-gray-500 dark:text-gray-300">
+                    {{descripcion}}
+                </p>
+            </div>
+        </div>
+    </a>
+</div>

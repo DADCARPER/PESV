@@ -21,7 +21,7 @@ export class RegisterComponent {
     telefono: '',
     email: '',
     password: '',
-    nivelAcceso: 'basico' // Nivel de acceso por defecto
+    nivelAcceso: 'no' // Nivel de acceso por defecto
   };
 
   constructor(private loginService: LoginService, private firestore: Firestore, private router: Router) {}

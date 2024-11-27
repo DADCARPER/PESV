@@ -34,12 +34,14 @@ export class RegistroComponent implements OnInit {
       console.log('No hay datos de empresa almacenados en sessionStorage.');
     }
 
-
+    console.log('Iniciando AOS');
     // Referente a la animacion
     AOS.init({
       duration: 1000, // Duración de las animaciones en milisegundos
       once: false,    // Las animaciones se pueden volver a ejecutar
     });
+
+    console.log('AOS iniciado');
   }
 
   form = {

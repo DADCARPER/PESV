@@ -1,16 +1,51 @@
 <div class="flex flex-wrap">
-  <div class="w-full xl:w-8/12 mb-12 xl:mb-0 px-4">
-    <app-card-line-chart></app-card-line-chart>
+  <div class="grid grid-cols-1 md:grid-cols-2">
+    <!-- Primera tarjeta -->
+    <div class="w-full xl:mb-0 px-4">
+      <app-card-tarjeta
+      [icono]="'fas fa-redo'"
+      [titulo]="'Planear '"
+      [descripcion]="'Consiste en diseñar y planificar el PESV, identificando los objetivos, metas, recursos y estrategias para mejorar la seguridad vial dentro de la organización.'"
+      [color]="'bg-amber-400'"
+      [linkvamos]="'/admin/planificar'">
+      </app-card-tarjeta>
+    </div>
+
+
+    <!-- Segunda tarjeta -->
+    <div class="w-full xl:mb-0 px-4">
+      <app-card-tarjeta
+      [icono]="'fas fa-tasks'"
+      [titulo]="'Hacer'"
+      [descripcion]="'En esta fase, se implementan las acciones planificadas en el PESV, llevando a cabo las actividades y procedimientos definidos para cumplir con los objetivos de seguridad vial.'"
+      [color]="'bg-sky-400'">
+      </app-card-tarjeta>
+    </div>
+
   </div>
-  <div class="w-full xl:w-4/12 px-4">
-    <app-card-bar-chart></app-card-bar-chart>
+  <div class="grid grid-cols-1 md:grid-cols-2">
+    
+    
+    <!-- Tercera tarjeta -->
+    <div class="w-full xl:mb-0 px-4">
+      <app-card-tarjeta
+      [icono]="'fas fa-chart-line'"
+      [titulo]="'Verificar'"
+      [descripcion]="'Implica realizar un seguimiento y monitoreo de las actividades implementadas, evaluando si se están cumpliendo los objetivos según lo planificado.'"
+      [color]="'bg-emerald-400'">
+      </app-card-tarjeta>
+    </div>
+    <!-- Cuarta tarjeta -->
+    <div class="w-full xl:mb-0 px-4">
+      <app-card-tarjeta
+      [icono]="'fas fa-check'"
+      [titulo]="'Actuar'"
+      [descripcion]="'Basado en los resultados de la fase de verificación, ajustando las estrategias o corrigiendo fallos para optimizar la seguridad vial en la organización.'"
+      [color]="'bg-red-400'">
+      </app-card-tarjeta>
+    </div>
+
   </div>
+
 </div>
-<div class="flex flex-wrap mt-4">
-  <div class="w-full xl:w-8/12 mb-12 xl:mb-0 px-4">
-    <app-card-page-visits></app-card-page-visits>
-  </div>
-  <div class="w-full xl:w-4/12 px-4">
-    <app-card-social-traffic></app-card-social-traffic>
-  </div>
-</div>
+<br><br><br><br><br><br><br><br><br>

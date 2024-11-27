@@ -15,6 +15,8 @@ export class SidebarComponent implements OnInit {
   submenuOpen = false;
   submenuLiderOpen = false;
 
+  dashboardInicio = false;
+
   submenuPlanificar = false;
 
   submenuDiagnostico = false;

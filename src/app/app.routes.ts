@@ -1,12 +1,12 @@
 import { Routes } from '@angular/router';
 //import { LoginComponent } from './pages/login/login.component';
 import { authGuard } from './guards/auth.guard';
-import { DashboardComponent } from './pages/dashboard/dashboard.component';
+//import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { ActuarComponent } from './pages/actuar/actuar.component';
 import { HacerComponent } from './pages/hacer/hacer.component';
 import { PlanearComponent } from './pages/planear/planear.component';
 import { VerificarComponent } from './pages/verificar/verificar.component';
-//import { DashboardComponent } from './views/admin/dashboard/dashboard.component';
+import { DashboardComponent } from './views/admin/dashboard/dashboard.component';
 import { IndexComponent } from './views/index/index.component';
 import { LandingComponent } from './views/landing/landing.component';
 import { ProfileComponent } from './views/profile/profile.component';

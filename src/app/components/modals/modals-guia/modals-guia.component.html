@@ -11,7 +11,8 @@
       'max-w-3xl': tamano === 'regular',
       'max-w-6xl': tamano === 'large'
     }" 
-    class="relative mx-auto my-6 bg-white rounded-lg shadow-lg">
+    class="relative mx-auto my-6 bg-white rounded-lg shadow-lg"
+    data-aos="fade-down" data-aos-duration="1000">
     
     <!-- Título del modal -->
     <div class="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
@@ -22,18 +23,18 @@
     
     <!-- Contenido del modal -->
     <div class="relative p-6 flex-auto">
-        <p class="text-sm text-blueGray-500">
+        <p class="text-base text-blueGray-500 whitespace-pre-wrap">
             {{ contenido }}
         </p>
     </div>
     
     <!--footer-->
     <div class="flex items-center justify-end p-5 border-t border-solid border-blueGray-200 rounded-b">
-      <button class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" (click)="cerrarModal()">
-        Close
+      <button class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" (click)="handleCancel()">
+        {{ cancelar }}
       </button>
-      <button class="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" (click)="cerrarModal()">
-        Save Changes
+      <button class="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" (click)="handleSave()">
+        {{ ok }}
       </button>
     </div>
   </div>

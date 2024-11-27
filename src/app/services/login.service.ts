@@ -1,6 +1,5 @@
-import { Injectable } from '@angular/core';
-import { Auth, signInWithPopup, User, createUserWithEmailAndPassword } from '@angular/fire/auth';
-import { GoogleAuthProvider, signInWithEmailAndPassword } from 'firebase/auth';
+import { inject, Injectable } from '@angular/core';
+import { Auth, signInWithPopup, User, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, UserCredential  } from '@angular/fire/auth';
 import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 
 @Injectable({
@@ -8,7 +7,10 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 })
 export class LoginService {
 
-  constructor(public auth: Auth, private firestore: Firestore) {}
+  public errorMessage: string = "";
+
+  public auth = inject(Auth);
+  public firestore = inject(Firestore);
 
   // Método para iniciar sesión con Google
   loginWithGoogle() {
@@ -16,9 +18,10 @@ export class LoginService {
   }
 
   // Método para iniciar sesión con correo y contraseña
-  signInWithEmail(email: string, password: string) {
+  async signInWithEmail(email: string, password: string) {
     return signInWithEmailAndPassword(this.auth, email, password);
   }
+ 
 
   // Método para registrar un usuario con correo y contraseña
   registerWithEmail(email: string, password: string) {
@@ -33,17 +36,25 @@ export class LoginService {
 
       if (userDocSnap.exists()) {
         const userData = userDocSnap.data();
-        console.log('Empresa:', userData['nombreEmpresa']);
-        console.log('Email:', userData['email']);
-        console.log('NIT Empresa:', userData['nitEmpresa']);
-        console.log('Teléfono:', userData['telefono']);
+        // console.log('Empresa:', userData['nombreEmpresa']);
+        // console.log('Email:', userData['email']);
+        // console.log('NIT Empresa:', userData['nitEmpresa']);
+        // console.log('Teléfono:', userData['telefono']);
         // Almacena los datos en sessionStorage si deseas
+        sessionStorage.setItem('userId', userId);
         sessionStorage.setItem('empresaData', JSON.stringify(userData));
+        if (userData['nivelAcceso'] === 'no'){
+          return true;
+        }else{
+          return false;
+        }
       } else {
-        console.log('No existe el documento para el usuario especificado.');
+        return 'No existe el documento para el usuario especificado.';
       }
     } catch (error) {
-      console.error('Error al obtener los datos de la empresa:', error);
+      
+      return 'Error No hay acceso al documento';
+      
     }
   }
 

@@ -1,25 +1,81 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
+import { LiderDelPesvService } from '../../../services/lider-del-pesv.service';
+import { CommonModule } from '@angular/common';
 
 //pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
   selector: 'app-pdf-lider-pesv',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './pdf-lider-pesv.component.html',
   styleUrl: './pdf-lider-pesv.component.css'
 })
 export class PdfLiderPesvComponent implements OnInit {
 
+  private  liderDelPesvService = inject(LiderDelPesvService);
+
+  @Input() subirBlob: boolean = false;
+  @Input() descargaOprevia: string = "vista"; //True es igual a vista previa false a descargar
+  @Input() disenoboton: string = "diseno3"; // True diseño transparente
+  @Input() disenoIcono: string = ""; // Diseño Icono
+  @Input() nombreBoton: string = "Send";
+  @Input() idFormulario: string = "0"; // Se requiere el idFomulario que es el nombre del documento 
+  @Input() idusuario: string = "0"; // usuario logueado
+  @Input() nombreEmpresa: string = ""; // usuario logueado
+
+
+  
+  data: any = {};
+  datosEmpresa:any;
+  clases: { [key: string]: string } = {
+    diseno1: 'text-sky-500 bg-white border-sky-500 hover:bg-sky-500 hover:text-white border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150',
+    diseno2: 'text-green-500 bg-white border-green-500 hover:bg-green-500 hover:text-white border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150',
+    diseno3: 'text-red-500 bg-transparent border border-solid border-red-500 hover:bg-red-500 hover:text-white active:bg-red-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150',
+    diseno4: 'text-amber-500 bg-transparent border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150',
+    diseno5: 'text-teal-500 bg-transparent border border-solid border-teal-500 hover:bg-teal-500 hover:text-white active:bg-teal-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150',
+    diseno6: 'text-sky-500 bg-transparent border border-solid border-sky-500 hover:bg-sky-500 hover:text-white active:bg-sky-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150'
+  };
 
   ngOnInit(): void {
     // Asegúrate de que vfs esté asignado aquí
     pdfMake.vfs = pdfFonts.pdfMake;
+    
   }
 
-  generatePdf(): void {
+  async llamodatosFormulario(){
+    if (this.idFormulario !== "0"){
+
+   
+      const dataCruda = await this.liderDelPesvService.getfomularioEdit(this.idFormulario,this.idusuario);
+      console.log( dataCruda);
+        if (dataCruda.exists()) {
+          
+          this.data = dataCruda.data();
+          //console.log( 'xsxsxsxs'+this.data);
+
+          console.log('Datos cargados en el formulario:', this.data); //data['cargoLider']
+
+        } else {
+          console.error('No se encontraron datos para este formulario');
+        }
+
+  
+      console.log('SI HAY FORMULARIO')
+    }else{
+      console.log('NO HAY FORMULARIO');
+    }
+  }
+
+
+  async generatePdf(subirBlob:boolean): Promise<void> {
+
+    await this.llamodatosFormulario();
+
+    const fechaArray = this.descomponerFecha(this.data['fechaDesignacion']);
+
     // Define el contenido del PDF
     const documentDefinition = {
       pageSize: 'LETTER', // Tamaño carta (8.5 x 11 pulgadas)
@@ -27,7 +83,7 @@ export class PdfLiderPesvComponent implements OnInit {
       content: [
         { text: 'LÍDER DEL DISEÑO E IMPLEMENTACIÓN DEL PESV', style: 'header' },
         { text: '\n\n' },
-        { text: 'El representante legal de REDITOS EMPRESARIALES S.A., identificada con el NIT: 900.081.559 – 6, ha designado a ANDREA GUTIÉRREZ RESTREPO y quien desempeña el cargo de ANALISTA SST al interior de la organización, como representante de la Alta Dirección y líder del diseño e implementación del Plan Estratégico de Seguridad Vial (PESV) de La organización, de acuerdo con lo establecido en la Resolución 40595 de 2022 del Ministerio de Transporte “Por la cual se adopta la metodología para el diseño, implementación y verificación de los Planes Estratégicos de Seguridad Vial y se dictan otras disposiciones”. En ese sentido y dentro del marco de esta designación, le corresponde realizar lo siguiente:', style: 'normal', alignment: 'justify' },
+        { text: `El representante legal de ${this.nombreEmpresa.toUpperCase()}, identificada con el NIT: ${this.data['nitEmpresa'].toUpperCase()}, ha designado a ${this.data['nombreLider'].toUpperCase()} y quien desempeña el cargo de ${this.data['cargoLider'].toUpperCase()} al interior de la organización, como representante de la Alta Dirección y líder del diseño e implementación del Plan Estratégico de Seguridad Vial (PESV) de La organización, de acuerdo con lo establecido en la Resolución 40595 de 2022 del Ministerio de Transporte “Por la cual se adopta la metodología para el diseño, implementación y verificación de los Planes Estratégicos de Seguridad Vial y se dictan otras disposiciones”. En ese sentido y dentro del marco de esta designación, le corresponde realizar lo siguiente:`, style: 'normal', alignment: 'justify' },
         { text: '\n\n' },
         {
           ul: [
@@ -41,12 +97,12 @@ export class PdfLiderPesvComponent implements OnInit {
           margin: [20, 0, 0, 0] // Ajuste del margen izquierdo para desplazar la lista a la derecha
         },
         { text: '\n\n' },
-        { text: 'Este documento se firma a los treinta (30) días del mes de marzo de 2024.', style: 'normal' },
+        { text: `Este documento se firma al día (${fechaArray[2]}) del mes de ${fechaArray[1]} de ${fechaArray[0]}.`, style: 'normal' },
         { text: '\n\n' },
         {
           columns: [
-            { text: '_______________________________\nXXXXXXXXXXX\nRepresentante legal\nREDITOS EMPRESARIALES S.A.', style: 'signature' },
-            { text: '_______________________________\nANDREA GUTIÉRREZ RESTREPO\nAnalista SST\nREDITOS EMPRESARIALES', style: 'signature', alignment: 'right' }
+            { text: `_______________________________\n ${this.data['representanteLegal'].toUpperCase()}\nRepresentante legal\n${this.nombreEmpresa.toUpperCase()}.`, style: 'signature' },
+            { text: `_______________________________\n ${this.data['nombreLider'].toUpperCase()} \n ${this.data['cargoLider']} \n ${this.nombreEmpresa.toUpperCase()}.`, style: 'signature', alignment: 'right' }
           ]
         },
         { text: '', pageBreak: 'after' },
@@ -205,7 +261,50 @@ export class PdfLiderPesvComponent implements OnInit {
     };
 
     // Genera y abre el PDF
-    pdfMake.createPdf(documentDefinition).open();
+
+    if(this.descargaOprevia === "vista"){
+      pdfMake.createPdf(documentDefinition).open();
+    }else if(this.descargaOprevia === "descarga"){
+
+      const fechaActual = new Date().toISOString().split('T')[0]; // Formato: YYYY-MM-DD
+      const nombreArchivo = `${fechaActual}.pdf`;
+
+      pdfMake.createPdf(documentDefinition).download(nombreArchivo); //pdfMake.createPdf(documentDefinition).download(['holasdf.pdf']);
+
+    }else if(this.descargaOprevia === "imprimir"){
+      pdfMake.createPdf(documentDefinition).print();
+    }
+    
+
+    // Generar el PDF como un Blob y subirlo
+    if (subirBlob){
+      pdfMake.createPdf(documentDefinition).getBlob((blob:any) => {
+      
+        this.liderDelPesvService.uploadPdfToFirebase(blob,this.idusuario,this.idFormulario);
+  
+      });
+    }
+    
+
   }
+
+  descomponerFecha(fecha: string): string[] {
+    // Dividimos la fecha por el carácter '-' para obtener año, mes y día
+    const [ano, mesNumero, dia] = fecha.split("-");
+  
+    // Array con los nombres de los meses
+    const meses = [
+      "enero", "febrero", "marzo", "abril", "mayo", "junio",
+      "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+    ];
+  
+    // Convertimos el número del mes en texto
+    const mes = meses[parseInt(mesNumero, 10) - 1];
+  
+    // Retornamos el arreglo con el año, el mes y el día
+    return [ano, mes, dia];
+  }
+
+  
   
 }

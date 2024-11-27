@@ -5,7 +5,7 @@ import { provideStorage, getStorage } from '@angular/fire/storage';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { AppComponent } from './app/app.component';
 import { environment } from './app/environment/environmentdesarrollo';
-import { provideRouter, Router } from '@angular/router';
+import { provideRouter } from '@angular/router';
 import { routes } from './app/app.routes';
 import { provideLottieOptions } from 'ngx-lottie';
 import player from 'lottie-web';  // Import Lottie player
@@ -15,7 +15,7 @@ import 'aos/dist/aos.css';
 
 bootstrapApplication(AppComponent, {
   providers: [
-    provideFirebaseApp(() => initializeApp(environment)),
+    provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
     provideAuth(() => getAuth()),
     provideStorage(() => getStorage()), // Añadir Storage como proveedor
     provideFirestore(() => getFirestore()),
