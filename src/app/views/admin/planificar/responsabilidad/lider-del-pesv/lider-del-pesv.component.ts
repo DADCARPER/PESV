@@ -1,10 +1,9 @@
 import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { ArchivoService } from '../../../../../services/archivos.service';
 import { Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import AOS from 'aos'; // Importa AOS
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LiderDelPesvService } from '../../../../../services/lider-del-pesv.service';
 import { LoginService } from '../../../../../services/login.service';
 import { Auth } from '@angular/fire/auth';

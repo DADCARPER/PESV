@@ -36,6 +36,7 @@ import { ProgramasComponent } from './views/admin/planificar/programas/programas
 import { MatrizLegalComponent } from './views/admin/planificar/matriz-legal/matriz-legal.component';
 import { InicioComponent } from './views/admin/inicio/inicio.component';
 import { LiderDelPesvComponent } from './views/admin/planificar/responsabilidad/lider-del-pesv/lider-del-pesv.component';
+import { ComiteseguridadvialComponent } from './views/admin/planificar/responsabilidad/comiteseguridadvial/comiteseguridadvial.component';
 
 
 // Rutas principales
@@ -62,6 +63,7 @@ export const routes: Routes = [
       { path: "planificar", component: PlanificarComponent },
       { path: "planificar/responsabilidad", component: ResponsabilidadComponent },
       { path: "planificar/responsabilidad/liderdelpesv", component: LiderDelPesvComponent },
+      { path: "planificar/responsabilidad/comiteseguridadvial", component: ComiteseguridadvialComponent },
       { path: "planificar/evaluacion", component: EvaluacionComponent },
       { path: "planificar/diagnostico", component: DiagnosticoComponent },
       { path: "planificar/diagnostico/sociodemografia", component: SociodemografiaComponent },
