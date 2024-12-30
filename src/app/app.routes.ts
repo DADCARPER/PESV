@@ -37,6 +37,9 @@ import { MatrizLegalComponent } from './views/admin/planificar/matriz-legal/matr
 import { InicioComponent } from './views/admin/inicio/inicio.component';
 import { LiderDelPesvComponent } from './views/admin/planificar/responsabilidad/lider-del-pesv/lider-del-pesv.component';
 import { ComiteseguridadvialComponent } from './views/admin/planificar/responsabilidad/comiteseguridadvial/comiteseguridadvial.component';
+import { PoliticaseguridadvialComponent } from './views/admin/planificar/responsabilidad/politicaseguridadvial/politicaseguridadvial.component';
+import { LiderazgoYCompromisoComponent } from './views/admin/planificar/responsabilidad/liderazgo-y-compromiso/liderazgo-y-compromiso.component';
+import { ObjetivosMetasComponent } from './views/admin/planificar/responsabilidad/objetivos-metas/objetivos-metas.component';
 
 
 // Rutas principales
@@ -64,6 +67,9 @@ export const routes: Routes = [
       { path: "planificar/responsabilidad", component: ResponsabilidadComponent },
       { path: "planificar/responsabilidad/liderdelpesv", component: LiderDelPesvComponent },
       { path: "planificar/responsabilidad/comiteseguridadvial", component: ComiteseguridadvialComponent },
+      { path: "planificar/responsabilidad/politicaseguridadvial", component: PoliticaseguridadvialComponent },
+      { path: "planificar/responsabilidad/liderazgo_y_compromiso", component: LiderazgoYCompromisoComponent },
+      { path: "planificar/responsabilidad/objetivos_y_metas", component: ObjetivosMetasComponent },
       { path: "planificar/evaluacion", component: EvaluacionComponent },
       { path: "planificar/diagnostico", component: DiagnosticoComponent },
       { path: "planificar/diagnostico/sociodemografia", component: SociodemografiaComponent },

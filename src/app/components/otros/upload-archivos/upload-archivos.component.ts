@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, Input } from '@angular/core';
 import { Storage, ref, uploadBytesResumable, getDownloadURL } from '@angular/fire/storage';
 import { Firestore, setDoc, doc, arrayUnion } from '@angular/fire/firestore';
 
@@ -19,6 +19,9 @@ export class UploadArchivosComponent {
   private _storage = inject(Storage);
   private _firestore = inject(Firestore);
   private _cdr = inject(ChangeDetectorRef);
+
+  @Input() urlStore: string = "001-lider-del-pesv"; // True diseño transparente
+  @Input() urlFire: string = "liderDelPesv"; // True diseño transparente
 
   // Método para manejar la subida del archivo
   uploadFile(event: any) {
@@ -49,7 +52,7 @@ export class UploadArchivosComponent {
     const cleanFileName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
     const timestamp = Date.now(); // Marca de tiempo actual
     const uniqueFileName = `${timestamp}_${cleanFileName}`;
-    const filePath = `uploads/${userId}/001-lider-del-pesv/${uniqueFileName}`;
+    const filePath = `uploads/${userId}/${this.urlStore}/${uniqueFileName}`;
     const storageRef = ref(this._storage, filePath);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
@@ -62,12 +65,18 @@ export class UploadArchivosComponent {
         this.downloadURL = downloadURL;
         this._cdr.detectChanges();
 
-          const userDocRef = doc(this._firestore, `liderDelPesv/${userId}`);
+          const userDocRef = doc(this._firestore, `${this.urlFire}/${userId}`);
           setDoc(
             userDocRef, 
-            { [timestamp]: { URL: downloadURL, esto: 100, fechaCreacion: new Date(), nombrePDf: uniqueFileName, tipo: "Cargado" } },
+            { [timestamp]: { URL: downloadURL, estado: 100, fechaCreacion: new Date(), nombrePDf: uniqueFileName, tipo: "Cargado" } },
             { merge: true }).then(() => {
             console.log('Archivo guardado en Firestore');
+
+            // Esperamos 2 segundos y luego reiniciamos el progreso a 0
+            setTimeout(() => {
+              this.uploadProgress = 0;
+              this._cdr.detectChanges();
+            }, 2000); // 2000 ms = 2 segundos
             
           }).catch((error) => {
             console.error('Error al guardar en Firestore:', error);

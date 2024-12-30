@@ -1,6 +1,8 @@
 import { inject, Injectable } from '@angular/core';
-import { Auth, signInWithPopup, User, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, UserCredential  } from '@angular/fire/auth';
+import { Auth, user, signInWithPopup, User, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, UserCredential  } from '@angular/fire/auth';
 import { Firestore, doc, getDoc } from '@angular/fire/firestore';
+import { Subscription } from 'rxjs';
+
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +12,25 @@ export class LoginService {
   public errorMessage: string = "";
 
   public auth = inject(Auth);
+  public user$ = user(this.auth);  // Observable de conveniencia para obtener el estado del usuario
+  private userSubscription: Subscription;
+  public currentUser: User | null = null;  // Aquí almacenamos el estado actual del usuario
+
   public firestore = inject(Firestore);
+
+
+  constructor() {
+    // Nos suscribimos a los cambios del estado de usuario
+    this.userSubscription = this.user$.subscribe((aUser: User | null) => {
+      this.currentUser = aUser;
+      // Verificamos que currentUser no sea null
+        if (this.currentUser) {
+          console.log('UID del usuario actual:', this.currentUser.uid);
+        } else {
+          console.log('No hay usuario autenticado');
+        }
+    });
+  }
 
   // Método para iniciar sesión con Google
   loginWithGoogle() {
@@ -19,9 +39,13 @@ export class LoginService {
 
   // Método para iniciar sesión con correo y contraseña
   async signInWithEmail(email: string, password: string) {
-    return signInWithEmailAndPassword(this.auth, email, password);
+    return signInWithEmailAndPassword( this.auth, email, password);
   }
  
+  // Método para verificar si el usuario está autenticado
+  isAuthenticated(): boolean {
+    return this.currentUser !== null;
+  }
 
   // Método para registrar un usuario con correo y contraseña
   registerWithEmail(email: string, password: string) {
@@ -62,4 +86,15 @@ export class LoginService {
   logout() {
     return this.auth.signOut();
   }
+
+  ngOnDestroy() {
+    // Es importante desuscribirnos del observable cuando el servicio se destruye
+    this.userSubscription.unsubscribe();
+  }
+
+  // Método para obtener el UID del usuario logueado /// OJO TOMA UN TIEMPO EN CAMBIAR
+  getUserId(): string | null {
+    return this.currentUser ? this.currentUser.uid : null;
+  }
+
 }

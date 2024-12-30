@@ -1,0 +1,5 @@
+<button *ngIf="mostrarBotones" type="button" (click)="generatePdf(subirBlob)" [ngClass]="clases[disenoboton]">
+    
+    <i *ngIf="disenoIcono" [class]="'fas ' + disenoIcono"></i>
+    {{nombreBoton}}
+</button>

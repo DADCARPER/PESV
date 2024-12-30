@@ -1,9 +1,13 @@
-<div class="flex mt-12">
+<div *ngIf="isLoading">
+  <app-loading [isLoading]="isLoading" [loadingText]="'Cargando información...'"></app-loading>
+</div>
+<div *ngIf="!isLoading" class="flex mt-12">
     <div class="w-full  ">
       
         <div class="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">
             <div class="px-16 py-10 flex-auto">
                 <div class="tab-content tab-space">
+                  <app-pasopaso *ngIf="openTab > 1 && openTab < 6" [steps]="['Información general','Objetivos','Funciones y respoonsabilidad','Confirmación']"></app-pasopaso>
                     <div *ngIf="openTab === 0" >
   
                         <h1 data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" class="text-3xl font-normal leading-normal mt-0 text-blueGray-700" style="text-align: center;">Comité de Seguridad Vial (CSV)</h1><br>
@@ -193,7 +197,7 @@
 
                             <!-- Botón para agregar el integrante a la tabla -->
                             <div class="flex justify-center">
-                              <button type="button" class="text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" (click)="addIntegrante()">Agregar Integrante</button>
+                              <button type="button" class="text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-4 ease-linear transition-all duration-150" (click)="addIntegrante()">Agregar Integrante</button>
                             </div>
 
                             <div class="flex justify-center">
@@ -256,7 +260,7 @@
 
                             <div class="flex justify-center">
                               <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="500"  (click)="toggleTabs(3,'Avanza')" 
-                                class="text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+                                class="text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 mt-4" type="button">
                                 <i class="fas fa-arrow-right"></i> Siguiente
                               </button>
                             </div>
@@ -782,19 +786,149 @@
                               [disenoboton]="'diseno1'"
                               [descargaOprevia]="'descarga'"
                               [nombreEmpresa]="dataEmpresa2.nombreEmpresa"></app-pdf-lider-pesv> -->
+                              <app-pdf-comite-seguridad-vial
+                              [subirBlob]=false
+                              [idFormulario]="id_formulario"
+                              [idusuario]="'123456'"
+                              [nombreBoton]="'Vista previa'"
+                              [disenoboton]="'diseno1'"
+                              [descargaOprevia]="'vista'"
+                              [nombreEmpresa]="dataEmpresa2.nombreEmpresa"
+                              ></app-pdf-comite-seguridad-vial>
             
             
-                              <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="500"  (click)="toggleTabs(6,'Avanza')" 
-                                class="text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="submit">
+                              <button type="submit" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="500"
+                                class="text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">
                                 <i class="fas fa-arrow-right"></i> Terminar
                               </button>
 
-                              <!-- Botón para enviar el formulario -->
-                              <button type="submit">Guardar</button>
                             </div>
 
                           </div>
                         </div>
+                      </div>
+
+                      <div *ngIf="openTab === 6" class="flex flex-wrap">
+  
+          
+                        <div class="w-full xl:w-3/12 px-4 mt-12">
+                          <app-upload-archivos
+                          [urlStore]="'002-comite-de-seguridad-vial'"
+                          [urlFire]="'comiteSeguridadVial'"></app-upload-archivos>
+                        </div>
+                        <!-- Tabla de Documentos cargados o Formularios completos -->
+                        <div class="w-full xl:w-10/12 mb-12 xl:mb-0 px-4">
+                          <div class="rounded-t mb-0 px-4 py-3 border-0">
+                            <div class="flex flex-wrap items-center">
+                              <div class="relative w-full px-4 max-w-full flex-grow flex-1">
+                                <h3 class="font-semibold text-lg text-blueGray-700">
+                                  Documentos cargados
+                                </h3>
+                              </div>
+                            </div>
+                          </div>
+          
+                          <div class="block w-full overflow-x-auto">
+                            <table class="items-center w-full bg-transparent border-collapse">
+                              <thead>
+                                <tr>
+                                  <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
+                                    No.
+                                  </th>
+                                  <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
+                                    Nombre del Documento
+                                  </th>
+                                  <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
+                                    Tipo
+                                  </th>
+                                  <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
+                                    Estado
+                                  </th>
+                                  <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
+                                    Acciones
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr *ngFor="let document of documentData; let i = index">
+                                  <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
+                                    {{i + 1}}
+                                  </td>
+                                  <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
+                                    {{ document.nombrePDf || 'N/A' }}
+                                  </td>
+                                  <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
+                                    {{ document.tipo }}
+                                  </td>
+                                  <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
+                                    {{ document.estado }} %
+                                  </td>
+                                  <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
+                                    
+                                    <ng-container *ngIf="document.nombrePDf; else noNombre">
+          
+                                      <ng-container *ngIf="document.tipo === 'Asistente'; else archivoCargado">
+                                        <app-pdf-comite-seguridad-vial
+                                        [subirBlob]=false
+                                        [idFormulario]="document.id"
+                                        
+                                        [nombreBoton]="'Ver'"
+                                        [disenoboton]="'diseno6'"
+                                        [disenoIcono]="'fa-eye'"
+                                        [descargaOprevia]="'vista'"
+                                        [nombreEmpresa]="dataEmpresa2.nombreEmpresa"></app-pdf-comite-seguridad-vial>
+          
+                                        <app-pdf-comite-seguridad-vial
+                                        [subirBlob]=false
+                                        [idFormulario]="document.id"
+                                        
+                                        [nombreBoton]="''"
+                                        [disenoboton]="'diseno4'"
+                                        [disenoIcono]="'fa-download'"
+                                        [descargaOprevia]="'descarga'"
+                                        [nombreEmpresa]="dataEmpresa2.nombreEmpresa"></app-pdf-comite-seguridad-vial>
+          
+                                        <app-pdf-comite-seguridad-vial
+                                        [subirBlob]=false
+                                        [idFormulario]="document.id"
+                                        
+                                        [nombreBoton]="''"
+                                        [disenoboton]="'diseno5'"
+                                        [disenoIcono]="'fa-print'"
+                                        [descargaOprevia]="'imprimir'"
+                                        [nombreEmpresa]="dataEmpresa2.nombreEmpresa"></app-pdf-comite-seguridad-vial>
+                                      </ng-container>
+          
+                                      <ng-template #archivoCargado>
+          
+                                        <a [href]="document.URL" target="_blank" class="text-sky-500 bg-transparent border border-solid border-sky-500 hover:bg-sky-500 hover:text-white active:bg-sky-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">Ver</a>
+          
+                                      </ng-template>
+          
+                                    </ng-container>
+          
+                                    <ng-template #noNombre>
+                                      <!-- Contenedor alternativo cuando nombrePDf no tiene valor -->
+                                      <span class="text-red-500">Documento no disponible</span>
+                                    </ng-template>
+          
+                                  </td>
+                                </tr>
+                                <tr *ngIf="documentData.length === 0">
+                                  <td colspan="5" class="text-center py-4">No hay documentos disponibles.</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+          
+                       
+                        
+            
+                        <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="600" (click)="irdashboard()" class="text-blueGray-500 bg-transparent border border-solid border-blueGray-500 hover:bg-blueGray-300 active:bg-blueGray-500 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+                          <i class="fas fa-cog"></i> Finalizar
+                        </button>
+            
                       </div>
 
                     </form>
@@ -803,3 +937,15 @@
         </div>
     </div>
 </div>
+
+
+
+<app-modals-guia 
+  [titulo]="'Comité de Seguridad Vial'"
+  [contenido]="'Se encontro un Documento pendiente. \n Desea continuar ( SI )  Descartar ( NO )'"
+  [tamano]="'regular'"
+  [cancelar]="'NO'"
+  [ok]="'si'"
+  (onSave)="toggleTabs(2,'')"
+  (onCancel)="borroSessionIdFormulario()"
+  ></app-modals-guia>

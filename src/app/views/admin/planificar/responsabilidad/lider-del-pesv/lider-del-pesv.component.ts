@@ -39,7 +39,7 @@ export class LiderDelPesvComponent implements OnInit {
   resumenInformacion: string[] = []; // Array para almacenar el resumen de la información
   openTab = 0;
   porcentaje = 0;
-  tablaDocumentos: any;
+  
 
   tablaDocumentos$ = this.liderDelPesvService.leerDocumentoIndex(this.userId);
   
@@ -67,14 +67,6 @@ export class LiderDelPesvComponent implements OnInit {
 
     this.iniciarformulariolimpio();
     
-
-    //Codigo temporal se debe borrar
-      if (!this.userId) {
-        console.error('OJO nO ESTA LOGUEADO ');
-        //this.router.navigate(['/login']);
-      }else{
-        console.error('SI ESTOY LOGUEADO :',this.userId);
-      }
     AOS.init();
     
     

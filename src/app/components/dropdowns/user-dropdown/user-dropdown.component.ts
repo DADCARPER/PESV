@@ -1,6 +1,7 @@
-import { Component, AfterViewInit, ViewChild, ElementRef } from "@angular/core";
+import { Component, AfterViewInit, ViewChild, ElementRef, inject } from "@angular/core";
 import { CommonModule } from '@angular/common';
 import { createPopper } from "@popperjs/core";
+import { LoginService } from "../../../services/login.service";
 
 @Component({
   selector: "app-user-dropdown",
@@ -9,6 +10,8 @@ import { createPopper } from "@popperjs/core";
   templateUrl: "./user-dropdown.component.html",
 })
 export class UserDropdownComponent implements AfterViewInit {
+
+  private _auth = inject(LoginService);
   dropdownPopoverShow = false;
   @ViewChild("btnDropdownRef", { static: false }) btnDropdownRef!: ElementRef;
   @ViewChild("popoverDropdownRef", { static: false }) popoverDropdownRef!: ElementRef;
@@ -26,5 +29,9 @@ export class UserDropdownComponent implements AfterViewInit {
   toggleDropdown(event: Event) {
     event.preventDefault();
     this.dropdownPopoverShow = !this.dropdownPopoverShow;
+  }
+
+  salir(){
+    this._auth.logout();
   }
 }
