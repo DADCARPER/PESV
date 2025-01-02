@@ -1,1 +1,167 @@
-<p>diagnostico works!</p>
+<div *ngIf="isLoading">
+    <app-loading [isLoading]="isLoading" [loadingText]="'Cargando información...'"></app-loading>
+</div>
+<div *ngIf="!isLoading" class="flex mt-12">
+    <div class="w-full  ">
+        <div class="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">
+            <div class="px-16 py-10 flex-auto">
+                <div class="tab-content tab-space">
+                    <div *ngIf="openTab === 0" >
+
+                        <h1 data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" class="text-3xl font-normal leading-normal mt-0 text-blueGray-700" style="text-align: center;">Define los objetivos y metas de tu Plan Estratégico de Seguridad Vial (PESV)</h1><br>
+                
+                        <div style="text-align: justify;" class="text-xl font-light leading-relaxed mt-6 mb-4" > 
+        
+                        <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300" style="margin-bottom: 14px;">
+                          Los Objetivos y Metas son la brújula que guía todas las acciones de un PESV. Son como las metas que te propones al iniciar un nuevo proyecto, pero en este caso, están enfocadas a mejorar la seguridad vial en una organización.
+                        </p>
+
+                        <div class="flex flex-col md:flex-row justify-center items-center mt-6 mb-6 space-y-6 md:space-y-0 md:space-x-16">
+                            <div class="lg:w-1/3 sm:w-full ">
+                         
+                            <app-cards-boton
+                            (click)="toggleTabs(1,'')"
+                            [titulo]="'Cargar docmento'"
+                            [descripcion]="'Ya cuento con el documento de Política de Seguridad Vial'"
+                            [tipoIcono]="'fas fa-upload'"
+                            [colorIcono]="'bg-blue-500'"
+                            ></app-cards-boton>
+                            </div>
+                            <div class="lg:w-1/3 sm:w-full ">
+                            <app-cards-boton
+                            (click)="toggleTabs(1,'')"
+                            [titulo]="'Crear docmento'"
+                            [descripcion]="'Aún no tengo el documento. Iniciar proceso de creación ahora'"
+                            [tipoIcono]="'fas fa-rocket'"
+                            [colorIcono]="'bg-green-500'"></app-cards-boton>
+                            </div>
+
+                        </div>
+                        </div>
+                    </div>
+                    <div *ngIf="openTab === 1" class="flex flex-wrap">
+  
+          
+                        <div class="w-full xl:w-3/12 px-4 mt-12">
+                          <app-upload-archivos
+                          [urlStore]="'006-diagnostico'"
+                          [urlFire]="'006-diagnostico'"></app-upload-archivos>
+                        </div>
+                        <!-- Tabla de Documentos cargados o Formularios completos -->
+                        <div class="w-full xl:w-10/12 mb-12 xl:mb-0 px-4">
+                          <div class="rounded-t mb-0 px-4 py-3 border-0">
+                            <div class="flex flex-wrap items-center">
+                              <div class="relative w-full px-4 max-w-full flex-grow flex-1">
+                                <h3 class="font-semibold text-lg text-blueGray-700">
+                                  Documentos cargados
+                                </h3>
+                              </div>
+                            </div>
+                          </div>
+          
+                          <div class="block w-full overflow-x-auto">
+                            <table class="items-center w-full bg-transparent border-collapse">
+                              <thead>
+                                <tr>
+                                  <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
+                                    No.
+                                  </th>
+                                  <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
+                                    Nombre del Documento
+                                  </th>
+                                  <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
+                                    Tipo
+                                  </th>
+                                  <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
+                                    Estado
+                                  </th>
+                                  <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
+                                    Acciones
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr *ngFor="let document of documentData; let i = index">
+                                  <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
+                                    {{i + 1}}
+                                  </td>
+                                  <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
+                                    {{ document.nombrePDf || 'N/A' }}
+                                  </td>
+                                  <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
+                                    {{ document.tipo }}
+                                  </td>
+                                  <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
+                                    {{ document.estado }} %
+                                  </td>
+                                  <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
+                                    
+                                    <ng-container *ngIf="document.nombrePDf; else noNombre">
+          
+                                      <ng-container *ngIf="document.tipo === 'Asistente'; else archivoCargado">
+                                        <!-- <app-pdf-objetivos-metas
+                                        [mostrarBotones]=true
+                                        [subirBlob]=false
+                                        [idFormulario]="document.id"
+                                        [nombreBoton]="'Ver'"
+                                        [disenoboton]="'diseno6'"
+                                        [disenoIcono]="'fa-eye'"
+                                        [descargaOprevia]="'vista'"
+                                        [nombreEmpresa]="dataEmpresa2.nombreEmpresa"></app-pdf-objetivos-metas>
+                                        <app-pdf-objetivos-metas
+                                        [mostrarBotones]=true
+                                        [subirBlob]=false
+                                        [idFormulario]="document.id"
+                                        [nombreBoton]="''"
+                                        [disenoboton]="'diseno4'"
+                                        [disenoIcono]="'fa-download'"
+                                        [descargaOprevia]="'descarga'"
+                                        [nombreEmpresa]="dataEmpresa2.nombreEmpresa"></app-pdf-objetivos-metas>
+          
+                                        <app-pdf-objetivos-metas
+                                        [mostrarBotones]=true
+                                        [subirBlob]=false
+                                        [idFormulario]="document.id"
+                                        [nombreBoton]="''"
+                                        [disenoboton]="'diseno5'"
+                                        [disenoIcono]="'fa-print'"
+                                        [descargaOprevia]="'imprimir'"
+                                        [nombreEmpresa]="dataEmpresa2.nombreEmpresa"></app-pdf-objetivos-metas> -->
+                                      </ng-container>
+          
+                                      <ng-template #archivoCargado>
+          
+                                        <a [href]="document.URL" target="_blank" class="text-sky-500 bg-transparent border border-solid border-sky-500 hover:bg-sky-500 hover:text-white active:bg-sky-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">Ver</a>
+          
+                                      </ng-template>
+          
+                                    </ng-container>
+          
+                                    <ng-template #noNombre>
+                                      <!-- Contenedor alternativo cuando nombrePDf no tiene valor -->
+                                      <span class="text-red-500">Documento no disponible</span>
+                                    </ng-template>
+          
+                                  </td>
+                                </tr>
+                                <tr *ngIf="documentData.length === 0">
+                                  <td colspan="5" class="text-center py-4">No hay documentos disponibles.</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+          
+                       
+                        
+            
+                        <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="600" (click)="irdashboard()" class="text-blueGray-500 bg-transparent border border-solid border-blueGray-500 hover:bg-blueGray-300 active:bg-blueGray-500 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+                          <i class="fas fa-cog"></i> Finalizar
+                        </button>
+            
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
