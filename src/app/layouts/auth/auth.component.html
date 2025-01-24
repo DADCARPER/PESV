@@ -1,14 +1,9 @@
 <div>
-  <!-- <app-auth-navbar></app-auth-navbar> -->
-   <app-index-navbar></app-index-navbar>
   <main>
-    <section class="relative w-full h-full py-40 min-h-screen">
-      <div
-        class="absolute top-0 w-full h-full bg-blueGray-800 bg-no-repeat bg-full"
-        style="background-image: url('assets/img/register_bg_2.png')"
-      ></div>
-      <router-outlet></router-outlet>
-      <app-footer-small [absolute]="true"></app-footer-small>
+    <section class="py-10 bg-gray-900 h-screen sm:py-16 lg:py-24">
+      <div class="max-w-6xl px-4 mx-auto sm:px-6 lg:px-8">
+        <router-outlet></router-outlet>
+      </div>
     </section>
   </main>
 </div>

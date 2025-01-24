@@ -1,5 +1,5 @@
-import { inject, Injectable } from '@angular/core';
-import { Auth, user, signInWithPopup, User, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, UserCredential  } from '@angular/fire/auth';
+import { computed, inject, Injectable, signal } from '@angular/core';
+import { Auth, user, signInWithPopup, User, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, sendPasswordResetEmail, updatePassword  } from '@angular/fire/auth';
 import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 import { Subscription } from 'rxjs';
 
@@ -8,6 +8,9 @@ import { Subscription } from 'rxjs';
   providedIn: 'root',
 })
 export class LoginService {
+
+  private userSignal = signal<User | null>(null);
+  public userIdSignal = computed(() => this.userSignal()?.uid ?? null);
 
   public errorMessage: string = "";
 
@@ -23,6 +26,8 @@ export class LoginService {
     // Nos suscribimos a los cambios del estado de usuario
     this.userSubscription = this.user$.subscribe((aUser: User | null) => {
       this.currentUser = aUser;
+      this.userSignal.set(this.currentUser);
+
       // Verificamos que currentUser no sea null
         if (this.currentUser) {
           console.log('UID del usuario actual:', this.currentUser.uid);
@@ -95,6 +100,34 @@ export class LoginService {
   // Método para obtener el UID del usuario logueado /// OJO TOMA UN TIEMPO EN CAMBIAR
   getUserId(): string | null {
     return this.currentUser ? this.currentUser.uid : null;
+  }
+
+  // Método para obtener el UID del usuario logueado /// MEJORADO YA QUE USA SIGNAL
+  get getUserIdSignal(): User | null {
+    return this.userSignal();
+  }
+
+  //Metodo para actualizar la contraseña 
+  async updateUserPassword(newPassword: string): Promise<void> {
+  
+    try {
+      await updatePassword(this.currentUser!, newPassword);
+    } catch (error: any) {
+      //console.error('Error al actualizar contraseña:', error);
+      throw error;
+    }
+  }
+
+  // Método para restablecer contraseña mediante un email
+  async resetPassword(email: string): Promise<void> {
+    try {
+      await sendPasswordResetEmail(this.auth, email);
+      
+    } catch (error: any) {
+      console.error('Error al enviar email de recuperación:', error);
+      //this.errorMessage = this.getResetPasswordErrorMessage(error.code);
+      throw error;
+    }
   }
 
 }

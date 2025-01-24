@@ -40,6 +40,10 @@ import { ComiteseguridadvialComponent } from './views/admin/planificar/responsab
 import { PoliticaseguridadvialComponent } from './views/admin/planificar/responsabilidad/politicaseguridadvial/politicaseguridadvial.component';
 import { LiderazgoYCompromisoComponent } from './views/admin/planificar/responsabilidad/liderazgo-y-compromiso/liderazgo-y-compromiso.component';
 import { ObjetivosMetasComponent } from './views/admin/planificar/responsabilidad/objetivos-metas/objetivos-metas.component';
+import { PerfilComponent } from './views/admin/perfil/perfil.component';
+import { PerfilEmpresaComponent } from './views/admin/perfil-empresa/perfil-empresa.component';
+import { RestoreComponent } from './views/auth/restore/restore.component';
+import { FirmasComponent } from './views/admin/firmas/firmas.component';
 
 
 // Rutas principales
@@ -51,6 +55,7 @@ export const routes: Routes = [
     children: [
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
+      { path: 'reset', component: RestoreComponent },
       { path: "", redirectTo: "login", pathMatch: "full" },
     ],
   },
@@ -59,9 +64,12 @@ export const routes: Routes = [
   {
     path: "admin",
     component: AdminComponent,
+    canActivate: [authGuard],  // Protege todo el grupo
     children: [
       
       { path: "dashboard", component: DashboardComponent },
+      { path: "perfil", component: PerfilComponent },
+      { path: "gestor_firmas", component: FirmasComponent },
 
       { path: "planificar", component: PlanificarComponent },
       { path: "planificar/responsabilidad", component: ResponsabilidadComponent },
@@ -85,18 +93,18 @@ export const routes: Routes = [
       { path: "settings", component: SettingsComponent },
       { path: "tables", component: TablesComponent },
       { path: "maps", component: MapsComponent },
-      { path: "", redirectTo: "dashboard", pathMatch: "full" },
+
     ],
   },
 
   // Rutas protegidas (se requieren permisos con authGuard)
-  { path: "starting", component: InicioComponent, canActivate: [authGuard] },
-  { path: 'dashboard1', component: DashboardComponent, canActivate: [authGuard] },
-  { path: 'login1', component: LoginComponent },
-  { path: 'actuar', component: ActuarComponent, canActivate: [authGuard] },
-  { path: 'hacer', component: HacerComponent, canActivate: [authGuard] },
-  { path: 'planear', component: PlanearComponent, canActivate: [authGuard] },
-  { path: 'verificar', component: VerificarComponent, canActivate: [authGuard] },
+  // { path: "starting", component: InicioComponent, canActivate: [authGuard] },
+  // { path: 'dashboard1', component: DashboardComponent, canActivate: [authGuard] },
+  // { path: 'login1', component: LoginComponent },
+  // { path: 'actuar', component: ActuarComponent, canActivate: [authGuard] },
+  // { path: 'hacer', component: HacerComponent, canActivate: [authGuard] },
+  // { path: 'planear', component: PlanearComponent, canActivate: [authGuard] },
+  // { path: 'verificar', component: VerificarComponent, canActivate: [authGuard] },
 
   // Rutas sin layout
   { path: 'index', component: IndexComponent },
@@ -104,6 +112,6 @@ export const routes: Routes = [
   { path: 'profile', component: ProfileComponent },
 
   // Redirección por defecto
-  //{ path: '', redirectTo: '/auth/login', pathMatch: 'full' },
-  //{ path: '**', redirectTo: '/auth/login' }
+  { path: '', redirectTo: '/login1', pathMatch: 'full' },
+  { path: '**', redirectTo: '/login1' }
 ];

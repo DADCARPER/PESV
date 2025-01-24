@@ -1,37 +1,170 @@
-<div class="flex justify-center items-center h-screen bg-gray-100">
-    <div class="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
-      <h2 class="text-2xl font-bold text-center mb-6">Iniciar sesión</h2>
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-        <div *ngIf="errorMessage" class="error-message">
-          {{ errorMessage }}
-        </div>
-        <div class="mb-4">
-          <label for="email" class="block text-gray-700">Correo electrónico:</label>
-          <input id="email" formControlName="email" type="email"
-                 class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="text-red-500">
-            El correo es requerido y debe ser válido.
+
+      <div class="grid grid-cols-1 md:items-stretch md:grid-cols-2 gap-x-12 lg:gap-x-20 gap-y-10">
+          <div class="flex flex-col justify-between lg:py-5">
+              <div>
+                  <h2 class="text-3xl font-bold leading-tight text-white sm:text-4xl lg:leading-tight lg:text-5xl">Conectando seguridad y movilidad responsable!</h2>
+                  <p class="max-w-xl mx-auto mt-4 text-base leading-relaxed text-white">PESV Interactivo es un sistema innovador diseñado para empresas que buscan crear, implementar y gestionar su propio Plan Estratégico de Seguridad Vial.</p>
+
+                  <img class="relative z-10 max-w-xs mx-auto -mb-16 md:hidden" src="https://cdn.rareblocks.xyz/collection/celebration/images/contact/4/curve-line-mobile.svg" alt="" />
+
+                  <img class="hidden w-full translate-x-24 translate-y-8 md:block" src="https://cdn.rareblocks.xyz/collection/celebration/images/contact/4/curve-line.svg" alt="" />
+              </div>
+
+              <div class="hidden md:mt-auto md:block">
+                  <div class="flex items-center">
+                      <svg class="w-6 h-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path
+                              d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                          />
+                      </svg>
+                      <svg class="w-6 h-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path
+                              d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                          />
+                      </svg>
+                      <svg class="w-6 h-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path
+                              d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                          />
+                      </svg>
+                      <svg class="w-6 h-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path
+                              d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                          />
+                      </svg>
+                      <svg class="w-6 h-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path
+                              d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                          />
+                      </svg>
+                  </div>
+
+                  <blockquote class="mt-6">
+                      <p class="text-lg leading-relaxed text-white">A través de una plataforma intuitiva y totalmente personalizable, las organizaciones pueden cumplir con la normativa de seguridad vial, diseñar estrategias efectivas y fomentar una cultura de prevención y responsabilidad en el transporte.</p>
+                  </blockquote>
+
+                  <div class="flex items-center mt-8">
+                      <img class="flex-shrink-0 object-cover  h-14 " src="../../../assets/img/esva2.png" alt="" />
+                      <div class="ml-4">
+                          <p class="text-base font-semibold text-white">Soliciones Inegrales</p>
+                          <p class="mt-px text-sm text-gray-400">Diseñado por ES&VA</p>
+                      </div>
+                  </div>
+              </div>
           </div>
-        </div>
-        <div class="mb-6">
-          <label for="password" class="block text-gray-700">Contraseña:</label>
-          <input id="password" formControlName="password" type="password"
-                 class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="text-red-500">
-            La contraseña es requerida y debe tener al menos 6 caracteres.
+
+          <div class="lg:pl-12">
+              <div class="overflow-hidden bg-white rounded-md lg:mt-16">
+                  <div class="p-6 sm:p-10">
+                      <!-- <h3 class="text-3xl font-semibold text-black">Get a free quote</h3> -->
+                      <img src="../../../assets/img/logo.png" alt="Logo" class="h-20 mx-auto mb-6" />
+                      <!-- <p class="mt-4 text-base text-gray-600">Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint.</p> -->
+
+                        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                          <div class="space-y-6">
+                              <div>
+                                  <label for="email" class="text-base font-medium text-gray-900"> Correo electronico </label>
+                                  <div class="mt-2.5 relative">
+                                      <input
+                                        id="email" formControlName="email" type="email"
+                                        placeholder="Correo"
+                                        class="block w-full px-4 py-4 text-black placeholder-gray-500 transition-all duration-200 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 caret-orange-500"
+                                      />
+                                      @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+                                        @if (loginForm.get('email')?.errors?.['email']) {
+                                          <span class="text-red-500 text-sm mt-1 block">Por favor, ingresa un correo válido</span>
+                                        }
+                                      }
+                                     
+                                  </div>
+                              </div>
+
+                              <div>
+                                  <label for="password" class="text-base font-medium text-gray-900"> Contraseña </label>
+                                  <div class="mt-2.5 relative">
+                                      <input
+                                            id="password" formControlName="password" type="password"
+                                          class="block w-full px-4 py-4 text-black placeholder-gray-500 transition-all duration-200 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 caret-orange-500"
+                                      />
+                                      
+                                  </div>
+                              </div>
+
+                              <!-- <div>
+                                  <label for="" class="text-base font-medium text-gray-900"> Project brief </label>
+                                  <div class="mt-2.5 relative">
+                                      <textarea
+                                          name=""
+                                          id=""
+                                          placeholder="Enter your project brief"
+                                          class="block w-full px-4 py-4 text-black placeholder-gray-500 transition-all duration-200 bg-white border border-gray-200 rounded-md resize-y focus:outline-none focus:ring-orange-500 focus:border-orange-500 caret-orange-500"
+                                          rows="4"
+                                      ></textarea>
+                                  </div>
+                              </div> -->
+
+                              <div>
+                                  <button type="submit" class="inline-flex items-center justify-center w-full px-4 py-4 text-base font-semibold text-white transition-all duration-200 bg-orange-500 border border-transparent rounded-md focus:outline-none hover:bg-orange-600 focus:bg-orange-600">
+                                    Iniciar sesión
+                                  </button>
+                              </div>
+                              <div>
+                                <button type="button" [routerLink]="['/auth/register']" class="inline-flex items-center justify-center w-full px-4 py-4 text-base font-semibold text-white transition-all duration-200 bg-orange-500 border border-transparent rounded-md focus:outline-none hover:bg-orange-600 focus:bg-orange-600">
+                                  Registrarse
+                                </button>
+                            </div>
+                          </div>
+                      </form>
+                  </div>
+              </div>
           </div>
-        </div>
-        <button type="submit" [disabled]="loginForm.invalid" 
-                class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">
-          Iniciar sesión
-        </button>
-        
-        
-          <button type="button" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 mt-2" [routerLink]="['/auth/register']">
-            Crear PESV INTERACTIVO
-          </button>
-        
-      </form>
-    </div>
-  </div>
-  
+
+          <div class="md:hidden">
+              <div class="flex items-center">
+                  <svg class="w-6 h-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                          d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                      />
+                  </svg>
+                  <svg class="w-6 h-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                          d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                      />
+                  </svg>
+                  <svg class="w-6 h-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                          d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                      />
+                  </svg>
+                  <svg class="w-6 h-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                          d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                      />
+                  </svg>
+                  <svg class="w-6 h-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                          d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                      />
+                  </svg>
+              </div>
+
+              <blockquote class="mt-6">
+                  <p class="text-lg leading-relaxed text-white">You made it so simple. My new site is so much faster and easier to work with than my old site. I just choose the page, make the change and click save.</p>
+              </blockquote>
+
+              <div class="flex items-center mt-8">
+                  <img class="flex-shrink-0 object-cover w-40 h-40 rounded-full" src="../../../assets/img/esva.png" alt="" />
+                  <div class="ml-4">
+                      <p class="text-base font-semibold text-white">Soluciones integrales</p>
+                      <p class="mt-px text-sm text-gray-400">Product Designer</p>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+@if (alertaService.showAlert) {
+<app-alerta-informativo
+    [type]="alertaService.alertType"
+    [message]="alertaService.alertMessage">
+</app-alerta-informativo>
+}

@@ -1,9 +1,5 @@
-<nav
-  class="md:left-0 md:block md:fixed md:top-0 md:bottom-0 md:overflow-y-auto md:flex-row md:flex-nowrap md:overflow-hidden shadow-xl bg-white flex flex-wrap items-center justify-between relative md:w-64 z-10 py-4 px-6"
->
-  <div
-    class="md:flex-col md:items-stretch md:min-h-full md:flex-nowrap px-0 flex flex-wrap items-center justify-between w-full mx-auto"
-  >
+<nav class="md:left-0 md:block md:fixed md:top-0 md:bottom-0 md:overflow-y-auto md:flex-row md:flex-nowrap md:overflow-hidden shadow-xl bg-white flex flex-wrap items-center justify-between relative md:w-64 z-10 py-4 px-6">
+  <div class="md:flex-col md:items-stretch md:min-h-full md:flex-nowrap px-0 flex flex-wrap items-center justify-between w-full mx-auto">
     <!-- Toggler -->
     <button
       class="cursor-pointer text-black opacity-50 md:hidden px-3 py-1 text-xl leading-none bg-transparent rounded border border-solid border-transparent"
@@ -17,8 +13,36 @@
       [routerLink]="[]"
       class="md:block text-left md:pb-2 text-blueGray-600 mr-0 inline-block whitespace-nowrap text-sm uppercase font-bold p-4 px-0"
     >
-      <span class="block sm:hidden"> Tailwind Angular </span>
-      <span class="hidden sm:block"> Notus Angular </span>
+      <span class="block sm:hidden"> PESV INTERACTIVO </span>
+      <!-- <span class="hidden sm:block"> PESV INTERACTIVO LOGO</span> -->
+      
+        <!-- User -->
+         
+        <div class="md:flex mb-6 hidden flex-row flex-wrap items-center lg:ml-auto justify-center">
+          <ul class="flex-col  md:flex-row list-none items-center hidden md:flex">
+            <app-user-dropdown
+            size="w-32 h-32"
+            [imageUrl]="_logoimagen.hasLogo() ? _logoimagen.logoUrl : 'assets/img/user.png'"></app-user-dropdown>
+          </ul>
+        </div>
+       
+        
+        <!-- Form -->
+        <form class="md:flex hidden flex-row flex-wrap items-center lg:ml-auto">
+          <div class="relative flex w-full flex-wrap items-stretch">
+            <span
+              class="z-10 h-full leading-snug font-normal absolute text-center text-blueGray-300 absolute bg-transparent rounded text-base items-center justify-center w-8 pl-3 py-3"
+              ><i class="fas fa-search"></i
+            ></span>
+            <input
+              type="text"
+              placeholder="Search here..."
+              class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white bg-white rounded text-sm shadow outline-none focus:outline-none focus:ring w-full pl-10"
+            />
+          </div>
+        </form>
+        
+      
     </a>
     <!-- User -->
     <ul class="md:hidden items-center flex flex-wrap list-none">
@@ -26,18 +50,18 @@
         <app-notification-dropdown class="block"></app-notification-dropdown>
       </li>
       <li class="inline-block relative">
-        <app-user-dropdown class="block"></app-user-dropdown>
+        <app-user-dropdown class="block"
+        size="w-12 h-12"
+        [imageUrl]="_logoimagen.hasLogo() ? _logoimagen.logoUrl : 'assets/img/user.png'"></app-user-dropdown>
       </li>
     </ul>
     <!-- Collapse -->
-    <div
-      class="md:flex md:flex-col md:items-stretch md:opacity-100 md:relative md:mt-4 md:shadow-none shadow absolute top-0 left-0 right-0 z-40 overflow-y-auto overflow-x-hidden h-auto items-center flex-1 rounded"
+    <div 
+      class="md:flex md:flex-col md:items-stretch md:opacity-100 md:relative md:mt-0 md:shadow-none shadow absolute top-0 left-0 right-0 z-40 overflow-y-auto overflow-x-hidden h-auto items-center flex-1 rounded"
       [ngClass]="collapseShow"
     >
       <!-- Collapse header -->
-      <div
-        class="md:min-w-full md:hidden block pb-4 mb-4 border-b border-solid border-blueGray-200"
-      >
+      <div class="md:min-w-full md:hidden block pb-4 mb-4 border-b border-solid border-blueGray-200">
         <div class="flex flex-wrap">
           <div class="w-6/12">
             <a
@@ -70,7 +94,7 @@
       </form>
 
       <!-- Divider -->
-      <hr class="my-4 md:min-w-full" />
+      <!-- <hr class="my-4 md:min-w-full" /> -->
       <!-- Heading -->
       <!-- <h6
         class="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline"
@@ -92,6 +116,7 @@
                 ? 'text-orange-600 hover:text-orange-700'
                 : 'text-blueGray-700 hover:text-blueGray-500'
             "
+            (click)="toggleCollapseShow('hidden')"
           >
             <i class="fas fa-tv mr-2 text-sm"></i>
             Dashboard
@@ -112,7 +137,7 @@
                 Planear
                 <i class="fas ml-2" [ngClass]="submenuOpen ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
               </a>
-              <!-- Submenú "Líder" dentro de "Planear" 
+              Submenú "Líder" dentro de "Planear" 
               <ul class="ml-8" [ngClass]="submenuLiderOpen ? 'block' : 'hidden'">
                 <li class="items-center">
                   <a
@@ -155,7 +180,6 @@
                 ? 'text-orange-600 hover:text-orange-700'
                 : 'text-blueGray-700 hover:text-blueGray-500'
             "
-            (click)="toggleCollapseShow('hidden')"
           >
             <i
               class="fas fa-tools mr-2 text-sm"
@@ -166,8 +190,177 @@
             Planificar
             <i class="fas ml-2" [ngClass]="submenuPlanificar ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
           </a>
-              
-              <ul class="ml-8" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
+          
+            <ul class="ml-4" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
+              <li class="items-center">
+                <a
+                  [routerLink]="['/admin/planificar/responsabilidad/liderdelpesv']"
+                  class="text-xs uppercase py-2 font-bold block"
+                  routerLinkActive="text-orange-600 hover:text-orange-700"
+                  [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
+                  (click)="toggleCollapseShow('hidden')"
+                >
+                <i class="fas fa-user-tie text-blueGray-300 mr-3 text-sm"></i>
+                  líder del pesv
+                </a>
+              </li>
+            </ul>
+            <ul class="ml-4" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
+              <li class="items-center">
+                <a
+                  [routerLink]="['/admin/planificar/responsabilidad/comiteseguridadvial']"
+                  class="text-xs uppercase py-2 font-bold block"
+                  routerLinkActive="text-orange-600 hover:text-orange-700"
+                  [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
+                >
+                <i class="fas fa-users text-blueGray-300 mr-2 text-sm"></i>
+                  Comité seg. vial
+                </a>
+              </li>
+            </ul>
+            <ul class="ml-4" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
+              <li class="items-center">
+                <a
+                  [routerLink]="['/admin/planificar/responsabilidad/politicaseguridadvial']"
+                  class="text-xs uppercase py-2 font-bold block"
+                  routerLinkActive="text-orange-600 hover:text-orange-700"
+                  [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
+                >
+                <i class="fas fa-balance-scale text-blueGray-300 mr-2 text-sm"></i>
+                  Política seg. vial
+                </a>
+              </li>
+            </ul>
+            <ul class="ml-4" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
+              <li class="items-center">
+                <a
+                  [routerLink]="['/admin/planificar/responsabilidad/liderazgo_y_compromiso']"
+                  class="text-xs uppercase py-2 font-bold block"
+                  routerLinkActive="text-orange-600 hover:text-orange-700"
+                  [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
+                >
+                <i class="fas fa-hands-helping text-blueGray-300 mr-2 text-sm"></i>
+                  Liderazgo compro.
+                </a>
+              </li>
+            </ul>
+            <ul class="ml-4" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
+              <li class="items-center">
+                <a
+                  (click)="collapseDiagnostico()"
+                  [routerLink]="['/admin/planificar/diagnostico']"
+                  class="text-xs uppercase py-2 font-bold block"
+                  routerLinkActive="text-orange-600 hover:text-orange-700"
+                  [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
+                >
+                  <i class="fas fa-diagnoses text-blueGray-300 mr-2 text-sm"></i>
+                  Diagnóstico
+                  <i class="fas ml-2" [ngClass]="submenuDiagnostico ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                </a>
+                  <!-- Submenú "Diagnóstico" dentro de "Planificar" -->
+                  <ul class="ml-4" [ngClass]="submenuDiagnostico ? 'block' : 'hidden'">
+                    <li class="items-center">
+                      <a
+                        [routerLink]="['/admin/planificar/diagnostico/sociodemografia']"
+                        class="text-xs uppercase py-2 font-bold block cursor-pointer"
+                      >
+                        <i class="fas fa-user-friends text-blueGray-300 mr-1 text-sm"></i>
+                        Sociodemografia
+                        
+                      </a>
+                    </li>
+                  </ul>
+                  <ul class="ml-4" [ngClass]="submenuDiagnostico ? 'block' : 'hidden'">
+                    <li class="items-center">
+                      <a
+                        [routerLink]="['/admin/planificar/diagnostico/movilidad']"
+                        class="text-xs uppercase py-2 font-bold block cursor-pointer"
+                      >
+                        <i class="fas fa-car text-blueGray-300 mr-1 text-sm"></i>
+                        Movilidad
+                        
+                      </a>
+                    </li>
+                  </ul>
+                  <ul class="ml-4" [ngClass]="submenuDiagnostico ? 'block' : 'hidden'">
+                    <li class="items-center">
+                      <a
+                        [routerLink]="['/admin/planificar/diagnostico/factor_riesgo']"
+                        class="text-xs uppercase py-2 font-bold block cursor-pointer"
+                      >
+                        <i class="fas fa-exclamation-circle text-blueGray-300 mr-1 text-sm"></i>
+                        Factor riesgo
+                        
+                      </a>
+                    </li>
+                  </ul>
+                  <ul class="ml-4" [ngClass]="submenuDiagnostico ? 'block' : 'hidden'">
+                    <li class="items-center">
+                      <a
+                        [routerLink]="['/admin/planificar/diagnostico/accidentalidad']"
+                        class="text-xs uppercase py-2 font-bold block cursor-pointer"
+                      >
+                        <i class="fas fa-ambulance text-blueGray-300 mr-1 text-sm"></i>
+                        Accidentalidad
+                        
+                      </a>
+                    </li>
+                  </ul>
+                  <ul class="ml-4" [ngClass]="submenuDiagnostico ? 'block' : 'hidden'">
+                    <li class="items-center">
+                      <a
+                        [routerLink]="['/admin/planificar/diagnostico/encuestas']"
+                        class="text-xs uppercase py-2 font-bold block cursor-pointer"
+                      >
+                        <i class="fas fa-poll text-blueGray-300 mr-1 text-sm"></i>
+                        Encuestas
+                        
+                      </a>
+                    </li>
+                  </ul>
+                  <ul class="ml-4" [ngClass]="submenuDiagnostico ? 'block' : 'hidden'">
+                    <li class="items-center">
+                      <a
+                        [routerLink]="['/admin/planificar/diagnostico/evidencias']"
+                        class="text-xs uppercase py-2 font-bold block cursor-pointer"
+                      >
+                        <i class="fas fa-file-alt text-blueGray-300 mr-1 text-sm"></i>
+                        Evidencias
+                        
+                      </a>
+                    </li>
+                  </ul>
+              </li>
+            </ul>
+            <ul class="ml-4" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
+              <li class="items-center">
+                <a
+                  [routerLink]="['/admin/planificar']"
+                  class="text-xs uppercase py-2 font-bold block"
+                  routerLinkActive="text-orange-600 hover:text-orange-700"
+                  [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
+                >
+                <i class="fas fa-exclamation-triangle text-blueGray-300 mr-2 text-sm"></i>
+                  Evaluación riesgo
+                </a>
+              </li>
+            </ul>
+            <ul class="ml-4" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
+              <li class="items-center">
+                <a
+                  [routerLink]="['/admin/planificar/responsabilidad/objetivos_y_metas']"
+                  class="text-xs uppercase py-2 font-bold block"
+                  routerLinkActive="text-orange-600 hover:text-orange-700"
+                  [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
+                >
+                <i class="fas fa-bullseye text-blueGray-300 mr-3 text-sm"></i>
+                  Objetivos Metas
+                </a>
+              </li>
+            </ul>
+            
+
+              <ul class="ml-4" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
                 <li class="items-center">
                   <a
                     [routerLink]="['/admin/planificar/responsabilidad']"
@@ -175,138 +368,39 @@
                     routerLinkActive="text-orange-600 hover:text-orange-700"
                     [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
                   >
-                  <i class="fas fa-tv mr-2 text-sm"></i>
+                  <i class="fas fa-user-check text-blueGray-300 mr-2 text-sm"></i>
                     Responsabilidad
                   </a>
                 </li>
               </ul>
-              <ul class="ml-8" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
-                <li class="items-center">
-                  <a
-                    [routerLink]="['/admin/planificar/evaluacion']"
-                    class="text-xs uppercase py-2 font-bold block"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                  >
-                  <i class="fas fa-tv mr-2 text-sm"></i>
-                    Evaluación
-                  </a>
-                </li>
-              </ul>
-              <ul class="ml-8" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
-                <li class="items-center">
-                  <a
-                    (click)="collapseDiagnostico()"
-                    [routerLink]="['/admin/planificar/diagnostico']"
-                    class="text-xs uppercase py-2 font-bold block"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                  >
-                    <i class="fas fa-tv mr-2 text-sm"></i>
-                    Diagnóstico
-                    <i class="fas ml-2" [ngClass]="submenuDiagnostico ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-                  </a>
-                    <!-- Submenú "Diagnóstico" dentro de "Planificar" -->
-                    <ul class="ml-8" [ngClass]="submenuDiagnostico ? 'block' : 'hidden'">
-                      <li class="items-center">
-                        <a
-                          [routerLink]="['/admin/planificar/diagnostico/sociodemografia']"
-                          class="text-xs uppercase py-2 font-bold block cursor-pointer"
-                        >
-                          <i class="fas fa-users mr-1 text-sm"></i>
-                          Socio demografia
-                          
-                        </a>
-                      </li>
-                    </ul>
-                    <ul class="ml-8" [ngClass]="submenuDiagnostico ? 'block' : 'hidden'">
-                      <li class="items-center">
-                        <a
-                          [routerLink]="['/admin/planificar/diagnostico/movilidad']"
-                          class="text-xs uppercase py-2 font-bold block cursor-pointer"
-                        >
-                          <i class="fas fa-users mr-1 text-sm"></i>
-                          Movilidad
-                          
-                        </a>
-                      </li>
-                    </ul>
-                    <ul class="ml-8" [ngClass]="submenuDiagnostico ? 'block' : 'hidden'">
-                      <li class="items-center">
-                        <a
-                          [routerLink]="['/admin/planificar/diagnostico/factor_riesgo']"
-                          class="text-xs uppercase py-2 font-bold block cursor-pointer"
-                        >
-                          <i class="fas fa-users mr-1 text-sm"></i>
-                          Factor riesgo
-                          
-                        </a>
-                      </li>
-                    </ul>
-                    <ul class="ml-8" [ngClass]="submenuDiagnostico ? 'block' : 'hidden'">
-                      <li class="items-center">
-                        <a
-                          [routerLink]="['/admin/planificar/diagnostico/accidentalidad']"
-                          class="text-xs uppercase py-2 font-bold block cursor-pointer"
-                        >
-                          <i class="fas fa-users mr-1 text-sm"></i>
-                          Accidentalidad
-                          
-                        </a>
-                      </li>
-                    </ul>
-                    <ul class="ml-8" [ngClass]="submenuDiagnostico ? 'block' : 'hidden'">
-                      <li class="items-center">
-                        <a
-                          [routerLink]="['/admin/planificar/diagnostico/encuestas']"
-                          class="text-xs uppercase py-2 font-bold block cursor-pointer"
-                        >
-                          <i class="fas fa-users mr-1 text-sm"></i>
-                          Encuestas
-                          
-                        </a>
-                      </li>
-                    </ul>
-                    <ul class="ml-8" [ngClass]="submenuDiagnostico ? 'block' : 'hidden'">
-                      <li class="items-center">
-                        <a
-                          [routerLink]="['/admin/planificar/diagnostico/evidencias']"
-                          class="text-xs uppercase py-2 font-bold block cursor-pointer"
-                        >
-                          <i class="fas fa-users mr-1 text-sm"></i>
-                          Evidencias
-                          
-                        </a>
-                      </li>
-                    </ul>
-                </li>
-              </ul>
-          <ul class="ml-8" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
-            <li class="items-center">
-              <a
-                [routerLink]="['/admin/planificar/programas']"
-                class="text-xs uppercase py-2 font-bold block"
-                routerLinkActive="text-orange-600 hover:text-orange-700"
-                [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-              >
-              <i class="fas fa-tv mr-2 text-sm"></i>
-                Programas
-              </a>
-            </li>
-          </ul>
-          <ul class="ml-8" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
-            <li class="items-center">
-              <a
-                [routerLink]="['/admin/planificar/matriz_legal']"
-                class="text-xs uppercase py-2 font-bold block"
-                routerLinkActive="text-orange-600 hover:text-orange-700"
-                [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-              >
-              <i class="fas fa-tv mr-2 text-sm"></i>
-                Matriz legal
-              </a>
-            </li>
-          </ul>
+              
+              
+            <ul class="ml-4" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
+              <li class="items-center">
+                <a
+                  [routerLink]="['/admin/planificar/programas']"
+                  class="text-xs uppercase py-2 font-bold block"
+                  routerLinkActive="text-orange-600 hover:text-orange-700"
+                  [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
+                >
+                <i class="fas fa-tasks text-blueGray-300 mr-3 text-sm"></i>
+                  Programas riesgo
+                </a>
+              </li>
+            </ul>
+            <ul class="ml-4" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
+              <li class="items-center">
+                <a
+                  [routerLink]="['/admin/planificar/matriz_legal']"
+                  class="text-xs uppercase py-2 font-bold block"
+                  routerLinkActive="text-orange-600 hover:text-orange-700"
+                  [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
+                >
+                <i class="fas fa-gavel text-blueGray-300 mr-3 text-sm"></i>
+                  Matriz legal
+                </a>
+              </li>
+            </ul>
 
         </li>
 
@@ -324,10 +418,7 @@
           >
             <i
               class="fas fa-table mr-2 text-sm"
-              [ngClass]="
-                planificar.isActive ? 'opacity-75' : 'text-blueGray-300'
-              "
-            ></i>
+              [ngClass]="planificar.isActive ? 'opacity-75' : 'text-blueGray-300'"></i>
             Hacer
           </a>
         </li>
@@ -371,6 +462,7 @@
               [ngClass]="
                 actuar.isActive ? 'opacity-75' : 'text-blueGray-300'
               "
+              (click)="toggleCollapseShow('bg-white m-2 py-3 px-6')"
             ></i>
             Actuar
           </a>
@@ -378,16 +470,16 @@
       </ul>
 
       <!-- Divider -->
-      <hr class="my-4 md:min-w-full" />
+      <!-- <hr class="my-4 md:min-w-full" /> -->
       <!-- Heading -->
-      <h6
+      <!-- <h6
         class="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline"
       >
         Auth Layout Pages
-      </h6>
+      </h6> -->
       <!-- Navigation -->
 
-      <ul class="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
+      <!-- <ul class="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
         <li class="items-center">
           <a
             [routerLink]="['/auth/login']"
@@ -407,19 +499,19 @@
             Register
           </a>
         </li>
-      </ul>
+      </ul> -->
 
       <!-- Divider -->
-      <hr class="my-4 md:min-w-full" />
+      <!-- <hr class="my-4 md:min-w-full" /> -->
       <!-- Heading -->
-      <h6
+      <!-- <h6
         class="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline"
       >
         No Layout Pages
-      </h6>
+      </h6> -->
       <!-- Navigation -->
 
-      <ul class="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
+      <!-- <ul class="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
         <li class="items-center">
           <a
             [routerLink]="['/landing']"
@@ -439,18 +531,16 @@
             Profile Page
           </a>
         </li>
-      </ul>
+      </ul> -->
 
-      <!-- Divider -->
-      <hr class="my-4 md:min-w-full" />
+      <!-- Divider
+      <hr class="my-4 md:min-w-full" /> -->
       <!-- Heading -->
-      <h6
-        class="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline"
-      >
+      <!-- <h6 class="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
         Documentation
-      </h6>
+      </h6> -->
       <!-- Navigation -->
-      <ul class="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
+      <!-- <ul class="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
         <li class="inline-flex">
           <a
             href="https://www.creative-tim.com/learning-lab/tailwind/angular/colors/notus"
@@ -538,7 +628,7 @@
             VueJS
           </a>
         </li>
-      </ul>
+      </ul> -->
     </div>
   </div>
 </nav>

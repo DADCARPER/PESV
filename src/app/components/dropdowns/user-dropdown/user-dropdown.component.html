@@ -5,13 +5,12 @@
   #btnDropdownRef
 >
   <div class="items-center flex">
-    <span
-      class="w-12 h-12 text-sm text-white bg-blueGray-200 inline-flex items-center justify-center rounded-full"
-    >
+    <span [class]="size + ' text-sm text-white bg-white inline-flex items-center justify-center rounded-full shadow-md'">
       <img
         alt="..."
-        class="w-full rounded-full align-middle border-none shadow-lg"
-        src="assets/img/team-1-800x800.jpg"
+        class="w-full rounded-full object-cover"
+        
+        [src]="imageUrl"
       />
     </span>
   </div>
@@ -22,27 +21,30 @@
     [ngClass]="dropdownPopoverShow ? 'block' : 'hidden'"
   >
     <a
-      href="#pablo"
+      routerLink="/admin/perfil"
       class="text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700"
+      (click)="toggleDropdown($event)"
     >
-      Action
+      Perfil
     </a>
     <a
-      href="#pablo"
+      routerLink="/admin/gestor_firmas"
       class="text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700"
+      (click)="toggleDropdown($event)"
     >
-      Another action
+      Gestionar firmas
     </a>
-    <a
+    <!-- <a
       href="#pablo"
       class="text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700"
     >
       Something else here
-    </a>
+    </a> -->
     <div class="h-0 my-2 border border-solid border-blueGray-100"></div>
     <a
+      routerLink="/auth/login"
       class="text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700 cursor-pointer"
-      (click)="salir()"
+      (click)="salir($event)"
     >
       Salir
     </a>

@@ -1,0 +1,33 @@
+<div class="block w-full overflow-x-auto p-4">
+  <div class="upload-container">
+    @if (previewUrl) {
+      <img 
+        [src]="previewUrl" 
+        alt="Logo preview" 
+        class="preview-image"
+      >
+    }
+
+    <div class="button-container">
+      <input
+        type="file"
+        #fileInput
+        (change)="onFileSelected($event)"
+        accept="image/png"
+        style="display: none"
+      >
+      
+      <button 
+        (click)="fileInput.click()"
+        class="select-button">
+        Seleccionar Logo
+      </button>
+    </div>
+
+    @if (errorMessage) {
+      <div class="error-message text-red-500 mt-2">
+        {{ errorMessage }}
+      </div>
+    }
+  </div>
+</div>

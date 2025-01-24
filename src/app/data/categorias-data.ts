@@ -10,3 +10,68 @@ export const CATEGORIAS = [
     { id: '050-categoria-especial-final', nombre: 'Categoría especial final', nivel: 'avanzado' }
   ];
   
+export const options = [
+    "Amazonas",
+    "Antioquia",
+    "Arauca",
+    "Atlántico",
+    "Bolívar",
+    "Boyacá",
+    "Caldas",
+    "Caquetá",
+    "Casanare",
+    "Cauca",
+    "Cesar",
+    "Chocó",
+    "Córdoba",
+    "Cundinamarca",
+    "Guainía",
+    "Guaviare",
+    "Huila",
+    "La Guajira",
+    "Magdalena",
+    "Meta",
+    "Nariño",
+    "Norte de Santander",
+    "Putumayo",
+    "Quindío",
+    "Risaralda",
+    "San Andrés y Providencia",
+    "Santander",
+    "Sucre",
+    "Tolima",
+    "Valle del Cauca",
+    "Vaupés",
+    "Vichada"
+];
+
+export const ciudades = [
+  "Armenia",
+  "Barranquilla",
+  "Bogotá",
+  "Bucaramanga",
+  "Cali",
+  "Cartagena",
+  "Cúcuta",
+  "Ibagué",
+  "Manizales",
+  "Medellín",
+  "Montería",
+  "Neiva",
+  "Pereira",
+  "Popayán",
+  "Santa Marta",
+  "Sincelejo",
+  "Soacha",
+  "Tunja",
+  "Valledupar",
+  "Villavicencio"
+];
+
+export const tipodocumento = [
+  "CC",
+  "CE",
+  "PA",
+  "NIT",
+  "DIE"
+];

@@ -1,0 +1,40 @@
+.preview-image {
+    max-width: 200px;
+    margin-bottom: 1rem;
+  }
+  .upload-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .button-container {
+    display: flex;
+    gap: 1rem;
+  }
+  .select-button, .upload-button {
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    background-color: #3b82f6;
+    color: white;
+    cursor: pointer;
+  }
+  .select-button:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+  }
+  .progress-container {
+    width: 100%;
+    background-color: #e5e7eb;
+    border-radius: 0.25rem;
+    margin-top: 1rem;
+  }
+  .progress-bar {
+    height: 0.5rem;
+    background-color: #3b82f6;
+    border-radius: 0.25rem;
+    transition: width 0.3s ease;
+  }
+  .error-message {
+    color: #ef4444;
+    margin-top: 0.5rem;
+  }

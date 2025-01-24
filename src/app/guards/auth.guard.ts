@@ -1,24 +1,28 @@
 import { CanActivateFn } from '@angular/router';
 import { inject } from '@angular/core';
-import { Auth, onAuthStateChanged  } from '@angular/fire/auth';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { LoginService } from '../services/login.service';
 
 export const authGuard: CanActivateFn = (route, state) => {
-  const auth = inject(Auth);
+  const loginService = inject(LoginService);
   const router = inject(Router);
 
-  return new Observable<boolean>(subscriber => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        subscriber.next(true); // Usuario autenticado
-        subscriber.complete();
-      } else {
-        router.navigate(['/login']); // Redirigir al login si no está autenticado
-        subscriber.next(false);
-        subscriber.complete();
+  return new Promise<boolean>((resolve) => {
+    const subscription = loginService.user$.subscribe({
+      next: (user) => {
+        subscription.unsubscribe(); // Nos desuscribimos de forma segura
+        if (user) {
+          resolve(true);
+        } else {
+          router.navigate(['/login']);
+          resolve(false);
+        }
+      },
+      error: (error) => {
+        console.error('Error en el guard:', error);
+        router.navigate(['/login']);
+        resolve(false);
       }
     });
   });
-
 };

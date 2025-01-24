@@ -1,1 +1,105 @@
-<p>movilidad works!</p>
+<div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
+    <div class="rounded-t bg-white mb-0 px-6 py-6 border-0 shadow">
+      <div class="text-center flex justify-between">
+        <h6 class="text-blueGray-700 text-xl font-bold">Conducción y Movilidad</h6>
+        <!-- <button
+          class="bg-red-600 text-white active:bg-red-700 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
+          type="button"
+        >
+          Settings
+        </button> -->
+      </div>
+    </div>
+    <div class="flex-auto px-4 lg:px-10 py-10 pt-0">
+      <!-- <form [formGroup]="form" (ngSubmit)="onSubmit()"> -->
+        <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">
+          Conducción
+        </h6>
+        <div style="text-align: justify;" class="flex flex-wrap text-lg font-light leading-relaxed mt-6 mb-4">
+            <p style="margin-bottom: 14px;">
+                Bienvenido al módulo de diseño e implementación del PESV. En esta sección, te guiaremos a través de los pasos necesarios para completar la designación del líder responsable de este plan, de acuerdo con la Resolución 40595 de 2022 emitida por el Ministerio de Transporte de Colombia.
+            </p>
+            <p style="margin-bottom: 14px;">
+                La encuesta permite identificar que el 69,39% (68) conducen un vehículo automotor. Al indagar respecto a la forma más común de desplazamiento en sus viajes In Itinere el 40,82% (40) de los encuestados se desplaza como conductor de motocicleta, el 32,65% (32) lo realiza como pasajeros de transporte público, el 22,45% (22) conduce un vehículo tipo automovil y el 4,08% restante se desplaza en vehículos no automotores o caminando.
+            </p>
+        </div>
+
+        <div class="flex flex-wrap">
+            <div class="w-full lg:w-4/12 px-4 ">
+                <app-columns-stracked></app-columns-stracked>
+            </div>
+            <div class="w-full lg:w-8/12 px-4 ">
+                <app-columns-stracked-iconos></app-columns-stracked-iconos>
+                <!-- <table class="items-center bg-transparent border-collapse mx-auto">
+                    <thead>
+                      <tr>
+                        <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
+                          Conduce
+                        </th>
+                        <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
+                          Frecuencia
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                      <tr class="">
+                        <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap text-center">
+                            si
+                        </td>
+                        <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap text-center">
+                            30
+                        </td>
+                      </tr>
+                      <tr >
+                        <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap text-center">
+                            no
+                        </td>
+                        <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap text-center">
+                            80
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap text-center">
+                            no
+                        </td>
+                        <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap text-center">
+                            80
+                        </td>
+                      </tr>
+                      
+                    </tbody>
+                  </table> -->
+            </div>
+            
+        </div>
+        
+  
+        <hr class="mt-6 border-b-1 border-blueGray-300" />
+
+  
+        <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">
+            Movilidad en Misión
+        </h6>
+
+        <div style="text-align: justify;" class="flex flex-wrap text-lg font-light leading-relaxed mt-6 mb-4">
+            <p style="margin-bottom: 14px;">
+                Los viajes generados a causa de las funciones laborales desempeñadas, se denominan viajes misionales dado que se dan durante la jornada laboral establecida. De acuerdo a los datos procesados se puede evidenciar que el 27,55% (27) de los encuestados emplean algún vehículo automotor para desplazarse durante su jornada laboral. El tiempo utilizado para realizar estos desplazamientos se distribuye de la siguiente manera, el 25,93% conduce en lapsos de tiempo entre 2 a 3 horas, siendo el grupo de mayor frecuencia.
+            </p>
+            <p style="margin-bottom: 14px;">
+                Sin embargo, el siguiente grupo tiene una misma distribución de 22,2% las franjas de tiempo inferiores a 1 hora y entre 3 y 4 horas.
+            </p>
+        </div>
+
+        <div class="flex flex-wrap">
+          
+          <div class="w-full lg:w-4/12 px-4">
+            <app-columns-stracked></app-columns-stracked>
+          </div>
+          <div class="w-full lg:w-8/12 px-4">
+            <app-columns-stracked-horizontal></app-columns-stracked-horizontal>
+          </div>
+        </div>
+  
+        
+    </div>
+</div>

@@ -7,12 +7,14 @@
             <app-cards-menu
             [titulo]="'Líder del PESV'"
             [descripcion]="'Se asigna a una persona o equipo responsable del diseño, ejecución y seguimiento del PESV.'"
+            [tipoIcono]="'fas fa-user-tie'"
             [colorIcono]="'bg-amber-400'"
             [linkvamos]="'responsabilidad/liderdelpesv'"
             ></app-cards-menu>
             <app-cards-menu
             [titulo]="'Comité de seguridad vial'"
             [descripcion]="'Se crea un comité encargado de coordinar, monitorear y ejecutar las acciones del PESV.'"
+            [tipoIcono]="'fas fa-users'"
             [colorIcono]="'bg-amber-400'"
             [linkvamos]="'responsabilidad/comiteseguridadvial'"
             ></app-cards-menu>
@@ -22,6 +24,7 @@
             <app-cards-menu
             [titulo]="'Política de Seguridad Vial'"
             [descripcion]="'Se define y comunica una política de seguridad vial que establezca el compromiso de la alta dirección para cumplir con los objetivos del PESV.'"
+            [tipoIcono]="'fas fa-balance-scale'"
             [colorIcono]="'bg-amber-400'"
             [linkvamos]="'responsabilidad/politicaseguridadvial'"
             ></app-cards-menu>
@@ -29,8 +32,23 @@
             <app-cards-menu
             [titulo]="'Liderazgo y compromiso'"
             [descripcion]="'La alta dirección debe liderar y demostrar compromiso con la seguridad vial, asignando recursos, personal y tiempo necesarios.'"
+            [tipoIcono]="'fas fa-hands-helping'"
             [colorIcono]="'bg-amber-400'"
             [linkvamos]="'responsabilidad/liderazgo_y_compromiso'"></app-cards-menu>
+            
+          </div>
+          <div class="grid grid-cols-1 gap-8 mt-8 xl:mt-0 xl:gap-12 md:grid-cols-2">
+            <!-- Contenido -->
+            <app-cards-menu
+            [titulo]="'Diagnóstico'"
+            [descripcion]="'Se realiza un análisis de la situación actual en términos de seguridad vial (accidentes, condiciones de vehículos, comportamiento de conductores.).'"
+            [tipoIcono]="'fas fa-hands-helping'"
+            [colorIcono]="'bg-amber-400'"
+            [linkvamos]="'responsabilidad/liderazgo_y_compromiso'"></app-cards-menu>
+
+            <app-cards-menu
+            [titulo]="'Evaluación de riesgos'"
+            [descripcion]="'Se identifican y clasifican los riesgos de seguridad vial (por ejemplo: rutas peligrosas, fallas en vehículos, factores humanos).'"></app-cards-menu>
             
           </div>
           <div class="grid grid-cols-1 gap-8 mt-8 xl:mt-0 xl:gap-12 md:grid-cols-2">
@@ -40,21 +58,11 @@
             [descripcion]="'Se establecen objetivos específicos y medibles para mejorar la seguridad vial en la organización.'"
             [colorIcono]="'bg-amber-400'"
             [linkvamos]="'responsabilidad/objetivos_y_metas'"></app-cards-menu>
-
+            
             <app-cards-menu
             [titulo]="'Actas de reunión comité'"
             [descripcion]="'Se crea un comité encargado de coordinar, monitorear y ejecutar las acciones del PESV.'"></app-cards-menu>
-            
-          </div>
-          <div class="grid grid-cols-1 gap-8 mt-8 xl:mt-0 xl:gap-12 md:grid-cols-2">
-            <!-- Contenido -->
-            <app-cards-menu
-            [titulo]="'Evaluación de riesgos'"
-            [descripcion]="'Se identifican y clasifican los riesgos de seguridad vial (por ejemplo: rutas peligrosas, fallas en vehículos, factores humanos).'"></app-cards-menu>
-            <app-cards-menu
-            [titulo]="'Diagnóstico'"
-            [descripcion]="'Se realiza un análisis de la situación actual en términos de seguridad vial (accidentes, condiciones de vehículos, comportamiento de conductores.).'"></app-cards-menu>
-            
+
           </div>
           <div class="grid grid-cols-1 gap-8 mt-8 xl:mt-0 xl:gap-12 md:grid-cols-2">
             <!-- Contenido -->

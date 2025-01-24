@@ -1,0 +1,21 @@
+<div class="relative w-full mb-3">
+    <label *ngIf="label" class="block uppercase text-blueGray-600 text-xs font-bold mb-2">
+      {{label}}
+    </label>
+    <input
+      [formControl]="control"
+      [placeholder]="placeholder"
+      (focus)="showDropdown = true"
+      (blur)="hideDropdown()"
+      (keydown)="onKeyDown($event)"
+      class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+    />
+    <ul *ngIf="showDropdown && filteredOptions.length > 0"
+        class="options-list absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-40 overflow-y-auto">
+      <li *ngFor="let option of filteredOptions; let i = index"
+          (mousedown)="selectOption(option)"
+          [class]="'px-3 py-2 cursor-pointer ' + (i === selectedIndex ? 'bg-blue-100' : 'hover:bg-blue-100')">
+        {{option}}
+      </li>
+    </ul>
+  </div>

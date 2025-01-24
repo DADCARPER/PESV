@@ -1,0 +1,85 @@
+<div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-blueGray-100 border-0">
+
+    <!-- Loading overlay -->
+  <div *ngIf="loading" 
+  class="absolute inset-0 bg-gray-50/50 flex items-center justify-center">
+<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+</div>
+
+
+    <div class="rounded-t bg-white mb-0 px-6 py-4">
+      <div class="text-center flex justify-between">
+        <h6 class="text-blueGray-700 text-xl font-bold">ADMINISTRAR FIRMAS</h6>
+        <!-- <button
+          class="bg-red-600 text-white active:bg-red-700 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
+          type="button"
+        >
+          Settings
+        </button> -->
+      </div>
+    </div>
+    <div class="flex-auto px-2 lg:px-4 py-4 pt-4">
+
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                        #
+                    </th>
+                  <th *ngFor="let header of tableHeaders" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                    {{ header.label }}
+                  </th>
+                  <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                    Acción
+                  </th>
+                </tr>
+              </thead>
+              <tbody *ngIf="integrantes.length > 0; else noData" class="divide-y divide-gray-200 bg-white">
+                <tr *ngFor="let integrante of integrantes; let i = index" class="transition-colors hover:bg-gray-50">
+                    <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">{{ i + 1 }}</td>
+                    <td *ngFor="let header of tableHeaders" class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
+                        <ng-container [ngSwitch]="header.type">
+                          <!-- Si es imagen -->
+                          <ng-container *ngSwitchCase="'image'">
+                            <img 
+                              *ngIf="integrante[header.key]"
+                              [src]="integrante[header.key]" 
+                              [alt]="'Imagen de ' + integrante.nombres"
+                              class="w-40 object-cover"
+                            />
+                            <span *ngIf="!integrante[header.key]" class="text-gray-400">Sin imagen</span>
+                          </ng-container>
+                          
+                          <!-- Para texto y valor por defecto -->
+                          <ng-container *ngSwitchDefault>
+                            {{ integrante[header.key] }}
+                          </ng-container>
+                        </ng-container>
+                    </td>
+                  <td class="px-6 py-4 whitespace-nowrap  text-sm ">
+                    <button 
+                      (click)="editIntegrante(integrante)"
+                      class="text-blue-600 hover:text-blue-900 mr-2">
+                      Editar
+                    </button>
+                    <button 
+                      (click)="removeIntegrante(integrante.id)"
+                      class="text-red-600 hover:text-red-900">
+                      Eliminar
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            <ng-template #noData>
+              <tbody class="divide-y divide-gray-200 bg-white">
+                <tr>
+                  <td colspan="6" class="px-6 py-4 text-sm text-center text-gray-500">
+                    No hay datos disponibles
+                  </td>
+                </tr>
+              </tbody>
+            </ng-template>
+          </table>
+
+    </div>
+</div>

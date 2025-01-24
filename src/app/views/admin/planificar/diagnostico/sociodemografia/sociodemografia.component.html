@@ -1,92 +1,132 @@
 <div *ngIf="isLoading">
     <app-loading [isLoading]="isLoading" [loadingText]="'Cargando información...'"></app-loading>
 </div>
-<div *ngIf="!isLoading" class="flex mt-12">
-    <div class="w-full">
-        <div class="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded ">
-            <div class="px-4 md:px-8 lg:px-16 py-6 md:py-8 lg:py-10 flex-auto ">
-                <div class="tab-content tab-space">
-                    <!-- Nuevo contenedor flex -->
-                    <div class="flex flex-col lg:flex-row gap-4">
-                        <!-- Primer marco -->
-                        <div class="flex-1">
-                            <div class="relative flex flex-col min-w-0 break-words shadow-lg rounded">
-                                <div class="rounded-t mb-0 px-4 py-3 border-0">
-                                    <div class="flex flex-wrap items-center">
-                                        <div class="relative w-full px-4 max-w-full flex-grow flex-1">
-                                            <h3 class="font-semibold text-lg">
-                                                Subir Archivo
-                                            </h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                <hr>
-                                <div class="block w-full overflow-x-auto p-4">
-                                    aaaaa
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Segundo marco -->
-                        <div class="flex-1">
-                            <div class="relative flex flex-col min-w-0 break-words shadow-lg rounded">
-                                <div class="rounded-t mb-0 px-4 py-3 border-0">
-                                    <div class="flex flex-wrap items-center">
-                                        <div class="relative w-full px-4 max-w-full flex-grow flex-1">
-                                            <h3 class="font-semibold text-lg">
-                                                Subir Archivo
-                                            </h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                <hr>
-                                <div class="block w-full overflow-x-auto p-4">
-                                    aaaaa
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Tercer marco -->
-                        <div class="flex-1">
-                            <div class="relative flex flex-col min-w-0 break-words shadow-lg rounded">
-                                <div class="rounded-t mb-0 px-4 py-3 border-0">
-                                    <div class="flex flex-wrap items-center">
-                                        <div class="relative w-full px-4 max-w-full flex-grow flex-1">
-                                            <h3 class="font-semibold text-lg">
-                                                Subir Archivo
-                                            </h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                <hr>
-                                <div class="block w-full overflow-x-auto p-4">
-                                    aaaaa
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Cuarto marco -->
-                        <div class="flex-1">
-                            <div class="relative flex flex-col min-w-0 break-words shadow-lg rounded">
-                                <div class="rounded-t mb-0 px-4 py-3 border-0">
-                                    <div class="flex flex-wrap items-center">
-                                        <div class="relative w-full px-4 max-w-full flex-grow flex-1">
-                                            <h3 class="font-semibold text-lg">
-                                                Subir Archivo
-                                            </h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                <hr>
-                                <div class="block w-full overflow-x-auto p-4">
-                                    aaaaa
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
+<div *ngIf="!isLoading" class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
+    <div class="rounded-t bg-white mb-0 px-6 py-6 border-0 shadow">
+      <div class="text-center flex justify-between">
+        <h6 class="text-blueGray-700 text-xl font-bold">Caracterización de la Población</h6>
+        <!-- <button
+          class="bg-red-600 text-white active:bg-red-700 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
+          type="button"
+        >
+          Settings
+        </button> -->
+      </div>
+    </div>
+    <div class="flex-auto px-4 lg:px-10 py-10 pt-0">
+      <!-- <form [formGroup]="form" (ngSubmit)="onSubmit()"> -->
+        <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">
+            Caracterización sociodemográficas
+        </h6>
+        <div style="text-align: justify;" class="flex flex-wrap text-lg font-light leading-relaxed mt-6 mb-4">
+            <p style="margin-bottom: 14px;">
+                Se puede determinar que el 63,27% (62) de los colaboradores de MAPEI COLOMBIA S.A.S. son hombres y el 36,73% (36) son mujeres, es decir, de cada 3 colaboradores dos (2) son hombres y uno (1) es mujere. Según las cifras del Observatorio Nacional de seguridad vial, por cada 4,5 hombres con lesiones fatales se registra una (1) mujer con este mismo tipo de lesión, la encuesta arroja una tendencia de colaboradores del género masculino y según las estadísticas nacionales este grupo presenta un mayor riesgo de sufrir un accidente Sin embargo, la gestión en seguridad vial se debe implementar de manera general a todos los actores viales.  
+            </p>
+            <p style="margin-bottom: 14px;">
+                Así como tambien fue posible identificar que en cuanto a la edad, la población deMAPEI COLOMBIA S.A.S. es relativamente joven de acuerdo con los datos procesados el 64,29% (63) de los trabajadores tienen menos de 41 años de edad, el 23,47% (23) tiene más de 41 años y menos de 50 años, y el 12,24% (12) tiene más de 50 años de edad. Lo cual según el Observatorio Nacional de seguridad vial La población que más presento accidentes de tránsito se ubica entre los 18 a 24 años, lo cual sugiere incluirlos en estrategias de seguridad vial independientemente el rol vial que desempeñen.
+            </p>
         </div>
+
+        <div class="flex flex-wrap">
+            <div class="w-full lg:w-4/12 px-4 ">
+                <app-simple-pie></app-simple-pie>
+            </div>
+            <div class="w-full lg:w-8/12 px-4 ">
+                <app-line-column></app-line-column>
+                <!-- <table class="items-center bg-transparent border-collapse mx-auto">
+                    <thead>
+                      <tr>
+                        <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
+                          Conduce
+                        </th>
+                        <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
+                          Frecuencia
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                      <tr class="">
+                        <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap text-center">
+                            si
+                        </td>
+                        <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap text-center">
+                            30
+                        </td>
+                      </tr>
+                      <tr >
+                        <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap text-center">
+                            no
+                        </td>
+                        <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap text-center">
+                            80
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap text-center">
+                            no
+                        </td>
+                        <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap text-center">
+                            80
+                        </td>
+                      </tr>
+                      
+                    </tbody>
+                  </table> -->
+            </div>
+            
+        </div>
+        
+  
+        <hr class="mt-6 border-b-1 border-blueGray-300" />
+
+  
+        <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">
+            Caracteristicas Sociales
+        </h6>
+
+        <div style="text-align: justify;" class="flex flex-wrap text-lg font-light leading-relaxed mt-6 mb-4">
+            <p style="margin-bottom: 14px;">
+                El 10,42% (25)  De los trabajadores tienen una formación académica básica secundaria, el 18,75% (45) tienen una formación técnica o tecnóloga y el 7,50% (18) de la población objeto tienen una formación académica superior o profesional, de los cuales el 55,56% cuenta con posgrado (Maestría y/o especialización). 
+            </p>
+            <p style="margin-bottom: 14px;">
+                La estratificación socioeconómica es una clasificación en estratos de los inmuebles residenciales que deben recibir servicios públicos. Esto permite asignar subsidios y cobrar contribuciones en esta área.  Se puede evidenciar que el 83,67% de la muestra se ubica en los estratos uno (1), dos (2) y tres (3), el 14,29% se ubican en el estrato cuatro (4) y cinco (5) y el 2,04% en un nivel seis (6).
+            </p>
+        </div>
+
+        <div class="flex flex-wrap">
+          
+          <div class="w-full lg:w-4/12 px-4">
+            <app-donut></app-donut>
+          </div>
+          <div class="w-full lg:w-8/12 px-4">
+            <app-pie-monochrome></app-pie-monochrome>
+          </div>
+        </div>
+  
+        <hr class="mt-6 border-b-1 border-blueGray-300" />
+  
+        <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">
+          Salud
+        </h6>
+
+        <div style="text-align: justify;" class="flex flex-wrap text-lg font-light leading-relaxed mt-6 mb-4">
+            <p style="margin-bottom: 14px;">
+                De acuerdo con el boletín de prensa 362 del 2022 del Ministerio de salud, 4 de cada 10 personas adultas sufren de hipertensión arterial, pero cerca del 60% desconoce esa información. Al ser una variable importante para la salud de los colaboradores, MAPEI COLOMBIA S.A.S contempla estas variables para tomar medidas preventivas que mitiguen la aparición de este tipo de enfermedades crónicas. De acuerdo con la encuesta de percepción del riesgo realizada, el 8,16% padece de una enfermedad diagnosticada que requiere medicación, lo cual representa una variable a tratar desde la prevención ya que algunos medicamentos generan un impacto significativo sobre el estado cognitivo y el estado de alerta.
+            </p>
+        </div>
+
+        <div class="flex flex-wrap">
+          <div class="w-full lg:w-12/12 px-4">
+            <app-columns-stracked></app-columns-stracked>
+          </div>
+        </div>
+  
+        <button
+          class="bg-red-600 text-white active:bg-red-700 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
+          type="submit"
+        >
+          Tolo listo
+        </button>
+      <!-- </form> -->
     </div>
 </div>

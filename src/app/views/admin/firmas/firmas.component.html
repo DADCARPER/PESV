@@ -1,0 +1,16 @@
+<div class="flex flex-wrap">
+    <div class="w-full lg:w-4/12 px-4">
+      <app-form-firmas></app-form-firmas>
+      
+    </div>
+    <div class="w-full lg:w-8/12 px-4">
+      <app-tabla-simple
+          [integrantes]="integrantes()"
+          [tableHeaders]="tableHeaders"
+          [loading]="loading()"
+          (onDelete)="handleDelete($event)"
+          (onEdit)="handleEdit($event)">
+        </app-tabla-simple>
+      
+    </div>
+</div>

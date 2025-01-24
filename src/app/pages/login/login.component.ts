@@ -4,13 +4,15 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators} from '@angular
 import { LoginService } from '../../services/login.service';
 import { Router, RouterLink } from '@angular/router';
 import { AuthErrorCodes } from 'firebase/auth';
+import { AlertaInformativoComponent } from "../../components/alertas/alerta-informativo/alerta-informativo.component";
+import { AlertaService } from '../../services/alerta.service';
 
 
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule,ReactiveFormsModule,RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, AlertaInformativoComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
@@ -21,12 +23,13 @@ export class LoginComponent {
 
   private _authService = inject(LoginService);
   private _router = inject(Router);
+  public alertaService = inject(AlertaService);
 
   constructor(private fb: FormBuilder) {
     
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required]]
     });
     
   }
@@ -64,31 +67,31 @@ export class LoginComponent {
         switch (error.code) {
           case 'auth/invalid-email':
             console.error('Correo electrónico no válido');
-            this.errorMessage = 'El formato del correo electrónico no es válido.';
+            this.alertaService.showError('El formato del correo electrónico no es válido.');
             break;
           case 'auth/user-disabled':
             console.error('Usuario deshabilitado');
-            this.errorMessage = 'La cuenta de usuario ha sido deshabilitada.';
+            this.alertaService.showError('La cuenta de usuario ha sido deshabilitada.');
             break;
           case 'auth/user-not-found':
             console.error('Usuario no encontrado');
-            this.errorMessage = 'No existe una cuenta con este correo.';
+            this.alertaService.showError('No existe una cuenta con este correo.');
             break;
           case 'auth/wrong-password':
             console.error('Contraseña incorrecta');
-            this.errorMessage = 'La contraseña ingresada es incorrecta.';
+            this.alertaService.showError('La contraseña ingresada es incorrecta.');
             break;
           case 'auth/too-many-requests':
             console.error('Demasiados intentos fallidos');
-            this.errorMessage = 'Acceso temporalmente bloqueado. Inténtalo más tarde.';
+            this.alertaService.showError('Acceso temporalmente bloqueado. Inténtalo más tarde.');
             break;
           case 'auth/network-request-failed':
             console.error('Error de red');
-            this.errorMessage = 'Error de red. Verifica tu conexión.';
+            this.alertaService.showError('Error de red. Verifica tu conexión.');
             break;
           default:
             console.error('Error inesperado:', error.message);
-            this.errorMessage = 'Ocurrió un error inesperado. Inténtalo de nuevo.';
+            this.alertaService.showError('Ocurrió un error inesperado. Inténtalo de nuevo.');
         }
         
 
@@ -97,8 +100,11 @@ export class LoginComponent {
       }
       
     } else {
-      this.errorMessage = 'Por favor, completa el formulario correctamente.';
+      //this.errorMessage = 'Por favor, completa el formulario correctamente.';
+      //this.showWarningAlert('Por favor, completa el formulario correctamente.');
+      this.alertaService.showWarning('Por favor, completa el formulario correctamente.');
     }
   }
+
 
 }
