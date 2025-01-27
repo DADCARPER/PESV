@@ -1,0 +1,7 @@
+.truncate-multiline {
+    display: -webkit-box; /* Configura el contenedor como una caja flexible */
+  -webkit-line-clamp: 3; /* Número de líneas permitidas */
+  -webkit-box-orient: vertical; /* Orienta el contenido de forma vertical */
+  overflow: hidden; /* Oculta el contenido sobrante */
+  text-overflow: ellipsis; /* Añade los puntos suspensivos */
+  }

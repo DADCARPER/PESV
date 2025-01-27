@@ -67,7 +67,7 @@
                                   <div class="mt-2.5 relative">
                                       <input
                                         id="email" formControlName="email" type="email"
-                                        placeholder="Correo"
+                                        placeholder="Correo electronico"
                                         class="block w-full px-4 py-4 text-black placeholder-gray-500 transition-all duration-200 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 caret-orange-500"
                                       />
                                       @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
@@ -83,7 +83,7 @@
                                   <label for="password" class="text-base font-medium text-gray-900"> Contraseña </label>
                                   <div class="mt-2.5 relative">
                                       <input
-                                            id="password" formControlName="password" type="password"
+                                            id="password" formControlName="password" type="password" placeholder="Contraseña"
                                           class="block w-full px-4 py-4 text-black placeholder-gray-500 transition-all duration-200 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 caret-orange-500"
                                       />
                                       
@@ -110,7 +110,7 @@
                               </div>
                               <div>
                                 <button type="button" [routerLink]="['/auth/register']" class="inline-flex items-center justify-center w-full px-4 py-4 text-base font-semibold text-white transition-all duration-200 bg-orange-500 border border-transparent rounded-md focus:outline-none hover:bg-orange-600 focus:bg-orange-600">
-                                  Registrarse
+                                    Crea tu cuenta
                                 </button>
                             </div>
                           </div>

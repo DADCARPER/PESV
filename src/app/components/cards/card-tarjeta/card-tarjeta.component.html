@@ -2,11 +2,12 @@
     <a [routerLink]="[linkvamos]" class="block no-underline">
         <div class="card-tarjeta relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg" >
             <div class="px-4 py-5 flex-auto">
-                <div class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full {{color}}">
-                    <i class="{{icono}}"></i>
+                <div class="text-white p-3 -mt-16 text-center inline-flex items-center justify-center w-52 h-52 mb-5 shadow-lg rounded-full {{color}}">
+                    <!-- <i class="{{icono}}"></i> -->
+                    <img [src]="urlimg" alt="Planear">
                 </div>
                 <h6 class="text-xl font-semibold">{{titulo}}</h6>
-                <p class="mt-2 mb-4 text-blueGray-500 text-balance">
+                <p class="mt-2 mb-4 px-4 text-blueGray-500 text-balance text-justify">
                 {{descripcion}}
                 </p>
             </div>

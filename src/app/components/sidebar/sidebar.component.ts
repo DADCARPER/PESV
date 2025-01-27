@@ -7,6 +7,7 @@ import { Firestore } from '@angular/fire/firestore';
 import { FirestoreService } from "../../services/firestore.service";
 import { LoginService } from "../../services/login.service";
 import { SignalsService } from "../../services/signals.service";
+import { UserProfile } from "../../interfaces/perfil.interface";
 
 @Component({
   selector: "app-sidebar",
@@ -23,7 +24,7 @@ export class SidebarComponent implements OnInit {
   submenuPlanificar = false;
   submenuDiagnostico = false;
 
-  imgUrl: string = "";
+  datosUser: UserProfile={};
 
   //signals para mostrar imagenes IMPORTANTE se crea un servicio para manejar las señales
 
@@ -40,7 +41,10 @@ export class SidebarComponent implements OnInit {
     if (userId) {
       this._firestore.getDocument(`users/${userId}`).then(userData => {
         if (userData && userData["logoEmpresaURL"]) {
+          this.datosUser = userData;
           this._logoimagen.setLogoUrl(userData["logoEmpresaURL"]);
+          console.log("Logo cargado", userData["logoEmpresaURL"]);
+          console.log("ver todos los datos", this.datosUser.nombreEmpresa);
         }
       });
     }

@@ -12,6 +12,13 @@ module.exports = {
       '2xl': '1536px',
     },
     extend: {
+      colors: {
+        color1: '#f46c2d', // Naranja
+        color2: '#fcbc7c', // Melocotón
+        color3: '#202e48', // Azul oscuro
+        color4: '#5d7ba2', // Azul
+        color5: '#a4cbd1', // Azul claro
+      },
       keyframes: {
         slideIn: {
           '0%': { transform: 'translateX(100%)', opacity: '0' },

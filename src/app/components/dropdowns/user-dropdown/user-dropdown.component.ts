@@ -9,11 +9,14 @@ import { RouterLink } from "@angular/router";
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: "./user-dropdown.component.html",
+  styleUrl: './user-dropdown.component.css',
 })
 export class UserDropdownComponent implements AfterViewInit {
 
   @Input() size: string = 'w-24 h-24'; // Valor por defecto
   @Input() imageUrl: string = 'assets/img/team-1-800x800.jpg'; // Valor por defecto
+  @Input() nameEmpresa: string = '- - -'; // Valor por defecto
+  @Input() email: string = ' - - - '; // Valor por defecto
 
   private _auth = inject(LoginService);
   dropdownPopoverShow = false;

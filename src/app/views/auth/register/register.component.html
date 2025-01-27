@@ -69,7 +69,7 @@
                 <p class="mt-4 text-base text-gray-600 mb-4">Debes completar todos los campos.</p>
 
                   <form [formGroup]="registroForm" (ngSubmit)="onSubmit()">
-                    <div class="space-y-6">
+                    <div class="space-y-5">
                         <div>
                             
                             <div class="mt-2.5 relative">
@@ -78,12 +78,6 @@
                                   placeholder="Escribe tu nombre completo"
                                   class="block w-full px-4 py-4 text-black placeholder-gray-500 transition-all duration-200 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 caret-orange-500"
                                 />
-                                @if (registroForm.get('nombreCompleto')?.invalid && registroForm.get('nombreCompleto')?.touched) {
-                                  @if (registroForm.get('nombreCompleto')?.errors?.['nombreCompleto']) {
-                                    <span class="text-red-500 text-sm mt-1 block">Por favor, ingresa un correo válido</span>
-                                  }
-                                }
-                                
                             </div>
                         </div>
                         <div>
@@ -96,7 +90,7 @@
                               />
                               @if (registroForm.get('email')?.invalid && registroForm.get('email')?.touched) {
                                 @if (registroForm.get('email')?.errors?.['email']) {
-                                  <span class="text-red-500 text-sm mt-1 block">Por favor, ingresa un correo válido</span>
+                                  <span class="text-red-500 text-sm mt-0 block">Por favor, ingresa un correo válido</span>
                                 }
                               }
                               
@@ -164,9 +158,14 @@
                         
                         <div>
                           <button type="submit" [routerLink]="['/auth/register']" class="inline-flex items-center justify-center w-full px-4 py-4 text-base font-semibold text-white transition-all duration-200 bg-orange-500 border border-transparent rounded-md focus:outline-none hover:bg-orange-600 focus:bg-orange-600">
-                            Registrar
+                            Regístrate Ahora
                           </button>
-                      </div>
+                        </div>
+                        <div>
+                            <button type="button" [routerLink]="['/auth/login']" class="inline-flex items-center justify-center w-full px-4 py-4 text-base font-semibold text-white transition-all duration-200 bg-orange-500 border border-transparent rounded-md focus:outline-none hover:bg-orange-600 focus:bg-orange-600">
+                                Regresar a inicio de sesión
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>

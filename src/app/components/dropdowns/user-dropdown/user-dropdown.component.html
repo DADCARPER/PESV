@@ -1,20 +1,30 @@
+<div class="flex flex-col items-center text-center justify-center">
+
 <a
   class="text-blueGray-500 block"
-  href="#pablo"
   (click)="toggleDropdown($event)"
   #btnDropdownRef
 >
-  <div class="items-center flex">
+  <div class="items-center flex cursor-pointer">
     <span [class]="size + ' text-sm text-white bg-white inline-flex items-center justify-center rounded-full shadow-md'">
       <img
         alt="..."
-        class="w-full rounded-full object-cover"
+        class="w-full object-cover"
         
         [src]="imageUrl"
       />
     </span>
   </div>
 </a>
+
+  
+  
+    <h2 class="mt-2 text-gray-900 text-base items-center justify-center hidden md:flex whitespace-normal break-words w-full font-bold">{{nameEmpresa}}</h2>
+
+    <!-- requiere de un css personalizado llamado  truncate-multiline-->
+    <small class="font-light items-center justify-center hidden md:flex whitespace-normal break-words w-full lowercase">{{email}}</small>
+  </div>
+  <hr class="mt-4 border-b-1 border-blueGray-300 mb-0 hidden md:flex" />
 <div class="min-w-48 z-50" #popoverDropdownRef>
   <div
     class="bg-white text-base z-50 float-left py-2 list-none text-left rounded shadow-lg mt-1 min-w-48"

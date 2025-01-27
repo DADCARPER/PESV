@@ -9,18 +9,20 @@
       <i class="fas fa-bars"></i>
     </button>
     <!-- Brand -->
-    <a
+    <!-- <a
       [routerLink]="[]"
       class="md:block text-left md:pb-2 text-blueGray-600 mr-0 inline-block whitespace-nowrap text-sm uppercase font-bold p-4 px-0"
-    >
+    > -->
       <span class="block sm:hidden"> PESV INTERACTIVO </span>
       <!-- <span class="hidden sm:block"> PESV INTERACTIVO LOGO</span> -->
       
         <!-- User -->
          
-        <div class="md:flex mb-6 hidden flex-row flex-wrap items-center lg:ml-auto justify-center">
+        <div class="w-full md:flex mb-0 hidden flex-row flex-wrap items-center lg:ml-auto justify-center">
           <ul class="flex-col  md:flex-row list-none items-center hidden md:flex">
             <app-user-dropdown
+            [nameEmpresa]="datosUser.nombreEmpresa!"
+            [email]="datosUser.email!"
             size="w-32 h-32"
             [imageUrl]="_logoimagen.hasLogo() ? _logoimagen.logoUrl : 'assets/img/user.png'"></app-user-dropdown>
           </ul>
@@ -28,7 +30,7 @@
        
         
         <!-- Form -->
-        <form class="md:flex hidden flex-row flex-wrap items-center lg:ml-auto">
+        <!-- <form class="md:flex hidden flex-row flex-wrap items-center lg:ml-auto">
           <div class="relative flex w-full flex-wrap items-stretch">
             <span
               class="z-10 h-full leading-snug font-normal absolute text-center text-blueGray-300 absolute bg-transparent rounded text-base items-center justify-center w-8 pl-3 py-3"
@@ -40,10 +42,10 @@
               class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white bg-white rounded text-sm shadow outline-none focus:outline-none focus:ring w-full pl-10"
             />
           </div>
-        </form>
+        </form> -->
         
       
-    </a>
+    <!-- </a> -->
     <!-- User -->
     <ul class="md:hidden items-center flex flex-wrap list-none">
       <li class="inline-block relative">
