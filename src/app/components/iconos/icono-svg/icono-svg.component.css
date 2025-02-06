@@ -1,0 +1,23 @@
+:host {
+    display: inline-flex;
+    width: inherit;  
+    height: inherit; 
+  }
+  span {
+    display: flex;
+    line-height: 0;
+  }
+  .sm { width: 18px; height: 18px; }
+  .md { width: 40px; height: 40px; }
+  .lg { width: 80px; height: 80px; }
+  .lg2 { width: 140px; height: 140px; }
+  .auto { width: 100%; height: 100%; }
+  svg {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }

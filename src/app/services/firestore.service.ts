@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject,signal, computed } from '@angular/core';
 import { Firestore, doc, getDoc, setDoc, onSnapshot } from '@angular/fire/firestore'; //nueva API modular de Firebase 9+
 import { Storage, ref, uploadBytes, uploadBytesResumable, getDownloadURL } from '@angular/fire/storage';
 import { Observable } from 'rxjs';
@@ -10,8 +10,6 @@ export class FirestoreService {
 
   private firestore = inject(Firestore);
   private storage = inject(Storage);
-
-  constructor() { }
 
   async getDocument(path: string) {
 
@@ -26,6 +24,44 @@ export class FirestoreService {
     await setDoc(docRef, data,{ merge: true }) // Garantiza que no se sobrescriba todo el documento;
   }
 
+  ////////////INITIALIZE SIGNALS///////////////////////////
+
+  // Creamos un signal privado para almacenar los datos
+  private documentSignal = signal<any[]>([]);
+
+  // Creamos un signal computado de solo lectura para exponer los datos
+  public readonly documentData = computed(() => this.documentSignal());
+
+  // Método para inicializar la escucha en tiempo real del documento
+  initDocumentRealTime(path: string, iduser: string | null): () => void {
+    const docRef = doc(this.firestore, path + iduser);
+
+    // Retornamos la función de cleanup (unsubscribe)
+    const unsubscribe = onSnapshot(docRef, 
+      (docSnapshot) => {
+        if (docSnapshot.exists()) {
+          const data = docSnapshot.data();
+          // Actualizamos el signal con los nuevos datos
+          this.documentSignal.set(this.convertObjectToArray(data));
+        } else {
+          this.documentSignal.set([]);
+        }
+      },
+      (error) => {
+        console.error('Error en tiempo real:', error);
+        this.documentSignal.set([]);
+      }
+    );
+
+    return unsubscribe;
+  }
+
+  // Método el cual se llama para obtener el signal de solo lectura
+  getDocumentSignal() {
+    return this.documentSignal.asReadonly();
+  }
+  /////////////////////FIN SIGNALS///////////////////////////
+  
   // Método para escuchar cambios en un documento en tiempo real
   getDocumentRealTime(path: string, iduser: string | null): Observable<any> {
     //console.log("id",path+iduser)

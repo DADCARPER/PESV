@@ -48,3 +48,19 @@ export interface Integrante {
   // Otros campos que puedas tener
 }
 
+export interface Archivos {
+  
+  id: string;
+  URL: string;
+  estado: string;
+  fechaCreacion:Date;
+  fechaFormateada: string;
+  horaFormateada: string;
+  nombrePDf: string;
+  mostrar: boolean;
+  tipo: string;
+  type: string;
+
+}
+
+

@@ -1,18 +1,17 @@
 <!-- Botón para abrir el modal -->
-<button (click)="abrirModal()" class="bg-blue-500 text-white px-4 py-2 rounded">Abrir Modal</button>
+<!-- <button (click)="abrirModal()" class="bg-blue-500 text-white px-4 py-2 rounded">Abrir Modal</button> -->
 
 <!-- Fondo oscuro -->
-<div *ngIf="mostrarModal" class="fixed inset-0 z-40 bg-black opacity-25"></div>
+<div *ngIf="mostrarModal" (click)="cerrarModal()" class="fixed inset-0 z-40 bg-black opacity-25"></div>
 
 <!-- Modal -->
-<div *ngIf="mostrarModal" (click)="cerrarModal()" class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex">
+<div *ngIf="mostrarModal" (click)="cerrarModal()" class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex modal-fade-down">
   <div (click)="$event.stopPropagation()" [ngClass]="{
       'max-w-sm': tamano === 'small',
       'max-w-3xl': tamano === 'regular',
       'max-w-6xl': tamano === 'large'
     }" 
-    class="relative mx-auto my-6 bg-white rounded-lg shadow-lg"
-    data-aos="fade-down" data-aos-duration="1000">
+    class="relative mx-auto my-6 bg-white rounded-lg shadow-lg">
     
     <!-- Título del modal -->
     <div class="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">

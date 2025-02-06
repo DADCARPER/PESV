@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import AOS from 'aos'; // Importa AOS
+
 
 @Component({
   selector: 'app-modals-guia',
@@ -13,21 +13,22 @@ export class ModalsGuiaComponent {
 
   @Input() titulo: string = 'Modal Título'; // Título del modal
   @Input() contenido: string = 'Este es el contenido del modal.'; // Contenido del modal
-  @Input() tamano: 'small' | 'regular' | 'large' = 'regular'; // Tamaño del modal
+  @Input() tamano: string = 'regular'; //'small' | 'regular' | 'large' // Tamaño del modal
   @Input() cancelar: string = 'Cerrar'; // Título del modal
   @Input() ok: string = 'OK'; // Título del modal
-  mostrarModal = false; // Controla si el modal está visible
+  @Input() mostrarModal = false; // Controla si el modal está visible
 
   @Output() onSave = new EventEmitter<void>(); // Evento que emitiremos al hacer clic en "Save Changes"
   @Output() onCancel = new EventEmitter<void>(); // Evento que emitiremos al hacer clic en "Save Changes"
 
   ngOnInit(): void {
-    AOS.init(); // Inicializar AOS una vez
+    
   }
 
   // Método para cerrar el modal
   cerrarModal() {
     this.mostrarModal = false;
+    this.onCancel.emit(); // Añade esta línea
   }
 
   // Método para abrir el modal

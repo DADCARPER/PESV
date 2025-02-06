@@ -1,0 +1,52 @@
+<div class="card-tarjeta rounded-xl border border-gray-100 bg-white p-4 mt-4">
+    <div class="flex items-start">
+      
+        <div class="w-14 h-14">
+            <app-icono-svg 
+            [name]="archivo.tipoIcono"
+            [mimeType]="archivo.tipoMime"
+            [color]="archivo.colorIcono" 
+            size="auto">
+            </app-icono-svg>
+        </div>
+        
+    
+        <div class="flex-1">  
+            <strong class="block font-medium text-gray-900 truncate w-36 sm:w-40 md:w-48  lg:w-52 "> {{ archivo.nombre }} </strong>
+
+            <p class="mt-1 text-sm text-gray-700">Tipo : {{ archivo.tipo }}.</p>
+            <p class="mt-1 text-sm text-gray-700">Fecha : {{ archivo.fecha }}.</p>
+
+            <div class="mt-4 flex gap-2">
+                
+                <a 
+                    href="{{ archivo.uRL }}" target="_blank" type="button" 
+                    class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white transition-all duration-200 bg-orange-500 border border-transparent rounded-md focus:outline-none hover:bg-orange-600 focus:bg-orange-600"
+                    >
+                    Descarga 
+                    <app-icono-svg name="descarga" color="#fff" size="sm" class="pl-1"></app-icono-svg>
+                </a>
+
+            </div>
+        </div>
+    
+        <button 
+          class="text-gray-500 transition hover:text-gray-600 focus:outline-none"
+          (click)="eliminarArchivo()">
+          <app-icono-svg name="equix" color="#71717a" size="sm" class="pl-1"></app-icono-svg>
+        </button>
+        
+
+    </div>
+</div>
+
+<app-modals-guia
+  [titulo]="modalConfig.titulo"
+  [contenido]="modalConfig.contenido"
+  [tamano]="modalConfig.tamano"
+  [mostrarModal]="modalConfig.mostrar"
+  [ok]="'Si'"
+  [cancelar]="'No'"
+  (onSave)="guardarCambios()"
+  (onCancel)="cancelarCambios()">
+</app-modals-guia>

@@ -1,36 +1,39 @@
-<div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded" 
-     [ngClass]="color === 'light' ? 'bg-white' : 'bg-orange-400 text-white'">
+<div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-white">
   <div class="rounded-t mb-0 px-4 py-3 border-0">
     <div class="flex flex-wrap items-center">
       <div class="relative w-full px-4 max-w-full flex-grow flex-1">
-        <h3 class="font-semibold text-lg" 
-            [ngClass]="color === 'light' ? 'text-blueGray-700' : 'text-white'">
-          Subir Archivo
+        <h3 class="font-semibold text-lg text-blueGray-700">
+          Subir Documentos
         </h3>
       </div>
     </div>
   </div>
   <hr>
   <div class="block w-full overflow-x-auto p-4"> <!-- Añadimos padding aquí para margen interno -->
-    <div class="mb-4">
-      <label for="category-select" class="block text-blueGray-700 text-sm font-bold mb-2">Selecciona una categoría</label>
-      <select id="category-select" [(ngModel)]="category" class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
-        <option value="" disabled selected>Seleccione una categoría</option>
-        <!-- Aquí se muestran las categorías filtradas -->
-        <option *ngFor="let categoria of categoriasDisponibles" [value]="categoria.id">
-          {{ categoria.nombre }}
-        </option>
-      </select>
+    <div class="relative ">
+
+      <div *ngIf="cargando" class="absolute inset-0  flex flex-col  items-center justify-center bg-white " style="margin-top: -10px;">
+        
+        <app-loading
+              [isLoading]="cargando"
+              loadingText="Procesando datos...">
+        </app-loading>
+
+      </div>
+
+      
+        <!-- Input de archivo oculto -->
+        <input type="file" id="file-upload" (change)="uploadFile($event)" class="hidden">
+      
+        <!-- Etiqueta que simula el botón con un ícono -->
+        <label for="file-upload" class="cursor-pointer flex flex-col items-center justify-center mt-4">
+          <i class="fas fa-file-upload text-6xl text-blueGray-200"></i>
+          <p class="text-blueGray-200 text-lg mt-2">Haz clic aquí</p>
+        </label>
+      
+
     </div>
-
-    <!-- Input de archivo oculto -->
-    <input type="file" id="file-upload" (change)="uploadFile($event)" class="hidden">
-
-    <!-- Etiqueta que simula el botón con un ícono -->
-    <label for="file-upload" class="cursor-pointer flex flex-col items-center justify-center mt-4">
-      <i class="fas fa-file-upload text-6xl text-blueGray-200"></i>
-      <p class="text-blueGray-200 text-lg mt-2">Subir Archivo</p>
-    </label>
+    
 
     <!-- Barra de carga -->
     <div class="overflow-hidden h-2 text-xs flex rounded bg-blueGray-200 mt-4"> <!-- mt-4 añade espacio superior -->
@@ -43,8 +46,38 @@
     </div>
 
     <!-- Mensaje al completar la carga -->
-    <div *ngIf="downloadURL" class="mt-4"> <!-- mt-4 añade espacio superior -->
-      <p>Archivo subido exitosamente. <a [href]="downloadURL" target="_blank" class="text-blue-500 hover:text-blue-700 underline">Ver archivo</a></p>
+    <div  class="text-sm text-gray-700 mt-4 italic"> <!-- mt-4 añade espacio superior -->
+      <!-- <p>Archivo subido exitosamente. <a [href]="downloadURL" target="_blank" class="text-blue-500 hover:text-blue-700 underline">Ver archivo</a></p> -->
+      <p>Formatos aceptados para cargue exitoso:</p>
+      <ul class="list-disc list-inside">
+        <li>Documentos: .doc, .docx, .pdf</li>
+        <li>Hojas de cálculo: .xls, .xlsx</li>
+        <li>Imágenes: .png</li>
+        <li>Presentaciones: .ppt, .pptx</li>
+        <!-- <li>Archivos comprimidos: .zip</li> -->
+      </ul>
+      <p>Importante el tamaño máximo de cada archivo es de 25MB.</p>
+      
+      
+      
     </div>
   </div>
 </div>
+
+<app-modals-guia
+  [titulo]="modalConfig.titulo"
+  [contenido]="modalConfig.contenido"
+  [tamano]="modalConfig.tamano"
+  [mostrarModal]="modalConfig.mostrar"
+  [ok]="'Aceptar'"
+  [cancelar]="'Cerrar'"
+  (onSave)="guardarCambios()"
+  (onCancel)="cancelarCambios()">
+</app-modals-guia>
+
+@if (_alertaService.showAlert) {
+  <app-alerta-informativo
+      [type]="_alertaService.alertType"
+      [message]="_alertaService.alertMessage">
+  </app-alerta-informativo>
+}

@@ -13,8 +13,18 @@ import player from 'lottie-web';  // Import Lottie player
 // Importar los estilos globales de AOS
 import 'aos/dist/aos.css';
 
+// Importaciones nuevas para localización
+import { LOCALE_ID } from '@angular/core';
+import { DatePipe, registerLocaleData } from '@angular/common';
+import es from '@angular/common/locales/es';
+
+// Registrar los datos de localización
+registerLocaleData(es);
+
 bootstrapApplication(AppComponent, {
   providers: [
+    { provide: LOCALE_ID, useValue: 'es-ES' }, // Añadir el proveedor de localización
+    DatePipe,
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
     provideAuth(() => getAuth()),
     provideStorage(() => getStorage()), // Añadir Storage como proveedor

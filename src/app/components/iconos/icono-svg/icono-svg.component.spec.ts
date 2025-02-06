@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EvaluacionComponent } from './evaluacion.component';
+import { IconoSvgComponent } from './icono-svg.component';
 
-describe('EvaluacionComponent', () => {
-  let component: EvaluacionComponent;
-  let fixture: ComponentFixture<EvaluacionComponent>;
+describe('IconoSvgComponent', () => {
+  let component: IconoSvgComponent;
+  let fixture: ComponentFixture<IconoSvgComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EvaluacionComponent]
+      imports: [IconoSvgComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(EvaluacionComponent);
+    fixture = TestBed.createComponent(IconoSvgComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

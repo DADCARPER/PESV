@@ -2,10 +2,7 @@ import { Routes } from '@angular/router';
 //import { LoginComponent } from './pages/login/login.component';
 import { authGuard } from './guards/auth.guard';
 //import { DashboardComponent } from './pages/dashboard/dashboard.component';
-import { ActuarComponent } from './pages/actuar/actuar.component';
-import { HacerComponent } from './pages/hacer/hacer.component';
-import { PlanearComponent } from './pages/planear/planear.component';
-import { VerificarComponent } from './pages/verificar/verificar.component';
+
 import { DashboardComponent } from './views/admin/dashboard/dashboard.component';
 import { IndexComponent } from './views/index/index.component';
 import { LandingComponent } from './views/landing/landing.component';
@@ -44,6 +41,11 @@ import { PerfilComponent } from './views/admin/perfil/perfil.component';
 import { PerfilEmpresaComponent } from './views/admin/perfil-empresa/perfil-empresa.component';
 import { RestoreComponent } from './views/auth/restore/restore.component';
 import { FirmasComponent } from './views/admin/firmas/firmas.component';
+import { HacerComponent } from './views/admin/hacer/hacer.component';
+import { VerificarComponent } from './views/admin/verificar/verificar.component';
+import { ActuarComponent } from './views/admin/actuar/actuar.component';
+import { DesarrolloComponent } from './components/desarrollo/desarrollo.component';
+import { ZGestionArchivosComponent } from './views/admin/planificar/diagnostico/z-gestion-archivos/z-gestion-archivos.component';
 
 
 // Rutas principales
@@ -70,7 +72,7 @@ export const routes: Routes = [
       { path: "dashboard", component: DashboardComponent },
       { path: "perfil", component: PerfilComponent },
       { path: "gestor_firmas", component: FirmasComponent },
-
+      //Planificar
       { path: "planificar", component: PlanificarComponent },
       { path: "planificar/responsabilidad", component: ResponsabilidadComponent },
       { path: "planificar/responsabilidad/liderdelpesv", component: LiderDelPesvComponent },
@@ -80,6 +82,7 @@ export const routes: Routes = [
       { path: "planificar/responsabilidad/objetivos_y_metas", component: ObjetivosMetasComponent },
       { path: "planificar/evaluacion", component: EvaluacionComponent },
       { path: "planificar/diagnostico", component: DiagnosticoComponent },
+      { path: "planificar/diagnostico/gestion_archivos", component: ZGestionArchivosComponent },
       { path: "planificar/diagnostico/sociodemografia", component: SociodemografiaComponent },
       { path: "planificar/diagnostico/movilidad", component: MovilidadComponent },
       { path: "planificar/diagnostico/factor_riesgo", component: FactorRiesgoComponent },
@@ -88,10 +91,15 @@ export const routes: Routes = [
       { path: "planificar/diagnostico/evidencias", component: EvidenciasComponent },
       { path: "planificar/programas", component: ProgramasComponent },
       { path: "planificar/matriz_legal", component: MatrizLegalComponent },
-
+      //hacer
+      { path: "hacer", component: HacerComponent },
+      //verificar
+      { path: "verificar", component: VerificarComponent },
+      //actuar
+      { path: "actuar", component: ActuarComponent },
       { path: "dashboardplanificar", component: DashboardplanificarComponent },
       { path: "settings", component: SettingsComponent },
-      { path: "tables", component: TablesComponent },
+      { path: "desarrollo", component: DesarrolloComponent },
       { path: "maps", component: MapsComponent },
 
     ],
