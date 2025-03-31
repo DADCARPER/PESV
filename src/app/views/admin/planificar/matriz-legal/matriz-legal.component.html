@@ -1,1 +1,27 @@
-<p>matriz-legal works!</p>
+<div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
+    <div class="rounded-t bg-blueGray-100  mb-0 px-6 py-6">
+      <div class="text-center flex ">
+        <button
+          [routerLink]="['/admin/planificar']"
+          class="bg-red-600 text-white active:bg-red-700 font-bold uppercase text-xs px-1 py-1  rounded shadow hover:shadow-md outline-none focus:outline-none mr-2 ease-linear transition-all duration-150"
+          type="button"
+        >
+        <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" /></svg>
+        </button>
+        <h6 class="text-blueGray-700 text-xl font-bold">Matriz legal</h6>
+      </div>
+    </div>
+    <div class="flex-auto px-4 lg:px-10 py-10 pt-0" style="user-select: none;">
+        <!-- Fondo oscuro -->
+<div *ngIf="isOpen" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
+    <!-- Modal con fade -->
+    <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg transform transition-opacity duration-500 ease-in-out" 
+         [ngClass]="{'opacity-0': !isOpen, 'opacity-100': isOpen}">
+      <h2 class="text-xl font-semibold">Título del Modal</h2>
+      <p>Este es un mensaje con un efecto de desvanecimiento.</p>
+      <button class="mt-4 px-4 py-2 bg-blue-500 text-white rounded" (click)="closeModal()">Cerrar</button>
+    </div>
+  </div>
+  
+    </div>
+</div>

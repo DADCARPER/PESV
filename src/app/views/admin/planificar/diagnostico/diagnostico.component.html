@@ -1,218 +1,398 @@
-<div *ngIf="isLoading">
+<!-- <div *ngIf="isLoading">
     <app-loading [isLoading]="isLoading" [loadingText]="'Cargando información...'"></app-loading>
-</div>
-<div *ngIf="!isLoading" class="flex mt-12">
-    <div class="w-full  ">
-        <div class="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">
-            <div class="px-16 py-10 flex-auto">
-                <div class="tab-content tab-space">
-                  <div *ngIf="openTab === 0" >
+</div> -->
+<div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
+  <div class="rounded-t bg-blueGray-100  mb-0 px-6 py-6">
+    <div class="text-center flex ">
+      <button
+        [routerLink]="['/admin/planificar']"
+        class="bg-red-600 text-white active:bg-red-700 font-bold uppercase text-xs px-1 py-1  rounded shadow hover:shadow-md outline-none focus:outline-none mr-2 ease-linear transition-all duration-150"
+        type="button"
+      >
+      <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" /></svg>
+      </button>
+      <h6 class="text-blueGray-700 text-xl font-bold">Diagnostico</h6>
+    </div>
+  </div>
+  <div class="flex-auto px-4 lg:px-10 py-10 pt-0">
 
-                    <h1 data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" class="text-3xl font-normal leading-normal mt-0 text-blueGray-700" style="text-align: center;">Define los objetivos y metas de tu Plan Estratégico de Seguridad Vial (PESV)</h1><br>
+    <div class="border-b border-gray-200">
+      <nav class="flex" aria-label="Tabs">
+        <button (click)="toggleTabs(0)" [ngClass]="openTab === 0 ? ' text-gray-600 py-4 px-6 block hover:text-blue-500 focus:outline-none  border-b-2 font-medium border-blue-500 ' : 'text-gray-600 py-4 px-6 block hover:text-blue-500 focus:outline-none'" id="tab-general" aria-controls="panel-general" aria-selected="true">
+            Dahsboard
+        </button>
+        <button (click)="toggleTabs(1)" [ngClass]="openTab === 1 ? ' text-gray-600 py-4 px-6 block hover:text-blue-500 focus:outline-none  border-b-2 font-medium border-blue-500 ' : 'text-gray-600 py-4 px-6 block hover:text-blue-500 focus:outline-none'"  id="tab-compliance" aria-controls="panel-compliance" aria-selected="false">
+            Sedes
+        </button>
+        <button (click)="toggleTabs(2)" [ngClass]="openTab === 2 ? ' text-gray-600 py-4 px-6 block hover:text-blue-500 focus:outline-none  border-b-2 font-medium border-blue-500 ' : 'text-gray-600 py-4 px-6 block hover:text-blue-500 focus:outline-none'" id="tab-documents" aria-controls="panel-documents" aria-selected="false">
+            Colaboradores
+        </button>
+        <button (click)="toggleTabs(3)" [ngClass]="openTab === 3 ? ' text-gray-600 py-4 px-6 block hover:text-blue-500 focus:outline-none  border-b-2 font-medium border-blue-500 ' : 'text-gray-600 py-4 px-6 block hover:text-blue-500 focus:outline-none'" id="tab-documents" aria-controls="panel-documents" aria-selected="false">
+            Conducción
+        </button>
+        <button (click)="toggleTabs(4)" [ngClass]="openTab === 4 ? ' text-gray-600 py-4 px-6 block hover:text-blue-500 focus:outline-none  border-b-2 font-medium border-blue-500 ' : 'text-gray-600 py-4 px-6 block hover:text-blue-500 focus:outline-none'" id="tab-documents" aria-controls="panel-documents" aria-selected="false">
+            Riesgos viales
+        </button>
+        <button (click)="toggleTabs(5)" [ngClass]="openTab === 5 ? ' text-gray-600 py-4 px-6 block hover:text-blue-500 focus:outline-none  border-b-2 font-medium border-blue-500 ' : 'text-gray-600 py-4 px-6 block hover:text-blue-500 focus:outline-none'" id="tab-documents" aria-controls="panel-documents" aria-selected="false">
+            Contratistas
+        </button>
+        <button (click)="toggleTabs(6)" [ngClass]="openTab === 6 ? ' text-gray-600 py-4 px-6 block hover:text-blue-500 focus:outline-none  border-b-2 font-medium border-blue-500 ' : 'text-gray-600 py-4 px-6 block hover:text-blue-500 focus:outline-none'" id="tab-documents" aria-controls="panel-documents" aria-selected="false">
+            Colaboradores
+        </button>
+      </nav>
+    </div>
+
+    <div *ngIf="openTab === 0" >
+
+      <div class="text-lg font-light leading-relaxed mt-4 mb-2 text-gray-700" >
+
+        <div class="flex flex-wrap space-y-4 sm:space-y-0 items-start justify-center">
+          
+          <div class="w-full lg:w-3/12 px-2 ">
+            <app-card-stats2
+            [titulo]="'Sedes'"
+            [valor]="'Total: '+ sedes.length"
+            [colorIcono]="'bg-amber-500'"
+            [iconClass]="'factory'"></app-card-stats2>
+          </div>
+          <div class="w-full lg:w-3/12 px-2 ">
+            <app-card-stats2
+            [titulo]="'Contratistas'"
+            [valor]="'Total: '+ sedes.length"
+            [colorIcono]="'bg-amber-600'"
+            [iconClass]="'conference'"></app-card-stats2>
+          </div>
+          <div class="w-full lg:w-3/12 px-2 ">
+            <app-card-stats2
+            [titulo]="'Colaboradores'"
+            [valor]="'Total: '+ sedes.length"
+            [colorIcono]="'bg-amber-700'"
+            [iconClass]="'mentoring'"></app-card-stats2>
+          </div>
+          <div class="w-full lg:w-3/12 px-2 ">
+            <app-card-stats2
+            [titulo]="'Rutas'"
+            [valor]="'Total: '+ sedes.length"
+            [colorIcono]="'bg-amber-800'"
+            [iconClass]="'road-location-01'"></app-card-stats2>
+          </div>
+
+
+          <!-- <div class="w-full lg:w-8/12 px-2 ">
+            <app-card-profid
+            [titulo]="'Sedes'"
+            [valor]="'Total: '+ sedes.length"
+            [colorIcono]="'bg-purple-500'"
+            [iconClass]="'fas fa-star'"
             
-                    <div style="text-align: justify;" class="text-xl font-light leading-relaxed mt-6 mb-4" > 
+            ></app-card-profid>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit quia voluptates optio soluta. Et assumenda facere dolorem totam? Labore, doloremque libero. Laboriosam nostrum non iusto impedit recusandae magnam et possimus.</p>
+          </div> -->
+        </div>
+        <div class="flex flex-wrap space-y-4 sm:space-y-0 mt-4 items-start justify-center">
+          <div class="w-full lg:w-3/12 px-2" >
+            <app-mapa-colombia
+            [departamentos]="departamento"
+            ></app-mapa-colombia>
+          </div>
+          <div class="w-full lg:w-9/12 px-2 ">
+            <app-donut
+            [labels]="['Bachiller', 'Técnico', 'Tecnólogo', 'Profesional', 'Especialista']" 
+            [series]="[10.42, 11.67, 7.08, 7.05, 4.17]"></app-donut>
+          </div>
+        </div>
+        
+
+        <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300" class="text-justify pb-3">
+          En este modulo tienes la capacidad de generar un diagnóstico detallado de seguridad vial para la tú organización. El diagnóstico incluye un análisis exhaustivo de los elementos clave relacionados con la seguridad vial, como la cantidad de sedes y servicios prestados, los tipos de contratistas y colaboradores, la lista de vehículos automotores y no automotores, las rutas frecuentes de los desplazamientos laborales, y los recursos humanos capacitados en seguridad vial.
+        </p>
+        
+
+      <!-- <div class="flex flex-col md:flex-row justify-center items-center mt-6 mb-6 space-y-0 md:space-y-0 md:space-x-0">
+        
+          <div class="lg:w-3/3 sm:w-full ">
+            <app-cards-boton
+            (click)="toggleTabs(1,'')"
+            [titulo]="'Cargar docmento'"
+            [descripcion]="'Ya cuento con el documento de Política de Seguridad Vial'"
+            [tipoIcono]="'fas fa-upload'"
+            [colorIcono]="'bg-blue-500'"
+            ></app-cards-boton>
+          </div>
+          
+
+      </div>
+      <div class="flex flex-col md:flex-row justify-center items-center mt-6 mb-6 space-y-6 md:space-y-0 md:space-x-6">
+        
+        <div class="lg:w-1/3 sm:w-full ">
+          <app-cards-boton
+          (click)="toggleTabs(1,'')"
+          [titulo]="'Sociodemografia'"
+          [descripcion]="'Ya cuento con el documento de Política de Seguridad Vial'"
+          [tipoIcono]="'fas fa-user-friends'"
+          [colorIcono]="'bg-amber-400'"
+          ></app-cards-boton>
+        </div>
+        <div class="lg:w-1/3 sm:w-full ">
+          <app-cards-boton
+          (click)="toggleTabs(1,'')"
+          [titulo]="'Movilidad'"
+          [descripcion]="'Analiza información sobre los patrones de desplazamiento de las personas. Esto incluye datos sobre el uso de medios de transporte y el tráfico'"
+          [tipoIcono]="'fas fa-car'"
+          [colorIcono]="'bg-amber-400'"></app-cards-boton>
+        </div>
+        <div class="lg:w-1/3 sm:w-full ">
+          <app-cards-boton
+          (click)="toggleTabs(1,'')"
+          [titulo]="'Factores de riesgo'"
+          [descripcion]="'Evalúa los elementos que pueden aumentar la probabilidad de accidentes o situaciones de peligro. Desde condiciones de las vías hasta comportamientos de los conductores'"
+          [tipoIcono]="'fas fa-exclamation-circle'"
+          [colorIcono]="'bg-amber-400'"></app-cards-boton>
+        </div>
+
+      </div>
+      <div class="flex flex-col md:flex-row justify-center items-center mt-6 mb-6 space-y-6 md:space-y-0 md:space-x-6">
+        
+        <div class="lg:w-1/3 sm:w-full ">
+          <app-cards-boton
+          (click)="toggleTabs(1,'')"
+          [titulo]="'Accidentalidad'"
+          [descripcion]="'Consulta información detallada sobre los accidentes ocurridos en un área específica.'"
+          [tipoIcono]="'fas fa-ambulance'"
+          [colorIcono]="'bg-amber-400'"
+          ></app-cards-boton>
+        </div>
+        <div class="lg:w-1/3 sm:w-full ">
+          <app-cards-boton
+          (click)="toggleTabs(1,'')"
+          [titulo]="'Encuestas'"
+          [descripcion]="'Aplica y analiza encuestas para recopilar opiniones y datos directamente de los usuarios.'"
+          [tipoIcono]="'fas fa-poll'"
+          [colorIcono]="'bg-amber-400'"></app-cards-boton>
+        </div>
+        <div class="lg:w-1/3 sm:w-full ">
+          <app-cards-boton
+          (click)="toggleTabs(1,'')"
+          [titulo]="'Evidencias'"
+          [descripcion]="'Consulta documentos, imágenes, y registros que respalden los análisis realizados'"
+          [tipoIcono]="'fas fa-file-alt'"
+          [colorIcono]="'bg-amber-400'"></app-cards-boton>
+        </div>
+
+      </div> -->
+      </div>
+      <section>
+        <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div class="max-w-2xl mx-auto text-center">
+                <h2 class="text-3xl font-bold leading-tight text-black sm:text-4xl lg:text-5xl">Instrucciones para Generar el Diagnóstico de Seguridad Vial</h2>
+                
+            </div>
     
-                    <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300" style="margin-bottom: 14px;">
-                      Los Objetivos y Metas son la brújula que guía todas las acciones de un PESV. Son como las metas que te propones al iniciar un nuevo proyecto, pero en este caso, están enfocadas a mejorar la seguridad vial en una organización.
-                    </p>
-
-                    <div class="flex flex-col md:flex-row justify-center items-center mt-6 mb-6 space-y-0 md:space-y-0 md:space-x-0">
-                      
-                        <div class="lg:w-3/3 sm:w-full ">
-                          <app-cards-boton
-                          (click)="toggleTabs(1,'')"
-                          [titulo]="'Cargar docmento'"
-                          [descripcion]="'Ya cuento con el documento de Política de Seguridad Vial'"
-                          [tipoIcono]="'fas fa-upload'"
-                          [colorIcono]="'bg-blue-500'"
-                          ></app-cards-boton>
-                        </div>
-                        
-
-                    </div>
-                    <div class="flex flex-col md:flex-row justify-center items-center mt-6 mb-6 space-y-6 md:space-y-0 md:space-x-6">
-                      
-                      <div class="lg:w-1/3 sm:w-full ">
-                        <app-cards-boton
-                        (click)="toggleTabs(1,'')"
-                        [titulo]="'Sociodemografia'"
-                        [descripcion]="'Ya cuento con el documento de Política de Seguridad Vial'"
-                        [tipoIcono]="'fas fa-user-friends'"
-                        [colorIcono]="'bg-amber-400'"
-                        ></app-cards-boton>
-                      </div>
-                      <div class="lg:w-1/3 sm:w-full ">
-                        <app-cards-boton
-                        (click)="toggleTabs(1,'')"
-                        [titulo]="'Movilidad'"
-                        [descripcion]="'Analiza información sobre los patrones de desplazamiento de las personas. Esto incluye datos sobre el uso de medios de transporte y el tráfico'"
-                        [tipoIcono]="'fas fa-car'"
-                        [colorIcono]="'bg-amber-400'"></app-cards-boton>
-                      </div>
-                      <div class="lg:w-1/3 sm:w-full ">
-                        <app-cards-boton
-                        (click)="toggleTabs(1,'')"
-                        [titulo]="'Factores de riesgo'"
-                        [descripcion]="'Evalúa los elementos que pueden aumentar la probabilidad de accidentes o situaciones de peligro. Desde condiciones de las vías hasta comportamientos de los conductores'"
-                        [tipoIcono]="'fas fa-exclamation-circle'"
-                        [colorIcono]="'bg-amber-400'"></app-cards-boton>
-                      </div>
-
-                    </div>
-                    <div class="flex flex-col md:flex-row justify-center items-center mt-6 mb-6 space-y-6 md:space-y-0 md:space-x-6">
-                      
-                      <div class="lg:w-1/3 sm:w-full ">
-                        <app-cards-boton
-                        (click)="toggleTabs(1,'')"
-                        [titulo]="'Accidentalidad'"
-                        [descripcion]="'Consulta información detallada sobre los accidentes ocurridos en un área específica.'"
-                        [tipoIcono]="'fas fa-ambulance'"
-                        [colorIcono]="'bg-amber-400'"
-                        ></app-cards-boton>
-                      </div>
-                      <div class="lg:w-1/3 sm:w-full ">
-                        <app-cards-boton
-                        (click)="toggleTabs(1,'')"
-                        [titulo]="'Encuestas'"
-                        [descripcion]="'Aplica y analiza encuestas para recopilar opiniones y datos directamente de los usuarios.'"
-                        [tipoIcono]="'fas fa-poll'"
-                        [colorIcono]="'bg-amber-400'"></app-cards-boton>
-                      </div>
-                      <div class="lg:w-1/3 sm:w-full ">
-                        <app-cards-boton
-                        (click)="toggleTabs(1,'')"
-                        [titulo]="'Evidencias'"
-                        [descripcion]="'Consulta documentos, imágenes, y registros que respalden los análisis realizados'"
-                        [tipoIcono]="'fas fa-file-alt'"
-                        [colorIcono]="'bg-amber-400'"></app-cards-boton>
-                      </div>
-
-                    </div>
-                  </div>
+            <div class="relative mt-12 lg:mt-20">
+                <div class="absolute inset-x-0 hidden xl:px-44 top-2 md:block md:px-20 lg:px-28">
+                    <img class="w-full" src="https://cdn.rareblocks.xyz/collection/celebration/images/steps/2/curved-dotted-line.svg" alt="" />
                 </div>
-                <div *ngIf="openTab === 1" class="flex flex-wrap">
-
-      
-                    <div class="w-full xl:w-3/12 px-4 mt-12">
-                      <app-upload-archivos
-                      [urlStore]="'006-diagnostico'"
-                      [urlFire]="'006-diagnostico'"></app-upload-archivos>
-                    </div>
-                    <!-- Tabla de Documentos cargados o Formularios completos -->
-                    <div class="w-full xl:w-10/12 mb-12 xl:mb-0 px-4">
-                      <div class="rounded-t mb-0 px-4 py-3 border-0">
-                        <div class="flex flex-wrap items-center">
-                          <div class="relative w-full px-4 max-w-full flex-grow flex-1">
-                            <h3 class="font-semibold text-lg text-blueGray-700">
-                              Documentos cargados
-                            </h3>
-                          </div>
+    
+                <div class="flex flex-col gap-8 relative text-center gap-y-12 md:flex-row">
+                    <div class="flex-1">
+                        <div class="flex items-center justify-center w-16 h-16 mx-auto bg-white border-2 border-gray-200 rounded-full shadow">
+                            <span class="text-xl font-semibold text-gray-700"> 1 </span>
                         </div>
-                      </div>
-      
-                      <div class="block w-full overflow-x-auto">
-                        <table class="items-center w-full bg-transparent border-collapse">
-                          <thead>
-                            <tr>
-                              <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
-                                No.
-                              </th>
-                              <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
-                                Nombre del Documento
-                              </th>
-                              <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
-                                Tipo
-                              </th>
-                              <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
-                                Estado
-                              </th>
-                              <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
-                                Acciones
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr *ngFor="let document of documentData; let i = index">
-                              <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
-                                {{i + 1}}
-                              </td>
-                              <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
-                                {{ document.nombrePDf || 'N/A' }}
-                              </td>
-                              <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
-                                {{ document.tipo }}
-                              </td>
-                              <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
-                                {{ document.estado }} %
-                              </td>
-                              <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
-                                
-                                <ng-container *ngIf="document.nombrePDf; else noNombre">
-      
-                                  <ng-container *ngIf="document.tipo === 'Asistente'; else archivoCargado">
-                                    <!-- <app-pdf-objetivos-metas
-                                    [mostrarBotones]=true
-                                    [subirBlob]=false
-                                    [idFormulario]="document.id"
-                                    [nombreBoton]="'Ver'"
-                                    [disenoboton]="'diseno6'"
-                                    [disenoIcono]="'fa-eye'"
-                                    [descargaOprevia]="'vista'"
-                                    [nombreEmpresa]="dataEmpresa2.nombreEmpresa"></app-pdf-objetivos-metas>
-                                    <app-pdf-objetivos-metas
-                                    [mostrarBotones]=true
-                                    [subirBlob]=false
-                                    [idFormulario]="document.id"
-                                    [nombreBoton]="''"
-                                    [disenoboton]="'diseno4'"
-                                    [disenoIcono]="'fa-download'"
-                                    [descargaOprevia]="'descarga'"
-                                    [nombreEmpresa]="dataEmpresa2.nombreEmpresa"></app-pdf-objetivos-metas>
-      
-                                    <app-pdf-objetivos-metas
-                                    [mostrarBotones]=true
-                                    [subirBlob]=false
-                                    [idFormulario]="document.id"
-                                    [nombreBoton]="''"
-                                    [disenoboton]="'diseno5'"
-                                    [disenoIcono]="'fa-print'"
-                                    [descargaOprevia]="'imprimir'"
-                                    [nombreEmpresa]="dataEmpresa2.nombreEmpresa"></app-pdf-objetivos-metas> -->
-                                  </ng-container>
-      
-                                  <ng-template #archivoCargado>
-      
-                                    <a [href]="document.URL" target="_blank" class="text-sky-500 bg-transparent border border-solid border-sky-500 hover:bg-sky-500 hover:text-white active:bg-sky-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">Ver</a>
-      
-                                  </ng-template>
-      
-                                </ng-container>
-      
-                                <ng-template #noNombre>
-                                  <!-- Contenedor alternativo cuando nombrePDf no tiene valor -->
-                                  <span class="text-red-500">Documento no disponible</span>
-                                </ng-template>
-      
-                              </td>
-                            </tr>
-                            <tr *ngIf="documentData.length === 0">
-                              <td colspan="5" class="text-center py-4">No hay documentos disponibles.</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
+                        <h3 class="mt-6 text-xl font-semibold leading-tight text-black md:mt-10">Descargar el formato</h3>
+                        <p class="mt-4 text-base text-gray-600 text-justify">Haz clic en el botón "Descargar" para obtener el archivo Excel. Llena los campos con la información solicitada sobre seguridad vial de tu organización.</p>
+                        <div class="flex justify-center">
+                          <a href="../../../../../assets/documentacion/006_diagnostico/plantillaDiagnostico.xlsx">
+                          <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="500" 
+                            class="text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 mt-4 ease-linear transition-all duration-150" type="button">
+                            <i class="fas fa-download mr-1"></i> Descargar
+                          </button>
+                          </a>
+                        </div>
                     </div>
-      
-                    
-                    
-        
-                    <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="600" (click)="irdashboard()" class="text-blueGray-500 bg-transparent border border-solid border-blueGray-500 hover:bg-blueGray-300 active:bg-blueGray-500 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
-                      <i class="fas fa-cog"></i> Finalizar
-                    </button>
-        
-                </div>
+    
+                    <div class="flex-1">
+                        <div class="flex items-center justify-center w-16 h-16 mx-auto bg-white border-2 border-gray-200 rounded-full shadow">
+                            <span class="text-xl font-semibold text-gray-700"> 2 </span>
+                        </div>
+                        <h3 class="mt-6 text-xl font-semibold leading-tight text-black md:mt-10">Carga el formato completo</h3>
+                        <p class="mt-4 mb-4 text-base text-gray-600 text-justify">Una vez que hayas completado el archivo, súbelo usando el campo Seleccionar archivo más abajo.</p>
+                        <app-diagnostico-import></app-diagnostico-import>
+                    </div>
+    
+                    <div class="flex-1">
+                        <div class="flex items-center justify-center w-16 h-16 mx-auto bg-white border-2 border-gray-200 rounded-full shadow">
+                            <span class="text-xl font-semibold text-gray-700"> 3 </span>
+                        </div>
+                        <h3 class="mt-6 text-xl font-semibold leading-tight text-black md:mt-10">Genera y descarga el informe</h3>
+                        <p class="mt-4  text-base text-gray-600 text-justify">Presiona Generar Informe para procesar los datos y obtener el diagnóstico. Descarga el informe con los resultados y recomendaciones.</p>
+                        <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="500" [routerLink]="'informe_diagnostico'" 
+                            class="text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 mt-4 ease-linear transition-all duration-150" type="button">
+                            <i class="fas fa-chart-bar mr-1"></i> Generar informe
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
+      </section>
+
+    
+
     </div>
+    <div *ngIf="openTab === 1" >
+
+      <div class="text-lg font-light leading-relaxed mt-6 mb-2 text-gray-700" >
+        <app-sedes></app-sedes>
+        <label htmlFor="basic-datalist" className="text-sm font-medium">
+          Basic Datalist
+        </label>
+        <div className="relative">
+          <input
+            id="basic-datalist"
+            list="basic-options"
+            placeholder="Select or type an option"
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+          />
+          <datalist id="basic-options">
+            <option value="Option 1" >
+            <option value="Option 2" >
+            <option value="Option 3" >
+          </datalist>
+        </div>
+      </div>
+      
+    </div>
+    <div *ngIf="openTab === 2">
+      
+      <div class="bg-white rounded-lg border shadow-sm mt-4">
+        <div class="p-4 border-b">
+          <h3 class="text-lg font-medium">Lista de Colaboradores</h3>
+          <p class="text-sm text-gray-500">
+            Colaboradores de la organización, incluyendo datos personales, licencias, capacitaciones y medios de transporte
+          </p>
+        </div>
+        <div class="p-4">
+          <div class="flex items-center justify-between mb-4">
+            <input type="text" placeholder="Buscar colaboradores..." class="px-3 py-2 border rounded-md w-full max-w-sm" />
+            
+            <div class="flex gap-2">
+              <button (click)="mostrarModalColaborador()" class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none  mb-1 ease-linear transition-all duration-150" type="button">
+                <div class="flex items-center">
+                    <iconify-icon icon="hugeicons:plus-sign-square" width="18" height="18" class="pr-2 "></iconify-icon> Crear
+                </div>
+              </button>
+              <button (click)="mostrarModalColaboradorImportar()" class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none  mb-1 ease-linear transition-all duration-150" type="button">
+                <div class="flex items-center">
+                    <iconify-icon icon="hugeicons:file-download" width="18" height="18" class="pr-2 "></iconify-icon> Importar
+                </div>
+              </button>
+            </div>
+            
+          </div>
+          <div class="rounded-md border overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Nac.</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Género</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cargo</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Antigüedad</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Licencia</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transporte</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Conductor</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Accíon</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Juan Pérez</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">15/05/1985</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Masculino</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Conductor</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">5 años</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">B1</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Automóvil</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Sí</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <div class="flex">
+                      <div class="text-amber-400 hover:text-amber-300 cursor-pointer">
+                        <iconify-icon (click)="toggleTabs(3)" icon="hugeicons:pencil-edit-02" width="22" height="22" class="pr-2 "></iconify-icon>
+                      </div>
+                      <div class="text-amber-600 hover:text-amber-500 cursor-pointer">
+                        <iconify-icon icon="hugeicons:delete-03" width="22" height="22" class="pr-2 "></iconify-icon>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">María López</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">22/08/1990</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Femenino</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Administrativa</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">3 años</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">B1</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Transporte Público</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">No</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Carlos Rodríguez</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">10/03/1982</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Masculino</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Mensajero</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">7 años</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">A2</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Motocicleta</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Sí</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Ana Martínez</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">05/11/1988</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Femenino</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Gerente</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">4 años</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">B1</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Automóvil</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Sí</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Pedro Sánchez</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">18/07/1992</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Masculino</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Técnico</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2 años</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">No tiene</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Bicicleta</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">No</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+
+    <div *ngIf="openTab === 5" >
+
+      <div class="text-lg font-light leading-relaxed mt-6 mb-2 text-gray-700" >
+        <app-contratistas></app-contratistas>
+      </div>
+      
+    </div>
+    
+
+  </div>
 </div>
+
+<app-crear-colaboradores #modalColaborador></app-crear-colaboradores>
+<app-importar-colaboradores #modalColaboradorImportar></app-importar-colaboradores>

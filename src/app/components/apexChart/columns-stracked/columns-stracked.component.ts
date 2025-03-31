@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core'; // Agregamos Input
 import { CommonModule } from '@angular/common';
 import {
   NgApexchartsModule,
@@ -42,18 +42,19 @@ export type ChartOptions = {
   `
 })
 export class ColumnsStrackedComponent {
+  @Input() series: ApexAxisChartSeries = [
+    {
+      name: "No",
+      data: [36]
+    },
+    {
+      name: "Si",
+      data: [62]
+    }
+  ];
 
   chartOptions: ChartOptions = {
-    series: [
-      {
-        name: "No",
-        data: [30]
-      },
-      {
-        name: "Si",
-        data: [68]
-      }
-    ],
+    series: this.series,
     chart: {
       type: 'bar',
       height: 350,
@@ -61,7 +62,18 @@ export class ColumnsStrackedComponent {
       stackType: '100%',
       toolbar: {
         show: false
-      }
+      },
+      defaultLocale: 'es',
+      locales: [{
+        name: 'es',
+        options: {
+          toolbar: {
+            exportToSVG: 'Descargar SVG',
+            exportToPNG: 'Descargar PNG',
+            menu: 'Menu'
+          }
+        }
+      }]
     },
     plotOptions: {
       bar: {
@@ -79,7 +91,7 @@ export class ColumnsStrackedComponent {
         fontWeight: 'bold'
       }
     },
-    colors: ['#CCCCCC', '#0066CC'], // Gris para "No", Azul para "Si"
+    colors: ['#CCCCCC', '#3f56b6'],
     xaxis: {
       categories: [''],
       labels: {
@@ -99,5 +111,4 @@ export class ColumnsStrackedComponent {
       horizontalAlign: 'center'
     }
   };
-
 }

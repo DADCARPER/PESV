@@ -1,0 +1,197 @@
+<!-- Fondo oscuro -->
+<div *ngIf="mostrarModal()" (click)="cerrarModal()" class="fixed inset-0 z-40 bg-black opacity-25"></div>
+
+<!-- Modal -->
+<div *ngIf="mostrarModal()" (click)="cerrarModal()" class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex modal-fade-down">
+  <div (click)="$event.stopPropagation()" class="relative mx-auto my-6 bg-white rounded-lg shadow-lg max-w-3xl w-full">
+    <!-- 'max-w-sm':  'small',
+      'max-w-3xl':  'regular',
+      'max-w-6xl':  'large' -->
+    <!-- Título del modal -->
+    <div class="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+      <h3 class="text-2xl font-semibold">
+         Crear Colaborador
+      </h3>
+    </div>
+    
+    <!-- Contenido del modal -->
+    <div class="relative p-6 flex-auto">
+      <h3 class="text-lg font-semibold mb-4 pb-2 border-b text-gray-700">Datos Personales</h3>
+
+      <div class="flex flex-wrap mb-4">
+
+        <div class="w-full lg:w-4/12 px-2">
+          <div class="space-y-2">
+            <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre Completo *</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Nombre y apellidos" required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          </div>
+        </div>
+          
+        <div class="w-full lg:w-4/12 px-2">
+          <div class="space-y-2">
+            <label for="fecha-nacimiento" class="block text-sm font-medium text-gray-700">Fecha de Nacimiento *</label>
+            <input type="date" id="fecha-nacimiento" name="fecha-nacimiento" required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          </div>
+        </div>
+
+        <div class="w-full lg:w-4/12 px-2">
+          <div class="space-y-2">
+            <span class="block text-sm font-medium text-gray-700">Género *</span>
+            <div class="flex gap-4 mt-1">
+              <div class="flex items-center">
+                <input type="radio" id="masculino" name="genero" value="masculino" checked
+                  class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                <label for="masculino" class="ml-2 text-sm text-gray-700">Masculino</label>
+              </div>
+              <div class="flex items-center">
+                <input type="radio" id="femenino" name="genero" value="femenino"
+                  class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                <label for="femenino" class="ml-2 text-sm text-gray-700">Femenino</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="flex flex-wrap mb-4">
+
+        <div class="w-full lg:w-4/12 px-2">
+          <div class="space-y-2">
+            <label for="documento" class="block text-sm font-medium text-gray-700">Número de Documento *</label>
+            <input type="text" id="documento" name="documento" placeholder="Cédula" required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          </div>
+        </div>
+
+        <div class="w-full lg:w-4/12 px-2">
+          <div class="space-y-2">
+            <label for="telefono" class="block text-sm font-medium text-gray-700">Teléfono</label>
+            <input type="tel" id="telefono" name="telefono" placeholder="3001112222"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          </div>
+        </div>
+
+        <div class="w-full lg:w-4/12 px-2">
+          <div class="space-y-2">
+            <label for="email" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
+            <input type="email" id="email" name="email" placeholder="ejemplo@correo.com"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          </div>
+        </div>
+        
+      </div>
+
+      <h3 class="text-lg font-semibold mb-4 pb-2 border-b text-gray-700">Información Laboral</h3>
+      
+      <div class="flex flex-wrap mb-4">
+
+        <div class="w-full lg:w-4/12 px-2">
+          <div class="space-y-2">
+            <label for="cargo" class="block text-sm font-medium text-gray-700">Cargo *</label>
+            <select id="cargo" name="cargo" required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              <option value="" disabled selected>Seleccionar cargo</option>
+              <option value="conductor">Conductor</option>
+              <option value="administrativo">Administrativo</option>
+              <option value="mensajero">Mensajero</option>
+              <option value="gerente">Gerente</option>
+              <option value="tecnico">Técnico</option>
+            </select>
+          </div>
+        </div>
+        <div class="w-full lg:w-4/12 px-2">
+          <div class="space-y-2">
+            <label for="antiguedad" class="block text-sm font-medium text-gray-700">Antigüedad (años) *</label>
+            <input type="number" id="antiguedad" name="antiguedad" min="0" placeholder="0" required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          </div>
+        </div>
+        <div class="w-full lg:w-4/12 px-2">
+          <div class="space-y-2">
+            <label for="cargo" class="block text-sm font-medium text-gray-700">Escolaridad</label>
+            <select id="cargo" name="cargo" required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              <option value="" disabled selected>Seleccionar escolaridad</option>
+              <option value="bachiller">Bachiller</option>
+              <option value="tecnico">Técnico</option>
+              <option value="tecnologo">Tecnólogo</option>
+              <option value="profesional">Profesional</option>
+              <option value="especialista">Especialista</option>
+            </select>
+          </div>
+        </div>
+        
+      </div>
+      
+      <h3 class="text-lg font-semibold mb-4 pb-2 border-b text-gray-700">Transporte y Licencias</h3>
+
+      <div class="flex flex-wrap mb-4">
+        <div class="w-full lg:w-4/12 px-2">
+          <div class="space-y-2">
+            <label for="licencia" class="block text-sm font-medium text-gray-700">Tipo de Licencia</label>
+            <select id="licencia" name="licencia"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              <option value="" disabled selected>Seleccionar licencia</option>
+              <option value="no">No tiene</option>
+              <option value="a1">A1</option>
+              <option value="a2">A2</option>
+              <option value="b1">B1</option>
+              <option value="b2">B2</option>
+              <option value="c1">C1</option>
+            </select>
+          </div>
+        </div>
+        <div class="w-full lg:w-4/12 px-2">
+          <div class="space-y-2">
+            <label for="transporte" class="block text-sm font-medium text-gray-700">Medio de Transporte *</label>
+            <select id="transporte" name="transporte" required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              <option value="" disabled selected>Seleccionar transporte</option>
+              <option value="automovil">Automóvil</option>
+              <option value="motocicleta">Motocicleta</option>
+              <option value="bicicleta">Bicicleta</option>
+              <option value="transporte-publico">Transporte Público</option>
+              <option value="a-pie">A pie</option>
+            </select>
+          </div>
+        </div>
+        <div class="w-full lg:w-4/12 px-2">
+          <div class="space-y-2">
+            <span class="block text-sm font-medium text-gray-700">¿Es conductor?</span>
+            <div class="flex items-center h-10 mt-1">
+              <label for="conductor" class="inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="conductor" name="conductor" class="sr-only peer">
+                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <span class="ml-3 text-sm font-medium text-gray-700">Sí</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      <div class="flex flex-wrap mb-4">
+        <div class="w-full lg:w-4/12 px-2">
+          <div class="space-y-2">
+            <label for="vencimiento-licencia" class="block text-sm font-medium text-gray-700">Fecha de Vencimiento de Licencia</label>
+            <input type="date" id="vencimiento-licencia" name="vencimiento-licencia"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          </div>
+        </div>
+      </div>
+
+    </div>
+    
+    <!--footer-->
+    <div class="flex items-center justify-end p-5 border-t border-solid border-blueGray-200 rounded-b">
+      <button class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" (click)="handleCancel()">
+        Cancelar
+      </button>
+      <button class="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" (click)="handleSave()">
+        Agregar
+      </button>
+    </div>
+  </div>
+</div>

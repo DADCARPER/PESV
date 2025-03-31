@@ -47,14 +47,14 @@ export class LoginComponent {
         const user = userCredential.user;
   
         // Esperar a que se obtengan los datos de la empresa
-        const sesioncreada = await this._authService.llamoDatosEmpresa(user.uid);
-        console.log('Inicio de sesión exitoso '+sesioncreada);
+        //const sesioncreada = await this._authService.llamoDatosEmpresa(user.uid);
+        //console.log('Inicio de sesión exitoso '+sesioncreada);
 
-        if (sesioncreada){
-          this._router.navigate(['/starting']);
-        }else{
-          this._router.navigate(['/admin/dashboard']);
-        }
+        // if (sesioncreada){
+        //   this._router.navigate(['/starting']);
+        // }else{
+        //   this._router.navigate(['/admin/dashboard']);
+        // }
   
       //   // Guardar userId en sessionStorage y medir el tiempo
       //   console.time("Guardar en sessionStorage");

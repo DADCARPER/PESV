@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   NgApexchartsModule,
@@ -26,6 +26,8 @@ export type ChartOptions = {
   standalone: true,
   imports: [CommonModule, NgApexchartsModule],
   template: `
+  <div [class]="muestraBorde ? 'rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200 text-center' : ''">
+    <p>Escolaridad</p>
     <div class="w-full max-w-2xl mx-auto p-4">
       <apx-chart
         [series]="chartOptions.series"
@@ -38,27 +40,32 @@ export type ChartOptions = {
         [colors]="chartOptions.colors"
       ></apx-chart>
     </div>
+  </div>
   `
 })
-export class DonutComponent {
+export class DonutComponent implements OnChanges {
+
+  @Input() labels: string[] = [];
+  @Input() series: number[] = [];
+  @Input() muestraBorde: boolean = true;
 
   chartOptions: ChartOptions = {
-    series: [25, 15, 20, 18, 12, 10], // Porcentajes por estrato
+    series: [],
     chart: {
       type: "donut",
-      height: 380
+      height: 280
     },
-    labels: ["Estrato 1", "Estrato 2", "Estrato 3", "Estrato 4", "Estrato 5", "Estrato 6"],
+    labels: [],
     plotOptions: {
       pie: {
         donut: {
-          size: '65%',
+          size: '54%',
           labels: {
             show: true,
             total: {
               show: true,
               label: 'Total',
-              formatter: function (w) {
+              formatter: (w) => {
                 return w.globals.seriesTotals.reduce((a: number, b: number) => a + b, 0) + ' %';
               }
             }
@@ -68,7 +75,7 @@ export class DonutComponent {
     },
     dataLabels: {
       enabled: true,
-      formatter: function (val, opts) {
+      formatter: (val, opts) => {
         return opts.w.config.series[opts.seriesIndex] + '%';
       }
     },
@@ -100,7 +107,14 @@ export class DonutComponent {
         }
       }
     ],
-    colors: ['#008FFB', '#00E396', '#FEB019', '#FF4560', '#775DD0', '#546E7A']
+    colors: ['#5892d8', '#3374c4', '#2661b3', '#1e4886', '#1c3f70', '#1d375d']
   };
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['labels'] || changes['series']) {
+      this.chartOptions.labels = this.labels;
+      this.chartOptions.series = this.series;
+    }
+  }
 
 }

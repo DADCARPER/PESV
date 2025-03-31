@@ -5,26 +5,26 @@
           <div class="grid grid-cols-1 gap-8 mt-0 xl:mt-0 xl:gap-12 md:grid-cols-2">
             <!-- Contenido -->
             <app-cards-menu
-            [titulo]="'Plan anual de trabajo'"
+            [titulo]="'Mejora continua, acciones preventivas y correctivas'"
             [descripcion]="'Orientado al cumplimiento de acciones y estrategias en seguridad vial para planificación, implementación, seguimiento y mejora del PESV.'"
             [tipoIcono]="'fas fa-user-tie'"
             [colorIcono]="'bg-sky-400'"
-            [porcentaje]="0"
+            [porcentaje]="estatusGeneral['023-mejora-continua-preventivas-correctivas']?.estado || 0"
             [colorgrafica]="'#0370a1'"
-            [linkvamos]="'/admin/desarrollo'"
+            [linkvamos]="'mejora_acciones_preventivas_correctivas'"
             ></app-cards-menu>
             
           </div>
           <div class="grid grid-cols-1 gap-8 mt-8 xl:mt-0 xl:gap-12 md:grid-cols-2">
             <!-- Contenido -->
             <app-cards-menu
-            [titulo]="'Responsabilidad y comportamiento seguro'"
+            [titulo]="'Mecanismos de comunicación'"
             [descripcion]="'Establece los lineamientos para la evaluación y seguimiento del comportamiento vial de los colaboradores que realizan desplazamientos.'"
             [tipoIcono]="'fas fa-balance-scale'"
             [colorIcono]="'bg-sky-400'"
-            [porcentaje]="20"
+            [porcentaje]="estatusGeneral['024-mecanismos-comunicacion']?.estado || 0"
             [colorgrafica]="'#0370a1'"
-            [linkvamos]="'/admin/desarrollo'"
+            [linkvamos]="'mecanismos_comunicacion'"
             ></app-cards-menu>
 
             

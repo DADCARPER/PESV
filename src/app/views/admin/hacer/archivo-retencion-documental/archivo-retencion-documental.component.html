@@ -1,0 +1,91 @@
+<div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
+    <div class="rounded-t bg-blueGray-100  mb-0 px-6 py-6">
+      <div class="text-center flex ">
+        <button
+          [routerLink]="['/admin/hacer']"
+          class="bg-red-600 text-white active:bg-red-700 font-bold uppercase text-xs px-1 py-1  rounded shadow hover:shadow-md outline-none focus:outline-none mr-2 ease-linear transition-all duration-150"
+          type="button"
+        >
+        <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" /></svg>
+        </button>
+        <h6 class="text-blueGray-700 text-xl font-bold">Archivo y retención documental</h6>
+      </div>
+    </div>
+    <div class="flex-auto px-4 lg:px-10 py-10 pt-0">
+  
+      
+      <div *ngIf="openTab === 0" >
+        <div class="text-lg font-light leading-relaxed mt-6 mb-4 text-gray-700" >
+  
+          <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300" style="margin-bottom: 14px;">
+            Centro documental del PESV. Aquí podrá almacenar, clasificar y recuperar todos los registros relacionados con la implementación de su plan, cumpliendo con los requisitos de retención y protección de datos personales establecidos por la normativa.
+          </p>
+          
+    
+          <div class="flex flex-col md:flex-row justify-center items-center mt-6 mb-6 space-y-6 md:space-y-0 md:space-x-16">
+            <div class="lg:w-1/3 sm:w-full ">
+              <a href="/admin/hacer/archivo_retencion_documental/gestion_archivos">
+                <app-cards-boton
+                [titulo]="'Cargar docmento'"
+                [descripcion]="'Ya cuento con el documento de Política de Seguridad Vial'"
+                [tipoIcono]="'fas fa-upload'"
+                [colorIcono]="'bg-blue-500'"
+                ></app-cards-boton>
+              </a>
+              </div>
+              <div class="lg:w-1/3 sm:w-full ">
+              <app-cards-boton
+              (click)="toggleTabs(1,'')"
+              [titulo]="'Crear docmento'"
+              [descripcion]="'Aún no tengo el documento. Iniciar proceso de creación ahora'"
+              [tipoIcono]="'fas fa-rocket'"
+              [colorIcono]="'bg-green-500'"></app-cards-boton>
+    
+            </div>
+          </div>
+    
+        </div>
+      </div>
+      <div *ngIf="openTab === 1" >
+  
+        <div style="text-align: justify;" class="text-xl font-light leading-relaxed mt-6 mb-4" >
+        
+            <p style="margin-bottom: 14px;"><strong>Documentos y Requisitos Necesarios</strong></p>
+  
+            <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="700" style="margin-bottom: 14px;">
+            Antes de comenzar con el formulario para la creación de Objetivos y Metas, asegúrate de tener la siguiente información:
+            </p>
+  
+            <div class="flex flex-col md:flex-row justify-between mt-6 mb-6 lg:pl-28 space-y-6 md:space-y-0 md:space-x-8">
+  
+                <!-- Lista original con subtítulo -->
+                <div class="w-full md:w-1/2">
+                    <p style="margin-bottom: 14px;"><strong>Información Específica a Tener a Mano</strong></p>
+                    <ul class="list-disc list-inside text-gray-500 space-y-1">
+                        <li>
+                            Descripcion clara y consisa de cada objetivo
+                            
+                        </li>
+                        <li>
+                          Descripcion clara y consisa de cada meta
+                          
+                      </li>
+                    </ul>
+                </div>
+            
+            </div>
+  
+        </div>
+  
+        <div class="flex justify-center">
+            <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="900" (click)="toggleTabs(2,'')" class="text-amber-500 bg-transparent border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+            <i class="fas fa-arrow-right"></i> Comenzar a crear
+            </button>
+        </div>
+  
+      </div>
+  
+    
+  
+    </div>
+</div>

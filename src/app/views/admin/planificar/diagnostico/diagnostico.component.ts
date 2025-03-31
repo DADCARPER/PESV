@@ -1,54 +1,53 @@
-import { Component } from '@angular/core';
-import { LoadingComponent } from "../../../../components/loading/loading/loading.component";
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CardsBotonComponent } from "../../../../components/cards/cards-boton/cards-boton.component";
 import AOS from 'aos';
-import { UploadArchivosComponent } from "../../../../components/otros/upload-archivos/upload-archivos.component"; // Importa AOS
-import { Router } from '@angular/router';
-import { FirestoreService } from '../../../../services/firestore.service';
-import { LoginService } from '../../../../services/login.service';
+import { RouterLink } from '@angular/router';
+import { DiagnosticoImportComponent } from "../../../../components/importsExcel/diagnostico-import/diagnostico-import.component";
+import { MapaColombiaComponent } from "../../../../components/apexChart/mapa-colombia/mapa-colombia.component";
+import { SedesComponent } from "./sedes/sedes.component";
+import { CardProfidComponent } from "../../../../components/cards/card-profid/card-profid.component";
+import { SedesDiagnosticoService } from '../../../../services/sedes-diagnostico.service';
+import { ContratistasComponent } from "./contratistas/contratistas.component";
+import { CardStats2Component } from "../../../../components/cards/card-stats2/card-stats2.component";
+import { DonutComponent } from "../../../../components/apexChart/donut/donut.component";
+import { CrearColaboradoresComponent } from "../../../../components/modals/crear-colaboradores/crear-colaboradores.component";
+import { ImportarColaboradoresComponent } from "../../../../components/modals/importar-colaboradores/importar-colaboradores.component";
+
 
 @Component({
   selector: 'app-diagnostico',
   standalone: true,
-  imports: [CommonModule, LoadingComponent, CardsBotonComponent, UploadArchivosComponent],
+  imports: [CommonModule, RouterLink, DiagnosticoImportComponent, MapaColombiaComponent, SedesComponent, CardProfidComponent, ContratistasComponent, CardStats2Component, DonutComponent, CrearColaboradoresComponent, ImportarColaboradoresComponent],
   templateUrl: './diagnostico.component.html',
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   styleUrl: './diagnostico.component.css'
 })
-export class DiagnosticoComponent {
+export class DiagnosticoComponent implements OnInit {
 
-  openTab = 0;
+  openTab = 2;
+  modalColaborador = viewChild.required<CrearColaboradoresComponent>('modalColaborador');
+  modalColaboradorImportar = viewChild.required<ImportarColaboradoresComponent>('modalColaboradorImportar');
 
-  userId: string | null = null;
   isLoading = false; //Al terminar el modulo de ir en true
 
   documentData: any;
+  tituloSedes: any = [{ header: "Genero", field: "femenino" },{ header: "Frecuencia", field: "masculino" }];
+  sedes: any = [];
+  departamento: any = [];
+  
 
-  constructor(
-    private router: Router,
-    private _firestore: FirestoreService,
-    private UID: LoginService
-  ){
-    this.UID.user$.subscribe(user => {
-      this.userId = user ? user.uid : null;
-
-      this._firestore.getDocumentRealTime('006-diagnostico/', this.userId)
-      .subscribe({
-        next: (data) => {
-          //console.log('Datos en tiempo real:', data);
-          this.documentData = data; // Almacenamos los datos en el componente
-        },
-        error: (error) => {
-          console.error('Error al recibir datos:', error);
-        },
-      });
-    
-      this.isLoading = false;  // El usuario ha sido autenticado
-    });
+  constructor( private _sedes: SedesDiagnosticoService ) { 
+    AOS.init();
   }
 
-  async toggleTabs(tabNumber: number,porce:string ) {
+  async ngOnInit() {
+    this.sedes = await this._sedes.getCollectionDepartamentoFirestore();
+    //console.log("datosde sedes",this.sedes);
+    this.departamento = this.sedes.map((sede: any) => sede.departamento); // Extrae solo los valores de 'departamento'
+    //console.log("yafinal",this.departamento);
+  }
 
+  async toggleTabs(tabNumber: number ) {
     this.openTab = tabNumber;
     setTimeout(() => {
       AOS.refresh(); // Reinicia AOS para detectar nuevos elementos
@@ -56,10 +55,17 @@ export class DiagnosticoComponent {
     }, 200);
   }
 
-  irdashboard(){
+  creararryadepto(){
+    
+  }
 
-    this.router.navigate(['admin/dashboardplanificar']);
+  mostrarModalColaborador(): void {
+    // Accedemos al componente hijo y llamamos a su método
+    this.modalColaborador().abrirModal();
+  }
 
+  mostrarModalColaboradorImportar(): void{
+    this.modalColaboradorImportar().abrirModal();
   }
 
 }

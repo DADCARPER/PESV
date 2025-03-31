@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   NgApexchartsModule,
@@ -17,7 +17,7 @@ export type ChartOptions = {
   plotOptions: ApexPlotOptions;
   legend: ApexLegend;
   dataLabels: ApexDataLabels;
-  theme: ApexTheme;
+  colors: string[];
 };
 
 @Component({
@@ -30,7 +30,7 @@ export type ChartOptions = {
         [series]="chartOptions.series"
         [chart]="chartOptions.chart"
         [labels]="chartOptions.labels"
-        [theme]="chartOptions.theme"
+        [colors]="chartOptions.colors"
         [plotOptions]="chartOptions.plotOptions"
         [legend]="chartOptions.legend"
         [dataLabels]="chartOptions.dataLabels"
@@ -38,13 +38,24 @@ export type ChartOptions = {
     </div>
   `
 })
-export class PieMonochromeComponent {
+export class PieMonochromeComponent implements OnChanges {
+  @Input() values: number[] = [];
+  @Input() labels: string[] = [];
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['values']) {
+      this.chartOptions.series = changes['values'].currentValue;
+    }
+    if (changes['labels']) {
+      this.chartOptions.labels = changes['labels'].currentValue;
+    }
+  }
 
   chartOptions: ChartOptions = {
-    series: [8, 50], // SI: 8, NO: 50
+    series: [], 
     chart: {
       type: "pie",
-      height: 250,
+      height: 360,
       animations: {
         enabled: true,
         speed: 400,
@@ -54,25 +65,18 @@ export class PieMonochromeComponent {
         }
       }
     },
-    labels: ["SI", "NO"],
-    theme: {
-      monochrome: {
-        enabled: true,
-        color: '#2E93fA',  // Color base
-        shadeTo: 'light',  // 'light' o 'dark'
-        shadeIntensity: 0.65
-      }
-    },
+    colors: ['#5892d8', '#3374c4', '#2661b3', '#1e4886', '#1c3f70', '#1d375d'],
+    labels: [],
     plotOptions: {
       pie: {
         startAngle: 0,
         endAngle: 360,
-        expandOnClick: true,
+        expandOnClick: false,
         offsetX: 0,
         offsetY: 0,
-        customScale: 1,
+        customScale: 0.9,
         dataLabels: {
-          offset: 0,
+          offset: 30,
           minAngleToShowLabel: 10
         }
       }
@@ -92,14 +96,22 @@ export class PieMonochromeComponent {
         return opts.w.config.series[opts.seriesIndex] + ' (' + val.toFixed(1) + '%)';
       },
       style: {
-        fontSize: '14px',
+        fontSize: '12px',
         fontFamily: 'Helvetica, Arial, sans-serif',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        colors: ['#fff']
+      },
+      background: {
+        enabled: true,
+        foreColor: '#000',
+        padding: 8,
+        borderRadius: 2,
+        borderWidth: 2,
+        borderColor: '#313e75',
       },
       dropShadow: {
         enabled: false
       }
     }
   };
-
 }

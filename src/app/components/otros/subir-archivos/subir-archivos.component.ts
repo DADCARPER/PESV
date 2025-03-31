@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { LoginService } from '../../../services/login.service';
-import { SharedService } from '../../../services/shared/shared.service';
+
 import { AlertaService } from '../../../services/alerta.service';
 
 import { Storage, ref, uploadBytesResumable, getDownloadURL } from '@angular/fire/storage';
@@ -12,6 +12,8 @@ import { Firestore, setDoc, doc, getDoc } from '@angular/fire/firestore';
 import { AlertaInformativoComponent } from "../../alertas/alerta-informativo/alerta-informativo.component";
 import { ModalsGuiaComponent } from '../../modals/modals-guia/modals-guia.component';
 import { LoadingComponent } from '../../loading/loading/loading.component';
+import { SharedService } from '../../../shared/cargar-documentos/shared.service';
+import { EstatusGeneralService } from '../../../services/estatus-general.service';
 
 
 @Component({
@@ -47,6 +49,7 @@ export class SubirArchivosComponent implements OnInit {
   private _storage = inject(Storage);
   private _firestore = inject(Firestore);
   private _shared = inject(SharedService);
+  private _estatusGeneral = inject(EstatusGeneralService);
   public _alertaService = inject(AlertaService);
 
 
@@ -69,7 +72,7 @@ export class SubirArchivosComponent implements OnInit {
     }
   
     const file = event.target.files[0];
-    console.log('Archivo seleccionado:', file);
+    //console.log('Archivo seleccionado:', file);
   
     // Verificar longitud total
     if (file.name.length > 85) {
@@ -149,7 +152,7 @@ export class SubirArchivosComponent implements OnInit {
         this.uploadProgress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
       }, 
       (error) => {
-        console.error('Error al subir archivo:', error);
+        this._alertaService.showError('Error conexión internet. Contacte con su proveedor');
         this.uploadProgress = 0;
       }, 
       async () => {
@@ -167,7 +170,10 @@ export class SubirArchivosComponent implements OnInit {
               mostrar: true,
             }
           }, { merge: true });
-  
+
+          // al Cargar el un documento estoy indicando que se cumple el 100% del modulo
+          this._estatusGeneral.setEstatusGeneralFirestore({[this.urlStore]:{ estado: '100' }});
+
           event.target.value = '';
           this._shared.notificarNuevaSubida();
           //console.log('Archivo guardado en Firestore');

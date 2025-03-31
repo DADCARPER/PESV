@@ -1,12 +1,12 @@
 import { Component, Input, inject, ViewChild } from '@angular/core';
 import { IconoSvgComponent } from "../../iconos/icono-svg/icono-svg.component";
-import { DiagnosticoService } from '../../../services/diagnostico.service';
 import { LoginService } from '../../../services/login.service';
 import { Firestore, doc, getDoc, updateDoc } from '@angular/fire/firestore';
-import { SharedService } from '../../../services/shared/shared.service';
+
 import { DatePipe } from '@angular/common';
 import { Storage, getStorage, ref, getDownloadURL, uploadBytes, deleteObject } from '@angular/fire/storage';
 import { ModalsGuiaComponent } from '../../modals/modals-guia/modals-guia.component';
+import { SharedService } from '../../../shared/cargar-documentos/shared.service';
 
 interface ArchivoData {
   nombre: string;
@@ -46,9 +46,7 @@ export class CardArchivoComponent {
   @Input() urlStore: string = ""; 
 
   private _auth = inject(LoginService);
-  private _diagnostico = inject(DiagnosticoService);
   private _firestore = inject(Firestore);
-  private _storage = inject(Storage);
   private _shared = inject(SharedService);
   private _datePipe = inject(DatePipe);
 

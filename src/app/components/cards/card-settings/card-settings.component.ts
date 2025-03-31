@@ -10,11 +10,14 @@ import { LoginService } from '../../../services/login.service';
 import { PerfilService } from '../../../services/perfil.service';
 import { Subscription } from 'rxjs';
 import { ComboselectComponent } from "../../controlesFormulario/comboselect/comboselect.component";
+import { AlertaInformativoComponent } from "../../alertas/alerta-informativo/alerta-informativo.component";
+import { AlertaService } from '../../../services/alerta.service';
+
 
 @Component({
   selector: "app-card-settings",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ComboselectComponent],  // Agregamos módulos necesarios
+  imports: [CommonModule, ReactiveFormsModule, ComboselectComponent, AlertaInformativoComponent],  // Agregamos módulos necesarios
   templateUrl: "./card-settings.component.html",
 })
 export class CardSettingsComponent implements OnInit, OnDestroy {
@@ -34,24 +37,15 @@ export class CardSettingsComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private _perfil: PerfilService,
-    private _UID: LoginService) { }
+    private _UID: LoginService,
+    public _alertaService: AlertaService
+  ) { }
   
 
   ngOnInit(): void {
 
     this.iniciarformulariolimpio();
-    // Nos suscribimos al observable user$ que ya tienes en LoginService
-    // para obtener el estado del usuario
-    this.userSubscription = this._UID.user$.subscribe(user => {
-      if (user?.uid) {
-        this.uid = user.uid;
-        this.cargarPerfil(user.uid);
-      } else {
-        this.loading = false;
-        this.error = 'Usuario no autenticado';
-      }
-    });
-
+    this.cargarPerfil();
     
   }
 
@@ -77,22 +71,25 @@ export class CardSettingsComponent implements OnInit, OnDestroy {
   onSubmit() {
     //console.log(this.formPerfil.value);
     if (this.formPerfil.valid) {
-      console.log(this.formPerfil.value);
-      this._perfil.updatePerfil(this.uid, this.formPerfil.value)
+      //console.log(this.formPerfil.value);
+      this._perfil.updatePerfil(this.formPerfil.value);
+      this._alertaService.showSuccess("Registro Actualizado con exito");
     } else {
-      console.log('Formulario inválido');
+      //console.log('Formulario inválido');
+      this._alertaService.showWarning("Registro inválido. ¡Debe completar los campos!");
     }
   }
 
-  private async cargarPerfil(uid: string) {
+  private async cargarPerfil() {
     try {
       this.loading = true;
-      this.perfil = await this._perfil.getPerfilEdit(uid);
-      console.log('Perfil:', this.perfil);
+      this.perfil = await this._perfil.getPerfilEdit();
+      //console.log('Perfil:', this.perfil);
       this.formPerfil.patchValue(this.perfil);
     } catch (error) {
       console.error('Error:', error);
-      this.error = 'Error al cargar el perfil';
+      //this.error = 'Error al cargar el perfil';
+      this._alertaService.showError("Error.¡Falla con la conexión a Internet!");
     } finally {
       this.loading = false;
     }

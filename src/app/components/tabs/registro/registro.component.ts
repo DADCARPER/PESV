@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { LoginService } from '../../../services/login.service';  // Importamos LoginService
-import { Firestore, setDoc, doc } from "@angular/fire/firestore";
+import { FirestoreService } from '../../../services/firestore.service';
 import { Router } from "@angular/router";
 import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import AOS from 'aos'; // Importa AOS
 import { ArchivoService } from '../../../services/archivos.service';
+
 
 @Component({
   selector: 'app-registro',
@@ -16,32 +17,19 @@ import { ArchivoService } from '../../../services/archivos.service';
 })
 export class RegistroComponent implements OnInit {
 
+  private _loginservice = inject(LoginService);
+  private _firestore = inject(FirestoreService);
   private _archivo = inject(ArchivoService);
   private _router = inject(Router);
+ 
 
-  datosEmpresa:any;
+  datosEmpresa:any ='';
+  
 
-  ngOnInit(): void {
-    //Tomo datos del sessionstorage
-    const objetoempresaDataString = sessionStorage.getItem('empresaData');
+  ngOnInit() {
+    AOS.init();
+    this.llamardocumento();
 
-    if (objetoempresaDataString) {
-      this.datosEmpresa = JSON.parse(objetoempresaDataString);
-    
-      // Ahora puedes acceder al campo email
-      console.log('Email:', this.datosEmpresa.email);
-    } else {
-      console.log('No hay datos de empresa almacenados en sessionStorage.');
-    }
-
-    console.log('Iniciando AOS');
-    // Referente a la animacion
-    AOS.init({
-      duration: 1000, // Duración de las animaciones en milisegundos
-      once: false,    // Las animaciones se pueden volver a ejecutar
-    });
-
-    console.log('AOS iniciado');
   }
 
   form = {
@@ -54,6 +42,18 @@ export class RegistroComponent implements OnInit {
   };
 
   resultado: string | null = null;
+
+  async llamardocumento(){
+
+    const userId = await this._loginservice.waitForUser();
+    // Aquí ya tienes el userId cargado
+    console.log('userId:', userId);
+
+    const documento = await this._firestore.getDocument(`users/${userId}`);
+    console.log('Documento cargado:', documento);
+    this.datosEmpresa = documento;
+
+  }
 
   onSubmit() {
 

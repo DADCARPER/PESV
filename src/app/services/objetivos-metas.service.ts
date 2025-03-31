@@ -19,7 +19,7 @@ export class ObjetivosMetasService {
     //Autoguarda y crear Documento 
     async autoGuardar(data: any, tipo: string, estado: number, id_formulario: string): Promise<void> {
   
-      const ruta = `objetivosMetas/${this._login.getUserId()}`; //---OJO TOMA UN TIEMPO EN TOMAR EL VALOR UID 
+      const ruta = `objetivosMetas/${this._login.userIdSignal()}`; //---OJO TOMA UN TIEMPO EN TOMAR EL VALOR UID 
       const formulariosIndex = await this._firestore.getDocument(ruta);
       //console.log(formulariosIndex)
   
@@ -57,7 +57,7 @@ export class ObjetivosMetasService {
   
     async getfomularioEdit(idformulario: string){
       
-      const ruta = `objetivosMetas/${this._login.getUserId()}/formularios/${idformulario}`; //---OJO TOMA UN TIEMPO EN TOMAR EL VALOR UID 
+      const ruta = `objetivosMetas/${this._login.userIdSignal()}/formularios/${idformulario}`; //---OJO TOMA UN TIEMPO EN TOMAR EL VALOR UID 
       const formularioDocEdit = await this._firestore.getDocument(ruta);
       return formularioDocEdit;
       
@@ -68,12 +68,12 @@ export class ObjetivosMetasService {
   
       
       //subo archivo Blob y retorno URL
-      const filePath = `uploads/${this._login.getUserId()}/005-objetivos-y-metas/${formularioID}`;
+      const filePath = `uploads/${this._login.userIdSignal()}/005-objetivos-y-metas/${formularioID}`;
       const url = await this._firestore.uploadFileProgreso(filePath,blob);
      
       //ACTUALIZO documento INDEX CON EL NOMBRE URL Y ESTADO 100%
   
-      const ruta = `objetivosMetas/${this._login.getUserId()}`;
+      const ruta = `objetivosMetas/${this._login.userIdSignal()}`;
       const nuevoFormulario = {
         [formularioID]:{ /// var_dinamica
           URL: url,
@@ -88,7 +88,7 @@ export class ObjetivosMetasService {
   
     // Método para leer el documento desde Firestore
     leerDocumentoIndex(): Observable<any[]> {
-      const filePath = `objetivosMetas/${this._login.getUserId()}`;
+      const filePath = `objetivosMetas/${this._login.userIdSignal()}`;
       
       // Llamamos al método getDocument que devuelve un Promise
       const documentPromise = this._firestore.getDocument(filePath);

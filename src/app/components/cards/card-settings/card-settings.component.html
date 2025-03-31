@@ -207,3 +207,9 @@
     </form>
   </div>
 </div>
+@if (_alertaService.showAlert) {
+  <app-alerta-informativo
+      [type]="_alertaService.alertType"
+      [message]="_alertaService.alertMessage">
+  </app-alerta-informativo>
+  }

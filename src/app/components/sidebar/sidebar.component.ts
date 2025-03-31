@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA  } from "@angular/core";
 import { RouterLink, RouterLinkActive } from "@angular/router";
 import { NotificationDropdownComponent } from "../dropdowns/notification-dropdown/notification-dropdown.component";
 import { CommonModule } from "@angular/common";
@@ -14,6 +14,7 @@ import { UserProfile } from "../../interfaces/perfil.interface";
   standalone: true,
   imports: [RouterLink,NotificationDropdownComponent,CommonModule,UserDropdownComponent,RouterLinkActive],
   templateUrl: "./sidebar.component.html",
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent implements OnInit {
@@ -23,6 +24,9 @@ export class SidebarComponent implements OnInit {
   dashboardInicio = false;
   submenuPlanificar = false;
   submenuDiagnostico = false;
+  submenuHacer = false;
+  submenuVerificar = false;
+  submenuActuar = false;
 
   datosUser: UserProfile={};
 
@@ -53,12 +57,39 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit() {}
 
+  collapseDashboard(){
+    this.submenuPlanificar = false;
+    this.submenuHacer = false;
+    this.submenuVerificar = false;
+    this.submenuActuar = false;
+  }
 
   collapsePlanificar(){
     this.submenuPlanificar = !this.submenuPlanificar;
+    this.submenuHacer = false;
+    this.submenuVerificar = false;
+    this.submenuActuar = false;
   }
   collapseDiagnostico(){
     this.submenuDiagnostico = !this.submenuDiagnostico;
+  }
+  collapseHacer(){
+    this.submenuHacer = !this.submenuHacer;
+    this.submenuPlanificar = false;
+    this.submenuVerificar = false;
+    this.submenuActuar = false;
+  }
+  collapseVerificar(){
+    this.submenuVerificar = !this.submenuVerificar;
+    this.submenuHacer = false;
+    this.submenuPlanificar = false;
+    this.submenuActuar = false;
+  }
+  collapseActuar(){
+    this.submenuActuar = !this.submenuActuar;
+    this.submenuHacer = false;
+    this.submenuVerificar = false;
+    this.submenuPlanificar = false;
   }
 
   toggleCollapseShow(classes:any) {

@@ -1,0 +1,728 @@
+<div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
+  <div class="rounded-t bg-blueGray-100  mb-0 px-6 py-6">
+    <div class="text-center flex ">
+      <button
+        [routerLink]="['/admin/planificar']"
+        class="bg-red-600 text-white active:bg-red-700 font-bold uppercase text-xs px-1 py-1  rounded shadow hover:shadow-md outline-none focus:outline-none mr-2 ease-linear transition-all duration-150"
+        type="button"
+      >
+      <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" /></svg>
+      </button>
+      <h6 class="text-blueGray-700 text-xl font-bold">Líder del diseño e implementación del (PESV)</h6>
+    </div>
+  </div>
+  <div class="flex-auto px-4 lg:px-10 py-10 pt-0">
+    
+    <app-pasopaso *ngIf="openTab > 1 && openTab < 6" [steps]="['Lider','Responsabilidad','Competencias','Confirmación']"></app-pasopaso>
+    <div *ngIf="openTab === 0" >
+
+      <div class="text-lg font-light leading-relaxed mt-6 mb-4 text-gray-700" >
+
+        <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300" class="text-justify pb-3">
+          Bienvenido al módulo de diseño e implementación del PESV. En esta sección, te guiaremos a través de los pasos necesarios para completar la designación del líder responsable de este plan, de acuerdo con la Resolución 40595 de 2022 emitida por el Ministerio de Transporte de Colombia.
+        </p>
+
+        <div data-aos="fade-right" data-aos-duration="1000" data-aos-delay="500" class="bg-amber-50 p-4 rounded-lg border border-amber-100">
+          <h3 class="font-medium text-amber-800 mb-2">Resumen de la Resolución 40595 de 2022</h3>
+          <p class= "text-justify">
+            La resolución establece la metodología para el diseño, implementación y verificación de los Planes
+            Estratégicos de Seguridad Vial (PESV). El nivel directivo debe designar a un líder con poder de decisión
+            para la gestión de seguridad vial, quien será responsable de velar por la planificación, implementación y
+            mejora del PESV.
+          </p>
+        </div>
+        
+        <div class="flex flex-col lg:flex-row justify-evenly mt-4 mb-6 mx-2 lg:space-x-16 ">
+          <!-- Lista original con subtítulo -->
+          <div class="w-full md:w-1/2 mb-6">
+            
+            <p style="margin-bottom: 14px;"><strong>Objetivos del Líder del PESV</strong></p>
+            <ul class="list-disc list-inside space-y-1">
+              <li>Diseñar y ejecutar el PESV.</li>
+              <li>Reportar indicadores y resultados de autogestión.</li>
+              <li>Asegurar el presupuesto necesario.</li>
+              <li>Coordinarse con autoridades en materia de seguridad vial.</li>
+            </ul>
+          </div>
+        
+          <!-- Nueva lista paralela con subtítulo -->
+          <div class="w-full md:w-1/2 ">
+            
+            <p style="margin-bottom: 14px;"><strong>Requisitos de Competencia</strong></p>
+            <ul class="list-disc list-inside space-y-1">
+              <li>Experiencia en Seguridad y Salud en el Trabajo (SG-SST).</li>
+              <li>Formación certificada en seguridad vial.</li>
+            </ul>
+          </div>
+        </div>
+
+        <app-previa-documentos></app-previa-documentos>
+
+        <div class="flex flex-col lg:flex-row justify-center items-center mt-6 mb-6 space-y-6 lg:space-y-0 lg:space-x-16">
+          <div class="lg:w-1/3 sm:w-full ">
+            <a href="/admin/planificar/liderdelpesv/gestion_archivos">
+            <app-cards-boton
+            
+            [titulo]="'Cargar docmento'"
+            [descripcion]="'Ya cuento con el documento de certificación del líder encargado.'"
+            [tipoIcono]="'fas fa-upload'"
+            [colorIcono]="'bg-blue-500'"
+            ></app-cards-boton>
+            </a>
+          </div>
+          <div class="lg:w-1/3 sm:w-full ">
+            <app-cards-boton
+            (click)="toggleTabs(1,'')"
+            [titulo]="'Crear docmento'"
+            [descripcion]="'Aún no tengo el documento. Iniciar proceso de creación ahora'"
+            [tipoIcono]="'fas fa-rocket'"
+            [colorIcono]="'bg-green-500'"></app-cards-boton>
+          </div>
+        </div>
+
+      </div>
+      
+    </div>
+    <div *ngIf="openTab === 1" >
+
+      <div style="text-align: justify;" class="text-xl font-light leading-relaxed mt-6 mb-4" >
+      
+        
+      
+        <p style="margin-bottom: 14px;"><strong>Documentos y Requisitos Necesarios</strong></p>
+
+        <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="700" style="margin-bottom: 14px;">
+          Antes de comenzar, asegúrate de contar con los siguientes documentos e información necesarios para completar el formulario de designación del líder del PESV. Esto agilizará el proceso y garantizará el cumplimiento de todos los requisitos.
+        </p>
+
+        <div class="flex flex-col md:flex-row justify-between mt-6 mb-6 lg:pl-28 space-y-6 md:space-y-0 md:space-x-8">
+          <!-- Lista original con subtítulo -->
+          <div class="w-full md:w-1/2">
+            <p style="margin-bottom: 14px;"><strong>Lista de Documentos Necesarios</strong></p>
+            <ul class="list-disc list-inside text-gray-500 space-y-1">
+              <li>
+                Documento de Identificación
+                <ol class="ps-5 mt-2 space-y-1 list-decimal list-inside w-9/12">
+                  Fotocopia de la cédula o identificación oficial del representante legal
+                </ol>
+              </li>
+              <li>
+                Acta de Designación del Líder del PESV.
+                <ol class="ps-5 mt-2 space-y-1 list-decimal list-inside w-9/12">
+                  Documento oficial de la organización que designe al líder del PESV y establezca sus responsabilidades.
+                </ol>
+              </li>
+              <li>
+                Certificados de Competencia.
+                <ol class="ps-5 mt-2 space-y-1 list-decimal list-inside w-9/12">
+                  Certificados de formación del líder en Seguridad y Salud en el Trabajo (SG-SST) y en Seguridad Vial (curso de 50 o 20 horas).
+                </ol>
+              </li>
+              <li>
+                Documentación de Experiencia Profesional.
+                <ol class="ps-5 mt-2 space-y-1 list-decimal list-inside w-9/12">
+                  Pruebas de experiencia en SG-SST y PESV de al menos 2 años.
+                </ol>
+              </li>
+            </ul>
+          </div>
+        
+          <!-- Nueva lista paralela con subtítulo -->
+          <div class="w-full md:w-1/2">
+            <p style="margin-bottom: 14px;"><strong>Información Específica a Tener a Mano</strong></p>
+            <ul class="list-disc list-inside text-gray-500 space-y-1">
+              <li>
+                Datos Generales de la Empresa.
+                <ol class="ps-5 mt-2 space-y-1 list-decimal list-inside w-9/12">
+                  - NIT de la empresa.
+                </ol>
+                <ol class="ps-5 mt-2 space-y-1 list-decimal list-inside w-9/12">
+                  - Nombre completo del representante legal.
+                </ol>
+              </li>
+              <li>
+                Datos del Líder del PESV.
+                <ol class="ps-5 mt-2 space-y-1 list-decimal list-inside w-9/12">
+                  - Certificados de formación del líder en Seguridad y Salud en el Trabajo (SG-SST) y en Seguridad Vial (curso de 50 o 20 horas).
+                </ol>
+                <ol class="ps-5 mt-2 space-y-1 list-decimal list-inside w-9/12">
+                  - Cargo en la empresa.
+                </ol>
+              </li>
+              <li>
+                Indicadores y Metas.
+                <ol class="ps-5 mt-2 space-y-1 list-decimal list-inside w-9/12">
+                  - Tasa de siniestralidad vial.
+                </ol>
+                <ol class="ps-5 mt-2 space-y-1 list-decimal list-inside w-9/12">
+                  - Cumplimiento del plan de trabajo.
+                </ol>
+                <ol class="ps-5 mt-2 space-y-1 list-decimal list-inside w-9/12">
+                  - Tasa de incidentes y gestión de no conformidades.
+                </ol>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+      <div class="flex justify-center">
+        <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="900" (click)="toggleTabs(2,'')" class="text-amber-500 bg-transparent border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+          <i class="fas fa-arrow-right"></i> Comenzar a crear
+        </button>
+      </div>
+    </div>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div *ngIf="openTab === 2">
+        <div class="flex flex-wrap" style="text-align: left;margin-top: 20px;margin-bottom: 20px;">
+          <div class="w-full lg:w-12/12 px-4">
+          
+            
+            <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">
+              Información del Representante Legal
+            </h6>
+            <div class="flex flex-wrap">
+              <!-- Nombre completo del representante legal -->
+              <div class="w-full lg:w-6/12 px-4">
+                <div class="relative w-full mb-3">
+                  <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">
+                    Nombre completo del representante legal
+                  </label>
+                  <input formControlName="representanteLegal" type="text" class="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white rounded text-sm shadow outline-transparent focus:outline-none focus:shadow-outline w-full" placeholder="Ejemplo: Juan Pérez" />
+                  <div *ngIf="form.get('representanteLegal')?.invalid && form.get('representanteLegal')?.touched">
+                    <small class="text-red-500">Este campo es obligatorio</small>
+                  </div>
+                </div>
+              </div>
+        
+              <!-- Cargo del representante legal -->
+              <div class="w-full lg:w-6/12 px-4">
+                <div class="relative w-full mb-3">
+                  <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">Cargo</label>
+                  <input formControlName="cargoRepresentante" type="text" class="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white rounded text-sm shadow outline-transparent focus:outline-none focus:shadow-outline w-full" />
+                  <div *ngIf="form.get('cargoRepresentante')?.invalid && form.get('cargoRepresentante')?.touched">
+                    <small class="text-red-500">Este campo es obligatorio</small>
+                  </div>
+                </div>
+              </div>
+        
+              <!-- Número de identificación del representante -->
+              <div class="w-full lg:w-6/12 px-4">
+                <div class="relative w-full mb-3">
+                  <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">Número de identificación</label>
+                  <input formControlName="identificacionRepresentante" type="text" class="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white rounded text-sm shadow outline-transparent focus:outline-none focus:shadow-outline w-full" />
+                  <div *ngIf="form.get('identificacionRepresentante')?.invalid && form.get('identificacionRepresentante')?.touched">
+                    <small class="text-red-500">Este campo es obligatorio</small>
+                  </div>
+                </div>
+              </div>
+        
+              <!-- NIT de la empresa -->
+              <div class="w-full lg:w-6/12 px-4">
+                <div class="relative w-full mb-3">
+                  <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">NIT de la empresa</label>
+                  <input formControlName="nitEmpresa" type="text" class="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white rounded text-sm shadow outline-transparent focus:outline-none focus:shadow-outline w-full" />
+                  <div *ngIf="form.get('nitEmpresa')?.invalid && form.get('nitEmpresa')?.touched">
+                    <small class="text-red-500">Este campo es obligatorio</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+        
+            <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">
+              Datos del Líder del PESV
+            </h6>
+            <div class="flex flex-wrap">
+              <!-- Nombre completo del líder -->
+              <div class="w-full lg:w-6/12 px-4">
+                <div class="relative w-full mb-3">
+                  <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">Nombre completo del líder designado</label>
+                  <input formControlName="nombreLider" type="text" class="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white rounded text-sm shadow outline-transparent focus:outline-none focus:shadow-outline w-full" />
+                  <div *ngIf="form.get('nombreLider')?.invalid && form.get('nombreLider')?.touched">
+                    <small class="text-red-500">Este campo es obligatorio</small>
+                  </div>
+                </div>
+              </div>
+        
+              <!-- Cargo del líder -->
+              <div class="w-full lg:w-6/12 px-4">
+                <div class="relative w-full mb-3">
+                  <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">Cargo en la empresa</label>
+                  <input formControlName="cargoLider" type="text" class="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white rounded text-sm shadow outline-transparent focus:outline-none focus:shadow-outline w-full" />
+                  <div *ngIf="form.get('cargoLider')?.invalid && form.get('cargoLider')?.touched">
+                    <small class="text-red-500">Este campo es obligatorio</small>
+                  </div>
+                </div>
+              </div>
+        
+              <!-- Departamento del líder -->
+              <div class="w-full lg:w-6/12 px-4">
+                <div class="relative w-full mb-3">
+                  <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">Departamento o área</label>
+                  <input formControlName="departamentoLider" type="text" class="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white rounded text-sm shadow outline-transparent focus:outline-none focus:shadow-outline w-full" />
+                  <div *ngIf="form.get('departamentoLider')?.invalid && form.get('departamentoLider')?.touched">
+                    <small class="text-red-500">Este campo es obligatorio</small>
+                  </div>
+                </div>
+              </div>
+        
+              <!-- Fecha de designación -->
+              <div class="w-full lg:w-6/12 px-4">
+                <div class="relative w-full mb-3">
+                  <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">Fecha de designación</label>
+                  <input formControlName="fechaDesignacion" type="date" class="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white rounded text-sm shadow outline-transparent focus:outline-none focus:shadow-outline w-full" />
+                  <div *ngIf="form.get('fechaDesignacion')?.invalid && form.get('fechaDesignacion')?.touched">
+                    <small class="text-red-500">Este campo es obligatorio</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex justify-center">
+              <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="500"  (click)="toggleTabs(3,'Avanza')" 
+                class="text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+                <i class="fas fa-arrow-right"></i> Siguiente
+              </button>
+            </div>
+          
+          </div>
+        </div>
+      </div>
+      <div *ngIf="openTab === 3">
+        <!-- Pregunta 2 -->
+        <div class="flex flex-wrap" style="text-align: left;margin-top: 20px;margin-bottom: 20px;">
+          <div class="w-full lg:w-12/12 px-4">
+
+            <p class="text-xl font-light leading-relaxed mt-6 mb-4">
+              La aceptación de las responsabilidades establecidas en este formulario es fundamental para garantizar el cumplimiento eficaz del Plan Estratégico de Seguridad Vial (PESV). Como líder designado, su compromiso con cada uno de estos aspectos asegura la implementación de medidas que protejan la seguridad y el bienestar de todos los colaboradores y partes involucradas. La responsabilidad de liderar y gestionar el PESV implica no solo el cumplimiento de las normativas legales, sino también un compromiso ético con la prevención de riesgos y la mejora continua en la cultura de seguridad vial dentro de la organización. Al marcar 'Sí, acepto' en cada uno de los apartados, usted ratifica su dedicación y responsabilidad en el rol, contribuyendo al fortalecimiento de un entorno seguro y regulado.
+            </p>
+            <!-- Paso 2: Designación y Autorización -->
+            <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">Responsabilidades del Líder</h6>
+            <div class="flex flex-wrap">
+              <!-- Checkbox 1: Liderar el diseño e implementación del PESV -->
+              <div class="w-full lg:w-6/12 px-4">
+                <div class="relative w-full mb-3">
+                  <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">¿Se compromete a liderar el diseño e implementación del PESV y velar por el cumplimiento de todas sus fases?
+                    <br><br><input type="checkbox" formControlName="liderResponsabilidades" />
+                    <small class="text-blueGray-500 pl-2"> Sí, acepto</small>
+                  </label>
+                  <div *ngIf="form.get('liderResponsabilidades')?.invalid && form.get('liderResponsabilidades')?.touched">
+                    <small class="text-red-500">Este campo es obligatorio</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Checkbox 2: Reportar resultados de autogestión -->
+              <div class="w-full lg:w-6/12 px-4">
+                <div class="relative w-full mb-3">
+                  <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">¿Reportará los resultados de autogestión y auditoría interna según lo establecido?
+                    <br><br><input type="checkbox" formControlName="reportaAutogestion" />
+                    <small class="text-blueGray-500 pl-2"> Sí, acepto</small>
+                  </label>
+                  <div *ngIf="form.get('reportaAutogestion')?.invalid && form.get('reportaAutogestion')?.touched">
+                    <small class="text-red-500">Este campo es obligatorio</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Checkbox 3: Garantizar presupuesto -->
+              <div class="w-full lg:w-6/12 px-4">
+                <div class="relative w-full mb-3">
+                  <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">¿Garantizará el presupuesto necesario para la implementación del PESV?
+                    <br><br><input type="checkbox" formControlName="garantizaPresupuesto" />
+                    <small class="text-blueGray-500 pl-2"> Sí, acepto</small>
+                  </label>
+                  <div *ngIf="form.get('garantizaPresupuesto')?.invalid && form.get('garantizaPresupuesto')?.touched">
+                    <small class="text-red-500">Este campo es obligatorio</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Checkbox 4: Responder a autoridades -->
+              <div class="w-full lg:w-6/12 px-4">
+                <div class="relative w-full mb-3">
+                  <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">¿Responderá a solicitudes de las autoridades en temas de seguridad vial?
+                    <br><br><input type="checkbox" formControlName="respondeAutoridades" />
+                    <small class="text-blueGray-500 pl-2"> Sí, acepto</small>
+                  </label>
+                  <div *ngIf="form.get('respondeAutoridades')?.invalid && form.get('respondeAutoridades')?.touched">
+                    <small class="text-red-500">Este campo es obligatorio</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Checkbox 5: Informar a la alta dirección -->
+              <div class="w-full lg:w-6/12 px-4">
+                <div class="relative w-full mb-3">
+                  <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">¿Informará a la alta dirección sobre resultados y mejoras del PESV?
+                    <br><br><input type="checkbox" formControlName="informaDireccion" />
+                    <small class="text-blueGray-500 pl-2"> Sí, acepto</small>
+                  </label>
+                  <div *ngIf="form.get('informaDireccion')?.invalid && form.get('informaDireccion')?.touched">
+                    <small class="text-red-500">Este campo es obligatorio</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Checkbox 6: Definir y asegurar cumplimiento de actividades -->
+              <div class="w-full lg:w-6/12 px-4">
+                <div class="relative w-full mb-3">
+                  <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">¿Definir y asegurar el cumplimiento de las actividades designadas en el Plan anual de trabajo y el plan de formación?
+                    <br><br><input type="checkbox" formControlName="defineCumplimientoActividades" />
+                    <small class="text-blueGray-500 pl-2"> Sí, acepto</small>
+                  </label>
+                  <div *ngIf="form.get('defineCumplimientoActividades')?.invalid && form.get('defineCumplimientoActividades')?.touched">
+                    <small class="text-red-500">Este campo es obligatorio</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+
+        <div class="flex justify-center">
+          <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="900" (click)="toggleTabs(2,'Atras')" class="text-blueGray-500 bg-transparent border border-solid border-blueGray-500 hover:bg-blueGray-300 active:bg-blueGray-500 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+            <i class="fas fa-arrow-left"></i> Regresar
+          </button>
+          <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="500"  (click)="toggleTabs(4,'Avanza')" 
+            class="text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+            <i class="fas fa-arrow-right"></i> Siguiente
+          </button>
+        </div>
+      
+        
+      
+      </div>
+      <div *ngIf="openTab === 4">
+        <!-- Pregunta 3 -->
+        <div class="flex flex-wrap" style="text-align: left;margin-top: 20px;margin-bottom: 20px;">
+          <div class="w-full lg:w-12/12 px-4">
+          
+            <!-- Competencias Requeridas -->
+            <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">Competencias Requeridas</h6>
+
+            <!-- Grado Académico -->
+            <div class="flex flex-wrap">
+              <div class="w-full lg:w-6/12 px-4">
+                <div class="relative w-full mb-3">
+                  <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">Grado Académico</label>
+                  <select formControlName="gradoAcademico" class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150">
+                    <option value="">Seleccione el grado académico</option>
+                    <option value="Tecnico">Técnico</option>
+                    <option value="Tecnologo">Tecnólogo</option>
+                    <option value="Administrador">Administrador</option>
+                    <option value="Profesional">Profesional</option>
+                    <option value="Ingeniero">Ingeniero</option>
+                    <option value="EspecialistaSST">Especialista en SST</option>
+                  </select>
+                  <div *ngIf="form.get('gradoAcademico')?.invalid && form.get('gradoAcademico')?.touched">
+                    <small class="text-red-500">Este campo es obligatorio</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Certificados -->
+              <div class="w-full lg:w-6/12 px-4">
+                <div class="relative w-full mb-3">
+                  <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">¿Cuenta con el curso de 50 horas o actualización de 20 horas en SG-SST?</label>
+                  <input type="checkbox" formControlName="certificadoSGSST" class="mr-2" />
+                  <small class="text-blueGray-500">Sí, acepto</small>
+                  <div *ngIf="form.get('certificadoSGSST')?.invalid && form.get('certificadoSGSST')?.touched">
+                    <small class="text-red-500">Este campo es obligatorio</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Años de experiencia en SG-SST -->
+            <div class="flex flex-wrap">
+              <div class="w-full lg:w-6/12 px-4">
+                <div class="relative w-full mb-3">
+                  <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">Años de experiencia en SG-SST</label>
+                  <input type="number" formControlName="experienciaSST" class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" placeholder="Ingrese los años de experiencia" min="0" />
+                  <div *ngIf="form.get('experienciaSST')?.invalid && form.get('experienciaSST')?.touched">
+                    <small class="text-red-500">Este campo es obligatorio</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Años de experiencia en PESV -->
+              <div class="w-full lg:w-6/12 px-4">
+                <div class="relative w-full mb-3">
+                  <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">Años de experiencia en Planes Estratégicos de Seguridad Vial (PESV)</label>
+                  <input type="number" formControlName="experienciaPESV" class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" placeholder="Ingrese los años de experiencia" min="0" />
+                  <div *ngIf="form.get('experienciaPESV')?.invalid && form.get('experienciaPESV')?.touched">
+                    <small class="text-red-500">Este campo es obligatorio</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Documentación: Carga de Certificados -->
+            <div class="w-full lg:w-12/12 px-4">
+              <div class="relative w-full mb-3">
+                <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">Subir certificados de formación en seguridad vial y temas afines</label>
+                <input type="file" formControlName="certificados" class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" (change)="onFilesSelected($event)" multiple />
+                <div *ngIf="form.get('certificados')?.invalid && form.get('certificados')?.touched">
+                  <small class="text-red-500">Este campo es obligatorio</small>
+                </div>
+              </div>
+            
+              <!-- Lista de archivos seleccionados -->
+              <div class="mt-4">
+                <h6 class="text-blueGray-400 text-sm font-bold uppercase mb-2">Archivos seleccionados:</h6>
+                <ul>
+                  <li *ngFor="let file of selectedFiles; let i = index" class="flex items-center mb-2">
+                    <!-- Ícono del archivo -->
+                    <i class="fas fa-file-alt text-blueGray-500 mr-2"></i>
+                    <!-- Nombre del archivo y tamaño -->
+                    <span class="text-blueGray-600 text-sm mr-4">{{ file.name }} ({{ (file.size / 1024).toFixed(2) }} KB)</span>
+                    <!-- Ícono de eliminación -->
+                    <i class="fas fa-trash-alt text-red-500 cursor-pointer" (click)="removeFile(i)"></i>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      
+        
+        <div class="flex justify-center">
+          <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="400" (click)="toggleTabs(3,'Atras')" class="text-blueGray-500 bg-transparent border border-solid border-blueGray-500 hover:bg-blueGray-300 active:bg-blueGray-500 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+            <i class="fas fa-arrow-left"></i> Regresar
+          </button>
+          <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="500"  (click)="toggleTabs(5,'Avanza')" 
+            class="text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+            <i class="fas fa-arrow-right"></i> Siguiente
+          </button>
+        </div>
+        
+      
+      </div>
+      <div *ngIf="openTab === 5">
+
+        <!-- Pregunta 5 -->
+        <div class="flex flex-wrap" style="text-align: left;margin-top: 20px;margin-bottom: 20px;">
+          <div class="w-full lg:w-12/12 px-4">
+          
+
+            <!-- Resumen de Información Ingresada -->
+            <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">Resumen de Información Ingresada</h6>
+            <div class="mb-4">
+              <!-- Aquí muestra el resumen de la información ingresada en cada paso -->
+              <ul>
+                <li *ngFor="let info of resumenInformacion">
+                  <span class="text-red-400 text-sm">{{ info }}</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Confirmación de Compromiso -->
+            <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">Confirmación de Compromiso</h6>
+            <div class="flex flex-wrap">
+              <div class="w-full lg:w-12/12 px-4">
+                <div class="relative w-full mb-3">
+                  <label class="text-blueGray-600 text-sm">
+                  <input type="checkbox" formControlName="confirmacionInformacion" class="mr-2" />
+                  Confirmo que toda la información proporcionada es correcta y completa.</label>
+                  <div *ngIf="form.get('confirmacionInformacion')?.invalid && form.get('confirmacionInformacion')?.touched">
+                    <small class="text-red-500">Este campo es obligatorio</small>
+                  </div>
+                </div>
+                <div class="relative w-full mb-3">
+                  <label class="text-blueGray-600 text-sm">
+                  <input type="checkbox" formControlName="compromisoLider" class="mr-2" />
+                  Acepto las responsabilidades asignadas y me comprometo a cumplir con el Plan Estratégico de Seguridad Vial.</label>
+                  <div *ngIf="form.get('compromisoLider')?.invalid && form.get('compromisoLider')?.touched">
+                    <small class="text-red-500">Este campo es obligatorio</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Firma Final -->
+            <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">Firma Final</h6>
+            <div class="flex flex-wrap">
+              <!-- Firma Representante Legal -->
+              <div class="w-full lg:w-6/12 px-4">
+                <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">Firma Electrónica del Representante Legal</label>
+                <input type="text" formControlName="firmaRepresentante" class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" placeholder="Ingrese la firma electrónica" />
+              </div>
+              <!-- Firma Líder del PESV -->
+              <div class="w-full lg:w-6/12 px-4">
+                <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">Firma Electrónica del Líder del PESV</label>
+                <input type="text" formControlName="firmaLider" class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" placeholder="Ingrese la firma electrónica" />
+              </div>
+            </div>
+
+            
+
+          </div>
+        </div>
+
+        <div class="flex justify-center">
+          <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="600" (click)="toggleTabs(4,'Atras')" class="text-blueGray-500 bg-transparent border border-solid border-blueGray-500 hover:bg-blueGray-300 active:bg-blueGray-500 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+            <i class="fas fa-arrow-left"></i> Regresar
+          </button>
+
+          <app-pdf-lider-pesv
+          [subirBlob]=false
+          [idFormulario]="id_formulario"
+          [idusuario]="userId"
+          [nombreBoton]="'Vista previa'"
+          [disenoboton]="'diseno1'"
+          [descargaOprevia]="'descarga'"
+          [nombreEmpresa]="dataEmpresa2.nombreEmpresa"></app-pdf-lider-pesv>
+
+
+          <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="500"  (click)="toggleTabs(5,'Avanza')" 
+            class="text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="submit">
+            <i class="fas fa-arrow-right"></i> Terminar
+          </button>
+        </div>
+
+        
+
+        
+
+
+
+      </div>
+    </form>
+
+    <div *ngIf="openTab === 6" class="flex flex-wrap">
+
+  
+      <div class="w-full xl:w-3/12 px-4">
+        <app-upload-archivos></app-upload-archivos>
+      </div>
+      <!-- Tabla de Documentos cargados o Formularios completos -->
+      <div class="w-full xl:w-10/12 mb-12 xl:mb-0 px-4">
+        <div class="rounded-t mb-0 px-4 py-3 border-0">
+          <div class="flex flex-wrap items-center">
+            <div class="relative w-full px-4 max-w-full flex-grow flex-1">
+              <h3 class="font-semibold text-lg text-blueGray-700">
+                Documentos cargados
+              </h3>
+            </div>
+          </div>
+        </div>
+
+        <div class="block w-full overflow-x-auto">
+          <table class="items-center w-full bg-transparent border-collapse">
+            <thead>
+              <tr>
+                <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
+                  No.
+                </th>
+                <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
+                  Nombre del Documento
+                </th>
+                <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
+                  Tipo
+                </th>
+                <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
+                  Estado
+                </th>
+                <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
+                  Acciones
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let registro of (tablaDocumentos$ | async), let i = index">
+                <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
+                  {{i + 1}}
+                </td>
+                <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
+                  {{ registro.nombrePDf || 'N/A' }}
+                </td>
+                <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
+                  {{ registro.tipo }}
+                </td>
+                <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
+                  {{ registro.estado }} %
+                </td>
+                <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
+                  
+                  <ng-container *ngIf="registro.nombrePDf; else noNombre">
+
+                    <ng-container *ngIf="registro.tipo === 'Asistente'; else archivoCargado">
+                      <app-pdf-lider-pesv
+                      [subirBlob]=false
+                      [idFormulario]="registro.id"
+                      [idusuario]="userId"
+                      [nombreBoton]="'Ver'"
+                      [disenoboton]="'diseno6'"
+                      [disenoIcono]="'fa-eye'"
+                      [descargaOprevia]="'vista'"
+                      [nombreEmpresa]="dataEmpresa2.nombreEmpresa"></app-pdf-lider-pesv>
+
+                      <app-pdf-lider-pesv
+                      [subirBlob]=false
+                      [idFormulario]="registro.id"
+                      [idusuario]="userId"
+                      [nombreBoton]="''"
+                      [disenoboton]="'diseno4'"
+                      [disenoIcono]="'fa-download'"
+                      [descargaOprevia]="'descarga'"
+                      [nombreEmpresa]="dataEmpresa2.nombreEmpresa"></app-pdf-lider-pesv>
+
+                      <app-pdf-lider-pesv
+                      [subirBlob]=false
+                      [idFormulario]="registro.id"
+                      [idusuario]="userId"
+                      [nombreBoton]="''"
+                      [disenoboton]="'diseno5'"
+                      [disenoIcono]="'fa-print'"
+                      [descargaOprevia]="'imprimir'"
+                      [nombreEmpresa]="dataEmpresa2.nombreEmpresa"></app-pdf-lider-pesv>
+                    </ng-container>
+
+                    <ng-template #archivoCargado>
+
+                      <a [href]="registro.URL" target="_blank" class="text-sky-500 bg-transparent border border-solid border-sky-500 hover:bg-sky-500 hover:text-white active:bg-sky-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">Ver</a>
+
+                    </ng-template>
+
+                  </ng-container>
+
+                  <ng-template #noNombre>
+                    <!-- Contenedor alternativo cuando nombrePDf no tiene valor -->
+                    <span class="text-red-500">Documento no disponible</span>
+                  </ng-template>
+
+                </td>
+              </tr>
+              <tr *ngIf="(tablaDocumentos$ | async)?.length === 0">
+                <td colspan="5" class="text-center py-4">No hay documentos disponibles.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      
+      
+
+      <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="600" (click)="irdashboard()" class="text-blueGray-500 bg-transparent border border-solid border-blueGray-500 hover:bg-blueGray-300 active:bg-blueGray-500 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
+        <i class="fas fa-cog"></i> Finalizar
+      </button>
+
+    </div>
+
+  </div>
+</div>
+
+
+  <app-modals-guia 
+  [titulo]="'Lider del PES'"
+  [contenido]="'Se encontro un Documento pendiente. \n Desea continuar ( SI )  Descartar ( NO )'"
+  [tamano]="'regular'"
+  [cancelar]="'NO'"
+  [ok]="'si'"
+  (onSave)="toggleTabs(2,'')"
+  (onCancel)="borroSessionIdFormulario()"
+  ></app-modals-guia>

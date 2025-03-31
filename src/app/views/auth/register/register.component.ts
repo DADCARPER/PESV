@@ -53,7 +53,7 @@ export class RegisterComponent {
         console.log('Formulario IUD', uid);
         // Guardar el perfil del usuario en Firestore
         if (uid) {
-          const userDocRef = this._perfilservice.updatePerfil(uid, this.registroForm.value);
+          const userDocRef = this._perfilservice.updatePerfil(this.registroForm.value);
           console.log('Formulario IUD', userDocRef);
           this._alerta.showSuccess('Cuenta creada exitosamente.');
           this.router.navigate(['/auth/login']);
@@ -84,7 +84,7 @@ export class RegisterComponent {
       this._alerta.showWarning('Por favor, completa el formulario correctamente.');
     }
 
-    // this.loginService.registerWithEmail(this.user.email, this.user.password).then((userCredential) => {
+    // this._loginService.registerWithEmail(this.user.email, this.user.password).then((userCredential) => {
     //   const uid = userCredential.user?.uid;
 
     //   // Guardar el perfil del usuario en Firestore

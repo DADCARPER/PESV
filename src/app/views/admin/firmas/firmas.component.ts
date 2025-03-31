@@ -44,18 +44,18 @@ export class FirmasComponent implements OnInit, OnDestroy {
       const userId = this._login.userIdSignal();
       if (!userId) throw new Error('Usuario no autenticado');
 
-      this.subscription = this._firestore.getDocumentRealTime(`gestor-firmas/`, userId)
-        .subscribe({
-          next: (data) => {
-            this.integrantesSignal.set(data);
-            this.loading.set(false);
-          },
-          error: (error) => {
-            console.error('Error al cargar firmas:', error);
-            // Aquí podrías emitir un evento de error o mostrar un mensaje
-            this.loading.set(false);
-          }
-        });
+      // this.subscription = this._firestore.getDocumentRealTime(`gestor-firmas/`, userId)
+      //   .subscribe({
+      //     next: (data) => {
+      //       this.integrantesSignal.set(data);
+      //       this.loading.set(false);
+      //     },
+      //     error: (error) => {
+      //       console.error('Error al cargar firmas:', error);
+      //       // Aquí podrías emitir un evento de error o mostrar un mensaje
+      //       this.loading.set(false);
+      //     }
+      //   });
     } catch (error) {
       console.error('Error:', error);
       this.loading.set(false);

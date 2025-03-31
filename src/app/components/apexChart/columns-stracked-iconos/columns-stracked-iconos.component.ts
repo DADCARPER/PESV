@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   NgApexchartsModule,
@@ -42,74 +42,117 @@ export type ChartOptions = {
   `
 })
 export class ColumnsStrackedIconosComponent {
+  @Input() data: number[] = [];
+  @Input() categories: string[] = [];
+  @Input() anchoColumna: number = 100;
+  @Input() espacioslinea: number = 5;
+  
 
-  chartOptions: ChartOptions = {
-    series: [{
-      name: 'Porcentaje',
-      data: [1.02, 3.06, 22.45, 40.82, 32.65]
-    }],
-    chart: {
-      type: 'bar',
-      height: 400,
-      toolbar: {
-        show: false
-      }
-    },
-    colors: ['#0047AB'], // Azul similar al de la imagen
-    plotOptions: {
-      bar: {
-        borderRadius: 0,
-        columnWidth: '50%',
-        dataLabels: {
-          position: 'top'
-        }
-      }
-    },
-    dataLabels: {
-      enabled: true,
-      formatter: function(val: any) {
-        if (typeof val === 'number') {
-          return val.toFixed(2) + "%";
-        }
-        return val + "%";
+  public chartOptions: ChartOptions;
+
+  constructor() {
+    this.chartOptions = this.initializeChartOptions();
+  }
+
+  ngOnInit(): void {
+    this.updateChartOptions();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['data'] || changes['categories'] || changes['anchoColumna']) {
+      this.updateChartOptions();
+    }
+  }
+
+  private initializeChartOptions(): ChartOptions {
+    return {
+      series: [{
+        name: 'Porcentaje',
+        data: []
+      }],
+      chart: {
+        type: 'bar',
+        height: 300,
+        toolbar: {
+          show: false
+        },
+        defaultLocale: 'es',
+        locales: [{
+          name: 'es',
+          options: {
+            toolbar: {
+              exportToSVG: 'Descargar SVG',
+              exportToPNG: 'Descargar PNG',
+              menu: 'Menu'
+            }
+          }
+        }]
       },
-      offsetY: -20,
-      style: {
-        fontSize: '12px',
-        fontWeight: 'bold'
-      }
-    },
-    xaxis: {
-      categories: ['A pie 🚶', 'Bicicleta 🚲', 'Automóvil 🚗', 'Motocicleta 🏍️', 'Transporte público 🚌'],
-      position: 'bottom',
-      labels: {
+      colors: ['#0047AB'],
+      plotOptions: {
+        bar: {
+          borderRadius: 0,
+          columnWidth: '40%',
+          dataLabels: {
+            position: 'top'
+          }
+        }
+      },
+      dataLabels: {
+        enabled: true,
+        formatter: function(val: any) {
+          if (typeof val === 'number') {
+            return val.toFixed(2) + "%";
+          }
+          return val + "%";
+        },
+        offsetY: -20,
         style: {
-          fontSize: '12px'
-        }
-      }
-    },
-    yaxis: {
-      labels: {
-        formatter: function (val) {
-          return val.toFixed(2) + '%';
+          fontSize: '12px',
+          fontWeight: 'bold'
         }
       },
-      max: 50, // Para que el gráfico tenga un máximo de 50%
-      tickAmount: 5
-    },
-    grid: {
-      borderColor: '#f1f1f1',
       xaxis: {
-        lines: {
-          show: true
+        categories: [],
+        position: 'bottom',
+        labels: {
+          style: {
+            fontSize: '12px'
+          }
         }
       },
       yaxis: {
-        lines: {
-          show: true
+        labels: {
+          formatter: function (val) {
+            return val.toFixed(2) + '%';
+          }
+        },
+        max: 100,
+        tickAmount: 4
+      },
+      grid: {
+        borderColor: '#f1f1f1',
+        xaxis: {
+          lines: {
+            show: true
+          }
+        },
+        yaxis: {
+          lines: {
+            show: true
+          }
         }
       }
-    }
-  };
+    };
+  }
 
+  private updateChartOptions(): void {
+    this.chartOptions.series = [{
+      name: 'Porcentaje',
+      data: this.data
+    }];
+    this.chartOptions.xaxis.categories = this.categories;
+    this.chartOptions.yaxis.max = this.anchoColumna;
+    this.chartOptions.yaxis.tickAmount = this.espacioslinea;
+  }
 }

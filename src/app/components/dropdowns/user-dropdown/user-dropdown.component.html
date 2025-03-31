@@ -6,10 +6,10 @@
   #btnDropdownRef
 >
   <div class="items-center flex cursor-pointer">
-    <span [class]="size + ' text-sm text-white bg-white inline-flex items-center justify-center rounded-full shadow-md'">
+    <span [class]="size + ' relative inline-flex items-center justify-center rounded-full shadow-md overflow-hidden aspect-square bg-white'">
       <img
         alt="..."
-        class="w-full object-cover"
+        class="absolute w-full h-full object-contain p-1"
         
         [src]="imageUrl"
       />

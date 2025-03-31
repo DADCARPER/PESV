@@ -1,90 +1,76 @@
-<div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
-    <div class="rounded-t bg-white mb-0 px-6 py-6 border-0 shadow">
-      <div class="text-center flex justify-between">
-        <h6 class="text-blueGray-700 text-xl font-bold">Factores de Riesgo Viales</h6>
-        <!-- <button
-          class="bg-red-600 text-white active:bg-red-700 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
-          type="button"
-        >
-          Settings
-        </button> -->
-      </div>
+<div class="flex-auto px-4 lg:px-10 py-10 pt-0">
+    <!-- <form [formGroup]="form" (ngSubmit)="onSubmit()"> -->
+    <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">
+        Factor Humano
+    </h6>
+    <div style="text-align: justify;" class="flex flex-wrap text-lg font-light leading-relaxed mt-6 mb-4">
+        <p style="margin-bottom: 14px;">
+            El factor humano no es uno de los factores de riesgo con mayor valoración. Sin embargo, aquel que ocupa un lugar destacado es la Distracción, seguido del Exceso de velocidad, por lo que diseñar las estrategias para el programa de gestión del riesgo teniendo en cuenta estas variables permitiría generar un mayor impacto y la creación de herramientas con mayor eficacia. 
+        </p>
     </div>
 
-    <div class="flex-auto px-4 lg:px-10 py-10 pt-0">
-        <!-- <form [formGroup]="form" (ngSubmit)="onSubmit()"> -->
-        <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">
-            Factor Humano
-        </h6>
-        <div style="text-align: justify;" class="flex flex-wrap text-lg font-light leading-relaxed mt-6 mb-4">
-            <p style="margin-bottom: 14px;">
-                El factor humano no es uno de los factores de riesgo con mayor valoración. Sin embargo, aquel que ocupa un lugar destacado es la Distracción, seguido del Exceso de velocidad, por lo que diseñar las estrategias para el programa de gestión del riesgo teniendo en cuenta estas variables permitiría generar un mayor impacto y la creación de herramientas con mayor eficacia. 
-            </p>
+    <div class="flex flex-wrap">
+        <div class="w-full lg:w-12/12 px-4 ">
+            <app-columns-bar-horizontal
+            [data]="causasAccidentes1"></app-columns-bar-horizontal>
         </div>
-
-        <div class="flex flex-wrap">
-            <div class="w-full lg:w-12/12 px-4 ">
-                <app-columns-bar-horizontal
-                [data]="causasAccidentes1"></app-columns-bar-horizontal>
-            </div>
-        </div>
-
-        <hr class="mt-6 border-b-1 border-blueGray-300" />
-
-        <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">
-           Factor Víal
-        </h6>
-
-        <div style="text-align: justify;" class="flex flex-wrap text-lg font-light leading-relaxed mt-6 mb-4">
-            <p style="margin-bottom: 14px;">
-                En el factor vía se destacando de manera significativa el mal estado de estas.  Sin embargo a pesar de que no es posible intervenir directamente vías públicas, la sensibilización y  la socialización de la identificación de este tipo de riesgos genera un mayor control. 
-            </p>
-        </div>
-
-        <div class="flex flex-wrap">
-            <div class="w-full lg:w-12/12 px-4 ">
-                <app-columns-bar-horizontal
-                [data]="causasAccidentes2"></app-columns-bar-horizontal>
-            </div>
-        </div>
-
-        <hr class="mt-6 border-b-1 border-blueGray-300" />
-
-        <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">
-           Factor Vehículo
-        </h6>
-
-        <div style="text-align: justify;" class="flex flex-wrap text-lg font-light leading-relaxed mt-6 mb-4">
-            <p style="margin-bottom: 14px;">
-                El listado de riesgos viales asociados al factor vehículo se limitó de manera general a fallas mecánicas, falta de manteniendo del vehículo automotor y la deficiencia en los sistemas de seguridad, del cual destaca de acuerdo a esto la falla mecánica como el factor más representativo.
-            </p>
-        </div>
-
-        <div class="flex flex-wrap">
-            <div class="w-full lg:w-12/12 px-4 ">
-                <app-columns-bar-horizontal
-                [data]="causasAccidentes3"></app-columns-bar-horizontal>
-            </div>
-        </div>
-
-        <hr class="mt-6 border-b-1 border-blueGray-300" />
-
-        <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">
-           Factor Entorno
-        </h6>
-
-        <div style="text-align: justify;" class="flex flex-wrap text-lg font-light leading-relaxed mt-6 mb-4">
-            <p style="margin-bottom: 14px;">
-                En el factor entorno destaca como factor de riesgo las condiciones climaticas, a pesar de ser un factor no controlable, es posible adpatarnos conductualmente frente a cualquiera de estas situaciones, por lo que se sugiere incluirlo dentro de la tematica de Actores viales vulnerables. 
-            </p>
-        </div>
-
-        <div class="flex flex-wrap">
-            <div class="w-full lg:w-12/12 px-4 ">
-                <app-columns-bar-horizontal
-                [data]="causasAccidentes4"></app-columns-bar-horizontal>
-            </div>
-        </div>
-
     </div>
+
+    <hr class="mt-6 border-b-1 border-blueGray-300" />
+
+    <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">
+        Factor Víal
+    </h6>
+
+    <div style="text-align: justify;" class="flex flex-wrap text-lg font-light leading-relaxed mt-6 mb-4">
+        <p style="margin-bottom: 14px;">
+            En el factor vía se destacando de manera significativa el mal estado de estas.  Sin embargo a pesar de que no es posible intervenir directamente vías públicas, la sensibilización y  la socialización de la identificación de este tipo de riesgos genera un mayor control. 
+        </p>
+    </div>
+
+    <div class="flex flex-wrap">
+        <div class="w-full lg:w-12/12 px-4 ">
+            <app-columns-bar-horizontal
+            [data]="causasAccidentes2"></app-columns-bar-horizontal>
+        </div>
+    </div>
+
+    <hr class="mt-6 border-b-1 border-blueGray-300" />
+
+    <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">
+        Factor Vehículo
+    </h6>
+
+    <div style="text-align: justify;" class="flex flex-wrap text-lg font-light leading-relaxed mt-6 mb-4">
+        <p style="margin-bottom: 14px;">
+            El listado de riesgos viales asociados al factor vehículo se limitó de manera general a fallas mecánicas, falta de manteniendo del vehículo automotor y la deficiencia en los sistemas de seguridad, del cual destaca de acuerdo a esto la falla mecánica como el factor más representativo.
+        </p>
+    </div>
+
+    <div class="flex flex-wrap">
+        <div class="w-full lg:w-12/12 px-4 ">
+            <app-columns-bar-horizontal
+            [data]="causasAccidentes3"></app-columns-bar-horizontal>
+        </div>
+    </div>
+
+    <hr class="mt-6 border-b-1 border-blueGray-300" />
+
+    <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">
+        Factor Entorno
+    </h6>
+
+    <div style="text-align: justify;" class="flex flex-wrap text-lg font-light leading-relaxed mt-6 mb-4">
+        <p style="margin-bottom: 14px;">
+            En el factor entorno destaca como factor de riesgo las condiciones climaticas, a pesar de ser un factor no controlable, es posible adpatarnos conductualmente frente a cualquiera de estas situaciones, por lo que se sugiere incluirlo dentro de la tematica de Actores viales vulnerables. 
+        </p>
+    </div>
+
+    <div class="flex flex-wrap">
+        <div class="w-full lg:w-12/12 px-4 ">
+            <app-columns-bar-horizontal
+            [data]="causasAccidentes4"></app-columns-bar-horizontal>
+        </div>
+    </div>
+
 </div>

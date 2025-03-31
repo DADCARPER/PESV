@@ -1,5 +1,5 @@
 import { Injectable, inject,signal, computed } from '@angular/core';
-import { Firestore, doc, getDoc, setDoc, onSnapshot } from '@angular/fire/firestore'; //nueva API modular de Firebase 9+
+import { Firestore, doc, getDoc, setDoc, onSnapshot, collection, getDocs } from '@angular/fire/firestore'; //nueva API modular de Firebase 9+
 import { Storage, ref, uploadBytes, uploadBytesResumable, getDownloadURL } from '@angular/fire/storage';
 import { Observable } from 'rxjs';
 
@@ -24,6 +24,11 @@ export class FirestoreService {
     await setDoc(docRef, data,{ merge: true }) // Garantiza que no se sobrescriba todo el documento;
   }
 
+  async getCollection(path: string) {
+    const collectionRef = collection(this.firestore, path);
+    const collectionSnapshot = await getDocs(collectionRef);
+    return collectionSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); //Mapeamos los datos y agregamos el id
+  }
   ////////////INITIALIZE SIGNALS///////////////////////////
 
   // Creamos un signal privado para almacenar los datos
@@ -61,33 +66,6 @@ export class FirestoreService {
     return this.documentSignal.asReadonly();
   }
   /////////////////////FIN SIGNALS///////////////////////////
-  
-  // Método para escuchar cambios en un documento en tiempo real
-  getDocumentRealTime(path: string, iduser: string | null): Observable<any> {
-    //console.log("id",path+iduser)
-    const docRef = doc(this.firestore, path+iduser); // Referencia al documento en Firestore
-
-    return new Observable<any>((observer) => {
-      // Usamos onSnapshot para escuchar los cambios en tiempo real
-      const unsubscribe = onSnapshot(docRef, (docSnapshot) => {
-        if (docSnapshot.exists()) {
-          // Emitimos los datos del documento en tiempo real
-          const data = docSnapshot.data();
-          observer.next(this.convertObjectToArray(data));
-        } else {
-          // Si el documento no existe, emitimos un valor nulo o vacío
-          observer.next([]);
-        }
-      }, (error) => {
-        // Si ocurre un error, lo emitimos al observable
-        observer.error(error);
-      });
-
-      // Nos aseguramos de cancelar la suscripción cuando ya no sea necesario
-      return () => unsubscribe();
-    });
-  
-  }
 
   // Método que convierte un objeto en un array (puedes usarlo en otros lugares también)
   convertObjectToArray(object: any): any[] {

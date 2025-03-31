@@ -55,7 +55,7 @@ export class SubirImagenComponent {
   async uploadImage() {
     if (!this.selectedFile) return;
 
-    const userId = this.loginService.getUserId();
+    const userId = this.loginService.userIdSignal();
     if (!userId) {
       this.errorMessage = 'No hay usuario autenticado';
       return;

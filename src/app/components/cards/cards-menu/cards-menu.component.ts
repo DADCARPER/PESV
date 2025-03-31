@@ -19,4 +19,5 @@ export class CardsMenuComponent {
   @Input() linkvamos:string = '/admin/planificar';
   @Input() porcentaje: number = 30;
   @Input() colorgrafica: string = "#5d7ba2";
+  @Input() muestradona: boolean = true;
 }

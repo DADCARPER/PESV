@@ -1,99 +1,170 @@
-<div class="container mx-auto px-4 h-full">
-  <div class="flex content-center items-center justify-center h-full">
-    <div class="w-full lg:w-4/12 px-4">
-      <div
-        class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-blueGray-200 border-0"
-      >
-        <div class="rounded-t mb-0 px-6 py-6">
-          <div class="text-center mb-3">
-            <h6 class="text-blueGray-500 text-sm font-bold">Sign in with</h6>
-          </div>
-          <div class="btn-wrapper text-center">
-            <button
-              class="bg-white active:bg-blueGray-50 text-blueGray-700 font-normal px-4 py-2 rounded outline-none focus:outline-none mr-2 mb-1 uppercase shadow hover:shadow-md inline-flex items-center font-bold text-xs ease-linear transition-all duration-150"
-              type="button"
-            >
-              <img alt="..." class="w-5 mr-1" src="assets/img/github.svg" />
-              Github
-            </button>
-            <button
-              class="bg-white active:bg-blueGray-50 text-blueGray-700 font-normal px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 uppercase shadow hover:shadow-md inline-flex items-center font-bold text-xs ease-linear transition-all duration-150"
-              type="button"
-            >
-              <img alt="..." class="w-5 mr-1" src="assets/img/google.svg" />
-              Google
-            </button>
-          </div>
-          <hr class="mt-6 border-b-1 border-blueGray-300" />
-        </div>
-        <div class="flex-auto px-4 lg:px-10 py-10 pt-0">
-          <div class="text-blueGray-400 text-center mb-3 font-bold">
-            <small>Or sign in with credentials</small>
-          </div>
-          <form>
-            <div class="relative w-full mb-3">
-              <label
-                class="block uppercase text-blueGray-600 text-xs font-bold mb-2"
-                htmlFor="grid-password"
-              >
-                Email
-              </label>
-              <input
-                type="email"
-                class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                placeholder="Email"
-              />
-            </div>
 
-            <div class="relative w-full mb-3">
-              <label
-                class="block uppercase text-blueGray-600 text-xs font-bold mb-2"
-                htmlFor="grid-password"
-              >
-                Password
-              </label>
-              <input
-                type="password"
-                class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                placeholder="Password"
-              />
-            </div>
-            <div>
-              <label class="inline-flex items-center cursor-pointer">
-                <input
-                  id="customCheckLogin"
-                  type="checkbox"
-                  class="form-checkbox border-0 text-blueGray-700 ml-1 w-5 h-5 ease-linear transition-all duration-150 rounded"
-                />
-                <span class="ml-2 text-sm font-semibold text-blueGray-600">
-                  Remember me
-                </span>
-              </label>
-            </div>
+<div class="grid grid-cols-1 md:items-stretch md:grid-cols-2 gap-x-12 lg:gap-x-20 gap-y-10">
+  <div class="flex flex-col justify-between lg:py-5">
+      <div>
+          <h2 class="text-3xl font-bold leading-tight text-white sm:text-4xl lg:leading-tight lg:text-5xl">Conectando seguridad y movilidad responsable!</h2>
+          <p class="max-w-xl mx-auto mt-4 text-base leading-relaxed text-white text-justify">PESV Interactivo es un sistema innovador diseñado para empresas que buscan crear, implementar y gestionar su propio Plan Estratégico de Seguridad Vial.</p>
 
-            <div class="text-center mt-6">
-              <button
-                class="bg-blueGray-800 text-white active:bg-blueGray-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 w-full ease-linear transition-all duration-150"
-                type="button"
-              >
-                Sign In
-              </button>
-            </div>
-          </form>
-        </div>
+          <img class="relative z-10 max-w-xs mx-auto -mb-16 md:hidden" src="https://cdn.rareblocks.xyz/collection/celebration/images/contact/4/curve-line-mobile.svg" alt="" />
+
+          <img class="hidden w-full translate-x-24 translate-y-8 md:block" src="https://cdn.rareblocks.xyz/collection/celebration/images/contact/4/curve-line.svg" alt="" />
       </div>
-      <div class="flex flex-wrap mt-6 relative">
-        <div class="w-1/2">
-          <a href="javascript:void(0)" class="text-blueGray-200">
-            <small>Forgot password?</small>
-          </a>
-        </div>
-        <div class="w-1/2 text-right">
-          <a [routerLink]="['/auth/register']" class="text-blueGray-200">
-            <small>Create new account</small>
-          </a>
-        </div>
+
+      <div class="hidden md:mt-auto md:block">
+          <div class="flex items-center">
+              <svg class="w-6 h-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path
+                      d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                  />
+              </svg>
+              <svg class="w-6 h-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path
+                      d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                  />
+              </svg>
+              <svg class="w-6 h-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path
+                      d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                  />
+              </svg>
+              <svg class="w-6 h-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path
+                      d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                  />
+              </svg>
+              <svg class="w-6 h-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path
+                      d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                  />
+              </svg>
+          </div>
+
+          <blockquote class="mt-6">
+              <p class="text-lg leading-relaxed text-white text-justify">A través de una plataforma intuitiva y totalmente personalizable, las organizaciones pueden cumplir con la normativa de seguridad vial, diseñar estrategias efectivas y fomentar una cultura de prevención y responsabilidad en el transporte.</p>
+          </blockquote>
+
+          <div class="flex items-center mt-8">
+              <img class="flex-shrink-0 object-cover  h-14 " src="../../../assets/img/esva2.png" alt="" />
+              <div class="ml-4">
+                  <p class="text-base font-semibold text-white">Soluciones Inegrales</p>
+                  <p class="mt-px text-sm text-gray-400">Diseñado por ES&VA s.a.s</p>
+              </div>
+          </div>
       </div>
-    </div>
+  </div>
+
+  <div class="lg:pl-12">
+      <div class="overflow-hidden bg-white rounded-md lg:mt-16">
+          <div class="p-6 sm:p-10">
+              <!-- <h3 class="text-3xl font-semibold text-black">Get a free quote</h3> -->
+              <img src="../../../assets/img/logo.png" alt="Logo" class="h-20 mx-auto mb-6" />
+              <!-- <p class="mt-4 text-base text-gray-600">Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint.</p> -->
+
+                <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                  <div class="space-y-6">
+                      <div>
+                          <label for="email" class="text-base font-medium text-gray-900"> Correo electronico </label>
+                          <div class="mt-2.5 relative">
+                              <input
+                                id="email" formControlName="email" type="email"
+                                placeholder="Correo electronico"
+                                class="block w-full px-4 py-4 text-black placeholder-gray-500 transition-all duration-200 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 caret-orange-500"
+                              />
+                              @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+                                @if (loginForm.get('email')?.errors?.['email']) {
+                                  <span class="text-red-500 text-sm mt-1 block">Por favor, ingresa un correo válido</span>
+                                }
+                              }
+                             
+                          </div>
+                      </div>
+
+                      <div>
+                          <label for="password" class="text-base font-medium text-gray-900"> Contraseña </label>
+                          <div class="mt-2.5 relative">
+                              <input
+                                    id="password" formControlName="password" type="password" placeholder="Contraseña"
+                                  class="block w-full px-4 py-4 text-black placeholder-gray-500 transition-all duration-200 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 caret-orange-500"
+                              />
+                              
+                          </div>
+                      </div>
+
+                      <!-- <div>
+                          <label for="" class="text-base font-medium text-gray-900"> Project brief </label>
+                          <div class="mt-2.5 relative">
+                              <textarea
+                                  name=""
+                                  id=""
+                                  placeholder="Enter your project brief"
+                                  class="block w-full px-4 py-4 text-black placeholder-gray-500 transition-all duration-200 bg-white border border-gray-200 rounded-md resize-y focus:outline-none focus:ring-orange-500 focus:border-orange-500 caret-orange-500"
+                                  rows="4"
+                              ></textarea>
+                          </div>
+                      </div> -->
+
+                      <div>
+                          <button type="submit" class="inline-flex items-center justify-center w-full px-4 py-4 text-base font-semibold text-white transition-all duration-200 bg-orange-500 border border-transparent rounded-md focus:outline-none hover:bg-orange-600 focus:bg-orange-600">
+                            Iniciar sesión
+                          </button>
+                      </div>
+                      <div>
+                        <button type="button" [routerLink]="['/auth/register']" class="inline-flex items-center justify-center w-full px-4 py-4 text-base font-semibold text-white transition-all duration-200 bg-orange-500 border border-transparent rounded-md focus:outline-none hover:bg-orange-600 focus:bg-orange-600">
+                            Crea tu cuenta
+                        </button>
+                    </div>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+
+  <div class="md:hidden">
+      <div class="flex items-center">
+          <svg class="w-6 h-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+              />
+          </svg>
+          <svg class="w-6 h-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+              />
+          </svg>
+          <svg class="w-6 h-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+              />
+          </svg>
+          <svg class="w-6 h-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+              />
+          </svg>
+          <svg class="w-6 h-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+              />
+          </svg>
+      </div>
+
+      <blockquote class="mt-6">
+          <p class="text-lg leading-relaxed text-white">You made it so simple. My new site is so much faster and easier to work with than my old site. I just choose the page, make the change and click save.</p>
+      </blockquote>
+
+      <div class="flex items-center mt-8">
+          <img class="flex-shrink-0 object-cover w-40 h-40 rounded-full" src="../../../assets/img/esva.png" alt="" />
+          <div class="ml-4">
+              <p class="text-base font-semibold text-white">Soluciones integrales</p>
+              <p class="mt-px text-sm text-gray-400">Product Designer</p>
+          </div>
+      </div>
   </div>
 </div>
+
+@if (alertaService.showAlert) {
+<app-alerta-informativo
+[type]="alertaService.alertType"
+[message]="alertaService.alertMessage">
+</app-alerta-informativo>
+}

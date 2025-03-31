@@ -9,18 +9,18 @@
             [descripcion]="'En esta sección te ayudaremos a establecer y gestionar los indicadores clave para medir el desempeño, realizar seguimiento periódico y generar reportes de autogestión que demuestren el progreso de tu plan'"
             [tipoIcono]="'fas fa-user-tie'"
             [colorIcono]="'bg-emerald-400'"
-            [porcentaje]="0"
+            [porcentaje]="estatusGeneral['020-indicadores-reporte-autogestion']?.estado || 0"
             [colorgrafica]="'#10b97b'"
-            [linkvamos]="'/admin/desarrollo'"
+            [linkvamos]="'indicadores_autogestion_pesv'"
             ></app-cards-menu>
             <app-cards-menu
             [titulo]="'Registro y análisis estadístico de siniestros viales'"
             [descripcion]="'Encontrarás las herramientas para documentar y analizar los datos históricos de siniestralidad. Podrás clasificar los siniestros según su nivel de riesgo, establecer tendencias y generar proyecciones estadísticas.'"
             [tipoIcono]="'fas fa-users'"
             [colorIcono]="'bg-emerald-400'"
-            [porcentaje]="10"
+            [porcentaje]="estatusGeneral['021-registro-analisis-siniestros-viales']?.estado || 0"
             [colorgrafica]="'#10b97b'"
-            [linkvamos]="'/admin/desarrollo'"
+            [linkvamos]="'registro_siniestros_viales'"
             ></app-cards-menu>
           </div>
           <div class="grid grid-cols-1 gap-8 mt-8 xl:mt-0 xl:gap-12 md:grid-cols-2">
@@ -30,9 +30,9 @@
             [descripcion]="'Esta sección te guiará en la realización de auditorías internas efectivas para evaluar el cumplimiento de tu PESV. Te ayudaremos a documentar el proceso, planificar las auditorías y dar seguimiento a los hallazgos identificados.'"
             [tipoIcono]="'fas fa-balance-scale'"
             [colorIcono]="'bg-emerald-400'"
-            [porcentaje]="20"
+            [porcentaje]="estatusGeneral['022-auditoria-anual']?.estado || 0"
             [colorgrafica]="'#10b97b'"
-            [linkvamos]="'/admin/desarrollo'"
+            [linkvamos]="'auditoria_anual'"
             ></app-cards-menu>
 
             

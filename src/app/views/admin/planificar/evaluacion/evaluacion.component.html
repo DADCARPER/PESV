@@ -1,203 +1,57 @@
-<div class="flex flex-wrap mt-4">
-    <div class="w-full lg:w-12/12 px-4">
-        
-        <div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
-            <div class="px-12 py-10 flex-auto">
-                <div class="tab-content tab-space">
-            
-                    <div *ngIf="openTab === 0" >
-          
-                      <h1 data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" class="text-3xl font-normal leading-normal mt-0 text-blueGray-700" style="text-align: center;">Caracterización, evaluación y control de riesgos</h1><br>
-                
-                      <div style="text-align: justify;" class="text-xl font-light leading-relaxed mt-6 mb-4" >
-        
-                        <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300" style="margin-bottom: 14px;">
-                            Bienvenido al módulo de Evaluación y Control de Riesgos. Aquí encontrarás las herramientas necesarias para identificar, analizar y gestionar los riesgos de seguridad vial en tu organización.
-                        </p>
-                        
-                        <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="500" style="margin-bottom: 14px;">
-                            Te guiaremos paso a paso en este proceso crucial para tu PESV. Explora cada sección para construir una gestión de riesgos robusta:
-                        </p>
-                        
-                        
-                        <div class="flex flex-col md:flex-row justify-center items-center mt-6 mb-6 space-y-0 md:space-y-0 md:space-x-0">
-                      
-                          <div class="lg:w-3/3 sm:w-full ">
-                            <app-cards-boton
-                            (click)="toggleTabs(1,'')"
-                            [titulo]="'Cargar docmento'"
-                            [descripcion]="'Ya cuento con el documento de Política de Seguridad Vial'"
-                            [tipoIcono]="'fas fa-upload'"
-                            [colorIcono]="'bg-blue-500'"
-                            ></app-cards-boton>
-                          </div>
-                          
-  
-                        </div>
-                        <div class="flex flex-col md:flex-row justify-center items-center mt-6 mb-6 space-y-6 md:space-y-0 md:space-x-6">
-                          
-                          <div class="lg:w-1/3 sm:w-full ">
-                            <app-cards-boton
-                            (click)="toggleTabs(1,'')"
-                            [titulo]="'Sociodemografia'"
-                            [descripcion]="'Ya cuento con el documento de Política de Seguridad Vial'"
-                            [tipoIcono]="'fas fa-user-friends'"
-                            [colorIcono]="'bg-amber-400'"
-                            ></app-cards-boton>
-                          </div>
-                          <div class="lg:w-1/3 sm:w-full ">
-                            <app-cards-boton
-                            (click)="toggleTabs(1,'')"
-                            [titulo]="'Movilidad'"
-                            [descripcion]="'Analiza información sobre los patrones de desplazamiento de las personas. Esto incluye datos sobre el uso de medios de transporte y el tráfico'"
-                            [tipoIcono]="'fas fa-car'"
-                            [colorIcono]="'bg-amber-400'"></app-cards-boton>
-                          </div>
-                          <div class="lg:w-1/3 sm:w-full ">
-                            <app-cards-boton
-                            (click)="toggleTabs(1,'')"
-                            [titulo]="'Factores de riesgo'"
-                            [descripcion]="'Evalúa los elementos que pueden aumentar la probabilidad de accidentes o situaciones de peligro. Desde condiciones de las vías hasta comportamientos de los conductores'"
-                            [tipoIcono]="'fas fa-exclamation-circle'"
-                            [colorIcono]="'bg-amber-400'"></app-cards-boton>
-                          </div>
-  
-                        </div>
-                        <div class="flex flex-col md:flex-row justify-center items-center mt-6 mb-6 space-y-6 md:space-y-0 md:space-x-6">
-                          
-                          <div class="lg:w-1/3 sm:w-full ">
-                            <app-cards-boton
-                            (click)="toggleTabs(1,'')"
-                            [titulo]="'Accidentalidad'"
-                            [descripcion]="'Consulta información detallada sobre los accidentes ocurridos en un área específica.'"
-                            [tipoIcono]="'fas fa-ambulance'"
-                            [colorIcono]="'bg-amber-400'"
-                            ></app-cards-boton>
-                          </div>
-                          <div class="lg:w-1/3 sm:w-full ">
-                            <app-cards-boton
-                            (click)="toggleTabs(1,'')"
-                            [titulo]="'Encuestas'"
-                            [descripcion]="'Aplica y analiza encuestas para recopilar opiniones y datos directamente de los usuarios.'"
-                            [tipoIcono]="'fas fa-poll'"
-                            [colorIcono]="'bg-amber-400'"></app-cards-boton>
-                          </div>
-                          <div class="lg:w-1/3 sm:w-full ">
-                            <app-cards-boton
-                            (click)="toggleTabs(1,'')"
-                            [titulo]="'Evidencias'"
-                            [descripcion]="'Consulta documentos, imágenes, y registros que respalden los análisis realizados'"
-                            [tipoIcono]="'fas fa-file-alt'"
-                            [colorIcono]="'bg-amber-400'"></app-cards-boton>
-                          </div>
-    
-                        </div>
-        
-                        
-                      </div>
-                      
-                    </div>
-                    <div *ngIf="openTab === 1" >
-          
-                      <div style="text-align: justify;" class="text-xl font-light leading-relaxed mt-6 mb-4" >
-                      
-                        
-                      
-                        <p style="margin-bottom: 14px;"><strong>Documentos y Requisitos Necesarios</strong></p>
-        
-                        <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="700" style="margin-bottom: 14px;">
-                          Antes de comenzar, asegúrate de contar con los siguientes documentos e información necesarios para completar el formulario de designación del líder del PESV. Esto agilizará el proceso y garantizará el cumplimiento de todos los requisitos.
-                        </p>
-        
-                        <div class="flex flex-col md:flex-row justify-between mt-6 mb-6 lg:pl-28 space-y-6 md:space-y-0 md:space-x-8">
-                          <!-- Lista original con subtítulo -->
-                          <div class="w-full md:w-1/2">
-                            <p style="margin-bottom: 14px;"><strong>Lista de Documentos Necesarios</strong></p>
-                            <ul class="list-disc list-inside text-gray-500 space-y-1">
-                              <li>
-                                Documento de Identificación
-                                <ol class="ps-5 mt-2 space-y-1 list-decimal list-inside w-9/12">
-                                  Fotocopia de la cédula o identificación oficial del representante legal
-                                </ol>
-                              </li>
-                              <li>
-                                Acta de Designación del Líder del PESV.
-                                <ol class="ps-5 mt-2 space-y-1 list-decimal list-inside w-9/12">
-                                  Documento oficial de la organización que designe al líder del PESV y establezca sus responsabilidades.
-                                </ol>
-                              </li>
-                              <li>
-                                Certificados de Competencia.
-                                <ol class="ps-5 mt-2 space-y-1 list-decimal list-inside w-9/12">
-                                  Certificados de formación del líder en Seguridad y Salud en el Trabajo (SG-SST) y en Seguridad Vial (curso de 50 o 20 horas).
-                                </ol>
-                              </li>
-                              <li>
-                                Documentación de Experiencia Profesional.
-                                <ol class="ps-5 mt-2 space-y-1 list-decimal list-inside w-9/12">
-                                  Pruebas de experiencia en SG-SST y PESV de al menos 2 años.
-                                </ol>
-                              </li>
-                            </ul>
-                          </div>
-                        
-                          <!-- Nueva lista paralela con subtítulo -->
-                          <div class="w-full md:w-1/2">
-                            <p style="margin-bottom: 14px;"><strong>Información Específica a Tener a Mano</strong></p>
-                            <ul class="list-disc list-inside text-gray-500 space-y-1">
-                              <li>
-                                Datos Generales de la Empresa.
-                                <ol class="ps-5 mt-2 space-y-1 list-decimal list-inside w-9/12">
-                                  - NIT de la empresa.
-                                </ol>
-                                <ol class="ps-5 mt-2 space-y-1 list-decimal list-inside w-9/12">
-                                  - Nombre completo del representante legal.
-                                </ol>
-                              </li>
-                              <li>
-                                Datos del Líder del PESV.
-                                <ol class="ps-5 mt-2 space-y-1 list-decimal list-inside w-9/12">
-                                  - Certificados de formación del líder en Seguridad y Salud en el Trabajo (SG-SST) y en Seguridad Vial (curso de 50 o 20 horas).
-                                </ol>
-                                <ol class="ps-5 mt-2 space-y-1 list-decimal list-inside w-9/12">
-                                  - Cargo en la empresa.
-                                </ol>
-                              </li>
-                              <li>
-                                Indicadores y Metas.
-                                <ol class="ps-5 mt-2 space-y-1 list-decimal list-inside w-9/12">
-                                  - Tasa de siniestralidad vial.
-                                </ol>
-                                <ol class="ps-5 mt-2 space-y-1 list-decimal list-inside w-9/12">
-                                  - Cumplimiento del plan de trabajo.
-                                </ol>
-                                <ol class="ps-5 mt-2 space-y-1 list-decimal list-inside w-9/12">
-                                  - Tasa de incidentes y gestión de no conformidades.
-                                </ol>
-                              </li>
-                            </ul>
-                          </div>
-                        </div>
-        
-                      </div>
-                      <div class="flex justify-center">
-                        <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="900" (click)="toggleTabs(2,'')" class="text-amber-500 bg-transparent border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
-                          <i class="fas fa-arrow-right"></i> Comenzar a crear
-                        </button>
-                      </div>
-                    </div>
-                   
-        
-                    
-                    
-                  </div>
-
-            </div>
-          </div>
-      
+<div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
+  <div class="rounded-t bg-blueGray-100  mb-0 px-6 py-6">
+    <div class="text-center flex ">
+      <button
+        [routerLink]="['/admin/planificar']"
+        class="bg-red-600 text-white active:bg-red-700 font-bold uppercase text-xs px-1 py-1  rounded shadow hover:shadow-md outline-none focus:outline-none mr-2 ease-linear transition-all duration-150"
+        type="button"
+      >
+      <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" /></svg>
+      </button>
+      <h6 class="text-blueGray-700 text-xl font-bold">Caracterización, evaluación y control de riesgos</h6>
     </div>
-    <!-- <div class="w-full lg:w-4/12 px-4">
-      <app-restore-password></app-restore-password>
+  </div>
+  <div class="flex-auto px-4 lg:px-10 py-10 pt-0">
 
-    </div> -->
+    <div class="text-lg font-light leading-relaxed mt-6 mb-4 text-gray-700" >
+
+      <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300" class="text-justify pb-3">
+        Bienvenido al módulo de caracterización, evaluación y control de riesgos, el cual te permite identificar, analizar, valorar y tratar los riesgos de seguridad vial en su organización. Incluye las siguientes funcionalidades:
+      </p>
+      <ul class="list-disc list-inside space-y-1 pl-4">
+        <li>Identificación de riesgos.</li>
+        <li>Análisis de riesgos.</li>
+        <li>Valoración de riesgos.</li>
+        <li>Tratamiento de Riesgos.</li>
+      </ul>
+      
+      
+      
+
+      <div class="flex flex-col lg:flex-row justify-center items-center mt-6 mb-6 space-y-6 lg:space-y-0 lg:space-x-16">
+        <div class="lg:w-1/3 sm:w-full ">
+          <a href="/admin/planificar/evaluacion_y_control_riesgos/gestion_archivos">
+          <app-cards-boton
+          
+          [titulo]="'Cargar docmento'"
+          [descripcion]="'Ya cuento con el documento de certificación del líder encargado.'"
+          [tipoIcono]="'fas fa-upload'"
+          [colorIcono]="'bg-blue-500'"
+          ></app-cards-boton>
+          </a>
+        </div>
+        <div class="lg:w-1/3 sm:w-full ">
+          <app-cards-boton
+          (click)="toggleTabs(1,'')"
+          [titulo]="'Crear docmento'"
+          [descripcion]="'Aún no tengo el documento. Iniciar proceso de creación ahora'"
+          [tipoIcono]="'fas fa-rocket'"
+          [colorIcono]="'bg-green-500'"></app-cards-boton>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
 </div>
+
