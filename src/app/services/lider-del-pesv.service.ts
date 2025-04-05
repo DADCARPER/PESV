@@ -13,6 +13,13 @@ export class LiderDelPesvService {
 
   constructor(private firestore: Firestore, private storage: Storage, private auth: Auth) {} // Añade Auth aquí
 
+  /**
+   * Este comentario documentará automáticamente al método "calcularTotal"
+   * @param data El precio base del producto
+   * @param usuarioLogueado Número de unidades
+   * @returns boolean
+   * @description Este método calcula el total multiplicando el precio por la cantidad de unidades.
+   */
   async autoGuardar(data: any, usuarioLogueado: string, tipo: string, estado: number, id_formulario: string): Promise<void> {
     try {
       const userDocRef = doc(this.firestore, `liderDelPesv/${usuarioLogueado}`);

@@ -11,6 +11,7 @@ import { TableHeader, Integrante } from '../../../interfaces/perfil.interface';
 })
 export class TablaSimpleComponent {
 
+  @Input() title: string = '';
   @Input() integrantes: Integrante[] = [];
   @Input() tableHeaders: TableHeader[] = [];
   @Input() loading: boolean = false;

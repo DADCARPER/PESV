@@ -10,7 +10,6 @@ export class LiderPesvService {
   private readonly COLLECTION = 'liderDelPesv';
       public _firestore = inject(FirestoreService);
     
-      //Llamo los datos del Docuemtno 
       async getDocDiagnostico(uid: string): Promise<Archivos> { 
     
         const ruta = `${this.COLLECTION}/${uid}`;

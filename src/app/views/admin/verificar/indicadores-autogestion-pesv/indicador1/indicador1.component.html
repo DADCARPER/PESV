@@ -1,0 +1,40 @@
+<div class="bg-white rounded-lg border shadow-sm mt-4">
+    <div class="p-4 border-b bg-gray-50">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-medium">Tasa de Siniestros Viales</h2>
+                <p class="text-sm text-gray-500">
+                TSV = (N° de Siniestros viales × K) / Kilómetros recorridos por trimestre
+                </p>
+            </div>
+
+            <div class="flex gap-2">
+                <div class="text-right">
+                    <p class="text-sm text-gray-500">
+                        K: Constante de 1,000,000 km
+                    </p>
+                    <p class="text-sm text-gray-500">
+                        Por cada 1,000,000 de kilómetros recorridos se presentaron XX cantidad de siniestros viales.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="p-4">
+      
+        <h4 class="text-lg font-medium">Número de kilómetros recorridos mensualmente por todos los vehículos</h4>
+
+        <app-tabla-compartida
+        [headers]="datos"></app-tabla-compartida>
+        <h4 class="text-lg font-medium">Tipos de Siniestros</h4>
+
+        <h4 class="text-lg font-medium">Meta</h4>
+        
+        
+        
+      
+      
+    </div>
+</div>
+<app-tabla-simple></app-tabla-simple>
