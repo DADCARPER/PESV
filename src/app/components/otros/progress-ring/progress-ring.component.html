@@ -1,0 +1,37 @@
+<div class="progress-ring-container" [style.width.px]="size" [style.height.px]="size">
+    <svg 
+      class="progress-ring" 
+      [attr.width]="size" 
+      [attr.height]="size" 
+      [style.transform]="'rotate(-90deg)'"
+      viewBox="0 0 36 36">
+      
+      <circle 
+        class="progress-ring-circle-bg" 
+        cx="18" 
+        cy="18" 
+        [attr.r]="radius" 
+        [attr.stroke-width]="strokeWidth"
+        fill="none">
+      </circle>
+      
+      <circle 
+        #progressCircle
+        class="progress-ring-circle" 
+        cx="18" 
+        cy="18" 
+        [attr.r]="radius" 
+        [attr.stroke-width]="strokeWidth"
+        [attr.stroke]="color"
+        [attr.stroke-dasharray]="circumference + ' ' + circumference"
+        [attr.stroke-dashoffset]="dashOffset()"
+        fill="none">
+      </circle>
+    </svg>
+    
+    @if (showText) {
+      <div class="progress-ring-text" [style.color]="textColor">
+        {{ displayValue }}{{ showPercent ? '%' : '' }}
+      </div>
+    }
+  </div>

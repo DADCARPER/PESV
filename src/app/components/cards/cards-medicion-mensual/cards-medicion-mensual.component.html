@@ -1,0 +1,37 @@
+<div class="bg-white rounded-lg border shadow-sm overflow-hidden">
+    <div class="px-4 pt-2">
+        <span class="text-lg font-medium block ">Medición Mensual</span>
+        <!-- <span class="text-sm text-gray-500">Tasa de incidentes reportados</span> -->
+    </div>
+    <div class="flex flex-col gap-2 p-2">
+        <!-- Primera fila de 6 meses -->
+        <div class="flex flex-col md:flex-row gap-2">
+            @for (titulo of headers.slice(0, 6); track $index) {
+                <div class="w-full flex flex-col items-center rounded-lg px-4 py-2 shadow-sm border-2" [ngClass]="[fondoColor, borderColor]">
+                    <span class="text-base text-gray-900 ">{{titulo}}</span>
+                    <span class="text-base font-medium" [ngClass]="textColor">
+                        ${{valores[$index]}}
+                    </span>
+                    <span class="text-base text-gray-500">
+                        Meta : {{metas[$index]}}
+                    </span>
+                </div>
+            }
+        </div>
+        
+        <!-- Segunda fila de 6 meses -->
+        <div class="flex flex-col md:flex-row gap-2">
+            @for (titulo of headers.slice(6, 12); track $index) {
+                <div class="w-full flex flex-col items-center rounded-lg px-4 py-2 shadow-sm border-2" [ngClass]="[fondoColor, borderColor]">
+                    <span class="text-base text-gray-900 ">{{titulo}}</span>
+                    <span class="text-base font-medium" [ngClass]="textColor">
+                        ${{valores[$index + 6]}}
+                    </span>
+                    <span class="text-base text-gray-500">
+                        Meta : {{metas[$index + 6]}}
+                    </span>
+                </div>
+            }
+        </div>
+    </div>
+</div>

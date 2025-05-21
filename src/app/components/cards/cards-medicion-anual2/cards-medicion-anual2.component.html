@@ -1,0 +1,23 @@
+<div class="bg-white rounded-lg border shadow-sm overflow-hidden">
+    <div class="px-4 pt-2">
+        <span class="text-lg font-medium block ">{{titulo}}</span>
+        <!-- <span class="text-sm text-gray-500">Tasa de incidentes reportados</span> -->
+    </div>
+    <div class="flex flex-col md:flex-row gap-2 p-2">
+ 
+      <div class="w-full flex flex-col items-center  px-4  " [ngClass]="[fondoColor, borderColor]">
+        <span class="text-lg text-gray-900 ">Metas alcanzadas</span>
+        <span class="text-2xl font-medium" [ngClass]="textColor">
+          {{valorActual}}
+        </span>
+        <span class="text-xl  text-gray-500">
+          Meta definida : {{valorMeta}}
+        </span>
+        <div class="w-full pt-1">
+          <app-progress-bar-doble>
+          </app-progress-bar-doble>
+        </div>
+      </div>
+      
+    </div>
+</div>

@@ -1,0 +1,48 @@
+<div class="bg-white rounded-lg border shadow-sm overflow-hidden">
+    <div class="p-4 border-b bg-gray-50">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-medium">No conformidades Auditoría Cerradas</h2>
+                <p class="text-sm text-gray-500">
+                    NCA = (N° No conformidades gestionadas / N° de No conformidades identificadas) × 100
+                </p>
+            </div>
+
+            <div class="flex gap-2">
+                <!-- <div class="text-right">
+                    <p class="text-sm text-gray-500">
+                        K: Constante de 1,000,000 km
+                    </p>
+                    <p class="text-sm text-gray-500">
+                        Por cada 1,000,000 de kilómetros recorridos se presentaron XX cantidad de siniestros viales.
+                    </p>
+                </div> -->
+            </div>
+
+        </div>
+    </div>
+    <div class="flex flex-col p-4 gap-4">
+
+
+        <app-cards-medicion-mensual></app-cards-medicion-mensual>
+        <app-cards-medicion-trimestral2
+        [titulo]="'Metas Definidas - Alcanzadas'"
+        [valorActual1]="5"
+        [valorMeta1]="10"
+        [valorActual2]="8"
+        [valorMeta2]="10"
+        [valorActual3]="2"
+        [valorMeta3]="10"
+        [valorActual4]="10"
+        [valorMeta4]="10"
+        [textColor]="'text-emerald-600'"
+        ></app-cards-medicion-trimestral2>
+
+        <app-cards-medicion-anual2></app-cards-medicion-anual2>
+   
+
+    </div>
+    
+        
+ 
+</div>

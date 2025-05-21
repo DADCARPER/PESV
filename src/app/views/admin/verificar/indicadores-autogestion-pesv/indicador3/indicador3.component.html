@@ -1,0 +1,83 @@
+<div class="bg-white rounded-lg border shadow-sm overflow-hidden">
+    <div class="p-4 border-b bg-gray-50">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-medium">Riesgos Viales</h2>
+                <p class="text-sm text-gray-500">
+                    RDV = # Riesgos Ident/Total n-1 - # Riesgos Ident/Total n
+                </p>
+            </div>
+
+            <!-- <div class="flex gap-2">
+                <div class="text-right">
+                    <p class="text-sm text-gray-500">
+                        K: Constante de 1,000,000 km
+                    </p>
+                    <p class="text-sm text-gray-500">
+                        Por cada 1,000,000 de kilómetros recorridos se presentaron XX cantidad de siniestros viales.
+                    </p>
+                </div>
+            </div> -->
+
+        </div>
+    </div>
+    <div class="flex flex-col p-4">
+
+        <div class="flex flex-col md:flex-row gap-2 mb-4">
+            <div class="w-full md:w-1/5 ">
+              <app-cards-riesgos
+              [nombre]="'Riesgos al inicio del año'"
+              [subnombre]="'RI(a): Total en matriz'"
+              [valorActual]="'24'"
+              [valorMeta]="'0'"
+              [color]="'#16a34d'"
+              ></app-cards-riesgos>
+            </div>
+            <div class="w-full md:w-1/5 ">
+                <app-cards-riesgos
+                [nombre]="'Riesgos al final del año'"
+                [subnombre]="'RI(fa): Total en matriz'"
+                [valorActual]="'18'"
+                [valorMeta]="'0'"
+                [color]="'#16a34d'"
+                ></app-cards-riesgos>
+            </div>
+            <div class="w-full md:w-1/5 ">
+                <app-cards-riesgos
+                [nombre]="'Riesgos con valoración alta (inicio)'"
+                [subnombre]="'RVA(a): Valoración alta'"
+                [valorActual]="'18'"
+                [valorMeta]="'0'"
+                [color]="'#16a34d'"
+                ></app-cards-riesgos>
+            </div>
+            <div class="w-full md:w-1/5 ">
+                <app-cards-riesgos
+                [nombre]="'Riesgos con valoración alta (final)'"
+                [subnombre]="'RVA(fa): Valoración alta'"
+                [valorActual]="'18'"
+                [valorMeta]="'0'"
+                [color]="'#16a34d'"
+                ></app-cards-riesgos>
+            </div>
+        </div>
+        <div class="flex flex-col md:flex-row gap-2 ">
+            <div class="w-full md:w-1/2 ">
+                <app-cards-riesgos-dona
+                [titulo]="'Riesgos de Seguridad Vial Identificados'"
+                [subtexto]="'(RSVI)'"
+                [valorActual]="'18'"
+         
+                ></app-cards-riesgos-dona>
+            </div>
+            <div class="w-full md:w-1/2 ">
+                <app-cards-riesgos-dona
+                [titulo]="'Gestión de Riesgos Viales'"
+                [subtexto]="'(GRV)'"
+                [valorActual]="'18'"
+         
+                ></app-cards-riesgos-dona>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,1 +1,48 @@
-<p>tabla-left works!</p>
+<div class="rounded-md border overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200 ">
+        <thead class="bg-gray-50">
+            <tr>
+                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider  ">{{tipo}}</th>
+                @for (header of headers; track $index) {
+                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{header}}</th>
+                }
+                @if (accion){
+                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Accíon</th>
+                }
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+
+            @for (leftheader of leftheaders; track $index) {
+                <tr>
+
+                <td class="w-[230px] min-w-[200px] px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 line-clamp-1" >{{leftheader}}</td>
+
+                @for (dato of datas; track $index) {
+                    <!-- @if($index == 0){
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{dato}}</td>
+                    } -->
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hover:bg-gray-100">{{dato}}</td>
+                }
+                </tr>
+            }
+            
+                
+                
+                
+            
+            
+            <!-- Muestra iconos <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <div class="flex">
+                <div class="text-amber-400 hover:text-amber-300 cursor-pointer">
+                    <iconify-icon (click)="toggleTabs(3)" icon="hugeicons:pencil-edit-02" width="22" height="22" class="pr-2 "></iconify-icon>
+                </div>
+                <div class="text-amber-600 hover:text-amber-500 cursor-pointer">
+                    <iconify-icon icon="hugeicons:delete-03" width="22" height="22" class="pr-2 "></iconify-icon>
+                </div>
+                </div>
+            </td> -->
+            
+        </tbody>
+    </table>
+</div>

@@ -1,36 +1,35 @@
-<div class="flex mt-4">
-    <div class="w-full px-4">
-      <div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-white">
-        <div class="block w-full p-8">
-          <div class="grid grid-cols-1 gap-8 mt-0 xl:mt-0 xl:gap-12 md:grid-cols-2">
-            <!-- Contenido -->
-            <app-cards-menu
-            [titulo]="'Mejora continua, acciones preventivas y correctivas'"
-            [descripcion]="'Orientado al cumplimiento de acciones y estrategias en seguridad vial para planificación, implementación, seguimiento y mejora del PESV.'"
-            [tipoIcono]="'fas fa-user-tie'"
-            [colorIcono]="'bg-sky-400'"
-            [porcentaje]="estatusGeneral['023-mejora-continua-preventivas-correctivas']?.estado || 0"
-            [colorgrafica]="'#0370a1'"
-            [linkvamos]="'mejora_acciones_preventivas_correctivas'"
-            ></app-cards-menu>
-            
-          </div>
-          <div class="grid grid-cols-1 gap-8 mt-8 xl:mt-0 xl:gap-12 md:grid-cols-2">
-            <!-- Contenido -->
-            <app-cards-menu
-            [titulo]="'Mecanismos de comunicación'"
-            [descripcion]="'Establece los lineamientos para la evaluación y seguimiento del comportamiento vial de los colaboradores que realizan desplazamientos.'"
-            [tipoIcono]="'fas fa-balance-scale'"
-            [colorIcono]="'bg-sky-400'"
-            [porcentaje]="estatusGeneral['024-mecanismos-comunicacion']?.estado || 0"
-            [colorgrafica]="'#0370a1'"
-            [linkvamos]="'mecanismos_comunicacion'"
-            ></app-cards-menu>
+<div class="flex">
+  <div class="w-full p-4">
+    <div class="relative flex-col w-full shadow-lg rounded bg-white p-8">
+      <div class="flex flex-col md:flex-row gap-6 mb-4">
+        <!-- Contenido -->
+        <app-cards-menu class="w-full md:w-1/2"
+        [titulo]="'Mejora continua, acciones preventivas y correctivas'"
+        [descripcion]="'Orientado al cumplimiento de acciones y estrategias en seguridad vial para planificación, implementación, seguimiento y mejora del PESV.'"
+        [tipoIcono]="'fas fa-user-tie'"
+        [colorIcono]="'bg-sky-400'"
+        [porcentaje]="estatusGeneral['023-mejora-continua-preventivas-correctivas']?.estado || 0"
+        [colorgrafica]="'#0370a1'"
+        [linkvamos]="'mejora_acciones_preventivas_correctivas'"
+        ></app-cards-menu>
 
-            
-          </div>   
-
-        </div>
+        
+        
       </div>
+      <div class="flex flex-col md:flex-row gap-6">
+        <!-- Contenido -->
+        <app-cards-menu class="w-full md:w-1/2"
+        [titulo]="'Mecanismos de comunicación'"
+        [descripcion]="'Establece los lineamientos para la evaluación y seguimiento del comportamiento vial de los colaboradores que realizan desplazamientos.'"
+        [tipoIcono]="'fas fa-balance-scale'"
+        [colorIcono]="'bg-sky-400'"
+        [porcentaje]="estatusGeneral['024-mecanismos-comunicacion']?.estado || 0"
+        [colorgrafica]="'#0370a1'"
+        [linkvamos]="'mecanismos_comunicacion'"
+        ></app-cards-menu>
+
+      </div>   
+
     </div>
+  </div>
 </div>

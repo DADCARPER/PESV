@@ -1,0 +1,46 @@
+<div class="bg-white rounded-lg border shadow-sm overflow-hidden">
+    <div class="p-4 border-b bg-gray-50">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-medium">Costos de Siniestros por nivel de pérdida</h2>
+                <p class="text-sm text-gray-500">
+                    CSV = Costos directos + Costos indirectos
+                </p>
+            </div>
+
+            <div class="flex gap-2">
+                <div class="text-right">
+                    <p class="text-sm text-gray-500">
+                        Costos generados en el período por siniestros viales.
+                    </p>
+                    <!-- <p class="text-sm text-gray-500">
+                        Por cada 1,000,000 de kilómetros recorridos se presentaron XX cantidad de siniestros viales.
+                    </p> -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="flex flex-col p-4 gap-4">
+        <app-tabla-left
+        [headers]="headertabla"
+        [leftheaders]="['Costos directos siniestros','Costos indirectos siniestros','META']"
+        ></app-tabla-left>
+        
+        <app-cards-medicion-mensual
+        [borderColor]="'border-green-500'"
+        [fondoColor]="'bg-emerald-50'"
+        [textColor]="'text-emerald-600'"></app-cards-medicion-mensual>
+
+        <app-cards-medicion-trimestral 
+        [borderColor]="'border-green-500'"
+        [fondoColor]="'bg-emerald-50'"
+        [textColor]="'text-emerald-600'"></app-cards-medicion-trimestral>
+
+        <app-cards-medicion-anual
+        [textColor]="'text-emerald-600'"
+        [valorActual]="'80.52'"
+        [colorBarra]="'#16a34d'"
+        [valorPorcentual]="80"></app-cards-medicion-anual>
+    </div>
+</div>

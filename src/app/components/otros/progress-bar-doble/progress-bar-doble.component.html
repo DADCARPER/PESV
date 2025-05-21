@@ -1,0 +1,38 @@
+<div class="progress-container">
+  <div class="progress-label">Progreso Actual: {{value}}%</div>
+
+  <div class="progress-bar-wrapper">
+    <!-- Barra base -->
+    <div class="progress-bar-background"
+         [style.height.px]="height"
+         [style.border-radius.px]="borderRadius">
+      
+      <!-- Barra de progreso actual -->
+      <div class="progress-bar-fill"
+           [style.width.%]="progressWidth()"
+           [style.height.px]="height"
+           [style.background-color]="color"
+           [style.border-radius.px]="borderRadius">
+      </div>
+      
+      <!-- Marcador de meta -->
+      <div class="target-marker" 
+           [style.left.%]="targetValue"
+           [style.height.px]="height + 20">
+        <div class="target-icon" [style.background-color]="color"></div>
+        <div class="target-label" [style.color]="color">Meta: {{targetValue}}%</div>
+      </div>
+    </div>
+    
+    <!-- Etiquetas de porcentaje -->
+    <div class="progress-labels">
+      <span>0%</span>
+      <span>25%</span>
+      <span>50%</span>
+      <span>75%</span>
+      <span>100%</span>
+    </div>
+    
+    
+  </div>
+</div>

@@ -1,0 +1,40 @@
+<div class="flex items-center justify-between">
+  @if(mostrarProgreso){
+
+    <div>
+      <span class="text-xs" [style.color]="color">
+          Progreso
+      </span>
+    </div>
+    <div class="text-right">
+      <span class="text-xs font-semibold inline-block" [style.color]="color">
+        {{value}}%
+      </span>
+    </div>
+  }
+</div>
+<div class="progress-bar-container" [style.height.px]="height">
+
+  <div class="progress-bar-bg" [style.border-radius.px]="borderRadius">
+    <div 
+      #progressFill
+      class="progress-bar-fill" 
+      [style.width.%]="progressWidth()"
+      [style.background-color]="color"
+      [style.border-radius.px]="borderRadius">
+    </div>
+  </div>
+  
+  @if (showLabels) {
+    <div class="progress-bar-labels">
+      @for (label of labels; track label.value) {
+        <span 
+          class="progress-label" 
+          [style.left.%]="label.value"
+          [class.progress-label-bold]="label.bold">
+          {{ label.text }}
+        </span>
+      }
+    </div>
+  }
+</div>

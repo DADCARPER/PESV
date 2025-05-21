@@ -1,5 +1,5 @@
 <div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
-    <div class="rounded-t bg-blueGray-100  mb-0 px-6 py-6">
+    <div class="rounded-t bg-emerald-400  mb-0 px-6 py-6">
       <div class="text-center flex ">
         <button
           [routerLink]="['/admin/verificar']"
@@ -8,64 +8,129 @@
         >
         <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" /></svg>
         </button>
-        <h6 class="text-blueGray-700 text-xl font-bold">Indicadores y reporte de autogestión PESV</h6>
+        <h6 class="text-blueGray-700 text-xl font-bold line-clamp-1">Indicadores y reporte de autogestión PESV</h6>
       </div>
     </div>
-    <div class="flex-auto px-4 lg:px-10 py-10 pt-0">
+    <div class="flex-auto px-4 py-0">
+
+      <div class="border-b border-gray-200">
+        <nav class="flex" aria-label="Tabs">
+          <button (click)="toggleTabs(0)" [ngClass]="openTab === 0 ? ' text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none  border-b-2 font-medium border-green-500 ' : 'text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none'" id="tab-general" aria-controls="panel-general" aria-selected="true">
+            IDC1
+          </button>
+          <button (click)="toggleTabs(1)" [ngClass]="openTab === 1 ? ' text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none  border-b-2 font-medium border-green-500 ' : 'text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none'"  id="tab-compliance" aria-controls="panel-compliance" aria-selected="false">
+            IDC2
+          </button>
+          <button (click)="toggleTabs(2)" [ngClass]="openTab === 2 ? ' text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none  border-b-2 font-medium border-green-500 ' : 'text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none'" id="tab-documents" aria-controls="panel-documents" aria-selected="false">
+            IDC3
+          </button>
+          <button (click)="toggleTabs(3)" [ngClass]="openTab === 3 ? ' text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none  border-b-2 font-medium border-green-500 ' : 'text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none'" id="tab-documents" aria-controls="panel-documents" aria-selected="false">
+            IDC4
+          </button>
+          <button (click)="toggleTabs(4)" [ngClass]="openTab === 4 ? ' text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none  border-b-2 font-medium border-green-500 ' : 'text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none'" id="tab-documents" aria-controls="panel-documents" aria-selected="false">
+            IDC5
+          </button>
+          <button (click)="toggleTabs(5)" [ngClass]="openTab === 5 ? ' text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none  border-b-2 font-medium border-green-500 ' : 'text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none'" id="tab-documents" aria-controls="panel-documents" aria-selected="false">
+            IDC6
+          </button>
+          <button (click)="toggleTabs(6)" [ngClass]="openTab === 6 ? ' text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none  border-b-2 font-medium border-green-500 ' : 'text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none'" id="tab-documents" aria-controls="panel-documents" aria-selected="false">
+            IDC7
+          </button>
+          <button (click)="toggleTabs(7)" [ngClass]="openTab === 7 ? ' text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none  border-b-2 font-medium border-green-500 ' : 'text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none'" id="tab-documents" aria-controls="panel-documents" aria-selected="false">
+            IDC8
+          </button>
+          <button (click)="toggleTabs(8)" [ngClass]="openTab === 8 ? ' text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none  border-b-2 font-medium border-green-500 ' : 'text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none'" id="tab-documents" aria-controls="panel-documents" aria-selected="false">
+            IDC9
+          </button>
+          <button (click)="toggleTabs(9)" [ngClass]="openTab === 9 ? ' text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none  border-b-2 font-medium border-green-500 ' : 'text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none'" id="tab-documents" aria-controls="panel-documents" aria-selected="false">
+            IDC10
+          </button>
+          <button (click)="toggleTabs(10)" [ngClass]="openTab === 10 ? ' text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none  border-b-2 font-medium border-green-500 ' : 'text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none'" id="tab-documents" aria-controls="panel-documents" aria-selected="false">
+            IDC11
+          </button>
+          <button (click)="toggleTabs(11)" [ngClass]="openTab === 11 ? ' text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none  border-b-2 font-medium border-green-500 ' : 'text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none'" id="tab-documents" aria-controls="panel-documents" aria-selected="false">
+            IDC12
+          </button>
+          <button (click)="toggleTabs(12)" [ngClass]="openTab === 12 ? ' text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none  border-b-2 font-medium border-green-500 ' : 'text-gray-600 py-4 px-6 block hover:text-green-500 focus:outline-none'" id="tab-documents" aria-controls="panel-documents" aria-selected="false">
+            IDC13
+          </button>
+
+        </nav>
+      </div>
   
       
       <div *ngIf="openTab === 0" >
-        <div class="text-lg font-light leading-relaxed mt-6 mb-4 text-gray-700" >
+        <div class="text-lg font-light leading-relaxed  my-4 text-gray-700" >
   
-          <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300" style="margin-bottom: 14px;">
+          <!-- <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300" style="margin-bottom: 14px;">
             Panel de control para el seguimiento y análisis de indicadores de desempeño en seguridad vial. Le permite definir métricas, registrar mediciones, generar reportes y evaluar la efectividad de las estrategias implementadas.
-          </p>
+          </p> -->
           
-    
           <app-indicador1></app-indicador1>
+          
     
         </div>
       </div>
       <div *ngIf="openTab === 1" >
-  
-        <div style="text-align: justify;" class="text-xl font-light leading-relaxed mt-6 mb-4" >
-        
-            <p style="margin-bottom: 14px;"><strong>Documentos y Requisitos Necesarios</strong></p>
-  
-            <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="700" style="margin-bottom: 14px;">
-            Antes de comenzar con el formulario para la creación de Objetivos y Metas, asegúrate de tener la siguiente información:
-            </p>
-  
-            <div class="flex flex-col md:flex-row justify-between mt-6 mb-6 lg:pl-28 space-y-6 md:space-y-0 md:space-x-8">
-  
-                <!-- Lista original con subtítulo -->
-                <div class="w-full md:w-1/2">
-                    <p style="margin-bottom: 14px;"><strong>Información Específica a Tener a Mano</strong></p>
-                    <ul class="list-disc list-inside text-gray-500 space-y-1">
-                        <li>
-                            Descripcion clara y consisa de cada objetivo
-                            
-                        </li>
-                        <li>
-                          Descripcion clara y consisa de cada meta
-                          
-                      </li>
-                    </ul>
-                </div>
-            
-            </div>
-  
+        <div class="text-lg font-light leading-relaxed  my-4 text-gray-700" >
+          <app-indicador2></app-indicador2>
         </div>
-  
-        <div class="flex justify-center">
-            <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="900" (click)="toggleTabs(2,'')" class="text-amber-500 bg-transparent border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
-            <i class="fas fa-arrow-right"></i> Comenzar a crear
-            </button>
-        </div>
-  
       </div>
-  
-    
+      <div *ngIf="openTab === 2" >
+        <div class="text-lg font-light leading-relaxed  my-4 text-gray-700" >
+          <app-indicador3></app-indicador3>
+        </div>
+      </div>
+      <div *ngIf="openTab === 3" >
+        <div class="text-lg font-light leading-relaxed  my-4 text-gray-700" >
+          <app-indicador4></app-indicador4>
+        </div>
+      </div>
+      <div *ngIf="openTab === 4" >
+        <div class="text-lg font-light leading-relaxed  my-4 text-gray-700" >
+          <app-indicador5></app-indicador5>
+        </div>
+      </div>
+      <div *ngIf="openTab === 5" >
+        <div class="text-lg font-light leading-relaxed  my-4 text-gray-700" >
+          <app-indicador6></app-indicador6>
+        </div>
+      </div>
+      <div *ngIf="openTab === 6" >
+        <div class="text-lg font-light leading-relaxed  my-4 text-gray-700" >
+          <app-indicador7></app-indicador7>
+        </div>
+      </div>
+      <div *ngIf="openTab === 7" >
+        <div class="text-lg font-light leading-relaxed  my-4 text-gray-700" >
+          <app-indicador8></app-indicador8>
+        </div>
+      </div>
+      <div *ngIf="openTab === 8" >
+        <div class="text-lg font-light leading-relaxed  my-4 text-gray-700" >
+          <app-indicador9></app-indicador9>
+        </div>
+      </div>
+      <div *ngIf="openTab === 9" >
+        <div class="text-lg font-light leading-relaxed  my-4 text-gray-700" >
+          <app-indicador10></app-indicador10>
+        </div>
+      </div>
+      <div *ngIf="openTab === 10" >
+        <div class="text-lg font-light leading-relaxed  my-4 text-gray-700" >
+          <app-indicador11></app-indicador11>
+        </div>
+      </div>
+      <div *ngIf="openTab === 11" >
+        <div class="text-lg font-light leading-relaxed  my-4 text-gray-700" >
+          <app-indicador12></app-indicador12>
+        </div>
+      </div>
+      <div *ngIf="openTab === 12" >
+        <div class="text-lg font-light leading-relaxed  my-4 text-gray-700" >
+          <app-indicador13></app-indicador13>
+        </div>
+      </div>
   
     </div>
 </div>

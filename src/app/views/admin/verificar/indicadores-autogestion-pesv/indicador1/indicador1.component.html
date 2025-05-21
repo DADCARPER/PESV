@@ -1,4 +1,4 @@
-<div class="bg-white rounded-lg border shadow-sm mt-4">
+<div class="bg-white rounded-lg border shadow-sm overflow-hidden">
     <div class="p-4 border-b bg-gray-50">
         <div class="flex items-center justify-between">
             <div>
@@ -9,32 +9,153 @@
             </div>
 
             <div class="flex gap-2">
-                <div class="text-right">
+              <button  class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none  mb-1 ease-linear transition-all duration-150" type="button">
+                <div class="flex items-center">
+                    <iconify-icon icon="hugeicons:plus-sign-square" width="18" height="18" class="pr-2 "></iconify-icon> Crear
+                </div>
+              </button>
+              <button  class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none  mb-1 ease-linear transition-all duration-150" type="button">
+                <div class="flex items-center">
+                    <iconify-icon icon="hugeicons:file-download" width="18" height="18" class="pr-2 "></iconify-icon> Importar
+                </div>
+              </button>
+                <!-- <div class="text-right">
                     <p class="text-sm text-gray-500">
                         K: Constante de 1,000,000 km
                     </p>
                     <p class="text-sm text-gray-500">
                         Por cada 1,000,000 de kilómetros recorridos se presentaron XX cantidad de siniestros viales.
                     </p>
-                </div>
+                </div> -->
             </div>
 
         </div>
     </div>
-    <div class="p-4">
-      
-        <h4 class="text-lg font-medium">Número de kilómetros recorridos mensualmente por todos los vehículos</h4>
+    <div class="flex flex-col p-4">
 
-        <app-tabla-compartida
-        [headers]="datos"></app-tabla-compartida>
-        <h4 class="text-lg font-medium">Tipos de Siniestros</h4>
+      <h4 class="text-lg font-medium">Metas y Resultados</h4>
+      <div class="flex flex-col md:flex-row gap-2 mb-4">
+        <div class="w-full md:w-1/5 ">
+          <app-cards-metas-resultados
+          [nombre]="'TSV Fatales'"
+          [subnombre]="'Descripción'"
+          [valorActual]="'4'"
+          [valorMeta]="'0'"
+          [color]="'#16a34d'"
+          ></app-cards-metas-resultados>
+        </div>
+        <div class="w-full md:w-1/5">
+          <app-cards-metas-resultados
+          [nombre]="'TVS Heridos Graves.ddg'"
+          [subnombre]="'Descripción'"
+          [valorActual]="'4'"
+          [valorMeta]="'0'"
+          [color]="'#16a34d'"
+          ></app-cards-metas-resultados>
+        </div>
+        <div class="w-full md:w-1/5">
+          <app-cards-metas-resultados
+          [nombre]="'TVS Heridos Leves'"
+          [subnombre]="'Descripción'"
+          [valorActual]="'4'"
+          [valorMeta]="'0'"
+          [color]="'#16a34d'"
+          ></app-cards-metas-resultados>
+        </div>
+        <div class="w-full md:w-1/5">
+          <app-cards-metas-resultados
+          [nombre]="'Choques Simples'"
+          [subnombre]="'Descripción'"
+          [valorActual]="'4'"
+          [valorMeta]="'0'"
+          [color]="'#16a34d'"
+          ></app-cards-metas-resultados>
+        </div>
+        <div class="w-full md:w-1/5">
+          <app-cards-metas-resultados
+          [nombre]="'TSV Fatales'"
+          [subnombre]="'Descripción'"
+          [valorActual]="'4'"
+          [valorMeta]="'0'"
+          [color]="'#16a34d'"
+          ></app-cards-metas-resultados>
+        </div>
+      </div>
 
-        <h4 class="text-lg font-medium">Meta</h4>
+      <div class="flex flex-col md:flex-row gap-4 pb-2">
+        <div class="w-full md:w-1/2 ">
+          <app-cards-medicion-trimestral
+          [borderColor]="'border-green-500'"
+          [fondoColor]="'bg-emerald-50'"
+          [textColor]="'text-emerald-600'"></app-cards-medicion-trimestral>
+        </div>
+        <div class="w-full md:w-1/2">
+          <app-cards-medicion-anual
+          [textColor]="'text-emerald-600'"
+          [valorActual]="'80.52'"
+          [colorBarra]="'#16a34d'"
+          [valorPorcentual]="80"></app-cards-medicion-anual>
+        </div>
+      </div>
+
+      <!-- <div class="flex items-center mb-4 md:mb-0">
+        <div class="relative h-20 w-20">
+          <svg class="h-20 w-20 transform -rotate-90" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="16" fill="none" stroke="#f3f4f6" stroke-width="3"></circle>
+            <circle cx="18" cy="18" r="16" fill="none" stroke="#eab308" stroke-width="3" stroke-dasharray="100 100" stroke-dashoffset="100" class="progress-ring" data-value="33"></circle>
+          </svg>
+          <div class="absolute inset-0 flex items-center justify-center text-lg font-medium text-yellow-600">67%</div>
+        </div>
+        <div class="ml-4">
+          <h4 class="text-xl font-bold text-gray-800">Implementación PESV</h4>
+          <p class="text-gray-600">4 de 6 componentes completados</p>
+        </div>
+      </div>
+      <app-progress-ring 
+      [value]="100" 
+      [maxValue]="100"
+      [size]="100"
+      [strokeWidth]="5"
+      [color]="'#eab308'"
+      [animate]="true"
+      [animationDelay]="300">
+    </app-progress-ring>
+
+    <app-progress-bar
+    [value]="75"
+    [maxValue]="100"
+    [height]="10"
+    [color]="'#eab308'"
+    [animate]="true"
+    [animationDelay]="300" 
+    [showLabels]="true"
+    [customLabels]="[
+    { value: 0, text: '0%' },
+    { value: 25, text: '25%' },
+    { value: 50, text: '50%' },
+    { value: 75, text: '75%' },
+    { value: 100, text: '100%' }]"
+    ></app-progress-bar> -->
+
+
+      <h4 class="text-lg font-medium pb-1">Número de kilómetros recorridos mensualmente por todos los vehículos</h4>
+
+      <app-tabla-compartida
+      [headers]="datos"></app-tabla-compartida>
+
+      <h4 class="text-lg font-medium">Tipos de Siniestros</h4>
+
+      <app-tabla-left
+      [headers]="datos"
+      [tipo]="'Tipos'" ></app-tabla-left>
+
+      <h4 class="text-lg font-medium">Resultados</h4>
+
+      <app-tabla-left
+      [headers]="datos"></app-tabla-left>
         
-        
-        
-      
+
       
     </div>
 </div>
-<app-tabla-simple></app-tabla-simple>
+

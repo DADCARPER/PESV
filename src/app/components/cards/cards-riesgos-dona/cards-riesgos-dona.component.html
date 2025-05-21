@@ -1,0 +1,25 @@
+<div class="bg-white rounded-lg border shadow-sm overflow-hidden">
+    <div class="px-4 pt-2">
+        <span class="text-lg font-medium block ">{{titulo}}</span>
+        <!-- <span class="text-sm text-gray-500">Tasa de incidentes reportados</span> -->
+    </div>
+    <div class="flex items-start justify-between gap-2 px-4 py-2">
+ 
+
+        <div class="flex flex-col items-start">
+            <span class="text-sm text-gray-500 ">{{subtexto}} </span>
+            <span class="text-2xl font-medium" [style.color]="textColor">
+                {{ valorActual }}
+            </span>
+            
+        </div>
+        <div class="mt-0">
+            <span class="text-xs font-semibold inline-block py-1 px-2 rounded text-green-600 bg-green-200 uppercase">
+                emerald
+            </span>
+        </div>
+
+
+    
+    </div>
+</div>
