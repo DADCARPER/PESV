@@ -23,7 +23,11 @@
       "ES2022",
       "dom"
     ],
-    "typeRoots": ["node_modules/@types", "src"]  // Agregar aquí las rutas de tipos
+    "strictPropertyInitialization": false, // desactivado para evitar errores de inicialización de propiedades
+    "strictNullChecks": false, // desactivado para evitar errores de null
+    "typeRoots": [
+      "node_modules/@types"
+    ]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

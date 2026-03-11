@@ -2,7 +2,7 @@
 <div class="grid grid-cols-1 md:items-stretch md:grid-cols-2 gap-x-12 lg:gap-x-20 gap-y-10">
     <div class="flex flex-col justify-between lg:py-5">
         <div>
-            <h2 class="text-3xl font-bold leading-tight text-white sm:text-4xl lg:leading-tight lg:text-5xl">Crea tu cuenta para empezar a diseñar tu propio Plan Estratégico de Seguridad Vial.</h2>
+            <h2 class="text-xl font-bold leading-tight text-white sm:text-4xl lg:leading-tight lg:text-xl">Crea tu cuenta para empezar a diseñar tu propio Plan Estratégico de Seguridad Vial.</h2>
             <!-- <p class="max-w-xl mx-auto mt-4 text-base leading-relaxed text-white">PESV Interactivo es un sistema innovador diseñado para empresas que buscan crear, implementar y gestionar su propio Plan Estratégico de Seguridad Vial.</p> -->
 
             <!-- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" opacity="0.2" stroke="currentColor" class="size-32 text-blueGray-400 hidden w-full translate-x-24 translate-y-8 md:block">
@@ -16,7 +16,7 @@
 
         <div class="hidden md:mt-auto md:block">
             
-                <ul class="max-w-md mx-auto mt-16 space-y-12">
+                <ul class="max-w-md mx-auto mt-4 space-y-12">
                     <li class="relative flex items-start">
                         <div class="-ml-0.5 absolute mt-0.5 top-14 left-8 w-px border-l-4 border-dotted border-gray-300 h-full" aria-hidden="true"></div>
         
@@ -117,8 +117,11 @@
                                 class="block w-full px-4 py-4 text-black placeholder-gray-500 transition-all duration-200 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 caret-orange-500"
                               />
                               @if (registroForm.get('nitEmpresa')?.invalid && registroForm.get('nitEmpresa')?.touched) {
-                                @if (registroForm.get('nitEmpresa')?.errors?.['nitEmpresa']) {
-                                  <span class="text-red-500 text-sm mt-1 block">Por favor, ingresa un correo válido</span>
+                                @if (registroForm.get('nitEmpresa')?.errors?.['required']) {
+                                  <span class="text-red-500 text-sm mt-1 block">El NIT es requerido.</span>
+                                }
+                                @if (registroForm.get('nitEmpresa')?.errors?.['pattern']) {
+                                  <span class="text-red-500 text-sm mt-1 block">El NIT no puede contener espacios.</span>
                                 }
                               }
                               
@@ -134,8 +137,8 @@
                                 class="block w-full px-4 py-4 text-black placeholder-gray-500 transition-all duration-200 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 caret-orange-500"
                               />
                               @if (registroForm.get('nombreEmpresa')?.invalid && registroForm.get('nombreEmpresa')?.touched) {
-                                @if (registroForm.get('nombreEmpresa')?.errors?.['nombreEmpresa']) {
-                                  <span class="text-red-500 text-sm mt-1 block">Por favor, ingresa un correo válido</span>
+                                @if (registroForm.get('nombreEmpresa')?.errors?.['required']) {
+                                  <span class="text-red-500 text-sm mt-1 block">El nombre de la empresa es requerido.</span>
                                 }
                               }
                               
@@ -157,7 +160,7 @@
 
                         
                         <div>
-                          <button type="submit" [routerLink]="['/auth/register']" class="inline-flex items-center justify-center w-full px-4 py-4 text-base font-semibold text-white transition-all duration-200 bg-orange-500 border border-transparent rounded-md focus:outline-none hover:bg-orange-600 focus:bg-orange-600">
+                          <button type="submit" class="inline-flex items-center justify-center w-full px-4 py-4 text-base font-semibold text-white transition-all duration-200 bg-orange-500 border border-transparent rounded-md focus:outline-none hover:bg-orange-600 focus:bg-orange-600">
                             Regístrate Ahora
                           </button>
                         </div>

@@ -16,6 +16,57 @@ export class MapaColombiaComponent implements OnInit, AfterViewInit, OnChanges {
   
   listacolores: string[] = ['#5796d9','#327ac8','#225ea7','#1c385e'];
 
+  // Mapeo de nombres a códigos DANE
+  private readonly departamentosMap: { [key: string]: string } = {
+    'amazonas': '91',
+    'antioquia': '05',
+    'arauca': '81',
+    'atlántico': '08',
+    'atlantico': '08', // Sin tilde
+    'bogotá': '11',
+    'bogota': '11', // Sin tilde
+    'bolívar': '13',
+    'bolivar': '13', // Sin tilde
+    'boyacá': '15',
+    'boyaca': '15', // Sin tilde
+    'caldas': '17',
+    'caquetá': '18',
+    'caqueta': '18', // Sin tilde
+    'casanare': '85',
+    'cauca': '19',
+    'cesar': '20',
+    'chocó': '27',
+    'choco': '27', // Sin tilde
+    'córdoba': '23',
+    'cordoba': '23', // Sin tilde
+    'cundinamarca': '25',
+    'guainía': '94',
+    'guainia': '94', // Sin tilde
+    'guaviare': '95',
+    'huila': '41',
+    'la guajira': '44',
+    'guajira': '44', // Alternativa
+    'magdalena': '47',
+    'meta': '50',
+    'nariño': '52',
+    'narino': '52', // Sin tilde
+    'norte de santander': '54',
+    'putumayo': '86',
+    'quindío': '63',
+    'quindio': '63', // Sin tilde
+    'risaralda': '66',
+    'san andrés': '88',
+    'san andres': '88', // Sin tilde
+    'santander': '68',
+    'sucre': '70',
+    'tolima': '73',
+    'valle del cauca': '76',
+    'valle': '76', // Alternativa
+    'vaupés': '97',
+    'vaupes': '97', // Sin tilde
+    'vichada': '99'
+  };
+
   private map!: L.Map;
   private geoJsonLayer!: L.GeoJSON;
 
@@ -45,10 +96,29 @@ export class MapaColombiaComponent implements OnInit, AfterViewInit, OnChanges {
     this.loadGeoJSON();
   }
 
+  // Método para convertir nombres a códigos
+  private convertirNombresACodigos(departamentos: string[]): string[] {
+    return departamentos
+      .map(nombre => {
+        const nombreNormalizado = nombre.toLowerCase().trim();
+        const codigo = this.departamentosMap[nombreNormalizado];
+        
+        if (!codigo) {
+          console.warn(`Departamento no encontrado: ${nombre}`);
+          return null;
+        }
+        
+        return codigo;
+      })
+      .filter(codigo => codigo !== null) as string[];
+  }
+
   private loadGeoJSON(): void {
     fetch('assets/mapColombia/colombia.geo.json')
       .then(response => response.json())
       .then(data => {
+        // Convertir nombres a códigos
+        const codigosDepartamentos = this.convertirNombresACodigos(this.departamentos);
         // Filtrar para excluir San Andrés (código 88)
         this.geoJsonLayer = L.geoJSON(data, {
           filter: (feature) => {
@@ -57,7 +127,7 @@ export class MapaColombiaComponent implements OnInit, AfterViewInit, OnChanges {
           },
           style: (feature) => {
             const deptCode = feature?.properties?.['DPTO'];
-            const colorIndex = this.departamentos.indexOf(deptCode);
+            const colorIndex = codigosDepartamentos.indexOf(deptCode);
             
             let color = '#ccc';  // Color predeterminado si no se encuentra en el array
             let fillColor = '#f8f8f8';

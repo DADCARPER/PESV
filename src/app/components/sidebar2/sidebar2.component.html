@@ -1,0 +1,114 @@
+<!-- Sidebar Profesional -->
+<div class="fixed inset-y-0 right-0 z-40 transition-transform duration-300 ease-in-out" 
+     [ngClass]="{'translate-x-0': isOpen, 'translate-x-full': !isOpen}">
+  
+  <!-- Sidebar -->
+  <div class="relative h-full w-64 bg-white shadow-xl flex flex-col sidebar-shadow">
+    
+    <!-- Header del Sidebar -->
+    <div class="flex items-center justify-between p-4 border-b border-gray-200">
+      <div class="flex items-center space-x-3">
+        <img src="assets/img/favicon3.png" alt="Logo" class="h-8 w-8">
+        <h2 class="text-lg font-semibold text-gray-900">PESV</h2>
+      </div>
+      <button 
+        (click)="toggleSidebar()"
+        class="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+        <i class="fas fa-times text-lg"></i>
+      </button>
+    </div>
+    
+    <!-- Navegación -->
+    <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto sidebar-nav">
+      
+      <!-- Dashboard -->
+      <a href="#" class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 nav-link">
+        <i class="fas fa-tachometer-alt w-5 h-5 mr-3"></i>
+        <span class="font-medium">Dashboard</span>
+      </a>
+      
+      <!-- Planear -->
+      <a href="#" class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 nav-link">
+        <i class="fas fa-calendar-alt w-5 h-5 mr-3"></i>
+        <span class="font-medium">Planear</span>
+      </a>
+      
+      <!-- Hacer -->
+      <a href="#" class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 nav-link">
+        <i class="fas fa-tasks w-5 h-5 mr-3"></i>
+        <span class="font-medium">Hacer</span>
+      </a>
+      
+      <!-- Verificar -->
+      <a href="#" class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 nav-link">
+        <i class="fas fa-search w-5 h-5 mr-3"></i>
+        <span class="font-medium">Verificar</span>
+      </a>
+      
+      <!-- Actuar -->
+      <a href="#" class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 nav-link">
+        <i class="fas fa-cogs w-5 h-5 mr-3"></i>
+        <span class="font-medium">Actuar</span>
+      </a>
+      
+      <!-- Separador -->
+      <div class="border-t border-gray-200 my-4"></div>
+      
+      <!-- Reportes -->
+      <a href="#" class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 nav-link">
+        <i class="fas fa-chart-bar w-5 h-5 mr-3"></i>
+        <span class="font-medium">Reportes</span>
+      </a>
+      
+      <!-- Empleados -->
+      <a href="#" class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 nav-link">
+        <i class="fas fa-users w-5 h-5 mr-3"></i>
+        <span class="font-medium">Empleados</span>
+      </a>
+      
+      <!-- Documentos -->
+      <a href="#" class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 nav-link">
+        <i class="fas fa-file-alt w-5 h-5 mr-3"></i>
+        <span class="font-medium">Documentos</span>
+      </a>
+      
+      <!-- Separador -->
+      <div class="border-t border-gray-200 my-4"></div>
+      
+      <!-- Configuración -->
+      <a href="#" class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 nav-link">
+        <i class="fas fa-cog w-5 h-5 mr-3"></i>
+        <span class="font-medium">Configuración</span>
+      </a>
+      
+      <!-- Ayuda -->
+      <a href="#" class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 nav-link">
+        <i class="fas fa-question-circle w-5 h-5 mr-3"></i>
+        <span class="font-medium">Ayuda</span>
+      </a>
+      
+    </nav>
+    
+    <!-- Footer del Sidebar -->
+    <div class="p-4 border-t border-gray-200">
+      <div class="flex items-center space-x-3">
+        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" 
+             alt="Usuario" class="h-8 w-8 rounded-full user-avatar">
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium text-gray-900 truncate">Juan Pérez</p>
+          <p class="text-xs text-gray-500 truncate">Administrador</p>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</div>
+
+<!-- Botón para abrir sidebar (solo visible cuando está cerrado) -->
+<!-- <button 
+  *ngIf="!isOpen"
+  (click)="toggleSidebar()"
+  class="fixed top-4 right-4 z-60 p-4 bg-white rounded-md shadow-lg text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors duration-200 toggle-button">
+  <i class="fas fa-bars text-lg"></i>
+</button> -->

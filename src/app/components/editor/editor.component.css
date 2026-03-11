@@ -1,0 +1,43 @@
+/* Estilos para establecer la altura del editor CKEditor */
+:host ::ng-deep .ck-editor__editable {
+  height: 400px !important;
+  min-height: 400px !important;
+  overflow-y: auto !important;
+}
+
+/* Eliminar completamente el borde azul de focus */
+:host ::ng-deep .ck-editor__editable:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* También eliminar el borde de focus del contenedor principal del editor */
+:host ::ng-deep .ck.ck-editor:focus-within {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Opcional: Estilos adicionales para mejorar la apariencia */
+:host ::ng-deep .ck-toolbar {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+:host ::ng-deep .ck-content {
+  font-family: inherit !important; /* Hereda la fuente base, pero permite sobrescribir con inline */
+}
+:host ::ng-deep .ck-content span[style*="font-family"] {
+  font-family: unset !important; /* Permite que los estilos inline de CKEditor funcionen */
+}
+
+:host ::ng-deep .ck-content ol {
+  list-style-type: decimal !important;
+  margin-left: 1.5em !important;
+}
+
+:host ::ng-deep .ck-content ul {
+  list-style-type: disc !important;
+  margin-left: 1.5em !important;
+}

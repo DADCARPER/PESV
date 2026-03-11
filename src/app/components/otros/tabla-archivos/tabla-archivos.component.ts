@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, Input } from '@angular/core';
 import { TableDropdownComponent } from "../../dropdowns/table-dropdown/table-dropdown.component";
-import { ArchivoService, CategoriaAgrupada } from '../../../services/archivos.service'; // Asegúrate de importar bien tu servicio
+import { ArchivoService, CategoriaAgrupada } from '../../../services/shared/archivos.service'; // Asegúrate de importar bien tu servicio
 import { InfoIconComponent } from '../../modals/info-icon/info-icon.component';
 import { ModalsGuiaComponent } from "../../modals/modals-guia/modals-guia.component";
 

@@ -1,292 +1,141 @@
-import { Component, inject, OnInit, ViewChild } from '@angular/core';
-import { ArchivoService } from '../../../../services/archivos.service';
-import { Router, RouterLink } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import AOS from 'aos'; // Importa AOS
+import { Component, inject, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { LiderDelPesvService } from '../../../../services/lider-del-pesv.service';
-import { LoginService } from '../../../../services/login.service';
-import { Auth } from '@angular/fire/auth';
-import { PdfLiderPesvComponent } from '../../../../components/pdfs/pdf-lider-pesv/pdf-lider-pesv.component';
 import { CardsBotonComponent } from "../../../../components/cards/cards-boton/cards-boton.component";
 import { PasopasoComponent } from "../../../../components/tabs/pasopaso/pasopaso.component";
-import { ProgressCircleComponent } from "../../../../components/otros/progress-circle/progress-circle.component";
-import { omit } from 'lodash';
-import { ModalsGuiaComponent } from '../../../../components/modals/modals-guia/modals-guia.component';
-import { UploadArchivosComponent } from "../../../../components/otros/upload-archivos/upload-archivos.component";
-import { PreviaDocumentosComponent } from "../../../../shared/previa-documentos/previa-documentos.component";
-
+import { AuthenticacionService } from '../../../../services/shared/authenticacion.service';
+import { AlertaService } from '../../../../services/shared/alerta.service';
+import { GestionDocumentosService } from '../../../../services/shared/gestion-documentos.service';
+import { FirestoreService } from '../../../../services/shared/firestore.service';
+import { AlertaInformativoComponent } from "../../../../components/alertas/alerta-informativo/alerta-informativo.component";
+import { LoadingComponent } from "../../../../components/loading/loading/loading.component";
+import { ReftourlPipe } from '../../../../pipes/reftourl.pipe';
+import { LimpiarnombrePipe } from '../../../../pipes/limpiarnombre.pipe';
+import { FechafirestorePipe } from '../../../../pipes/fechafirestore.pipe';
+import { EditorComponent } from "../../../../components/editor/editor.component";
+import { Models } from '../../../../interfaces/models';
 
 @Component({
   selector: 'app-lider-del-pesv',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, PdfLiderPesvComponent, CardsBotonComponent, PasopasoComponent, ProgressCircleComponent, ModalsGuiaComponent, UploadArchivosComponent, RouterLink, PreviaDocumentosComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, CardsBotonComponent, PasopasoComponent, RouterLink, AlertaInformativoComponent, LoadingComponent, ReftourlPipe, LimpiarnombrePipe, FechafirestorePipe, EditorComponent],
   templateUrl: './lider-del-pesv.component.html',
+  schemas:[CUSTOM_ELEMENTS_SCHEMA],
   styleUrls: ['./lider-del-pesv.component.css']
 })
 export class LiderDelPesvComponent implements OnInit {
 
-  @ViewChild(PasopasoComponent) pasoPaso!: PasopasoComponent;
-  @ViewChild(ModalsGuiaComponent) modalOkCancelar!: ModalsGuiaComponent;
-  @ViewChild(PdfLiderPesvComponent) crearpdf!: PdfLiderPesvComponent;
+  nombreModulo: string = '001-lider-pesv';
 
-  userId: any = sessionStorage.getItem('userId'); //session Storage =)
-  dataEmpresa: any = sessionStorage.getItem('empresaData');
-  dataEmpresa2 = JSON.parse(this.dataEmpresa);
-  id_formulario: string = "0";
+  private _authcations = inject(AuthenticacionService);
+  private _gestDoc = inject(GestionDocumentosService);
+  private _firestore = inject(FirestoreService);
+  public _alerta = inject(AlertaService);
 
-  form!: FormGroup;
-  selectedFiles: File[] = []; // Almacena los archivos seleccionados
-  resumenInformacion: string[] = []; // Array para almacenar el resumen de la información
+  nit = this._authcations.getCurrentUser().displayName;
+  empresa = this._authcations.getCurrentUser().photoURL;
+  uid = this._authcations.getCurrentUser().uid;
+
+  documento1: Models.Documentos.Documento[] = [];
+  documento2: Models.Documentos.Documento[] = [];
+  documento3: Models.Documentos.Documento[] = [];
+  documento4: Models.Documentos.Documento[] = [];
+
+  historico1: Models.Documentos.Documento[] = [];
+  historico2: Models.Documentos.Documento[] = [];
+  historico3: Models.Documentos.Documento[] = [];
+  historico4: Models.Documentos.Documento[] = [];
+
   openTab = 0;
-  porcentaje = 0;
-  
+  cargando: Record<string, boolean> = {};
+  eliminando: Record<string, boolean> = {};
+  mostrarHistorico: Record<string, boolean> = {};
 
-  tablaDocumentos$ = this.liderDelPesvService.leerDocumentoIndex(this.userId);
-  
-
-  constructor(
-    private fb: FormBuilder, 
-    private router: Router, 
-    private archivoService: ArchivoService, 
-    private liderDelPesvService: LiderDelPesvService,
-  ) {}
+  constructor() {}
 
   ngOnInit(): void {
-
-    this.id_formulario = sessionStorage.getItem('id_formulario') || "0";
-    console.log(this.id_formulario+" aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-    if (this.id_formulario !== "0"){
-
-      setTimeout(() => {
-        if (this.modalOkCancelar) {
-          this.modalOkCancelar.abrirModal(); // este modal se apoya en ViewChild que llama 2 metodos del padre segun su respuesta
-        }
-      }, 0);
-      console.log('Se encontro un Documento perndiente Desea continuar "SI" Descartar "NO" ')
-    }
-
-    this.iniciarformulariolimpio();
-    
-    AOS.init();
-    
-    
+    this.consultarDocumentos();
   }
 
-  iniciarformulariolimpio(){
-    this.form = this.fb.group({
-
-      // starUp
-      tipo: ['Asistente'],
-      // Paso 1
-      representanteLegal: [''],
-      cargoRepresentante: [''],
-      identificacionRepresentante: [''],
-      nitEmpresa: [''],
-
-      nombreLider: [''],
-      cargoLider: [''],
-      departamentoLider: [''],
-      fechaDesignacion: [''],
-      
-      // Paso 2: Designación y Autorización
-
-      liderResponsabilidades: [false], // Check para liderar el PESV
-      reportaAutogestion: [false],     // Check para reportar autogestión
-      garantizaPresupuesto: [false],   // Check para presupuesto
-      respondeAutoridades: [false],    // Check para responder a autoridades
-      informaDireccion: [false],       // Check para informar a dirección
-      defineCumplimientoActividades: [false], 
-
-      // Paso : 3
-
-      gradoAcademico: [''],
-      certificadoSGSST: [false],
-      experienciaSST: ['', [Validators.min(0)]],
-      experienciaPESV: ['', [Validators.min(0)]],
-      certificados: [''],
-
-      // Confirmación de Designación
-      confirmacionInformacion: [false],
-      compromisoLider: [false],
-
-      firmaRepresentante: [''],
-      firmaLider: [''],
-
-    });
-  }
-
-  async toggleTabs(tabNumber: number,porce:string ) {
-    this.openTab = tabNumber;
-    setTimeout(() => {
-      AOS.refresh(); // Reinicia AOS para detectar nuevos elementos
-      if (tabNumber === 5) {
-        //this.onSubmit();
-        this.generarResumen();
-      }
-    }, 200);
-
-    if(this.openTab > 1 && this.openTab < 6){ //autoguardado
-
-      
-
-      if(this.openTab == 2){ //crear fomulario o carga autoguardado o carga editable
-
-        
-        if (this.id_formulario !== "0") { //existe session de id_formulario creada?
-          //this.cargarFormulario(id_formulario);
-          const dataCruda = await this.liderDelPesvService.getfomularioEdit(this.id_formulario,this.userId);
-
-          if (dataCruda.exists()) {
-            
-            const data = dataCruda.data();
-            // Excluir el campo 'certificados'
-            const dataSinCertificados = omit(data, ['certificados']);
-            // Rellenar el formulario con los datos obtenidos
-            this.form.patchValue(dataSinCertificados);
-            console.log('Datos cargados en el formulario:', data);
-
-          } else {
-            console.error('No se encontraron datos para este formulario');
-          }
-          
-        }else{
-          //creo el id_formulario por primera vez
-          sessionStorage.setItem('id_formulario', Date.now().toString());
-          this.id_formulario = sessionStorage.getItem('id_formulario') as string ;
-
-        }
-
-        
-      }
-
-      if (porce === "Avanza") {
-        this.porcentaje = Math.min(this.porcentaje + 20, 100);  // aumenta el porcentaje de barra IMPORTANTE INICIA EN 0
-        this.pasoPaso.nextStep();  //  ESTOS SON METODOS LLAMADOS POR @ViewChild del componenten pasopaso
-      } else if(porce === "Atras") {
-        this.porcentaje = Math.max(this.porcentaje - 20, 0);
-        this.pasoPaso.prevStep(); //  ESTOS SON METODOS LLAMADOS POR @ViewChild del componenten pasopaso
-      }
-      //console.log("porcentaje" + this.porcentaje +"porcentaje" ); 
-      this.liderDelPesvService.autoGuardar(this.form.value,this.userId,"Asistente",this.porcentaje,this.id_formulario ?? "");
-
-      
-    }
-    
-  }
-
-
-  async onSubmit() {
-
-    
-    //this.crearpdf.generatePdf(true);
-    //this.form.get("firmaLider")?.valid
-    
-    if (this.form.valid) {
-      //console.log("se ejecutoooooooooooooooooooooooooooooooooooooooooooooooooooooooooox123x");
-      const formData = this.form.value;
-      formData.userId = this.userId; // Agrega el ID del usuario autenticado
-      const fileUrls: string[] = [];
-  
-      try {
-        // Guarda los datos del formulario en Firestore sin los archivos primero
-        console.log(formData);
-        // const id_formulario = Date.now().toString();
-        // const documentRef = await this.liderDelPesvService.saveLiderData(formData,this.userId,id_formulario);
-  
-        // Subir cada archivo y obtener la URL
-        for (const file of this.selectedFiles) {
-          try {
-            const url: any = await this.liderDelPesvService.uploadFile(file,this.userId).toPromise();
-            fileUrls.push(url);
-          } catch (error) {
-            console.error('Error al subir archivo:', file.name, error);
-          }
-        }
-  
-        // Actualizar el documento en Firestore con el array de URLs de los archivos
-        await this.liderDelPesvService.updateLiderDataWithFiles(this.userId,this.id_formulario, fileUrls);
-        console.log('Datos y URLs de archivos guardados en Firestore');
-        
-        this.liderDelPesvService.leerdatosformulario(this.userId, this.id_formulario);
-
-        // Guardo el PDF CREADO EN STORAGE POR Blob
-        this.crearpdf.generatePdf(true);
-
-        //Borro id_formulario
-        this.borroSessionIdFormulario();
-        
-        //Redirigo a final Tab 6
-
-        this.toggleTabs(6,'Avanza');
-        //this.router.navigate(['/admin/dashboardplanificar']);
-  
-      } catch (error) {
-        console.error('Error al guardar los datos en Firestore', error);
-      }
-    } else {
-      this.form.markAllAsTouched();
+  async uploadFile(event: any, seccion: string) {
+    this.cargando[seccion] = true;
+    const docsMap: Record<string, Models.Documentos.Documento[]> = {
+      'Documento de Identificación': this.documento1,
+      'Acta de Designación del Líder del PESV': this.documento2,
+      'Certificados de Competencia': this.documento3,
+      'Documentación de Experiencia Profesional': this.documento4,
+    };
+    try {
+      await this._gestDoc.uploadFile({
+        nit: this.nit,
+        empresa: this.empresa,
+        uid: this.uid,
+        nombreModulo: this.nombreModulo,
+        event,
+        seccion,
+        currentDocs: docsMap[seccion] ?? [],
+        periodo: this._authcations.periodo(),
+      });
+      await this.consultarDocumentos();
+    } finally {
+      this.cargando[seccion] = false;
     }
   }
-  
 
-  onFilesSelected(event: any) {
-    const files: File[] = Array.from(event.target.files) as File[];
-    
-    files.forEach(file => {
-      // Verifica si el archivo ya existe en selectedFiles
-      if (this.selectedFiles.some(existingFile => existingFile.name === file.name)) {
-        console.log(`Ya existe un archivo con el nombre: ${file.name}`);
-      } else {
-        this.selectedFiles.push(file); // Agrega el archivo solo si no existe
-      }
-    });
-  
-    console.log('Archivos seleccionados:', this.selectedFiles.map(file => file.name));
+  async eliminarVigente(doc: Models.Documentos.Documento, seccion: string) {
+    if (!doc.id) return;
+    this.eliminando[seccion] = true;
+    try {
+      await this._gestDoc.marcarHistorico(this.nit, this.nombreModulo, doc.periodo ?? this._authcations.periodo(), doc.id!);
+      await this.consultarDocumentos();
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'Error al eliminar el documento';
+      console.error('[LiderPesv] eliminarVigente:', error);
+      this._alerta.showError(msg);
+    } finally {
+      this.eliminando[seccion] = false;
+    }
   }
 
-  removeFile(index: number) {
-    const removedFile = this.selectedFiles.splice(index, 1); // Elimina el archivo en el índice especificado
-    console.log(`Archivo eliminado: ${removedFile[0].name}`);
+  toggleHistorico(seccion: string) {
+    this.mostrarHistorico[seccion] = !this.mostrarHistorico[seccion];
   }
 
-
-  generarResumen() {
-    this.resumenInformacion = [
-      `Nombre del representante legal: ${this.form.get('nombreRepresentante')?.value || 'No ingresado'}`,
-      `Cargo del representante legal: ${this.form.get('cargoRepresentante')?.value || 'No ingresado'}`,
-      `NIT de la empresa: ${this.form.get('nitEmpresa')?.value || 'No ingresado'}`,
-      `Nombre del líder del PESV: ${this.form.get('nombreLider')?.value || 'No ingresado'}`,
-      `Cargo del líder del PESV: ${this.form.get('cargoLider')?.value || 'No ingresado'}`,
-      `Confirmación de información proporcionada: ${this.form.get('confirmacionInformacion')?.value ? 'Sí' : 'No'}`,
-      `Compromiso del líder del PESV: ${this.form.get('compromisoLider')?.value ? 'Sí' : 'No'}`
-    ];
-  }
-  
-
-  irdashboard(){
-
-    this.router.navigate(['admin/dashboardplanificar']);
-
+  async consultarDocumentos() {
+    const periodo = this._authcations.periodo();
+    const [docs, hist] = await Promise.all([
+      this._gestDoc.consultarDocumentos(this.nit, this.nombreModulo, periodo),
+      this._gestDoc.consultarHistorico(this.nit, this.nombreModulo, periodo),
+    ]);
+    this.documento1 = docs['Documento de Identificación'] ?? [];
+    this.documento2 = docs['Acta de Designación del Líder del PESV'] ?? [];
+    this.documento3 = docs['Certificados de Competencia'] ?? [];
+    this.documento4 = docs['Documentación de Experiencia Profesional'] ?? [];
+    this.historico1 = hist['Documento de Identificación'] ?? [];
+    this.historico2 = hist['Acta de Designación del Líder del PESV'] ?? [];
+    this.historico3 = hist['Certificados de Competencia'] ?? [];
+    this.historico4 = hist['Documentación de Experiencia Profesional'] ?? [];
+    await this.actualizarEstatusGeneral();
   }
 
-  cargarDocumento(){
-    
-    this.router.navigate(['admin/planificar/liderdelpesv/gestion_archivos']);
+  private async actualizarEstatusGeneral(): Promise<void> {
+    const periodo = this._authcations.periodo();
+    const modulo: Models.Procesos.Modulo001LiderPesv = {
+      total_progreso: [this.documento1, this.documento2, this.documento3, this.documento4]
+        .filter(d => d.length > 0).length * 25,
+      docIdentidad:              { total: this.documento1.length > 0 ? 1 : 0 },
+      actaLiderpesv:             { total: this.documento2.length > 0 ? 1 : 0 },
+      certificadoCompetencia:    { total: this.documento3.length > 0 ? 1 : 0 },
+      docExperienciaProfesional: { total: this.documento4.length > 0 ? 1 : 0 },
+    };
+    try {
+      await this._firestore.upsertDocument(`EstatusGeneral/${this.nit}`, {
+        periodo,
+        '001-lider-pesv-documentos': modulo,
+      });
+    } catch (error: unknown) {
+      console.error('[LiderPesv] actualizarEstatusGeneral:', error);
+    }
   }
-
-
-  avanzarPaso() {
-    this.pasoPaso.nextStep();
-  }
-
-  retrocederPaso() {
-    this.pasoPaso.prevStep();
-  }
-
-  borroSessionIdFormulario(){
-    sessionStorage.removeItem('id_formulario');//
-    this.id_formulario = "0";
-  }
-
 }

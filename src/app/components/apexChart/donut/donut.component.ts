@@ -27,7 +27,7 @@ export type ChartOptions = {
   imports: [CommonModule, NgApexchartsModule],
   template: `
   <div [class]="muestraBorde ? 'rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200 text-center' : ''">
-    <p>Escolaridad</p>
+    <p>{{titulo}}</p>
     <div class="w-full max-w-2xl mx-auto p-4">
       <apx-chart
         [series]="chartOptions.series"
@@ -48,12 +48,13 @@ export class DonutComponent implements OnChanges {
   @Input() labels: string[] = [];
   @Input() series: number[] = [];
   @Input() muestraBorde: boolean = true;
+  @Input() titulo: string = '';
 
   chartOptions: ChartOptions = {
     series: [],
     chart: {
       type: "donut",
-      height: 280
+      height: 287
     },
     labels: [],
     plotOptions: {
@@ -66,7 +67,9 @@ export class DonutComponent implements OnChanges {
               show: true,
               label: 'Total',
               formatter: (w) => {
-                return w.globals.seriesTotals.reduce((a: number, b: number) => a + b, 0) + ' %';
+                // Suma de los conteos reales → número entero sin símbolo %
+                const total = w.globals.seriesTotals.reduce((a: number, b: number) => a + b, 0);
+                return total.toString();
               }
             }
           }
@@ -75,8 +78,11 @@ export class DonutComponent implements OnChanges {
     },
     dataLabels: {
       enabled: true,
-      formatter: (val, opts) => {
-        return opts.w.config.series[opts.seriesIndex] + '%';
+      formatter: (val: number, opts: any) => {
+        // val = porcentaje calculado por ApexCharts (0-100)
+        // series[i] = conteo real del segmento
+        const count = opts.w.config.series[opts.seriesIndex];
+        return `${count} (${val.toFixed(1)}%)`;
       }
     },
     legend: {

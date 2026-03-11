@@ -9,6 +9,7 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app/app.routes';
 import { provideLottieOptions } from 'ngx-lottie';
 import player from 'lottie-web';  // Import Lottie player
+import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 
 // Importar los estilos globales de AOS
 import 'aos/dist/aos.css';
@@ -20,7 +21,7 @@ import es from '@angular/common/locales/es';
 
 // Registrar los datos de localización
 registerLocaleData(es);
-
+ModuleRegistry.registerModules([AllCommunityModule]);
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: LOCALE_ID, useValue: 'es-ES' }, // Añadir el proveedor de localización
@@ -30,6 +31,7 @@ bootstrapApplication(AppComponent, {
     provideStorage(() => getStorage()), // Añadir Storage como proveedor
     provideFirestore(() => getFirestore()),
     provideRouter(routes),
+    
     provideLottieOptions({  // Añade la configuración para Lottie
       player: () => player
     })

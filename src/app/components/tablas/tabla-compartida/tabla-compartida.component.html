@@ -3,33 +3,66 @@
         <thead class="bg-gray-50">
             <tr>
                 @for (header of headers; track $index) {
-                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{header}}</th>
+                    <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {{header}}
+                    </th>
                 }
                 @if (accion){
-                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Accíon</th>
+                    <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acción</th>
                 }
             </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-            <tr>
-                <!-- <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Juan Pérez</td> -->
-                @for (dato of datas; track $index) {
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hover:bg-gray-100">{{dato}}</td>
-                }
-                
-            
-            
-            <!-- <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                <div class="flex">
-                <div class="text-amber-400 hover:text-amber-300 cursor-pointer">
-                    <iconify-icon (click)="toggleTabs(3)" icon="hugeicons:pencil-edit-02" width="22" height="22" class="pr-2 "></iconify-icon>
-                </div>
-                <div class="text-amber-600 hover:text-amber-500 cursor-pointer">
-                    <iconify-icon icon="hugeicons:delete-03" width="22" height="22" class="pr-2 "></iconify-icon>
-                </div>
-                </div>
-            </td> -->
-            
+            @for (dato of datas; track $index) {
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 text-sm text-gray-500 hover:bg-gray-100 text-center">
+                        {{ $index + 1 }}
+                    </td>
+                    
+                    @for (key of dataKeys; track keyIndex; let keyIndex = $index) {
+                        <td class="px-6 py-4 text-sm text-gray-500 hover:bg-gray-100 text-center"
+                            [style.max-width]="getAncho(keyIndex)">
+                            
+                            @if (deberTruncar(keyIndex)) {
+                                <div class="truncate" [title]="dato[key]">
+                                    {{ dato[key] }}
+                                </div>
+                            } @else {
+                                {{ dato[key] }}
+                            }
+                        </td>
+                    }
+                    
+                    @if (accion){
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <div class="flex gap-2 justify-center" role="group" aria-label="Acciones">
+                                <button 
+                                    type="button"
+                                    (click)="onEditar(dato)"
+                                    class="text-amber-400 hover:text-amber-300 cursor-pointer p-1 rounded focus:outline-none focus:ring-2 focus:ring-amber-400"
+                                    aria-label="Editar registro">
+                                    <iconify-icon icon="hugeicons:pencil-edit-02" width="20" height="20"></iconify-icon>
+                                </button>
+                                <button 
+                                    type="button"
+                                    (click)="onEliminar(dato)"
+                                    class="text-red-600 hover:text-red-500 cursor-pointer p-1 rounded focus:outline-none focus:ring-2 focus:ring-red-400"
+                                    aria-label="Eliminar registro">
+                                    <iconify-icon icon="hugeicons:delete-03" width="20" height="20"></iconify-icon>
+                                </button>
+                            </div>
+                        </td>
+                    }
+                </tr>
+            }
+            @if (datas.length === 0) {
+                <tr>
+                    <td [attr.colspan]="headers.length + (accion ? 2 : 1)" 
+                        class="px-6 py-12 text-center text-gray-500">
+                        No hay datos disponibles
+                    </td>
+                </tr>
+            }
         </tbody>
     </table>
 </div>

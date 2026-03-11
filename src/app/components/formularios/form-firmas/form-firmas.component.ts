@@ -1,11 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FirestoreService } from '../../../services/firestore.service';
-import { LoginService } from '../../../services/login.service';
+import { FirestoreService } from '../../../services/shared/firestore.service';
+import { StorageService } from '../../../services/shared/storage.service';
+import { AuthenticacionService } from '../../../services/shared/authenticacion.service';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ComboselectComponent } from "../../controlesFormulario/comboselect/comboselect.component";
 import { tipodocumento } from '../../../data/categorias-data';
-import { FirmasService } from '../../../services/firmas.service';
+import { FirmasService } from '../../../services/shared/firmas.service';
 import { SubirImagenComponent } from "../../otros/subir-imagen/subir-imagen.component";
 import { InputImagenComponent } from "../../controlesFormulario/input-imagen/input-imagen.component";
 
@@ -29,17 +30,19 @@ export class FormFirmasComponent implements OnInit {
 
   constructor(
       private _firestore: FirestoreService,
-      private _login: LoginService,
+      private _storage: StorageService,
+      private _login: AuthenticacionService,
       private _firmas: FirmasService,
       private fb: FormBuilder
     ) {
-  
+
       // Cargar el logo inicial
       const userId = this._login.userIdSignal();
       console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaa"+userId);
       if (userId) {
         this.uid = userId;
-        this._firestore.getDocument(`gestor-firmas/${userId}`).then(userData => {
+        this._firestore.getDocument<any>(`gestor-firmas/${userId}`).then(snap => {
+          const userData = snap.data() ?? {};
           if (userData && userData["logoEmpresaURL"]) {
             //this._logoimagen.setLogoUrl(userData["logoEmpresaURL"]);
             console.log("ccccccccc"+userId);
@@ -76,7 +79,7 @@ export class FormFirmasComponent implements OnInit {
         const path = `uploads/${this._login.userIdSignal()}/firmas/${nombreArchivo}`;
         
         // Subir archivo y obtener URL
-        const url = await this._firestore.uploadFileProgreso(
+        const url = await this._storage.uploadFileProgreso(
           path,
           formValues.firma
         );

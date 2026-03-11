@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CardsMenuComponent } from "../../../components/cards/cards-menu/cards-menu.component";
 import { CommonModule } from '@angular/common';
-import { EstatusGeneralService } from '../../../services/estatus-general.service';
+import { EstatusGeneralService } from '../../../services/shared/estatus-general.service';
 
 @Component({
   selector: 'app-actuar',

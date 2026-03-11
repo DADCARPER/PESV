@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Storage, ref, uploadBytesResumable, getDownloadURL } from '@angular/fire/storage';
 import { Firestore, setDoc, doc, arrayUnion } from '@angular/fire/firestore';
 import * as XLSX from 'xlsx';
-import { LoginService } from '../../../services/login.service';
-import { AlertaService } from '../../../services/alerta.service';
+import { AuthenticacionService } from '../../../services/shared/authenticacion.service';
+import { AlertaService } from '../../../services/shared/alerta.service';
 import { AlertaInformativoComponent } from "../../alertas/alerta-informativo/alerta-informativo.component";
 
 @Component({
@@ -26,7 +26,7 @@ export class DiagnosticoImportComponent {
   data: any[] = [];
   header: string[] = [];;
 
-  private _loginsercivico = inject(LoginService);
+  private _loginsercivico = inject(AuthenticacionService);
   private _storage = inject(Storage);
   private _firestore = inject(Firestore);
   public _alertaService = inject(AlertaService);

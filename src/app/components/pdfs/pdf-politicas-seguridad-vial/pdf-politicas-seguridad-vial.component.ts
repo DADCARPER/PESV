@@ -2,7 +2,7 @@ import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-import { PoliticaSeguridadVialService } from '../../../services/politica-seguridad-vial.service';
+import { PoliticaSeguridadVialService } from '../../../services/shared/politica-seguridad-vial.service';
 
 @Component({
   selector: 'app-pdf-politicas-seguridad-vial',

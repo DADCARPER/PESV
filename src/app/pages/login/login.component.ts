@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators} from '@angular/forms';
-import { LoginService } from '../../services/login.service';
+import { AuthenticacionService } from '../../services/shared/authenticacion.service';
 import { Router, RouterLink } from '@angular/router';
 import { AuthErrorCodes } from 'firebase/auth';
 import { AlertaInformativoComponent } from "../../components/alertas/alerta-informativo/alerta-informativo.component";
-import { AlertaService } from '../../services/alerta.service';
+import { AlertaService } from '../../services/shared/alerta.service';
 
 
 
@@ -21,7 +21,7 @@ export class LoginComponent {
   loginForm: FormGroup;
   errorMessage: any | null = null;
 
-  private _authService = inject(LoginService);
+  private _authService = inject(AuthenticacionService);
   private _router = inject(Router);
   public alertaService = inject(AlertaService);
 

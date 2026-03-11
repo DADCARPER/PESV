@@ -18,14 +18,19 @@
       
         <!-- User -->
          
-        <div class="w-full md:flex mb-0 hidden flex-row flex-wrap items-center lg:ml-auto justify-center">
-          <ul class="flex-col  md:flex-row list-none items-center hidden md:flex">
-            <app-user-dropdown
-            [nameEmpresa]="datosUser.nombreEmpresa!"
-            [email]="datosUser.email!"
-            size="w-32 h-32"
-            [imageUrl]="_logoimagen.hasLogo() ? _logoimagen.logoUrl : 'assets/img/user.png'"></app-user-dropdown>
-          </ul>
+        <!-- Logo de la empresa -->
+        <div class="w-full hidden md:flex flex-col items-center justify-center py-4">
+          <img
+            [src]="_logoimagen.hasLogo() ? _logoimagen.logoUrl : 'assets/img/user.png'"
+            alt="Logo empresa"
+            class="w-28 h-28 object-contain rounded-xl shadow-sm bg-gray-50 p-1 cursor-pointer"
+            [routerLink]="['/admin/dashboard']"
+          />
+          @if (datosUser.nombreEmpresa) {
+            <p class="mt-2 text-xs font-semibold text-gray-600 text-center leading-tight px-2">
+              {{ datosUser.nombreEmpresa }}
+            </p>
+          }
         </div>
        
         
@@ -52,9 +57,11 @@
         <app-notification-dropdown class="block"></app-notification-dropdown>
       </li>
       <li class="inline-block relative">
-        <app-user-dropdown class="block"
-        size="w-12 h-12"
-        [imageUrl]="_logoimagen.hasLogo() ? _logoimagen.logoUrl : 'assets/img/user.png'"></app-user-dropdown>
+        <img
+          [src]="_logoimagen.hasLogo() ? _logoimagen.logoUrl : 'assets/img/user.png'"
+          alt="Logo empresa"
+          class="w-10 h-10 object-contain rounded-lg"
+        />
       </li>
     </ul>
     <!-- Collapse -->

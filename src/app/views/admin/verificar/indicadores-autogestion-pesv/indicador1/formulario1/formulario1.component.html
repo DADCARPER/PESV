@@ -1,0 +1,208 @@
+<!-- Fondo oscuro -->
+<div *ngIf="mostrarModal()" (click)="cerrarModal()" class="fixed inset-0 z-40 bg-black opacity-25"></div>
+
+<!-- Modal -->
+<div *ngIf="mostrarModal()" (click)="cerrarModal()" class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex modal-fade-down">
+  <div (click)="$event.stopPropagation()" class="relative mx-auto my-6 bg-white rounded-lg shadow-lg max-w-6xl w-full">
+    <!-- 'max-w-sm':  'small',
+      'max-w-3xl':  'regular',
+      'max-w-6xl':  'large' -->
+    <!-- Título del modal -->
+    <div class="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+      <h3 class="text-xl font-semibold">
+        KM Recorridos - Indicador 1
+      </h3>
+    </div>
+    
+    <!-- Contenido del modal -->
+    <div class="relative p-6 flex-auto">
+        
+      <h3 class="text-lg font-semibold mb-4 pb-2 border-b text-gray-700">Ingrese el número de kilómetros recorridos por todos los vehículos cada mes</h3>
+
+      <div class="flex flex-wrap mb-4">
+
+        <div class="w-full lg:w-12/12 px-2">
+          <div class="space-y-2">
+            <div class="rounded-md border overflow-x-auto mb-2">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            
+                            <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">ENERO</th>
+                            <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">FEBRERO</th>
+                            <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">MARZO</th>
+                            <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">ABRIL</th>
+                            <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">MAYO</th>
+                            <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">JUNIO</th>
+           
+
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            
+                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
+                                <div class="relative w-full">
+                                    <input type="number" name="km" placeholder="0" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 pr-10">
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 text-sm">
+                                        km
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
+                                <div class="relative w-full">
+                                    <input type="number" name="km" placeholder="0" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 pr-10">
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 text-sm">
+                                        km
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
+                                <div class="relative w-full">
+                                    <input type="number" name="km" placeholder="0" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 pr-10">
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 text-sm">
+                                        km
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
+                                <div class="relative w-full">
+                                    <input type="number" name="km" placeholder="0" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 pr-10">
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 text-sm">
+                                        km
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
+                                <div class="relative w-full">
+                                    <input type="number" name="km" placeholder="0" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 pr-10">
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 text-sm">
+                                        km
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
+                                <div class="relative w-full">
+                                    <input type="number" name="km" placeholder="0" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 pr-10">
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 text-sm">
+                                        km
+                                    </span>
+                                </div>
+                            </td>
+
+
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">JULIO</td>
+                            <td class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">AGOSTO</td>
+                            <td class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">SEPTIEMBRE</td>
+                            <td class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">OCTUBRE</td>
+                            <td class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">NOVIEMBRE</td>
+                            <td class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">DICIEMBRE</td>
+                        </tr>
+                        <tr>
+                            
+                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
+                                <div class="relative w-full">
+                                    <input type="number" name="km" placeholder="0" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 pr-10">
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 text-sm">
+                                        km
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
+                                <div class="relative w-full">
+                                    <input type="number" name="km" placeholder="0" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 pr-10">
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 text-sm">
+                                        km
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
+                                <div class="relative w-full">
+                                    <input type="number" name="km" placeholder="0" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 pr-10">
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 text-sm">
+                                        km
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
+                                <div class="relative w-full">
+                                    <input type="number" name="km" placeholder="0" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 pr-10">
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 text-sm">
+                                        km
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
+                                <div class="relative w-full">
+                                    <input type="number" name="km" placeholder="0" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 pr-10">
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 text-sm">
+                                        km
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
+                                <div class="relative w-full">
+                                    <input type="number" name="km" placeholder="0" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 pr-10">
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 text-sm">
+                                        km
+                                    </span>
+                                </div>
+                            </td>
+
+                        </tr>
+
+                            
+                            
+
+                            <!-- @for (dato of datas; track $index) {
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hover:bg-gray-100">{{dato}}</td>
+                            } -->
+                            
+                        
+                        
+                        <!-- <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <div class="flex">
+                            <div class="text-amber-400 hover:text-amber-300 cursor-pointer">
+                                <iconify-icon (click)="toggleTabs(3)" icon="hugeicons:pencil-edit-02" width="22" height="22" class="pr-2 "></iconify-icon>
+                            </div>
+                            <div class="text-amber-600 hover:text-amber-500 cursor-pointer">
+                                <iconify-icon icon="hugeicons:delete-03" width="22" height="22" class="pr-2 "></iconify-icon>
+                            </div>
+                            </div>
+                        </td> -->
+                        
+                    </tbody>
+                </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+    
+    <!--footer-->
+    <div class="flex items-center justify-end p-5 border-t border-solid border-blueGray-200 rounded-b">
+      <button class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" (click)="handleCancel()">
+        Cancelar
+      </button>
+      <button class="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" (click)="handleSave()">
+        Agregar
+      </button>
+    </div>
+  </div>
+</div>

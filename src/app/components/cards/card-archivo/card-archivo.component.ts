@@ -1,6 +1,6 @@
 import { Component, Input, inject, ViewChild } from '@angular/core';
 import { IconoSvgComponent } from "../../iconos/icono-svg/icono-svg.component";
-import { LoginService } from '../../../services/login.service';
+import { AuthenticacionService } from '../../../services/shared/authenticacion.service';
 import { Firestore, doc, getDoc, updateDoc } from '@angular/fire/firestore';
 
 import { DatePipe } from '@angular/common';
@@ -45,7 +45,7 @@ export class CardArchivoComponent {
   @Input() urlFire: string = ""; 
   @Input() urlStore: string = ""; 
 
-  private _auth = inject(LoginService);
+  private _auth = inject(AuthenticacionService);
   private _firestore = inject(Firestore);
   private _shared = inject(SharedService);
   private _datePipe = inject(DatePipe);

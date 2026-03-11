@@ -2,28 +2,60 @@
 <nav class="absolute top-0 left-0 w-full z-10 bg-transparent md:flex-row md:flex-nowrap md:justify-start flex items-center p-4">
   <div class="w-full mx-autp items-center flex justify-between md:flex-nowrap flex-wrap md:px-10 px-4">
     <!-- Brand -->
-     <img src="assets/img/favicon3.png" alt="logo" class="w-10 h-10">
-    <h4 class="text-white text-3xl font-normal leading-normal hidden lg:inline-block ">
+     <img src="assets/img/favicon3.png"  alt="logo" [routerLink]="['/admin/dashboard']" class="w-10 h-10 cursor-pointer">
+    <h4 class="text-white text-3xl font-normal leading-normal hidden lg:inline-block cursor-pointer" [routerLink]="['/admin/dashboard']">
       {{titulopagina}}
     </h4>
     <!-- Form -->
-    <form class="md:flex hidden flex-row flex-wrap items-center lg:ml-auto mr-3">
-      <div class="relative flex w-full flex-wrap items-stretch">
-        <span
-          class="z-10 h-full leading-snug font-normal absolute text-center text-blueGray-300 absolute bg-transparent rounded text-base items-center justify-center w-8 pl-3 py-3"
-          ><i class="fas fa-search"></i
-        ></span>
-        <input
-          type="text"
-          placeholder="Buscar..."
-          class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white bg-white rounded text-sm shadow outline-none focus:outline-none focus:ring w-full pl-10"
-        />
+    <div class="md:flex hidden flex-row flex-wrap items-center lg:ml-auto mr-3 gap-3">
+
+      <!-- Badge nivel PESV -->
+      @if (nivelLabel()) {
+        <span class="flex items-center gap-1 px-3 py-1.5 rounded-full text-base font-semibold" [ngClass]="nivelClasses()">
+          <iconify-icon icon="hugeicons:shield-01" width="20" height="20"></iconify-icon>
+          {{ nivelLabel() }}
+        </span>
+      }
+
+      <!-- Selector de período -->
+      <div class="relative">
+        <button
+          (click)="toggleDropdown()"
+          class="flex items-center gap-2 px-4 py-2 bg-white rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          <iconify-icon icon="hugeicons:calendar-02" width="20" height="20"></iconify-icon>
+          <span class="font-medium text-gray-700">Período {{ selectedPeriod() }}</span>
+          <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        @if (isOpen()) {
+          <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+            @for (period of periods; track period) {
+              <button
+                (click)="selectPeriod(period)"
+                class="w-full flex items-center gap-2 px-4 py-2 text-left hover:bg-gray-50 transition-colors"
+                [class.bg-blue-50]="period === selectedPeriod()"
+                [class.text-blue-600]="period === selectedPeriod()"
+                [class.font-medium]="period === selectedPeriod()"
+              >
+                <iconify-icon icon="hugeicons:calendar-02" width="20" height="20"></iconify-icon>
+                <span>Período {{ period }}</span>
+              </button>
+            }
+          </div>
+        }
       </div>
-    </form>
+    </div>
     <!-- User -->
-    <!-- <ul class="flex-col md:flex-row list-none items-center hidden md:flex">
+    <ul class="flex-col md:flex-row list-none items-center hidden md:flex">
       <app-user-dropdown
-      size="w-14 h-14"></app-user-dropdown>
-    </ul> -->
+        size="w-7 h-7"
+        [nameEmpresa]="nombreEmpresa"
+        [email]="email">
+      </app-user-dropdown>
+    </ul>
   </div>
 </nav>
+<app-modal #modal (datoRecibido)="recibeDato($event)"></app-modal>

@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FirestoreService } from '../../../services/firestore.service';
-import { LoginService } from '../../../services/login.service';
-import { SignalsService } from '../../../services/signals.service';
+import { FirestoreService } from '../../../services/shared/firestore.service';
+import { StorageService } from '../../../services/shared/storage.service';
+import { AuthenticacionService } from '../../../services/shared/authenticacion.service';
+import { SignalsService } from '../../../services/shared/signals.service';
 
 @Component({
   selector: 'app-subir-imagen',
@@ -21,7 +22,8 @@ export class SubirImagenComponent {
 
   constructor(
     private firestoreService: FirestoreService,
-    private loginService: LoginService,
+    private storageService: StorageService,
+    private loginService: AuthenticacionService,
     private signalsimagen: SignalsService
   ) {}
 
@@ -68,7 +70,7 @@ export class SubirImagenComponent {
       const path = `uploads/${userId}/perfil/${this.selectedFile.name}`;
       
       // Subir archivo y obtener URL
-      const url = await this.firestoreService.uploadFileProgreso(
+      const url = await this.storageService.uploadFileProgreso(
         path,
         this.selectedFile,
         (progress) => {
@@ -77,7 +79,7 @@ export class SubirImagenComponent {
       );
 
       // Actualizar URL en Firestore
-      await this.firestoreService.setDocument(
+      await this.firestoreService.updateDocument(
         `users/${userId}`,
         { logoEmpresaURL: url }
       );

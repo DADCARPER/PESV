@@ -1,130 +1,45 @@
-import { Component, OnInit } from '@angular/core';
-import { options, ciudades, mapacolombia } from '../../../../../data/categorias-data';
-import { diagnosticosedes } from '../../../../../interfaces/perfil.interface';
-import { ReactiveFormsModule, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, viewChild, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ComboselectComponent } from "../../../../../components/controlesFormulario/comboselect/comboselect.component";
-import { SedesDiagnosticoService } from '../../../../../services/sedes-diagnostico.service';
-import { AlertaService } from '../../../../../services/alerta.service';
-import es from '@angular/common/locales/es';
+import { TablaCompartidaComponent } from "../../../../../components/tablas/tabla-compartida/tabla-compartida.component";
+import { Form1SedesComponent } from './form1-sedes/form1-sedes.component';
+import { Form2SedesComponent } from './form2-sedes/form2-sedes.component';
 
 @Component({
   selector: 'app-sedes',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ComboselectComponent],
+  imports: [CommonModule, TablaCompartidaComponent, Form1SedesComponent, Form2SedesComponent],
   templateUrl: './sedes.component.html',
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   styleUrl: './sedes.component.css'
 })
-export class SedesComponent implements OnInit {
+export class SedesComponent {
 
-  perfil?: diagnosticosedes;
-  formPerfil: FormGroup = this.fb.group({});
+  modalFormulario = viewChild.required<Form1SedesComponent>('modalFormulario');
+  modalEliminar = viewChild.required<Form2SedesComponent>('modalEliminar');
 
-  options = options // Opciones para el desplegable IMPORT
-  ciudades = ciudades // Opciones para el desplegable IMPORT 
-  mapacolombia = mapacolombia // Opciones para el desplegable IMPORT
-  filteredOptions = [...this.options];
+  heads=["#","SEDE","ACTIVIDAD","DEPARTAMENTO","CIUDAD","DIRECCIÓN","TELEFONO"];
+  @Input() datos:any=[];
 
-  listaSedes: diagnosticosedes[] = [];
-  listaDepartamentos: {} = {};
 
-  valores: any = [];
+  constructor() { }
 
-  constructor(
-    private fb: FormBuilder,
-    private _sede: SedesDiagnosticoService,
-    private _alertaService: AlertaService 
-  ) { }
 
-  async ngOnInit() {
-    this.iniciarformulariolimpio();
-    this.valores = await this._sede.getCollectionDepartamentoFirestore();
-    this.listaSedes = this.valores;
-    console.log("jamaica",this.valores);
+  mostrarModalFormulario(modo: string, datoaEditar?: {}): void { /// paso el dato a editar debe ser opcional ya que solo es en caso de editar
+    this.modalFormulario().abrirModal(modo,datoaEditar);
   }
 
-  iniciarformulariolimpio() {
-    this.formPerfil = this.fb.group({
-   
-      nombreSede: ['', Validators.required],
-      actividadEmpresa: [''],
-      nombreDepartamento: [''],
-      departamento: ['', Validators.required],
-      municipio: [''],
-      direccion: [''],
-      telefono: [''],
-      estado: ['Activo'],
-      fechacreacion: [new Date()],
-      mostrarsede: [true]
-      
-    });
+  manejarEdicion(dato: any) {
+    // Aquí implementas la lógica para editar
+    // Por ejemplo, abrir un modal, navegar a otra página, etc.
+    //console.log('Donde diocli editar -->>>>', dato);
+    this.mostrarModalFormulario("editar",dato);
   }
 
-  agregarSede() {
-    this.formPerfil.markAllAsTouched();
-    if (this.formPerfil.valid){
-
-      // Asegurarse de que el nombreDepartamento esté actualizado
-      const departamentoSeleccionado = this.formPerfil.get('departamento')?.value;
-
-      // Verificamos que el valor seleccionado no sea vacío
-      if (departamentoSeleccionado !== null && departamentoSeleccionado !== undefined) {
-        // Encontramos el índice del valor seleccionado en mapacolombia para obtener el nombre
-        const indexDepartamento = this.mapacolombia.indexOf(departamentoSeleccionado);
-
-        if (indexDepartamento !== -1) {
-          // Actualizamos nombreDepartamento con el nombre correspondiente de la opción seleccionada
-          const nombreDepartamento = this.options[indexDepartamento];
-          this.formPerfil.patchValue({
-            nombreDepartamento: nombreDepartamento
-          });
-        }
-      }
-      
-      this.listaSedes.push(this.formPerfil.value);
-      this._sede.setDepartamentoFirestore(this.formPerfil.value);
-      console.log(this.listaSedes);
-
-
-      this.iniciarformulariolimpio();
-
-    }
-    
+  manejarEliminar(idDocumento: string){
+    this.modalEliminar().abrirModal(idDocumento);
   }
 
-  // Método para eliminar un integrante de la lista por índice
-  removerSede(index: number): void {
-    this.listaSedes.splice(index, 1); // Elimina el integrante en el índice especificado
-     
-  }
-
-  onSubmit() {
-    //console.log();
-    if (this.listaSedes.length != 0) {
-      // console.log(this.listaSedes);
-      // const guardarlista = this.listaSedes.values();
-      // console.log(guardarlista);
-      // for (let i = 0; i < this.listaSedes.length; i++) {
-      //   this._sede.setDepartamentoFirestore(this.listaSedes[i], this.listaSedes[i].nombreSede);
-      // }
-
-      //this._sede.setDepartamentoLocal(this.listaDepartamentos);
-      this._alertaService.showSuccess("Registro Actualizado con exito");
-    } else {
-      //console.log('Formulario inválido');
-      this._alertaService.showWarning("Registro inválido. ¡Debe crear minimo una sede!");
-    }
-  }
-
-  // Método para obtener el control del formulario
-  //importante para el insertar select en el formulario
-  get departamentoControl() {
-    return this.formPerfil.get('departamento') as FormControl;
-  }
-
-  get ciudadControl() {
-    return this.formPerfil.get('municipio') as FormControl;
-  }
+ 
 
 
 }

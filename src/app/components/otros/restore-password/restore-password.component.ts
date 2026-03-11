@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { LoginService } from '../../../services/login.service';
+import { AuthenticacionService } from '../../../services/shared/authenticacion.service';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-restore-password',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule],
   templateUrl: './restore-password.component.html',
   styleUrl: './restore-password.component.css'
 })
@@ -18,7 +19,7 @@ export class RestorePasswordComponent {
 
   constructor(
     private fb: FormBuilder,
-    private loginService: LoginService
+    private loginService: AuthenticacionService
   ) {
     this.passwordForm = this.fb.group({
       newPassword: ['', [Validators.required, Validators.minLength(6)]],

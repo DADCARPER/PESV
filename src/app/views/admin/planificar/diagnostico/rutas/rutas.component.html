@@ -1,0 +1,152 @@
+<div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
+
+  <!-- Cabecera -->
+  <div class="rounded-t bg-amber-400 mb-0 px-6 py-6">
+    <div class="flex items-center gap-2">
+      <button [routerLink]="['/admin/planificar/diagnostico']"
+        class="bg-red-600 text-white active:bg-red-700 font-bold uppercase text-xs px-1 py-1 rounded shadow hover:shadow-md outline-none focus:outline-none ease-linear transition-all duration-150"
+        type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+          <path d="M5 12l14 0"/><path d="M5 12l6 6"/><path d="M5 12l6 -6"/>
+        </svg>
+      </button>
+      <h6 class="text-blueGray-700 text-xl font-bold">Rutas Frecuentes</h6>
+    </div>
+  </div>
+
+  <!-- Contenido -->
+  <div class="flex-auto px-4 lg:px-10 py-8">
+
+    @if (cargando) {
+      <div class="flex items-center justify-center py-20 text-gray-400">
+        <svg class="animate-spin mr-3" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+        </svg>
+        Cargando rutas...
+      </div>
+    } @else {
+
+      <!-- Stats rápidas -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-amber-50 border border-amber-100 rounded-xl p-4 text-center">
+          <p class="text-2xl font-bold text-amber-700">{{ totalRutas }}</p>
+          <p class="text-xs text-gray-500 mt-1 uppercase tracking-wide">Rutas registradas</p>
+        </div>
+        <div class="bg-amber-50 border border-amber-100 rounded-xl p-4 text-center">
+          <p class="text-2xl font-bold text-amber-700">{{ distanciaPromedio | number }} <span class="text-sm font-normal">km</span></p>
+          <p class="text-xs text-gray-500 mt-1 uppercase tracking-wide">Distancia promedio</p>
+        </div>
+        <div class="bg-amber-50 border border-amber-100 rounded-xl p-4 text-center">
+          <p class="text-2xl font-bold text-amber-700">{{ tiempoPromedio | number }} <span class="text-sm font-normal">min</span></p>
+          <p class="text-xs text-gray-500 mt-1 uppercase tracking-wide">Tiempo promedio</p>
+        </div>
+        <div class="bg-amber-50 border border-amber-100 rounded-xl p-4 text-center">
+          <p class="text-2xl font-bold text-amber-700">{{ distanciaMaxima | number }} <span class="text-sm font-normal">km</span></p>
+          <p class="text-xs text-gray-500 mt-1 uppercase tracking-wide">Ruta más larga</p>
+        </div>
+      </div>
+
+      @if (rutas.length === 0) {
+        <div class="flex flex-col items-center justify-center py-16 gap-3 text-gray-400">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M3 17h18M3 12l9-9 9 9"/>
+          </svg>
+          <p class="text-sm">No hay rutas registradas para este periodo.</p>
+        </div>
+      } @else {
+
+        <!-- Gráficas -->
+        <div class="mb-4">
+          <h3 class="text-base font-semibold text-gray-800 mb-1">Análisis de Rutas</h3>
+          <p class="text-xs text-gray-400">Distribución de rutas según tipo de vía, frecuencia y rango de distancia</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+
+          <!-- Gráfica 1: Tipo de vía -->
+          <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+            <p class="text-sm font-semibold text-gray-700 mb-1">Por tipo de vía</p>
+            <p class="text-xs text-gray-400 mb-3">Urbana, rural, autopista o mixta</p>
+            @if (tipoViaLabels.length > 0) {
+              <app-donut [labels]="tipoViaLabels" [series]="tipoViaSeries" [muestraBorde]="false" titulo=""></app-donut>
+            } @else {
+              <div class="flex items-center justify-center h-40 text-sm text-gray-400">Sin datos</div>
+            }
+          </div>
+
+          <!-- Gráfica 2: Frecuencia de uso -->
+          <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+            <p class="text-sm font-semibold text-gray-700 mb-1">Por frecuencia de uso</p>
+            <p class="text-xs text-gray-400 mb-3">Qué tan seguido se realiza cada ruta</p>
+            @if (frecuenciaLabels.length > 0) {
+              <app-donut [labels]="frecuenciaLabels" [series]="frecuenciaSeries" [muestraBorde]="false" titulo=""></app-donut>
+            } @else {
+              <div class="flex items-center justify-center h-40 text-sm text-gray-400">Sin datos</div>
+            }
+          </div>
+
+          <!-- Gráfica 3: Rango de distancia -->
+          <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+            <p class="text-sm font-semibold text-gray-700 mb-1">Por rango de distancia</p>
+            <p class="text-xs text-gray-400 mb-3">Agrupación de rutas según kilómetros recorridos</p>
+            @if (distanciaLabels.length > 0) {
+              <app-donut [labels]="distanciaLabels" [series]="distanciaSeries" [muestraBorde]="false" titulo=""></app-donut>
+            } @else {
+              <div class="flex items-center justify-center h-40 text-sm text-gray-400">Sin datos</div>
+            }
+          </div>
+
+        </div>
+
+        <!-- Tabla resumen -->
+        <div>
+          <h3 class="text-base font-semibold text-gray-800 mb-4">Listado de rutas</h3>
+          <div class="rounded-xl border border-gray-100 overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-100">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Ruta</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Tipo de vía</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Frecuencia</th>
+                  <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide">Distancia</th>
+                  <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide">Tiempo est.</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Observaciones</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-50">
+                @for (r of rutas; track r.id) {
+                  <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-4 py-3">
+                      <p class="text-sm font-semibold text-gray-800">{{ r.nombreRuta }}</p>
+                      <p class="text-xs text-gray-400">{{ r.origen }} → {{ r.destino }}</p>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="inline-flex text-xs font-medium bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">
+                        {{ r.tipoVia || '—' }}
+                      </span>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-600">{{ r.frecuencia || '—' }}</td>
+                    <td class="px-4 py-3 text-sm text-center text-gray-600">
+                      {{ r.distanciaKm ? (r.distanciaKm | number) + ' km' : '—' }}
+                    </td>
+                    <td class="px-4 py-3 text-sm text-center text-gray-600">
+                      {{ r.tiempoMinutos ? (r.tiempoMinutos | number) + ' min' : '—' }}
+                    </td>
+                    <td class="px-4 py-3 text-xs text-gray-400 max-w-[200px] truncate">
+                      {{ r.observaciones || '—' }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      }
+    }
+
+  </div>
+
+</div>

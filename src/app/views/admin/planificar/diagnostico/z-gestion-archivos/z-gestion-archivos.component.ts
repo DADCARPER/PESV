@@ -1,8 +1,8 @@
 import { Component, inject, signal, effect } from '@angular/core';
 import { CardArchivoComponent } from "../../../../../components/cards/card-archivo/card-archivo.component";
 import { CommonModule, DatePipe } from '@angular/common';
-import { DiagnosticoService } from '../../../../../services/diagnostico.service';
-import { LoginService } from '../../../../../services/login.service';
+import { DiagnosticoService } from '../../../../../services/shared/diagnostico.service';
+import { AuthenticacionService } from '../../../../../services/shared/authenticacion.service';
 import { Archivos } from '../../../../../interfaces/perfil.interface';
 import { SubirArchivosComponent } from "../../../../../components/otros/subir-archivos/subir-archivos.component";
 import { RouterLink } from '@angular/router';
@@ -17,7 +17,7 @@ import { RouterLink } from '@angular/router';
 })
 export class ZGestionArchivosComponent {
 
-  private _uid = inject(LoginService)
+  private _uid = inject(AuthenticacionService)
   private _diagnosticoService = inject(DiagnosticoService);
   //private _shared = inject(SharedService)
   private _datePipe = inject(DatePipe);

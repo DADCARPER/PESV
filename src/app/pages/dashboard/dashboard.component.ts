@@ -1,5 +1,5 @@
 import { Component, inject, Input } from '@angular/core';
-import { LoginService } from '../../services/login.service';
+import { AuthenticacionService } from '../../services/shared/authenticacion.service';
 import { CommonModule } from '@angular/common';
 import { Storage, ref, uploadBytesResumable, getDownloadURL } from '@angular/fire/storage';
 import { Firestore, setDoc, doc, arrayUnion } from '@angular/fire/firestore';
@@ -43,7 +43,7 @@ export class DashboardComponent {
   }
   private _color = 'dark';
 
-  private _auth = inject(LoginService);
+  private _auth = inject(AuthenticacionService);
   private _storage = inject(Storage);
   private _firestore = inject(Firestore);
 

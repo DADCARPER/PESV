@@ -2,10 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { LoginService } from '../../../services/login.service';
 import { AlertaInformativoComponent } from '../../../components/alertas/alerta-informativo/alerta-informativo.component';
-import { AlertaService } from '../../../services/alerta.service';
-import { FirestoreService } from '../../../services/firestore.service';
+import { AlertaService } from '../../../services/shared/alerta.service';
+import { FirestoreService } from '../../../services/shared/firestore.service';
+import { AuthenticacionService } from '../../../services/shared/authenticacion.service';
+
 
 @Component({
   selector: "app-login",
@@ -17,12 +18,24 @@ export class LoginComponent {
   loginForm: FormGroup;
   errorMessage: any | null = null;
 
-  private _authService = inject(LoginService);
-  private _firestore = inject(FirestoreService)
+  private _firestore = inject(FirestoreService);
+  private _authService = inject(AuthenticacionService);
   private _router = inject(Router);
   public alertaService = inject(AlertaService);
 
   constructor(private fb: FormBuilder) {
+
+    // this._authService.authState.subscribe( res => {
+    //   console.log('Datos del usuario ->', res?.);
+    //   if (res){
+    //     this.logiadoMostrar = false;
+    //     console.log('Muestra Contenido ->', this.logiadoMostrar);
+    //     //this._router.navigate(['/admin/dashboard']);
+    //   } else {
+    //     this.logiadoMostrar = true; // Mostrar el formulario de login
+    //   }
+
+    // });
     
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -39,15 +52,15 @@ export class LoginComponent {
   
         // Autenticar al usuario y obtener el objeto `user`
         const userCredential = await this._authService.signInWithEmail(email, password); // singInthEmail se encargar de activar el catch.
-        console.log(userCredential);
+        // console.log('--><<',userCredential.user.uid);
 
-        const documento = await this._firestore.getDocument('users/'+this._authService.userIdSignal());
-        console.log('Documento usuario',documento['nivelAcceso']);
+        const documento = await this._firestore.getDocument<any>('users/'+userCredential.user.uid);
+        const docRef = documento.data();
+        // console.log('Documento usuario',docRef.nivelAcceso);
 
-        if(documento['nivelAcceso'] === 'no'){
-          this._router.navigate(['/starting']);
+        if(docRef.nivelAcceso === 'no'){
+          this._router.navigate(['/starting']); //INICIA EL TEST DE PREGUTAS 
         }else{
-          //this._router.navigate(['/starting']);
           this._router.navigate(['/admin/dashboard']);
         }
           

@@ -6,7 +6,7 @@
         <div class="tab-content tab-space">
           <div *ngIf="openTab === 1" >
 
-            <h1 data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" class="text-3xl font-normal leading-normal mt-0 mb-2 text-blueGray-700">Bienvenido {{datosEmpresa['nombreEmpresa']}}</h1><br>
+            <h1 data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" class="text-3xl font-normal leading-normal mt-0 mb-2 text-blueGray-700">Bienvenido {{nombreEmpresa}}</h1><br>
       
             <div style="text-align: justify;">
             <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300">
@@ -336,12 +336,20 @@
           </div>
           <div *ngIf="openTab === 6">
 
+            @if (_alerta.showAlert) {
+              <app-alerta-informativo [type]="_alerta.alertType" [message]="_alerta.alertMessage"></app-alerta-informativo>
+            }
+
             <!-- Mostrar resultado -->
             <div *ngIf="resultado" class="mt-4 alert alert-info">
               <h6 data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" class="text-3xl font-normal leading-normal mt-0 mb-2 text-blueGray-800">
                 {{ resultado }}
               </h6>
             </div>
+
+            
+            <h6 data-aos="fade-right" data-aos-duration="1000" data-aos-delay="600">Período en curos {{periodo}}</h6>
+            
 
             <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="600" (click)="irdashboard()" class="text-blueGray-500 bg-transparent border border-solid border-blueGray-500 hover:bg-blueGray-300 active:bg-blueGray-500 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
               <i class="fas fa-cog"></i> Finalizar

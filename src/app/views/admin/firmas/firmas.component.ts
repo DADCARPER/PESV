@@ -1,8 +1,8 @@
 import { Component, OnInit, computed, signal, OnDestroy } from '@angular/core';
 import { FormFirmasComponent } from "../../../components/formularios/form-firmas/form-firmas.component";
 import { TablaSimpleComponent } from "../../../components/tablas/tabla-simple/tabla-simple.component";
-import { FirestoreService } from '../../../services/firestore.service';
-import { LoginService } from '../../../services/login.service';
+import { FirestoreService } from '../../../services/shared/firestore.service';
+import { AuthenticacionService } from '../../../services/shared/authenticacion.service';
 import { Integrante, TableHeader } from '../../../interfaces/perfil.interface';
 import { CommonModule } from '@angular/common';
 
@@ -31,7 +31,7 @@ export class FirmasComponent implements OnInit, OnDestroy {
 
   constructor(
     private _firestore: FirestoreService,
-    private _login: LoginService
+    private _login: AuthenticacionService
   ) {}
 
   ngOnInit() {

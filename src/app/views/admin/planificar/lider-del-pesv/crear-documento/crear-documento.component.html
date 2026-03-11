@@ -1,0 +1,103 @@
+<div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
+    <div class="rounded-t bg-blueGray-100 bg-amber-400 mb-0 px-6 py-6">
+      <div class="text-center flex ">
+        <button
+          [routerLink]="['/admin/planificar']"
+          class="bg-red-600 text-white active:bg-red-700 font-bold uppercase text-xs px-1 py-1  rounded shadow hover:shadow-md outline-none focus:outline-none mr-2 ease-linear transition-all duration-150"
+          type="button"
+        >
+        <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" /></svg>
+        </button>
+        <h6 class="text-blueGray-700 text-xl font-bold">Líder del diseño e implementación del (PESV) - Crear Documento</h6>
+      </div>
+    </div>
+    <div class="flex-auto px-4 lg:px-10 py-10 pt-0">
+
+        <div class="text-lg font-light leading-relaxed mt-6 mb-4 text-gray-700" >
+
+            <!-- <p class="text-justify pb-3">
+              Bienvenido al módulo de diseño e implementación del PESV. En esta sección, te guiaremos a través de los pasos necesarios para completar la designación del líder responsable de este plan, de acuerdo con la Resolución 40595 de 2022 emitida por el Ministerio de Transporte de Colombia.
+            </p> -->
+            <div class="flex flex-col  md:flex-row gap-2">
+              <div class="w-full md:w-1/2">
+                <div class="bg-amber-50 p-2 rounded-lg border border-amber-100 mb-2 flex flex-col items-center">
+                  <p class="font-base text-amber-800 flex items-center"><iconify-icon icon="hugeicons:task-done-02" class="text-amber-800" width="20" height="20" ></iconify-icon> Formato 1</p>
+                  <button (click)="formato1()" class="w-full text-amber-700 bg-white border border-solid border-amber-700 hover:bg-amber-700 hover:text-white active:bg-amber-700 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150 max-w-[200px]" type="button">
+                      <div class="flex items-center justify-center w-full">
+                        Generar
+                      </div>
+                  </button>
+                </div>
+              </div>
+              <div class="w-full md:w-1/2">
+                <div class="bg-amber-50 p-2 rounded-lg border border-amber-100 mb-2 flex flex-col items-center">
+                  
+                    <p class="font-base text-amber-800 flex items-center"><iconify-icon icon="hugeicons:task-done-02" class="text-amber-800" width="18" height="18" ></iconify-icon>Formato 2</p>
+                    <button (click)="formato2()" class="w-full text-amber-700 bg-white border border-solid border-amber-700 hover:bg-amber-700 hover:text-white active:bg-amber-700 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150 max-w-[200px]" type="button">
+                        <div class="flex items-center justify-center w-full">
+                            Generar
+                        </div>
+                    </button>
+                </div>
+              </div>
+              <div class="w-full md:w-1/2">
+                <div class="bg-amber-50 p-2 rounded-lg border border-amber-100 mb-2 flex flex-col items-center">
+                  
+                    <p class="font-base text-amber-800 flex items-center"><iconify-icon icon="hugeicons:task-done-02" class="text-amber-800" width="18" height="18" ></iconify-icon>Formato 3</p>
+                    <button (click)="formato3()" class="w-full text-amber-700 bg-white border border-solid border-amber-700 hover:bg-amber-700 hover:text-white active:bg-amber-700 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150 max-w-[200px]" type="button">
+                        <div class="flex items-center justify-center w-full">
+                            Generar
+                        </div>
+                    </button>
+                </div>
+              </div>
+              <div class="w-full md:w-1/2">
+                <div class="bg-amber-50 p-2 rounded-lg border border-amber-100 mb-2 flex flex-col items-center">
+                  
+                    <p class="font-base text-amber-800 flex items-center"><iconify-icon icon="hugeicons:agreement-03" class="text-amber-800" width="18" height="18" ></iconify-icon>Firma 1</p>
+                    <div class="flex items-center justify-center">
+                      <button (click)="firma1Izquierda()" class="text-amber-700 bg-white border border-solid border-amber-700 hover:bg-amber-700 hover:text-white active:bg-amber-700 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150 max-w-[200px]" type="button">
+                          <div class="flex items-center justify-center">
+                            <iconify-icon icon="hugeicons:text-centerline-left" class="text-amber-800" width="16" height="16" ></iconify-icon>
+                          </div>
+                      </button>
+                      <button (click)="firma1Centro()" class="text-amber-700 bg-white border border-solid border-amber-700 hover:bg-amber-700 hover:text-white active:bg-amber-700 font-bold uppercase text-xs ml-1 px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150 max-w-[200px]" type="button">
+                        <div class="flex items-center justify-center">
+                          <iconify-icon icon="hugeicons:text-centerline-middle" class="text-amber-800" width="16" height="16" ></iconify-icon>
+                        </div>
+                      </button>
+                      <button (click)="firma1Derecha()" class="text-amber-700 bg-white border border-solid border-amber-700 hover:bg-amber-700 hover:text-white active:bg-amber-700 font-bold uppercase text-xs ml-1 px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150 max-w-[200px]" type="button">
+                        <div class="flex items-center justify-center">
+                          <iconify-icon icon="hugeicons:text-centerline-right" class="text-amber-800" width="16" height="16" ></iconify-icon>
+                        </div>
+                      </button>
+                    </div>
+                </div>
+              </div>
+              <div class="w-full md:w-1/2">
+                <div class="bg-amber-50 p-2 rounded-lg border border-amber-100 mb-2 flex flex-col items-center">
+                  
+                    <p class="font-base text-amber-800 flex items-center"><iconify-icon icon="hugeicons:agreement-03" class="text-amber-800" width="18" height="18" ></iconify-icon>Firmas 2</p>
+                    <div class="flex items-center justify-center">
+                      <button (click)="firma2Centro()" class="text-amber-700 bg-white border border-solid border-amber-700 hover:bg-amber-700 hover:text-white active:bg-amber-700 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150 max-w-[200px]" type="button">
+                          <div class="flex items-center justify-center">
+                              Generar
+                          </div>
+                      </button>
+                      <button (click)="firma2derecha()" class="text-amber-700 bg-white border border-solid border-amber-700 hover:bg-amber-700 hover:text-white active:bg-amber-700 font-bold uppercase text-xs ml-1 px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150 max-w-[200px]" type="button">
+                        <div class="flex items-center justify-center">
+                            Generar
+                        </div>
+                      </button>
+                    </div>
+                </div>
+              </div>
+            </div>
+
+            <app-editor 
+            [recibeContenido]="contenido"></app-editor>
+            
+        </div>
+      
+    </div>
+</div>

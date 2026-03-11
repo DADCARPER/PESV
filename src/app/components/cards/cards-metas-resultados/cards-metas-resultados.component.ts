@@ -16,5 +16,6 @@ export class CardsMetasResultadosComponent {
   @Input() valorMeta = "10.0";
   @Input() valorColorBarra = "success";
   @Input() color = "#000000";
+  @Input() porcentageActual = 0;
 
 }

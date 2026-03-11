@@ -2,7 +2,7 @@ import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-import { ObjetivosMetasService } from '../../../services/objetivos-metas.service';
+import { ObjetivosMetasService } from '../../../services/shared/objetivos-metas.service';
 
 @Component({
   selector: 'app-pdf-objetivos-metas',

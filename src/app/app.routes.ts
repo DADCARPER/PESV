@@ -56,6 +56,12 @@ import { GestionArchivos9Component } from './views/admin/planificar/actas-reunio
 import { GestionArchivos10Component } from './views/admin/planificar/matriz-legal/gestion-archivos10/gestion-archivos10.component';
 import { ActasReunionComiteComponent } from './views/admin/planificar/actas-reunion-comite/actas-reunion-comite.component';
 import { InformeDiagnosticoComponent } from './views/admin/planificar/diagnostico/informe-diagnostico/informe-diagnostico.component';
+import { InformacionOrganizacionComponent } from './views/admin/planificar/diagnostico/informacion-organizacion/informacion-organizacion.component';
+import { GestionContratistasComponent } from './views/admin/planificar/diagnostico/gestion-contratistas/gestion-contratistas.component';
+import { FlotaVehiculosComponent } from './views/admin/planificar/diagnostico/flota-vehiculos/flota-vehiculos.component';
+import { RutasComponent } from './views/admin/planificar/diagnostico/rutas/rutas.component';
+import { EmergenciasPlanComponent } from './views/admin/planificar/diagnostico/emergencias-plan/emergencias-plan.component';
+import { GestionColaboradoresComponent } from './views/admin/planificar/diagnostico/gestion-colaboradores/gestion-colaboradores.component';
 import { MapaColombiaComponent } from './components/apexChart/mapa-colombia/mapa-colombia.component';
 import { PlanAnualTrabajoComponent } from './views/admin/hacer/plan-anual-trabajo/plan-anual-trabajo.component';
 import { GestionArchivos11Component } from './views/admin/hacer/plan-anual-trabajo/gestion-archivos11/gestion-archivos11.component';
@@ -73,7 +79,6 @@ import { GestionArchivos12Component } from './views/admin/hacer/competencias-pla
 import { GestionArchivos13Component } from './views/admin/hacer/responsabilidad-comportamiento-seguro/gestion-archivos13/gestion-archivos13.component';
 import { GestionArchivos14Component } from './views/admin/hacer/preparacion-respuesta-emergencias-viales/gestion-archivos14/gestion-archivos14.component';
 import { GestionArchivos15Component } from './views/admin/hacer/investigacion-incidentes-viales/gestion-archivos15/gestion-archivos15.component';
-import { GestionArchivos16Component } from './views/admin/hacer/vias-seguras-administadas-organizacion/gestion-archivos16/gestion-archivos16.component';
 import { GestionArchivos17Component } from './views/admin/hacer/planificacion-desplazamientos-laborales/gestion-archivos17/gestion-archivos17.component';
 import { GestionArchivos18Component } from './views/admin/hacer/inspeccion-vehiculos-equipos/gestion-archivos18/gestion-archivos18.component';
 import { GestionArchivos19Component } from './views/admin/hacer/mantenimiento-control-vehiculos-seguros/gestion-archivos19/gestion-archivos19.component';
@@ -89,6 +94,12 @@ import { MejoraAccionesPreventivasCorrectivasComponent } from './views/admin/act
 import { MecanismosComunicacionComponent } from './views/admin/actuar/mecanismos-comunicacion/mecanismos-comunicacion.component';
 import { GestionArchivos25Component } from './views/admin/actuar/mejora-acciones-preventivas-correctivas/gestion-archivos25/gestion-archivos25.component';
 import { GestionArchivos26Component } from './views/admin/actuar/mecanismos-comunicacion/gestion-archivos26/gestion-archivos26.component';
+import { EncuestaVistaComponent } from './views/admin/planificar/diagnostico/encuesta-vista/encuesta-vista.component';
+import { LoginEmpresaComponent } from './views/empresas/login/login.component';
+import { EmrpesaComponent } from './layouts/empresas/emrpesa/emrpesa.component';
+import { DetallesActividadComponent } from './views/admin/planificar/programas/detalles-actividad/detalles-actividad.component';
+import { GestionArchivos16Component } from './views/admin/hacer/vias-seguras-administadas-organizacion/gestion-archivos16/gestion-archivos16.component';
+import { CrearDocumentoComponent } from './views/admin/planificar/lider-del-pesv/crear-documento/crear-documento.component';
 
 
 
@@ -123,6 +134,7 @@ export const routes: Routes = [
         component: PlanificarComponent,
       },
       { path: "planificar/liderdelpesv", component: LiderDelPesvComponent,},
+      { path: "planificar/liderdelpesv/crear_documento", component: CrearDocumentoComponent,},
       { path: "planificar/liderdelpesv/gestion_archivos", component: GestionArchivosComponent },
       { path: "planificar/comiteseguridadvial", component: ComiteseguridadvialComponent },
       { path: "planificar/comiteseguridadvial/gestion_archivos", component: GestionArchivos2Component },
@@ -132,6 +144,12 @@ export const routes: Routes = [
       { path: "planificar/liderazgo_y_compromiso/gestion_archivos", component: GestionArchivos4Component },
       { path: "planificar/diagnostico", component: DiagnosticoComponent },
       { path: "planificar/diagnostico/informe_diagnostico", component: InformeDiagnosticoComponent },
+      { path: "planificar/diagnostico/informacion_organizacion", component: InformacionOrganizacionComponent },
+      { path: "planificar/diagnostico/gestion_contratistas", component: GestionContratistasComponent },
+      { path: "planificar/diagnostico/flota_vehiculos", component: FlotaVehiculosComponent },
+      { path: "planificar/diagnostico/rutas_frecuentes", component: RutasComponent },
+      { path: "planificar/diagnostico/plan_emergencias", component: EmergenciasPlanComponent },
+      { path: "planificar/diagnostico/gestion_colaboradores", component: GestionColaboradoresComponent },
       { path: "planificar/diagnostico/gestion_archivos", component: ZGestionArchivosComponent },
       { path: "planificar/diagnostico/sociodemografia", component: SociodemografiaComponent },
       { path: "planificar/diagnostico/mapa", component: MapaColombiaComponent },
@@ -145,6 +163,7 @@ export const routes: Routes = [
       { path: "planificar/objetivos_y_metas", component: ObjetivosMetasComponent },
       { path: "planificar/objetivos_y_metas/gestion_archivos", component: GestionArchivos7Component },
       { path: "planificar/programas_gestion_riesgos", component: ProgramasComponent, },
+      { path: "planificar/programas_gestion_riesgos/programas_detalles/:idPrograma", component: DetallesActividadComponent },
       { path: "planificar/programas_gestion_riesgos/gestion_archivos", component: GestionArchivos8Component },
       { path: "planificar/actas_reunion_comite", component: ActasReunionComiteComponent, },
       { path: "planificar/actas_reunion_comite/gestion_archivos", component: GestionArchivos9Component },
@@ -202,12 +221,25 @@ export const routes: Routes = [
   // { path: 'planear', component: PlanearComponent, canActivate: [authGuard] },
   // { path: 'verificar', component: VerificarComponent, canActivate: [authGuard] },
 
+  {
+    path: 'empresa',
+    component: EmrpesaComponent,
+    // children: [
+    //   { path: 'dashboard', component: LoginComponent },
+    //   { path: 'register', component: RegisterComponent },
+    //   { path: 'reset', component: RestoreComponent },
+    //   { path: "", redirectTo: "login", pathMatch: "full" },
+    // ],
+  },
+
   // Rutas sin layout
   { path: 'index', component: IndexComponent },
+  { path: 'login', component: LoginEmpresaComponent },
   { path: 'landing', component: LandingComponent },
-  { path: 'profile', component: ProfileComponent },
+  //{ path: 'profile', component: EncuestaVistaComponent },
+  { path: 'encuesta/:nitEmpresa', component: EncuestaVistaComponent },
 
   // Redirección por defecto
-  { path: '', redirectTo: '/auth/login', pathMatch: 'full' },
+  { path: '', redirectTo: 'index', pathMatch: 'full' },
   { path: '**', redirectTo: '/auth/login' }
 ];

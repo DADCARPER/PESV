@@ -1,181 +1,140 @@
-<form [formGroup]="formPerfil" (ngSubmit)="onSubmit()">
-    
-    <!-- <div *ngIf="valores">
-      <strong>{{valores.municipio}}</strong>
-    </div>
-    <div *ngFor="let valor of valores">
-      <h1>{{valor.municipio}}</h1>
-    </div> -->
-    <div class="flex flex-wrap">
-
-      <div class="w-full lg:w-3/12  rounded-lg border border-gray-100 bg-white p-2 shadow-sm  ">
-
-        <h6 class="w-full lg:w-12/12 px-2 text-blueGray-400 text-sm mt-2 mb-3 font-bold uppercase  ">
-          Información empresarial sedes
-        </h6>
-
-        <div class="border-b border-gray-200 mb-4"></div>
-
-        <div class="w-full lg:w-12/12 px-2">
-          <div class="relative w-full mb-3">
-            <label
-              class="block uppercase text-blueGray-600 text-xs font-bold mb-2"
-              htmlFor="grid-password"
-            >
-              Nombre de la sede
-            </label>
-            <input formControlName="nombreSede"
-              type="text"
-              class="mt-1 w-full rounded-md border-blueGray-300 shadow-sm sm:text-sm"
-            />
-            <div *ngIf="formPerfil.get('nombreSede')?.invalid && formPerfil.get('nombreSede')?.touched">
-              <small class="text-red-500">El campo es obligatorio</small>
+<div class="bg-white rounded-lg border shadow-sm overflow-hidden">
+    <div class="p-4 border-b">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-medium">Sedes de la empresa</h2>
+                <p class="text-sm text-gray-500">
+                    Información de las sedes de la empresa
+                </p>
             </div>
-          </div>
-        </div>
-        <div class="w-full lg:w-12/12 px-2">
-        
-          <label for="departa" class="block uppercase text-blueGray-600 text-xs font-bold mb-2"> Departamentos </label>
-        
-          <select
-            formControlName="departamento"
-            id="departa"
-            class="mt-1 py-2.5 w-full rounded-md border-blueGray-300 shadow-sm sm:text-sm"
-            style="max-height: 180px; overflow-y: auto;"
-          >
-            <option value="" disabled selected>Seleccione Departamento</option>
-            <option *ngFor="let option of options; let i = index" [value]="mapacolombia[i]">{{ option }}</option>
-          </select>
-          <div *ngIf="formPerfil.get('departamento')?.invalid && formPerfil.get('departamento')?.touched">
-            <small class="text-red-500">El campo es obligatorio</small>
-          </div>
-          
-        </div>
-        <div class="w-full lg:w-12/12 px-2">
-          <app-comboselect 
-          [control]="ciudadControl"
-          [options]="ciudades"
-          label="ciudad"  
-          placeholder="Ciudades principales"></app-comboselect>
-        </div>
-        <div class="w-full lg:w-12/12 px-2">
-          <div class="relative w-full mb-3">
-            <label
-              class="block uppercase text-blueGray-600 text-xs font-bold mb-2"
-              htmlFor="grid-password"
-            >
-              Telefono
-            </label>
-            <input formControlName="telefono"
-              type="text"
-              class="mt-1 w-full rounded-md border-blueGray-300 shadow-sm sm:text-sm"
-              value="United States"
-            />
-          </div>
-        </div>
-        <div class="w-full lg:w-12/12 px-2">
-          <div class="relative w-full mb-3">
-            <label
-              class="block uppercase text-blueGray-600 text-xs font-bold mb-2"
-              htmlFor="grid-password"
-            >
-              Actividad de la sede
-            </label>
-            <input formControlName="actividadEmpresa"
-              type="text"
-              class="mt-1 w-full rounded-md border-blueGray-300 shadow-sm sm:text-sm"
-            />
-          </div>
-        </div>
-        <div class="w-full lg:w-12/12 px-2">
-          <div class="relative w-full mb-3">
-            <label
-              class="block uppercase text-blueGray-600 text-xs font-bold mb-2"
-              htmlFor="grid-password"
-            >
-              Dirección
-            </label>
-            <input formControlName="direccion"
-              type="text"
-              class="mt-1 w-full rounded-md border-blueGray-300 shadow-sm sm:text-sm"
-            />
-          </div>
-        </div>
 
-        <div class="flex justify-center pb-4">
-          <button type="button" (click)="agregarSede()"
-            class="text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 mt-4 ease-linear transition-all duration-150">
-            <i class="fas fa-chart-bar mr-1"></i> Agregar a lista
-          </button>
+            <div class="flex gap-2">
+                
+                <button (click)="mostrarModalFormulario('crear')" class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none  mb-1 ease-linear transition-all duration-150" type="button">
+                    <div class="flex items-center">
+                        <iconify-icon icon="hugeicons:plus-sign-square" width="18" height="18" class="pr-2 "></iconify-icon> Agregar sede
+                    </div>
+                </button>
+                <!-- <button  class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none  mb-1 ease-linear transition-all duration-150" type="button">
+                    <div class="flex items-center">
+                        <iconify-icon icon="hugeicons:plus-sign-square" width="18" height="18" class="pr-2 "></iconify-icon> Meta
+                    </div>
+                </button> -->
+                <!-- <p class="text-sm text-gray-500">
+                    Por cada 1,000,000 de kilómetros recorridos se presentaron XX cantidad de siniestros viales.
+                </p> -->
+                
+            </div>
+
         </div>
-
-      </div>
-
-      <div class="w-full lg:w-9/12 px-2">
-
-        <div class="w-full lg:w-12/12 overflow-hidden rounded-lg bg-white shadow">
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                    #
-                  </th>
-                  <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                    Sede
-                  </th>
-                  <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                    Actividad
-                  </th>
-                  <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                    Ubicación y contacto
-                  </th>
-                  <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                    Acción
-                  </th>
-                </tr>
-              </thead>
-              <tbody *ngIf="listaSedes.length > 0; else noData" class="divide-y divide-gray-200 bg-white">
-                <tr *ngFor="let integrante of listaSedes; let i = index" class="transition-colors hover:bg-gray-50">
-                  <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">{{i+1}}</td>
-                  <td class="whitespace-normal px-6 py-4 text-sm text-gray-700 w-[10%]"> {{ integrante.nombreSede }}</td>
-                  <td class="whitespace-normal px-6 py-4 text-sm text-gray-700 w-[30%]">{{ integrante.actividadEmpresa }}</td>
-                  <td class="whitespace-normal px-6 py-4 text-sm text-gray-700 w-[50%]">{{ integrante.nombreDepartamento }}<br>{{ integrante.municipio }}<br>{{ integrante.direccion }}<br>Contacto : {{ integrante.telefono }}</td>
-                  
-                  <td class="w-[10%]">
-                    <button type="button" (click)="removerSede(i)" >Eliminar</button> <!-- Botón para eliminar -->
-                  </td>
-  
-                </tr>
-              </tbody>
-              <ng-template #noData>
-                <tbody class="divide-y divide-gray-200 bg-white">
-                  <tr>
-                    <td colspan="8" class="px-6 py-4 text-sm text-center text-gray-500">
-                      No hay datos disponibles
-                    </td>
-                  </tr>
-                </tbody>
-              </ng-template>
-            </table>
-          </div>
-        </div>
-
-        
-
-      </div>
-      
     </div>
+  <div class="p-4">
 
-    
-
-    <div class="flex justify-center">
-
-      
-
+    <!-- <app-tabla-compartida 
+    [datas]="datos"
+    [headers]="heads"
+    [dataKeys]="['nombreSede', 'actividad', 'departamento', 'ciudad', 'direccion', 'telefono']"
+    [accion]="true"
+    (editar)="manejarEdicion($event)"
+    (eliminar)="manejarEliminar($event)">
+    ></app-tabla-compartida> -->
+    <div class="text-lg font-light leading-relaxed  mb-2 text-gray-700" >
+        <div class="flex flex-col gap-2 mb-2">
+            <div class="w-full" *ngFor="let sede of datos">
+                <article class="rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200">
+                    <div class="flex items-start justify-between mb-2">
+                      <div class="flex items-end justify-start">
+                        <div class="text-gray-500 text-center inline-flex items-center  ">
+                          <iconify-icon icon="hugeicons:factory" width="28" height="28"></iconify-icon>
+                        </div>
+                        <div>
+                          <p class="text-xl font-medium text-gray-900 ml-2">
+                              {{sede.nombreSede}}
+                            </p>
+                        </div>
+                        <span class="ml-4 text-xs font-semibold inline-flex items-center py-1 px-2 rounded text-gray-500 bg-gray-100 last:mr-0 mr-1">
+                            {{sede.tiposede}}
+                        </span>
+                      </div>
+                      
+                    <div class="flex gap-3">
+                        <div class="flex flex-col text-center">
+                            <span class="text-base font-bold -mb-1">{{ sede.totalempleados === '' || sede.totalempleados == null ? 0 : sede.totalempleados }}</span>
+                            <span class="text-sm">Empleados</span>
+                        </div>
+                        <div class="flex flex-col text-center">
+                            <span class="text-base font-bold -mb-1">{{ sede.totalasignados === '' || sede.totalasignados == null ? 0 : sede.totalasignados }}</span>
+                            <span class="text-sm">Vehículos</span>
+                        </div>
+                        <div class="flex flex-col text-center">
+                            <span class="text-base font-bold -mb-1">{{ sede.totaloperacion === '' || sede.totaloperacion == null ? 0 : sede.totaloperacion }}</span>
+                            <span class="text-sm">Años</span>
+                        </div>                            
+                    </div>
+                      
+                    </div>
+                    <div class="flex items-center justify-between ">
+                        <div class="flex gap-4">
+                            <div class="flex items-center justify-start">
+                              <div class="text-gray-500 text-center inline-flex items-center  ">
+                                <iconify-icon icon="hugeicons:manager" width="24" height="24"></iconify-icon>
+                              </div>
+                              <div>
+                                  <p class="text-base  text-gray-900 ml-2">
+                                      {{sede.responsable}}
+                                  </p>
+                                  <p class="text-sm  text-gray-500 ml-2">
+                                      {{sede.cargoresponsable}}
+                                  </p>
+                              </div>
+                            </div>
+                            <div class="flex items-center justify-start">
+                              <div class="text-gray-500 text-center inline-flex items-center  ">
+                                <iconify-icon icon="hugeicons:maps-square-01" width="24" height="24"></iconify-icon>
+                              </div>
+                              <div>
+                                  <p class="text-base  text-gray-900 ml-2">
+                                        {{sede.departamento}} - {{sede.ciudad}}
+                                  </p>
+                                  <p class="text-sm  text-gray-500 ml-2">
+                                    {{sede.direccion}}
+                                  </p>
+                              </div>
+                            </div>
+                            <div class="flex items-center justify-start">
+                              <div class="text-gray-500 text-center inline-flex items-center  ">
+                                <iconify-icon icon="hugeicons:flip-phone" width="24" height="24"></iconify-icon>
+                              </div>
+                              <div>
+                                  <p class="text-base  text-gray-900 ml-2">
+                                      {{sede.telefono}}
+                                  </p>
+                                  <p class="text-sm  text-gray-500 ml-2">
+                                      {{sede.email}}
+                                  </p>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <button (click)="manejarEdicion(sede)" class="w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-2 py-2 rounded outline-none focus:outline-none  mb-1 ease-linear transition-all duration-150" type="button">
+                                <div class="flex items-center justify-center w-full">
+                                    <iconify-icon icon="hugeicons:pencil-edit-02" width="18" height="18" class=" "></iconify-icon> 
+                                </div>
+                            </button>
+                            <button (click)="manejarEliminar(sede)" class="w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-2 py-2 rounded outline-none focus:outline-none  mb-1 ease-linear transition-all duration-150" type="button">
+                                <div class="flex items-center justify-center w-full">
+                                    <iconify-icon icon="hugeicons:delete-03" width="18" height="18" class=""></iconify-icon> 
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
     </div>
-
     
+  </div>
+</div>
 
-    
-  </form>
+<app-form1-sedes #modalFormulario></app-form1-sedes>
+<app-form2-sedes #modalEliminar></app-form2-sedes>

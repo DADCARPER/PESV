@@ -5,10 +5,10 @@ import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule, FormArray } from '@angular/forms';
 import AOS from 'aos'; // Importa AOS
 import { CardsBotonComponent } from "../../../../components/cards/cards-boton/cards-boton.component";
-import { ObjetivosMetasService } from '../../../../services/objetivos-metas.service';
+import { ObjetivosMetasService } from '../../../../services/shared/objetivos-metas.service';
 import { PasopasoComponent } from '../../../../components/tabs/pasopaso/pasopaso.component';
-import { FirestoreService } from '../../../../services/firestore.service';
-import { LoginService } from '../../../../services/login.service';
+import { FirestoreService } from '../../../../services/shared/firestore.service';
+import { AuthenticacionService } from '../../../../services/shared/authenticacion.service';
 import { UploadArchivosComponent } from "../../../../components/otros/upload-archivos/upload-archivos.component";
 import { PdfObjetivosMetasComponent } from '../../../../components/pdfs/pdf-objetivos-metas/pdf-objetivos-metas.component';
 
@@ -44,8 +44,7 @@ export class ObjetivosMetasComponent {
       private router: Router,
       private _objetivosmetas: ObjetivosMetasService,
       private _firestore: FirestoreService,
-      private UID: LoginService
-      //private archivoService: ArchivoService, 
+      //private archivoService: ArchivoService,
       //private liderDelPesvService: LiderDelPesvService,
     ){
       this.iniciarformulariolimpio();

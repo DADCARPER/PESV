@@ -24,9 +24,9 @@ export class MapExampleComponent implements OnInit {
       scrollwheel: false,
       center: myLatlng,
       mapTypeId: google.maps.MapTypeId.ROADMAP,
-      styles: [
-        // Aquí se definen los estilos personalizados para el mapa
-      ],
+      // styles: [
+      //   // Aquí se definen los estilos personalizados para el mapa
+      // ],
     };
 
     const map = new google.maps.Map(mapElement, mapOptions);

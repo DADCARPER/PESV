@@ -2,7 +2,7 @@ import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-import { LiderazgoCompromisoService } from '../../../services/liderazgo-compromiso.service';
+import { LiderazgoCompromisoService } from '../../../services/shared/liderazgo-compromiso.service';
 
 @Component({
   selector: 'app-pdf-liderazgo-compromiso',

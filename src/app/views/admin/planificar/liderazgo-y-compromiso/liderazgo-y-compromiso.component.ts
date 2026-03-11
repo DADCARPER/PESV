@@ -1,83 +1,145 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, inject, ViewChild, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { LoadingComponent } from "../../../../components/loading/loading/loading.component";
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule, FormArray } from '@angular/forms';
-import AOS from 'aos'; // Importa AOS
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import AOS from 'aos';
 import { CardsBotonComponent } from "../../../../components/cards/cards-boton/cards-boton.component";
-import { LiderazgoCompromisoService } from '../../../../services/liderazgo-compromiso.service';
+import { LiderazgoCompromisoService } from '../../../../services/shared/liderazgo-compromiso.service';
 import { PasopasoComponent } from '../../../../components/tabs/pasopaso/pasopaso.component';
-import { FirestoreService } from '../../../../services/firestore.service';
-import { LoginService } from '../../../../services/login.service';
 import { PdfLiderazgoCompromisoComponent } from '../../../../components/pdfs/pdf-liderazgo-compromiso/pdf-liderazgo-compromiso.component';
 import { UploadArchivosComponent } from "../../../../components/otros/upload-archivos/upload-archivos.component";
+import { AuthenticacionService } from '../../../../services/shared/authenticacion.service';
+import { AlertaService } from '../../../../services/shared/alerta.service';
+import { GestionDocumentosService } from '../../../../services/shared/gestion-documentos.service';
+import { FirestoreService } from '../../../../services/shared/firestore.service';
+import { AlertaInformativoComponent } from "../../../../components/alertas/alerta-informativo/alerta-informativo.component";
+import { ReftourlPipe } from '../../../../pipes/reftourl.pipe';
+import { LimpiarnombrePipe } from '../../../../pipes/limpiarnombre.pipe';
+import { FechafirestorePipe } from '../../../../pipes/fechafirestore.pipe';
+import { Models } from '../../../../interfaces/models';
 
 @Component({
   selector: 'app-liderazgo-y-compromiso',
   standalone: true,
-  imports: [CommonModule, LoadingComponent, FormsModule, ReactiveFormsModule, CardsBotonComponent, PasopasoComponent, PdfLiderazgoCompromisoComponent, UploadArchivosComponent, RouterLink],
+  imports: [CommonModule, LoadingComponent, FormsModule, ReactiveFormsModule, CardsBotonComponent, PasopasoComponent, PdfLiderazgoCompromisoComponent, UploadArchivosComponent, RouterLink, AlertaInformativoComponent, ReftourlPipe, LimpiarnombrePipe, FechafirestorePipe],
   templateUrl: './liderazgo-y-compromiso.component.html',
+  schemas:[CUSTOM_ELEMENTS_SCHEMA],
   styleUrl: './liderazgo-y-compromiso.component.css'
 })
 export class LiderazgoYCompromisoComponent {
 
+  nombreModulo: string = '004-liderazgo-compromiso';
+
+  private _authcations = inject(AuthenticacionService);
+  private _gestDoc = inject(GestionDocumentosService);
+  private _firestore = inject(FirestoreService);
+  public _alerta = inject(AlertaService);
+
+  nit = this._authcations.getCurrentUser().displayName;
+  empresa = this._authcations.getCurrentUser().photoURL;
+  uid = this._authcations.getCurrentUser().uid;
+
+  documento1: Models.Documentos.Documento[] = [];
+  historico1: Models.Documentos.Documento[] = [];
+  cargando: Record<string, boolean> = {};
+  eliminando: Record<string, boolean> = {};
+  mostrarHistorico: Record<string, boolean> = {};
+
   @ViewChild(PasopasoComponent) pasoPaso!: PasopasoComponent;
   @ViewChild(PdfLiderazgoCompromisoComponent) crearPdf!: PdfLiderazgoCompromisoComponent;
-
 
   form!: FormGroup;
   openTab = 0;
 
   id_formulario: string = "0";
-  dataEmpresa: any = sessionStorage.getItem('empresaData');
-  dataEmpresa2 = JSON.parse(this.dataEmpresa);
+  dataEmpresa: string | null = sessionStorage.getItem('empresaData');
+  dataEmpresa2: Models.Empresa.ConsultarEmpresa = JSON.parse(this.dataEmpresa ?? '{}');
   porcentaje = 0;
 
-  documentData: any;
-
   userId: string | null = null;
-  isLoading = false; //Al terminar el modulo de ir en true
+  isLoading = false;
 
   constructor(
-      private fb: FormBuilder, 
-      private router: Router,
-      private _liderazgoCompromiso: LiderazgoCompromisoService,
-      private _firestore: FirestoreService,
-      private UID: LoginService
-      //private archivoService: ArchivoService, 
-      //private liderDelPesvService: LiderDelPesvService,
-    ){
-      this.iniciarformulariolimpio();
-  
-      // this.UID.user$.subscribe(user => {
-      //   this.userId = user ? user.uid : null;
-  
-      //   this._firestore.getDocumentRealTime('liderazgoCompromiso/', this.userId)
-      //   .subscribe({
-      //     next: (data) => {
-      //       //console.log('Datos en tiempo real:', data);
-      //       this.documentData = data; // Almacenamos los datos en el componente
-      //     },
-      //     error: (error) => {
-      //       console.error('Error al recibir datos:', error);
-      //     },
-      //   });
-      
-      //   this.isLoading = false;  // El usuario ha sido autenticado
-      // });
-  
-    }
-  
-  ngOnInit(): void {
+    private fb: FormBuilder,
+    private router: Router,
+    private _liderazgoCompromiso: LiderazgoCompromisoService,
+  ){
+    this.iniciarformulariolimpio();
+  }
 
+  ngOnInit(): void {
     AOS.init();
-    
+    this.consultarDocumentos();
+  }
+
+  async uploadFile(event: any, seccion: string) {
+    this.cargando[seccion] = true;
+    try {
+      await this._gestDoc.uploadFile({
+        nit: this.nit,
+        empresa: this.empresa,
+        uid: this.uid,
+        nombreModulo: this.nombreModulo,
+        event,
+        seccion,
+        currentDocs: this.documento1,
+        periodo: this._authcations.periodo(),
+      });
+      await this.consultarDocumentos();
+    } finally {
+      this.cargando[seccion] = false;
+    }
+  }
+
+  async eliminarVigente(doc: Models.Documentos.Documento, seccion: string) {
+    if (!doc.id) return;
+    this.eliminando[seccion] = true;
+    try {
+      await this._gestDoc.marcarHistorico(this.nit, this.nombreModulo, doc.periodo ?? this._authcations.periodo(), doc.id!);
+      await this.consultarDocumentos();
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'Error al eliminar el documento';
+      console.error('[LiderazgoCompromiso] eliminarVigente:', error);
+      this._alerta.showError(msg);
+    } finally {
+      this.eliminando[seccion] = false;
+    }
+  }
+
+  toggleHistorico(seccion: string) {
+    this.mostrarHistorico[seccion] = !this.mostrarHistorico[seccion];
+  }
+
+  async consultarDocumentos() {
+    const periodo = this._authcations.periodo();
+    const [docs, hist] = await Promise.all([
+      this._gestDoc.consultarDocumentos(this.nit, this.nombreModulo, periodo),
+      this._gestDoc.consultarHistorico(this.nit, this.nombreModulo, periodo),
+    ]);
+    this.documento1 = docs['Liderazgo y compromiso'] ?? [];
+    this.historico1 = hist['Liderazgo y compromiso'] ?? [];
+    await this.actualizarEstatusGeneral();
+  }
+
+  private async actualizarEstatusGeneral(): Promise<void> {
+    const periodo = this._authcations.periodo();
+    const modulo: Models.Procesos.Modulo004LiderazgoCompromiso = {
+      total_progreso: this.documento1.length > 0 ? 100 : 0,
+      actaLiderazgo: { total: this.documento1.length > 0 ? 1 : 0 },
+    };
+    try {
+      await this._firestore.upsertDocument(`EstatusGeneral/${this.nit}`, {
+        periodo,
+        '004-liderazgo-compromiso-documentos': modulo,
+      });
+    } catch (error: unknown) {
+      console.error('[LiderazgoCompromiso] actualizarEstatusGeneral:', error);
+    }
   }
 
   iniciarformulariolimpio() {
     this.form = this.fb.group({
-   
-      //fechaDocumento: ['', Validators.required],
       objetivo1: [false],
       objetivo2: [false],
       objetivo3: [false],
@@ -86,94 +148,57 @@ export class LiderazgoYCompromisoComponent {
       objetivo6: [false],
       objetivo7: [false],
       objetivo8: [''],
-      
     });
   }
 
-  async toggleTabs(tabNumber: number,porce:string ) {
-
+  async toggleTabs(tabNumber: number, porce: string) {
     this.openTab = tabNumber;
-    setTimeout(() => {
-      AOS.refresh(); // Reinicia AOS para detectar nuevos elementos
-      
-    }, 200);
+    setTimeout(() => { AOS.refresh(); }, 200);
 
-    if(this.openTab > 1 && this.openTab < 3){ //autoguardado
+    if(this.openTab > 1 && this.openTab < 3){
 
-      if(this.openTab == 2){ //crear fomulario o carga autoguardado o carga editable
-
-        if (this.id_formulario !== "0") { //existe session de id_formulario creada?
-          //this.cargarFormulario(id_formulario);
+      if(this.openTab == 2){
+        if (this.id_formulario !== "0") {
           const dataCruda = await this._liderazgoCompromiso.getfomularioEdit(this.id_formulario);
-
-          console.log("datacrudaaaaaaaaaaa",dataCruda);
-          
           this.form.patchValue(dataCruda);
-          
-        }else{
-          //creo el id_formulario por primera vez
+        } else {
           sessionStorage.setItem('id_formulario_liderazgo_compromiso', Date.now().toString());
-          this.id_formulario = sessionStorage.getItem('id_formulario_liderazgo_compromiso') as string ;
-
+          this.id_formulario = sessionStorage.getItem('id_formulario_liderazgo_compromiso') as string;
         }
-
-        
       }
 
       if (porce === "Avanza") {
-        this.porcentaje = Math.min(this.porcentaje + 20, 100);  // aumenta el porcentaje de barra IMPORTANTE INICIA EN 0
-        this.pasoPaso.nextStep();  //  ESTOS SON METODOS LLAMADOS POR @ViewChild del componenten pasopaso
+        this.porcentaje = Math.min(this.porcentaje + 20, 100);
+        this.pasoPaso.nextStep();
       } else if(porce === "Atras") {
         this.porcentaje = Math.max(this.porcentaje - 20, 0);
-        this.pasoPaso.prevStep(); //  ESTOS SON METODOS LLAMADOS POR @ViewChild del componenten pasopaso
+        this.pasoPaso.prevStep();
       }
 
-      //console.log("porcentaje" + this.form.value +"porcentaje" );
-
-      this._liderazgoCompromiso.autoGuardar(this.form.value,"Asistente",this.porcentaje,this.id_formulario ?? "");
-      console.log("todododododo",this.form.value);
-
-      
-      
+      this._liderazgoCompromiso.autoGuardar(this.form.value, "Asistente", this.porcentaje, this.id_formulario ?? "");
     }
-
-
   }
 
   async onSubmit(){
-
     if (this.form.valid) {
-
-      console.log('Submittttt')
-    
       this.crearPdf.generatePdf(true);
       this.porcentaje = 100;
-      this.toggleTabs(3,"");
-      // this.borroSessionIdFormulario();
-
-      
-
-
-    }else{
+      this.toggleTabs(3, "");
+    } else {
       this.form.markAllAsTouched();
     }
   }
 
   async vistaPrevia(){
     if (this.form.valid) {
-
-      await this._liderazgoCompromiso.autoGuardar(this.form.value,"Asistente",100,this.id_formulario ?? "");
+      await this._liderazgoCompromiso.autoGuardar(this.form.value, "Asistente", 100, this.id_formulario ?? "");
       this.crearPdf.generatePdf(true);
-
-    }else{
+    } else {
       this.form.markAllAsTouched();
     }
   }
 
   irdashboard(){
-
     this.router.navigate(['admin/dashboardplanificar']);
-
   }
-
 }

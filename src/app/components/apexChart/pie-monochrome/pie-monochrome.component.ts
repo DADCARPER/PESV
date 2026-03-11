@@ -25,6 +25,8 @@ export type ChartOptions = {
   standalone: true,
   imports: [CommonModule, NgApexchartsModule],
   template: `
+  <div [class]="muestraBorde ? 'rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200 text-center' : ''">
+    <p>{{titulo}}</p>
     <div class="w-full max-w-lg mx-auto p-4">
       <apx-chart
         [series]="chartOptions.series"
@@ -36,11 +38,14 @@ export type ChartOptions = {
         [dataLabels]="chartOptions.dataLabels"
       ></apx-chart>
     </div>
+  </div>
   `
 })
 export class PieMonochromeComponent implements OnChanges {
   @Input() values: number[] = [];
   @Input() labels: string[] = [];
+  @Input() muestraBorde: boolean = true;
+  @Input() titulo:string='';
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['values']) {
@@ -55,7 +60,7 @@ export class PieMonochromeComponent implements OnChanges {
     series: [], 
     chart: {
       type: "pie",
-      height: 360,
+      height: 287,
       animations: {
         enabled: true,
         speed: 400,

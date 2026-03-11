@@ -6,18 +6,19 @@ import { ReactiveFormsModule, FormBuilder, FormControl, FormGroup, Validators } 
 
 import { UserProfile } from '../../../interfaces/perfil.interface';
 
-import { LoginService } from '../../../services/login.service';
-import { PerfilService } from '../../../services/perfil.service';
+import { AuthenticacionService } from '../../../services/shared/authenticacion.service';
+import { PerfilService } from '../../../services/shared/perfil.service';
 import { Subscription } from 'rxjs';
 import { ComboselectComponent } from "../../controlesFormulario/comboselect/comboselect.component";
 import { AlertaInformativoComponent } from "../../alertas/alerta-informativo/alerta-informativo.component";
-import { AlertaService } from '../../../services/alerta.service';
+import { AlertaService } from '../../../services/shared/alerta.service';
+import { RouterLink } from "@angular/router";
 
 
 @Component({
   selector: "app-card-settings",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ComboselectComponent, AlertaInformativoComponent],  // Agregamos módulos necesarios
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, ComboselectComponent, AlertaInformativoComponent],  // Agregamos módulos necesarios
   templateUrl: "./card-settings.component.html",
 })
 export class CardSettingsComponent implements OnInit, OnDestroy {
@@ -37,7 +38,7 @@ export class CardSettingsComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private _perfil: PerfilService,
-    private _UID: LoginService,
+    private _UID: AuthenticacionService,
     public _alertaService: AlertaService
   ) { }
   

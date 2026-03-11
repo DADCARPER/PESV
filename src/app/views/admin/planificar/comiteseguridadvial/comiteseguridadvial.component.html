@@ -1,5 +1,5 @@
 <div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
-  <div class="rounded-t bg-blueGray-100  mb-0 px-6 py-6">
+  <div class="rounded-t bg-blueGray-100 bg-amber-400 mb-0 px-6 py-6">
     <div class="text-center flex ">
       <button
         [routerLink]="['/admin/planificar']"
@@ -16,18 +16,83 @@
     <app-pasopaso *ngIf="openTab > 1 && openTab < 6" [steps]="['Información general','Objetivos','Funciones y respoonsabilidad','Confirmación']"></app-pasopaso>
       <div *ngIf="openTab === 0" >
         <div class="text-lg font-light leading-relaxed mt-6 mb-4 text-gray-700" >
-          <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" class="text-justify pb-3">
+          <p class="text-justify pb-3">
             Este comité jugará un papel fundamental en la implementación, seguimiento y mejora continua del Plan Estratégico de Seguridad Vial (PESV), con el objetivo de promover la seguridad vial, prevenir accidentes y fomentar una cultura de conducción responsable entre todos los miembros de la organización.
           </p>
-          <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300" class="text-justify pb-3">
+          <p class="text-justify pb-3">
             Mediante nuestra guía podrás definir los miembros del comité, establecer sus roles y responsabilidades, y definir los objetivos y acciones clave para garantizar la movilidad segura de todos los actores viales dentro de la empresa.
           </p>
-          <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="500" class="text-justify pb-3">
+          <p class="text-justify pb-3">
             Recuerda que el Comité de Seguridad Vial no solo es una estructura operativa, sino un motor para generar conciencia, cambio de actitudes y hábitos de seguridad vial entre todos los colaboradores, promoviendo un entorno más seguro para todos.
           </p>
 
+          <article class="w-full md:w-1/3 rounded-lg border border-gray-100 bg-white p-4">
+            <div class="flex items-center justify-between mb-1">
+              <div class="flex items-center gap-2">
+                <div class="text-white inline-flex items-center justify-center w-9 h-9 shadow rounded-full bg-amber-800">
+                  <p class="font-bold text-sm">1</p>
+                </div>
+                <p class="text-lg font-medium text-amber-800">Acta de Conformación del Comité de Seguridad Vial</p>
+              </div>
+              @if (documento1.length > 0) {
+                <span class="text-xs font-semibold px-2 py-1 rounded-full text-green-700 bg-green-100">Completado</span>
+              }
+            </div>
+            <p class="text-sm text-gray-500 mb-3">Documento oficial que formaliza la creación del Comité de Seguridad Vial, incluyendo integrantes, cargos, roles, funciones y firmas (Res. 40595 de 2022).</p>
+
+            @if (cargando['Comité de Seguridad Vial']) {
+              <app-loading [isLoading]="true" loadingText="Procesando..."></app-loading>
+            } @else if (documento1.length === 0) {
+              <input type="file" id="fu1" (change)="uploadFile($event, 'Comité de Seguridad Vial')" class="hidden" accept=".pdf" #fu1>
+              <button (click)="fu1.click()" type="button" class="text-amber-600 bg-white border border-amber-600 hover:bg-amber-600 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded transition-all duration-150">
+                <div class="flex items-center gap-1">
+                  <iconify-icon icon="hugeicons:plus-sign-square" width="16" height="16"></iconify-icon> Seleccionar archivo
+                </div>
+              </button>
+            } @else {
+              <div class="flex flex-col gap-2">
+                <div class="bg-amber-50 border border-amber-100 px-3 py-2 rounded">
+                  <a [href]="documento1[0].ruta | reftourl | async" target="_blank" class="text-amber-800 font-medium text-sm hover:underline block truncate" [title]="documento1[0].nombre | limpiarnombre">
+                    {{ documento1[0].nombre | limpiarnombre }}
+                  </a>
+                  <p class="text-xs text-gray-500 mt-0.5">Cargado: {{ documento1[0].docCreado | fechafirestore }}</p>
+                </div>
+                <div class="flex gap-2">
+                  <input type="file" id="fu1u" (change)="uploadFile($event, 'Comité de Seguridad Vial')" class="hidden" accept=".pdf" #fu1u>
+                  <button (click)="fu1u.click()" type="button" class="flex-1 text-amber-800 bg-white border border-amber-800 hover:bg-amber-800 hover:text-white font-bold uppercase text-xs px-3 py-1.5 rounded transition-all duration-150">
+                    <div class="flex items-center justify-center gap-1">
+                      <iconify-icon icon="hugeicons:plus-sign-square" width="14" height="14"></iconify-icon> Actualizar
+                    </div>
+                  </button>
+                  <button (click)="eliminarVigente(documento1[0], 'Comité de Seguridad Vial')" [disabled]="eliminando['Comité de Seguridad Vial']" type="button" class="text-red-600 bg-white border border-red-300 hover:bg-red-600 hover:text-white font-bold uppercase text-xs px-3 py-1.5 rounded transition-all duration-150 disabled:opacity-50">
+                    <iconify-icon icon="hugeicons:delete-02" width="14" height="14"></iconify-icon>
+                  </button>
+                </div>
+              </div>
+            }
+
+            @if (historico1.length > 0) {
+              <button (click)="toggleHistorico('Comité de Seguridad Vial')" type="button" class="mt-2 text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1">
+                <iconify-icon [icon]="mostrarHistorico['Comité de Seguridad Vial'] ? 'hugeicons:arrow-up-01' : 'hugeicons:arrow-down-01'" width="14" height="14"></iconify-icon>
+                Versiones anteriores ({{ historico1.length }})
+              </button>
+              @if (mostrarHistorico['Comité de Seguridad Vial']) {
+                <div class="mt-1 space-y-1 border-l-2 border-gray-200 pl-3">
+                  @for (h of historico1; track h.id) {
+                    <div class="text-xs text-gray-500">
+                      <a [href]="h.ruta | reftourl | async" target="_blank" class="hover:underline text-gray-600 truncate block" [title]="h.nombre | limpiarnombre">
+                        {{ h.nombre | limpiarnombre }}
+                      </a>
+                      <span>{{ h.docCreado | fechafirestore }}</span>
+                    </div>
+                  }
+                </div>
+              }
+            }
+          </article>
+
           <div class="flex flex-col lg:flex-row justify-center items-center mt-6 mb-6 space-y-6 lg:space-y-0 lg:space-x-16">
-            <div class="lg:w-1/3 sm:w-full ">
+            <!-- <div class="lg:w-1/3 sm:w-full ">
               <a href="/admin/planificar/comiteseguridadvial/gestion_archivos">
               <app-cards-boton
               [titulo]="'Cargar docmento'"
@@ -36,7 +101,7 @@
               [colorIcono]="'bg-blue-500'"
               ></app-cards-boton>
               </a>
-            </div>
+            </div> -->
             <div class="lg:w-1/3 sm:w-full ">
               <app-cards-boton
               (click)="toggleTabs(1,'')"
@@ -55,7 +120,7 @@
         
           <p style="margin-bottom: 14px;"><strong>Documentos y Requisitos Necesarios</strong></p>
 
-          <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="700" style="margin-bottom: 14px;">
+          <p style="margin-bottom: 14px;">
             Antes de comenzar con el formulario para la creación del Comité de Seguridad Vial (CSV), asegúrate de tener la siguiente información:
           </p>
 
@@ -227,18 +292,20 @@
                         </tr>
                       </thead>
                       <tbody *ngIf="integrantes.length > 0; else noData" class="divide-y divide-gray-200 bg-white">
-                        <tr *ngFor="let integrante of integrantes; let i = index" class="transition-colors hover:bg-gray-50">
+                        @for (integrante of integrantes; track integrante.nombreintegrante; let i = $index) {
+                        <tr class="transition-colors hover:bg-gray-50">
                           <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">{{i+1}}</td>
                           <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">{{ integrante.nombreintegrante }}</td>
                           <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">{{ integrante.cargo }}</td>
                           <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">{{ integrante.rol }}</td>
                           <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">{{ integrante.contacto }}</td>
-                         
+
                           <td>
                             <button type="button" (click)="removeIntegrante(i)">Eliminar</button> <!-- Botón para eliminar -->
                           </td>
 
                         </tr>
+                        }
                       </tbody>
                       <ng-template #noData>
                         <tbody class="divide-y divide-gray-200 bg-white">
@@ -757,12 +824,14 @@
                 </div>
               </div> -->
               <div formArrayName="firmas">  
-                <div class="w-full lg:w-6/12 px-4" *ngFor="let firma of firmas.controls; let i = index">
-                  <div [formGroupName]="i" >  
+                @for (firma of firmas.controls; track firma; let i = $index) {
+                <div class="w-full lg:w-6/12 px-4">
+                  <div [formGroupName]="i" >
                     <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2" for="firma{{i}}">{{i + 1}} Firma Electrónica {{integrantes[i].rol}}:</label>
                     <input type="text" id="firma{{i}}" formControlName="firma" class="border-0 px-3 py-3 mb-6 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" placeholder="Ingrese la firma electrónica">
                   </div>
                 </div>
+                }
               </div>
               <ng-template #noFirma>
                 <div class="w-full lg:w-6/12 px-4">
@@ -849,7 +918,8 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let document of documentData; let i = index">
+                  @for (document of documento1; track document.id; let i = $index) {
+                  <tr>
                     <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
                       {{i + 1}}
                     </td>
@@ -913,7 +983,8 @@
 
                     </td>
                   </tr>
-                  <tr *ngIf="documentData.length === 0">
+                  }
+                  <tr *ngIf="documento1.length === 0">
                     <td colspan="5" class="text-center py-4">No hay documentos disponibles.</td>
                   </tr>
                 </tbody>
@@ -937,12 +1008,12 @@
 
 
 
-<!-- <div *ngIf="isLoading">
-  <app-loading [isLoading]="isLoading" [loadingText]="'Cargando información...'"></app-loading>
-</div>
-<div *ngIf="!isLoading" class="flex mt-12">
-    
-</div> -->
+@if (_alerta.showAlert) {
+  <app-alerta-informativo
+      [type]="_alerta.alertType"
+      [message]="_alerta.alertMessage">
+  </app-alerta-informativo>
+  }
 
 
 

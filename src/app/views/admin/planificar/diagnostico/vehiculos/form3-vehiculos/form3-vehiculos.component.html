@@ -1,0 +1,128 @@
+<div *ngIf="mostrarModal()" (click)="cerrarModal()" class="fixed inset-0 z-40 bg-black opacity-25"></div>
+
+<div *ngIf="mostrarModal()" class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex">
+  <div (click)="$event.stopPropagation()" class="relative mx-auto my-6 bg-white rounded-lg shadow-lg max-w-xl w-full">
+    <form [formGroup]="operacionForm">
+
+      <!-- Título -->
+      <div class="flex items-center gap-3 p-5 border-b rounded-t bg-emerald-50">
+        <div class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-emerald-100">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41"/><path d="M20 12h-2"/><path d="M17.66 17.66l-1.41-1.41"/>
+            <path d="M12 20v-2"/><path d="M6.34 17.66l1.41-1.41"/><path d="M4 12h2"/><path d="M4.93 4.93l1.41 1.41"/>
+            <path d="M12 4V2"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800">Operación y mantenimiento</h3>
+          <p class="text-xs text-gray-500">Placa: <span class="font-semibold text-emerald-600">{{ placa }}</span></p>
+        </div>
+      </div>
+
+      <!-- Contenido -->
+      <div class="p-6 flex flex-col gap-5 overflow-y-auto max-h-[65vh]">
+
+        <!-- Promedio km -->
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-700">Promedio km recorridos al mes *</label>
+          <input type="number" formControlName="promedioKmMes" min="0" placeholder="0"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
+        </div>
+
+        <!-- Plan de mantenimiento -->
+        <div class="space-y-2">
+          <p class="text-sm font-medium text-gray-700">¿Tiene plan de mantenimiento preventivo? *</p>
+          <div class="flex gap-6">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" formControlName="tienePlanMantenimiento" value="SI"
+                class="h-4 w-4 text-emerald-500 border-gray-300 focus:ring-emerald-500">
+              <span class="text-sm text-gray-700">Sí</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" formControlName="tienePlanMantenimiento" value="NO"
+                class="h-4 w-4 text-emerald-500 border-gray-300 focus:ring-emerald-500">
+              <span class="text-sm text-gray-700">No</span>
+            </label>
+          </div>
+          @if (operacionForm.get('tienePlanMantenimiento').invalid && operacionForm.get('tienePlanMantenimiento').touched) {
+            <span class="text-red-500 text-xs">Selecciona una opción</span>
+          }
+        </div>
+
+        <!-- Campos condicionales de mantenimiento -->
+        @if (mostrarMantenimiento) {
+          <div class="grid grid-cols-2 gap-4 pl-2 border-l-2 border-emerald-200">
+            <div class="space-y-1">
+              <label class="block text-sm font-medium text-gray-700">Frecuencia mantenimiento</label>
+              <select formControlName="frecuenciaMantenimiento"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
+                <option value="" disabled selected>Seleccionar</option>
+                <option value="Mensual">Mensual</option>
+                <option value="Bimestral">Bimestral</option>
+                <option value="Trimestral">Trimestral</option>
+                <option value="Semestral">Semestral</option>
+                <option value="Anual">Anual</option>
+                <option value="Por kilometraje">Por kilometraje</option>
+              </select>
+            </div>
+            <div class="space-y-1">
+              <label class="block text-sm font-medium text-gray-700">Fecha último mantenimiento</label>
+              <input type="date" formControlName="fechaUltimoMantenimiento"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
+            </div>
+          </div>
+        }
+
+        <!-- Siniestros -->
+        <div class="space-y-2">
+          <p class="text-sm font-medium text-gray-700">¿Ha tenido siniestros viales? *</p>
+          <div class="flex gap-6">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" formControlName="tieneSiniestros" value="SI"
+                class="h-4 w-4 text-emerald-500 border-gray-300 focus:ring-emerald-500">
+              <span class="text-sm text-gray-700">Sí</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" formControlName="tieneSiniestros" value="NO"
+                class="h-4 w-4 text-emerald-500 border-gray-300 focus:ring-emerald-500">
+              <span class="text-sm text-gray-700">No</span>
+            </label>
+          </div>
+          @if (operacionForm.get('tieneSiniestros').invalid && operacionForm.get('tieneSiniestros').touched) {
+            <span class="text-red-500 text-xs">Selecciona una opción</span>
+          }
+        </div>
+
+        <!-- Número de siniestros (condicional) -->
+        @if (mostrarSiniestros) {
+          <div class="space-y-1 pl-2 border-l-2 border-red-200">
+            <label class="block text-sm font-medium text-gray-700">Número de siniestros</label>
+            <input type="number" formControlName="numeroSiniestros" min="0" placeholder="0"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
+          </div>
+        }
+
+        <!-- Observaciones -->
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-700">Observaciones <span class="text-gray-400 font-normal">(opcional)</span></label>
+          <textarea formControlName="observaciones" rows="3" placeholder="Novedades, condiciones del vehículo, etc."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 resize-none"></textarea>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="flex items-center justify-end p-5 border-t gap-2">
+        <button type="button" (click)="handleCancel()"
+          class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none ease-linear transition-all duration-150">
+          Cancelar
+        </button>
+        <button type="button" (click)="handleSave()"
+          class="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150">
+          Guardar
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

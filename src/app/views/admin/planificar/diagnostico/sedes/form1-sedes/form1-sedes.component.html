@@ -1,0 +1,208 @@
+<!-- Fondo oscuro -->
+<div *ngIf="mostrarModal()" (click)="cerrarModal()" class="fixed inset-0 z-40 bg-black opacity-25"></div>
+
+<!-- Modal -->
+<div *ngIf="mostrarModal()" class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex modal-fade-down">
+    <div (click)="$event.stopPropagation()" class="relative mx-auto my-6 bg-white rounded-lg shadow-lg max-w-3xl w-full">
+    <!-- 'max-w-sm':  'small',
+      'max-w-3xl':  'regular',
+      'max-w-6xl':  'large' -->
+    <!-- Título del modal -->
+    <div class="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+      <h3 class="text-xl font-semibold">
+        Nueva sede
+      </h3>
+    </div>
+    <form [formGroup]="agregarsedeForm" (ngSubmit)="handleSave()">
+    <!-- Contenido del modal -->
+    <div class="relative p-6 flex-auto">
+      <!-- <h3 class="text-lg font-semibold mb-4 pb-2 border-b text-gray-700">Establezca costo total de siniestros</h3> -->
+
+      <div class="flex flex-wrap mb-4">
+        <div class="w-full lg:w-6/12 px-2">
+            <div class="space-y-2">
+              <label for="nombreSede" class="block text-sm font-medium text-gray-700">Nombre Sede *</label>
+              <input type="text" id="nombreSede" formControlName="nombreSede" name="nombreSede" placeholder="" required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+        </div>
+        <div class="w-full lg:w-6/12 px-2">
+          <div class="space-y-2">
+            <label for="tiposede" class="block text-sm font-medium text-gray-700">Tipo de Sede *</label>
+            <select id="tiposede" formControlName="tiposede" name="tiposede" required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              <option value="">Seleccionar tipo sede</option>
+              <option value="Principal - Sede Matriz">Principal - Sede Matriz</option>
+              <option value="Operativa - Centro de Operaciones">Operativa - Centro de Operaciones</option>
+              <option value="Comercial - Oficina de Ventas">Comercial - Oficina de Ventas</option>
+              <option value="Logística - Almacén/Distribución">Logística - Almacén/Distribución</option>
+              <option value="Mantenimiento - Taller">Mantenimiento - Taller</option>
+              <option value="Administrativa - Solo Oficinas">Administrativa - Solo Oficinas</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-wrap mb-4">
+        <div class="w-full lg:w-6/12 px-2">
+          <div class="space-y-2">
+            <label for="telefono" class="block text-sm font-medium text-gray-700">Numero telefonico principal</label>
+            <input type="text" id="telefono" formControlName="telefono" name="telefono" placeholder="" required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          </div>
+        </div>
+        <div class="w-full lg:w-6/12 px-2">
+          <div class="space-y-2">
+            <label for="email" class="block text-sm font-medium text-gray-700">Email de la Sede</label>
+            <input type="text" id="email" formControlName="email" name="email" placeholder="" required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          </div>
+        </div>
+      </div>
+
+      <h3 class="text-lg font-semibold mb-4 pb-2 border-b text-gray-700">Personal y Operaciones</h3>
+
+      <div class="flex flex-wrap mb-4">
+        <div class="w-full lg:w-6/12 px-2">
+            <div class="space-y-2">
+              <label for="responsable" class="block text-sm font-medium text-gray-700">Responsable de la Sede</label>
+              <input type="text" id="responsable" formControlName="responsable" name="responsable" placeholder="" required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+        </div>
+        <div class="w-full lg:w-6/12 px-2">
+          <div class="space-y-2">
+            <label for="cargoresponsable" class="block text-sm font-medium text-gray-700">Cargo del Responsable</label>
+            <input type="text" id="cargoresponsable" formControlName="cargoresponsable" name="cargoresponsable" placeholder="" 
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap mb-4">
+        <div class="w-full lg:w-3/12 px-2">
+          <div class="space-y-2">
+          <label for="totalempleados" class="block text-sm font-medium text-gray-700">Total Empleados</label>
+          <input type="number" id="totalempleados" formControlName="totalempleados" name="totalempleados" placeholder="0" min="0" max="999" 
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          </div>
+        </div>
+        <div class="w-full lg:w-3/12 px-2">
+          <div class="space-y-2">
+          <label for="totalconductores" class="block text-sm font-medium text-gray-700">Total Conductores</label>
+          <input type="number" id="totalconductores" formControlName="totalconductores" name="totalconductores" placeholder="0" min="0" max="999" 
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          </div>
+        </div>
+        <div class="w-full lg:w-3/12 px-2">
+          <div class="space-y-2">
+          <label for="totalasignados" class="block text-sm font-medium text-gray-700">Vehículos Asignados</label>
+          <input type="number" id="totalasignados" formControlName="totalasignados" name="totalasignados" placeholder="0" min="0" max="999" 
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          </div>
+        </div>
+        <div class="w-full lg:w-3/12 px-2">
+          <div class="space-y-2">
+          <label for="totaloperacion" class="block text-sm font-medium text-gray-700">Total Años en Operación</label>
+          <input type="number" id="totaloperacion" formControlName="totaloperacion" name="totaloperacion" placeholder="0" min="0" max="999" 
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap mb-4">
+        <div class="w-full lg:w-12/12 px-2">
+            <div class="space-y-2">
+              <label for="direccion" class="block text-sm font-medium text-gray-700">Dirección Sede</label>
+              <input type="text" id="direccion" formControlName="direccion" name="direccion" placeholder="" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap mb-4">
+        <div class="w-full lg:w-6/12 px-2">
+            <div class="space-y-2">
+              <label for="departamento" class="block text-sm font-medium text-gray-700">Departamento</label>
+              <select id="departamento" formControlName="departamento" name="departamento" required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Seleccionar departamento</option>
+                <option value="Amazonas">Amazonas</option>
+                <option value="Antioquia">Antioquia</option>
+                <option value="Arauca">Arauca</option>
+                <option value="Atlántico">Atlántico</option>
+                <option value="Bolívar">Bolívar</option>
+                <option value="Boyacá">Boyacá</option>
+                <option value="Caldas">Caldas</option>
+                <option value="Caquetá">Caquetá</option>
+                <option value="Casanare">Casanare</option>
+                <option value="Cauca">Cauca</option>
+                <option value="Cesar">Cesar</option>
+                <option value="Chocó">Chocó</option>
+                <option value="Córdoba">Córdoba</option>
+                <option value="Cundinamarca">Cundinamarca</option>
+                <option value="Guainía">Guainía</option>
+                <option value="Guaviare">Guaviare</option>
+                <option value="Huila">Huila</option>
+                <option value="La Guajira">La Guajira</option>
+                <option value="Magdalena">Magdalena</option>
+                <option value="Meta">Meta</option>
+                <option value="Nariño">Nariño</option>
+                <option value="Norte de Santander">Norte de Santander</option>
+                <option value="Putumayo">Putumayo</option>
+                <option value="Quindío">Quindío</option>
+                <option value="Risaralda">Risaralda</option>
+                <option value="San Andrés y Providencia">San Andrés y Providencia</option>
+                <option value="Santander">Santander</option>
+                <option value="Sucre">Sucre</option>
+                <option value="Tolima">Tolima</option>
+                <option value="Valle del Cauca">Valle del Cauca</option>
+                <option value="Vaupés">Vaupés</option>
+                <option value="Vichada">Vichada</option>
+              </select>
+            </div>
+          </div>
+          <div class="w-full lg:w-6/12 px-2">
+            <div class="space-y-2">
+                <label for="ciudad" class="block text-sm font-medium text-gray-700">Ciudad</label>
+                <input type="text" id="ciudad" formControlName="ciudad" name="ciudad" placeholder=""
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+          </div>
+      </div>
+
+      <!-- <div class="flex flex-wrap">
+        <div class="w-full lg:w-12/12 px-2">
+            <div class="">
+              <label for="actividad" class="block text-sm font-medium text-gray-700">Actividad</label>
+              <textarea id="actividad" formControlName="actividad" name="actividad" placeholder="Describa las actividades principales que se realizan en esta Sede"
+              type="text"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              rows="2"></textarea>
+
+            </div>
+        </div>
+      </div> -->
+
+      
+      
+
+    </div>
+    </form>
+    <!--footer-->
+    <div class="flex items-center justify-end p-5 border-t border-solid border-blueGray-200 rounded-b">
+      <button class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" (click)="handleCancel()">
+        Cancelar
+      </button>
+      <button class="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="submit" (click)="handleSave()">
+        Agregar
+      </button>
+    </div>
+  </div>
+</div>
+
+@if (_alerta.showAlert) {
+  <app-alerta-informativo
+      [type]="_alerta.alertType"
+      [message]="_alerta.alertMessage">
+  </app-alerta-informativo>
+  }

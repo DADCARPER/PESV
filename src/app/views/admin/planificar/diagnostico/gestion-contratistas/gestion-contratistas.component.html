@@ -1,0 +1,170 @@
+<div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
+
+  <!-- Cabecera -->
+  <div class="rounded-t bg-amber-400 mb-0 px-6 py-6">
+    <div class="flex items-center gap-2">
+      <button [routerLink]="['/admin/planificar/diagnostico']"
+        class="bg-red-600 text-white active:bg-red-700 font-bold uppercase text-xs px-1 py-1 rounded shadow hover:shadow-md outline-none focus:outline-none ease-linear transition-all duration-150"
+        type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+          <path d="M5 12l14 0"/><path d="M5 12l6 6"/><path d="M5 12l6 -6"/>
+        </svg>
+      </button>
+      <h6 class="text-blueGray-700 text-xl font-bold">Gestión de Contratistas</h6>
+    </div>
+  </div>
+
+  <!-- Contenido -->
+  <div class="flex-auto px-4 lg:px-10 py-8">
+
+    @if (cargando) {
+      <div class="flex items-center justify-center py-20 text-gray-400">
+        <svg class="animate-spin mr-3" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+        </svg>
+        Cargando contratistas...
+      </div>
+    } @else {
+
+      <!-- Stats rápidas -->
+      <div class="grid grid-cols-4 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-amber-50 border border-amber-100 rounded-xl p-4 text-center">
+          <p class="text-2xl font-bold text-amber-700">{{ contratistas.length }}</p>
+          <p class="text-xs text-gray-500 mt-1 uppercase tracking-wide">Contratistas</p>
+        </div>
+        <div class="bg-amber-50 border border-amber-100 rounded-xl p-4 text-center">
+          <p class="text-2xl font-bold text-amber-700">{{ conDesplazamientos }}</p>
+          <p class="text-xs text-gray-500 mt-1 uppercase tracking-wide">Con desplazamientos</p>
+        </div>
+        <div class="bg-amber-50 border border-amber-100 rounded-xl p-4 text-center">
+          <p class="text-2xl font-bold text-amber-700">{{ totalVehiculos }}</p>
+          <p class="text-xs text-gray-500 mt-1 uppercase tracking-wide">Vehículos</p>
+        </div>
+        <div class="bg-amber-50 border border-amber-100 rounded-xl p-4 text-center">
+          <p class="text-2xl font-bold text-amber-700">{{ totalConductores }}</p>
+          <p class="text-xs text-gray-500 mt-1 uppercase tracking-wide">Conductores</p>
+        </div>
+      </div>
+
+      @if (contratistas.length === 0) {
+        <div class="flex flex-col items-center justify-center py-16 gap-3 text-gray-400">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <p class="text-sm">No hay contratistas registrados para este periodo.</p>
+        </div>
+      } @else {
+
+        <!-- Gráficas -->
+        <div class="mb-4">
+          <h3 class="text-base font-semibold text-gray-800 mb-1">Análisis de Contratistas</h3>
+          <p class="text-xs text-gray-400">Distribución según las características de vinculación y operación</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+
+          <!-- Gráfica 1: Tipo de vinculación -->
+          <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+            <p class="text-sm font-semibold text-gray-700 mb-1">Por tipo de vinculación</p>
+            <p class="text-xs text-gray-400 mb-3">Cómo se relacionan contractualmente con la empresa</p>
+            @if (vinculacionLabels.length > 0) {
+              <app-donut
+                [labels]="vinculacionLabels"
+                [series]="vinculacionSeries"
+                [muestraBorde]="false"
+                titulo="">
+              </app-donut>
+            } @else {
+              <div class="flex items-center justify-center h-40 text-sm text-gray-400">Sin datos</div>
+            }
+          </div>
+
+          <!-- Gráfica 2: Tipo de persona -->
+          <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+            <p class="text-sm font-semibold text-gray-700 mb-1">Por tipo de persona</p>
+            <p class="text-xs text-gray-400 mb-3">Persona natural vs jurídica</p>
+            @if (personaLabels.length > 0) {
+              <app-donut
+                [labels]="personaLabels"
+                [series]="personaSeries"
+                [muestraBorde]="false"
+                titulo="">
+              </app-donut>
+            } @else {
+              <div class="flex items-center justify-center h-40 text-sm text-gray-400">Sin datos</div>
+            }
+          </div>
+
+          <!-- Gráfica 3: Desplazamientos laborales -->
+          <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+            <p class="text-sm font-semibold text-gray-700 mb-1">Desplazamientos laborales</p>
+            <p class="text-xs text-gray-400 mb-3">Contratistas que realizan desplazamientos</p>
+            @if (desplazamientoLabels.length > 0) {
+              <app-donut
+                [labels]="desplazamientoLabels"
+                [series]="desplazamientoSeries"
+                [muestraBorde]="false"
+                titulo="">
+              </app-donut>
+            } @else {
+              <div class="flex items-center justify-center h-40 text-sm text-gray-400">Sin datos</div>
+            }
+          </div>
+
+        </div>
+
+        <!-- Tabla resumen -->
+        <div>
+          <h3 class="text-base font-semibold text-gray-800 mb-4">Listado de contratistas</h3>
+          <div class="rounded-xl border border-gray-100 overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-100">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Contratista</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Tipo persona</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Vinculación</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Servicio</th>
+                  <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide">Desplazamientos</th>
+                  <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide">Flota</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-50">
+                @for (c of contratistas; track c.id) {
+                  <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-4 py-3">
+                      <p class="text-sm font-semibold text-gray-800">{{ c.nombreRazonSocial }}</p>
+                      <p class="text-xs text-gray-400">{{ c.nitCedula }}</p>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-600">{{ c.tipoPersona }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600">{{ c.tipoVinculacion }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600 max-w-[180px] truncate">{{ c.servicioPrestado }}</td>
+                    <td class="px-4 py-3 text-center">
+                      @if (c.realizaDesplazamientos === 'SI') {
+                        <span class="inline-flex items-center text-xs font-medium bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Sí</span>
+                      } @else {
+                        <span class="inline-flex items-center text-xs font-medium bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">No</span>
+                      }
+                    </td>
+                    <td class="px-4 py-3 text-center text-sm text-gray-500">
+                      @if (c.realizaDesplazamientos === 'SI') {
+                        <span class="text-xs">{{ c.tipoFlota || '—' }}</span>
+                      } @else {
+                        <span class="text-gray-300 text-xs">—</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      }
+    }
+
+  </div>
+
+</div>

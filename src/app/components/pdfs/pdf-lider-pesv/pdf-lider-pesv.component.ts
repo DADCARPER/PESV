@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, inject } from '@angular/core';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-import { LiderDelPesvService } from '../../../services/lider-del-pesv.service';
+import { LiderDelPesvService } from '../../../services/shared/lider-del-pesv.service';
 import { CommonModule } from '@angular/common';
 
 //pdfMake.vfs = pdfFonts.pdfMake.vfs;

@@ -1,0 +1,1173 @@
+<div class="min-h-screen bg-gray-50">
+    <div class="container mx-auto px-4 py-2">
+
+        <div class="relative flex flex-col min-w-0 break-words w-full mb-0 shadow-lg rounded-lg bg-white border-0">
+            <div class="rounded-t bg-color3  px-6 py-6">
+                <div class="text-center flex ">
+                    <!-- <button
+                    [routerLink]="['/admin/verificar']"
+                    class="bg-red-600 text-white active:bg-red-700 font-bold uppercase text-xs px-1 py-1  rounded shadow hover:shadow-md outline-none focus:outline-none mr-2 ease-linear transition-all duration-150"
+                    type="button"
+                    >
+                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" /></svg>
+                    </button> -->
+                    <h6 class="text-blueGray-700 text-xl text-white font-bold line-clamp-1">{{nombreEmpresa}}</h6>
+                </div>
+            </div>
+            <div class="flex-auto px-4 lg:px-10 ">
+            @if (muestraEncuesta){
+
+                <div class="border-b border-gray-200">
+                    <nav class="flex" aria-label="Tabs">
+                    <button (click)="toggleTabs(0)" [ngClass]="openTab === 0 ? ' text-gray-600 py-4 px-6 block hover:text-color4 focus:outline-none  border-b-2 font-medium border-color3 ' : 'text-gray-600 py-4 px-6 block hover:text-color4 focus:outline-none'" id="tab-general" aria-controls="panel-general" aria-selected="true">
+                            Modulo 1
+                    </button>
+                    <button *ngIf="encuestaParameters.modulo2" (click)="toggleTabs(1)" [ngClass]="openTab === 1 ? ' text-gray-600 py-4 px-6 block hover:text-color4 focus:outline-none  border-b-2 font-medium border-color3 ' : 'text-gray-600 py-4 px-6 block hover:text-color4 focus:outline-none'"  id="tab-compliance" aria-controls="panel-compliance" aria-selected="false">
+                            Modulo 2
+                    </button>
+                    <button *ngIf="encuestaParameters.modulo3" (click)="toggleTabs(2)" [ngClass]="openTab === 2 ? ' text-gray-600 py-4 px-6 block hover:text-color4 focus:outline-none  border-b-2 font-medium border-color3 ' : 'text-gray-600 py-4 px-6 block hover:text-color4 focus:outline-none'" id="tab-documents" aria-controls="panel-documents" aria-selected="false">
+                            Modulo 3
+                    </button>
+                    <button *ngIf="encuestaParameters.modulo4" (click)="toggleTabs(3)" [ngClass]="openTab === 3 ? ' text-gray-600 py-4 px-6 block hover:text-color4 focus:outline-none  border-b-2 font-medium border-color3 ' : 'text-gray-600 py-4 px-6 block hover:text-color4 focus:outline-none'" id="tab-documents" aria-controls="panel-documents" aria-selected="false">
+                            Modulo 4 
+                    </button>
+                    <button *ngIf="encuestaParameters.modulo5" (click)="toggleTabs(4)" [ngClass]="openTab === 4 ? ' text-gray-600 py-4 px-6 block hover:text-color4 focus:outline-none  border-b-2 font-medium border-color3 ' : 'text-gray-600 py-4 px-6 block hover:text-color4 focus:outline-none'" id="tab-documents" aria-controls="panel-documents" aria-selected="false">
+                            Modulo 5
+                    </button>
+                    <button *ngIf="encuestaParameters.modulo6" (click)="toggleTabs(5)" [ngClass]="openTab === 5 ? ' text-gray-600 py-4 px-6 block hover:text-color4 focus:outline-none  border-b-2 font-medium border-color3 ' : 'text-gray-600 py-4 px-6 block hover:text-color4 focus:outline-none'" id="tab-documents" aria-controls="panel-documents" aria-selected="false">
+                            Modulo 6
+                    </button>
+                    
+                    </nav>
+                </div>
+                <form [formGroup]="agregarEcuestaForm" (ngSubmit)="guardar()">
+                <div *ngIf="openTab === 0" >
+                    <div class="text-lg font-light leading-relaxed text-gray-700" >
+
+                        <!-- Título del modal -->
+                        <div class="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+                            <h3 class="text-2xl font-semibold">
+                                Información Personal y Laboral
+                            </h3>
+                        </div>
+                
+                        <!-- Contenido del modal -->
+                        <div class="relative p-6 flex-auto">
+                            <h3 class="text-lg font-semibold mb-4 pb-2 border-b text-gray-700">Datos Personales</h3>
+                    
+                            <div class="flex flex-wrap mb-4">
+                    
+                                <div class="w-full lg:w-4/12 px-2">
+                                    <div class="space-y-2">
+                                    <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre Completo *</label>
+                                    <input type="text" id="nombre" name="nombre" formControlName="nombre" placeholder="Nombre y apellidos" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                        @if (agregarEcuestaForm.get('nombre')?.invalid && agregarEcuestaForm.get('nombre')?.touched) {
+                                            <span class="text-red-500 text-sm mt-1 block">
+                                                @if (agregarEcuestaForm.get('nombre')?.errors?.['required']) {
+                                                    El nombre completo es obligatorio
+                                                  } @else if (agregarEcuestaForm.get('nombre')?.errors?.['pattern']) {
+                                                    El nombre solo debe contener letras
+                                                  } @else if (agregarEcuestaForm.get('nombre')?.errors?.['minlength']) {
+                                                    El nombre debe tener al menos 3 caracteres
+                                                  } @else if (agregarEcuestaForm.get('nombre')?.errors?.['maxlength']) {
+                                                    El nombre no puede exceder 100 caracteres
+                                                  }
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+                                    
+                                <div class="w-full lg:w-4/12 px-2">
+                                    <div class="space-y-2">
+                                    <label for="fecha-nacimiento" class="block text-sm font-medium text-gray-700">Fecha de Nacimiento</label>
+                                    <input type="date" id="fecha-nacimiento" name="fecha-nacimiento" formControlName="fechaNacimiento" min="1940-01-01"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    </div>
+                                </div>
+                        
+                                <div class="w-full lg:w-4/12 px-2">
+                                    <div class="space-y-2">
+                                    <span class="block text-sm font-medium text-gray-700">Género</span>
+                                    <div class="flex gap-4 mt-1">
+                                        <div class="flex items-center">
+                                        <input type="radio" id="masculino" name="genero" formControlName="genero" value="Masculino"
+                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                        <label for="masculino" class="ml-2 text-sm text-gray-700">Masculino</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                        <input type="radio" id="femenino" name="genero" formControlName="genero" value="Femenino"
+                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                        <label for="femenino" class="ml-2 text-sm text-gray-700">Femenino</label>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                    
+                            </div>
+                    
+                            <div class="flex flex-wrap mb-4">
+                    
+                                <div class="w-full lg:w-4/12 px-2">
+                                    <div class="space-y-2">
+                                    <label for="documento" class="block text-sm font-medium text-gray-700">Número de Documento *</label>
+                                    <input type="text" id="documento" name="documento" formControlName="documento" placeholder="Cédula" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                        @if (agregarEcuestaForm.get('documento')?.invalid && agregarEcuestaForm.get('documento')?.touched) {
+                                            <span class="text-red-500 text-sm mt-1 block">
+                                                @if (agregarEcuestaForm.get('documento')?.errors?.['required']) {
+                                                    El documento es obligatorio
+                                                  } @else if (agregarEcuestaForm.get('documento')?.errors?.['pattern']) {
+                                                    El documento solo debe contener números
+                                                  } @else if (agregarEcuestaForm.get('documento')?.errors?.['minlength']) {
+                                                    El documento debe tener al menos 6 dígitos
+                                                  } @else if (agregarEcuestaForm.get('documento')?.errors?.['maxlength']) {
+                                                    El documento no puede exceder 20 dígitos
+                                                  } 
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+                        
+                                <div class="w-full lg:w-4/12 px-2">
+                                    <div class="space-y-2">
+                                    <label for="telefono" class="block text-sm font-medium text-gray-700">Teléfono Celular *</label>
+                                    <input type="tel" id="telefono" name="telefono" formControlName="telefono" placeholder="3001112222" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                        @if (agregarEcuestaForm.get('telefono')?.invalid && agregarEcuestaForm.get('telefono')?.touched) {
+                                            <span class="text-red-500 text-sm mt-1 block">
+                                                @if (agregarEcuestaForm.get('telefono')?.errors?.['required']) {
+                                                    El teléfono es obligatorio
+                                                  } @else if (agregarEcuestaForm.get('telefono')?.errors?.['pattern']) {
+                                                    El numero teléfonico no es real
+                                                  } @else if (agregarEcuestaForm.get('telefono')?.errors?.['minlength']) {
+                                                    El teléfono debe tener al menos 10 dígitos
+                                                  } @else if (agregarEcuestaForm.get('telefono')?.errors?.['maxlength']) {
+                                                    El teléfono no puede exceder 12 dígitos
+                                                  } @else if (agregarEcuestaForm.get('telefono')?.errors?.['soloNumeros']) {
+                                                    Solo se permiten números
+                                                  } @else if (agregarEcuestaForm.get('telefono')?.errors?.['longitudTelefono']) {
+                                                    El teléfono debe tener exactamente 10 dígitos
+                                                  }
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+                        
+                                <div class="w-full lg:w-4/12 px-2">
+                                    <div class="space-y-2">
+                                    <label for="email" class="block text-sm font-medium text-gray-700">Correo Electrónico *</label>
+                                    <input type="email" id="email" name="email" formControlName="email" placeholder="ejemplo@correo.com" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                        @if (agregarEcuestaForm.get('email')?.invalid && agregarEcuestaForm.get('email')?.touched) {
+                                            <span class="text-red-500 text-sm mt-1 block">
+                                                @if (agregarEcuestaForm.get('email')?.errors?.['required']) {
+                                                  El correo es obligatorio
+                                                } @else if (agregarEcuestaForm.get('email')?.errors?.['maxlength']) {
+                                                  El correo no puede exceder 100 caracteres
+                                                } @else if (agregarEcuestaForm.get('email')?.errors?.['email']) {
+                                                  Por favor, ingresa un correo válido
+                                                }
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+                            
+                            </div>
+
+                            <div class="flex flex-wrap mb-4">
+                    
+                                <div class="w-full lg:w-4/12 px-2">
+                                    <div class="space-y-2">
+                                    <label for="escolaridad" class="block text-sm font-medium text-gray-700">Escolaridad</label>
+                                    <select id="escolaridad" name="escolaridad" formControlName="escolaridad"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                        <option value="" disabled selected>Seleccionar Escolaridad</option>
+                                        <option value="Bachiller">Bachiller</option>
+                                        <option value="Técnico">Técnico</option>
+                                        <option value="Tecnólogo">Tecnólogo</option>
+                                        <option value="Profesional">Profesional</option>
+                                        <option value="Especialista">Especialista</option>
+                                    </select>
+                                    </div>
+                                </div>
+                                <div class="w-full lg:w-4/12 px-2">
+                                    <div class="space-y-2">
+                                    <label for="estrato" class="block text-sm font-medium text-gray-700">Estrato</label>
+                                    <select id="estrato" name="estrato" formControlName="estrato"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                        <option value="" disabled selected>Seleccionar Estrato</option>
+                                        <option value="Estrato 1">Estrato 1</option>
+                                        <option value="Estrato 2">Estrato 2</option>
+                                        <option value="Estrato 3">Estrato 3</option>
+                                        <option value="Estrato 4">Estrato 4</option>
+                                        <option value="Estrato 5">Estrato 5</option>
+                                        <option value="Estrato 6">Estrato 6</option>
+                                    </select>
+                                    </div>
+                                </div>
+                                <div class="w-full lg:w-4/12 px-2">
+                                    <div class="space-y-2">
+                                    <label for="estadoCivil" class="block text-sm font-medium text-gray-700">Estado Civil</label>
+                                    <select id="estadoCivil" name="estadoCivil" formControlName="estadoCivil" 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                        <option value="" disabled selected>Seleccionar Estado Civil</option>
+                                        <option value="Soltero">Soltero</option>
+                                        <option value="Casado">Casado</option>
+                                        <option value="Unión libre">Unión libre</option>
+                                        <option value="Separado">Separado</option>
+                                        <option value="Divorciado">Divorciado</option>
+                                        <option value="Viudo">Viudo</option>
+                                    </select>
+                                    </div>
+                                </div>
+                            
+                            </div>
+                    
+                            <h3 class="text-lg font-semibold mb-4 pb-2 border-b text-gray-700">Información Laboral</h3>
+                            
+                            <div class="flex flex-wrap mb-4">
+                    
+                                <div class="w-full lg:w-4/12 px-2">
+                                    <div class="space-y-2">
+                                    <label for="cargo" class="block text-sm font-medium text-gray-700">Cargo</label>
+                                    <input type="text" id="cargo" name="cargo" formControlName="cargo" placeholder="Cargo" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    </div>
+                                </div>
+                                <div class="w-full lg:w-4/12 px-2">
+                                    <div class="space-y-2">
+                                    <label for="jornada" class="block text-sm font-medium text-gray-700">Jornada Laboral</label>
+                                    <select id="jornada" name="jornada" formControlName="jornada"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                        <option value="" disabled selected>Seleccionar Jornadas</option>
+                                        <option value="Diurna">Diurna</option>
+                                        <option value="Nocturna">Nocturna</option>
+                                        <option value="Mixta Día - Noche">Mixta Día - Noche</option>
+
+                                    </select>
+                                    </div>
+                                </div>
+                                <div class="w-full lg:w-4/12 px-2">
+                                    <div class="space-y-2">
+                                    <label for="horasLaborales" class="block text-sm font-medium text-gray-700">Numero de Horas</label>
+                                    <input type="number" id="horasLaborales" name="horasLaborales" formControlName="horasLaborales" min="0" placeholder="0" 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    </div>
+                                </div>
+                                
+                            
+                            </div>
+                            <div class="flex flex-wrap mb-4">
+                                <div class="w-full lg:w-4/12 px-2">
+                                    <div class="space-y-2">
+                                    <label for="tiempoEmpresa" class="block text-sm font-medium text-gray-700">Tiempo en la empersa - Años</label>
+                                    <input type="number" id="tiempoEmpresa" name="tiempoEmpresa" formControlName="tiempoEmpresa" min="0" placeholder="0" 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    </div>
+                                </div>
+                                <div class="w-full lg:w-4/12 px-2">
+                                    <div class="space-y-2">
+                                    <label for="tipoContrato" class="block text-sm font-medium text-gray-700">Tipo de contrato</label>
+                                    <select id="tipoContrato" name="tipoContrato" formControlName="tipoContrato" 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                        <option value="" disabled selected>Seleccionar Tipo Contrato</option>
+                                        <option value="Término fijo">Término fijo</option>
+                                        <option value="Término indefinido">Término indefinido</option>
+                                        <option value="Prestación de servicios">Prestación de servicios</option>
+                                        <option value="Obra o labor">Obra o labor</option>
+                                        <option value="Aprendizaje">Aprendizaje</option>
+                                        <option value="Otro">Otro</option>
+                                    </select>
+                                    </div>
+                                </div>
+                                <div class="w-full lg:w-4/12 px-2">
+                                    <div class="space-y-2">
+                                    <label for="areaDepartamento" class="block text-sm font-medium text-gray-700">Áreas o departamentos</label>
+                                    <select id="areaDepartamento" name="areaDepartamento" formControlName="areaDepartamento" 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                        <option value="" disabled selected>Seleccionar Área Departamento</option>
+                                        <option value="Administrativa / Financiera">Administrativa / Financiera</option>
+                                        <option value="Recursos Humanos">Recursos Humanos</option>
+                                        <option value="Producción / Operaciones">Producción / Operaciones</option>
+                                        <option value="Mantenimiento">Mantenimiento</option>
+                                        <option value="Seguridad y Salud en el Trabajo">Seguridad y Salud en el Trabajo</option>
+                                        <option value="Medio Ambiente">Medio Ambiente</option>
+                                        <option value="Logística / Compras">Logística / Compras</option>
+                                        <option value="Tecnología / Sistemas">Tecnología / Sistemas</option>
+                                        <option value="Dirección / Gerencia">Dirección / Gerencia</option>
+                                        <option value="Otro">Otro</option>
+                                    </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                
+                
+                        <!--footer-->
+                        <div class="flex items-center justify-end p-5 border-t border-solid border-blueGray-200 rounded-b">
+                            <button *ngIf="openTab !== getLastEnabledTabIndex()" (click)="goToNextTab()" class="bg-color3 text-white active:bg-color4 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" >
+                            Siguiente
+                            </button>
+                            <button *ngIf="openTab === getLastEnabledTabIndex()" (click)="guardar()" class="bg-color3 text-white active:bg-color4 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" >
+                            Finalizar
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+                <div *ngIf="openTab === 1" >
+                    <div class="text-lg font-light leading-relaxed text-gray-700" >
+
+                        <!-- Título del modal -->
+                        <div class="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+                            <h3 class="text-2xl font-semibold">
+                                Salud y Condición Física
+                            </h3>
+                        </div>
+
+                        <div class="relative p-6 flex-auto">
+                            <h3 class="text-lg font-semibold mb-4 pb-2 border-b text-gray-700">Estado de salud y capacidades físicas</h3>
+                    
+                            <div class="flex flex-wrap mb-4">
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="estadoGeneral" class="block text-sm font-medium text-gray-700">¿Cómo calificaría su estado general de salud?</label>
+                                        <select id="estadoGeneral" name="estadoGeneral" formControlName="estadoGeneral"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="Excelente">Excelente</option>
+                                            <option value="Buena">Buena</option>
+                                            <option value="Regular">Regular</option>
+                                            <option value="Mala">Mala</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="limitacionFisica" class="block text-sm font-medium text-gray-700">¿Presenta alguna limitación física para realizar su trabajo?</label>
+                                        <select id="limitacionFisica" name="limitacionFisica" formControlName="limitacionFisica"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="No">No</option>
+                                            <option value="Sí, leve">Sí, leve</option>
+                                            <option value="Sí, moderada">Sí, moderada</option>
+                                            <option value="Sí, severa">Sí, severa</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            <div class="flex flex-wrap mb-4">
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="incapacidades" class="block text-sm font-medium text-gray-700">¿Ha tenido incapacidades médicas en los últimos 12 meses?</label>
+                                        <select id="incapacidades" name="incapacidades" formControlName="incapacidades"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="No">No</option>
+                                            <option value="Sí, de 1 a 3 días">Sí, de 1 a 3 días</option>
+                                            <option value="Sí, de 4 a 15 días">Sí, de 4 a 15 días</option>
+                                            <option value="Sí, más de 15 días">Sí, más de 15 días</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="actividadFisica" class="block text-sm font-medium text-gray-700">¿Realiza actividad física con regularidad?</label>
+                                        <select id="actividadFisica" name="actividadFisica" formControlName="actividadFisica"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="No">No</option>
+                                            <option value="Sí, todos los días">Sí, todos los días</option>
+                                            <option value="Sí, 2 a 3 veces por semana">Sí, 2 a 3 veces por semana</option>
+                                            <option value="Ocasionalmente">Ocasionalmente</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap mb-4">
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="dolorMolestia" class="block text-sm font-medium text-gray-700">¿Siente dolor o molestia física durante o después de la jornada laboral?</label>
+                                        <select id="dolorMolestia" name="dolorMolestia" formControlName="dolorMolestia"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="No">No</option>
+                                            <option value="Sí, leve">Sí, leve</option>
+                                            <option value="Sí, moderada">Sí, moderada</option>
+                                            <option value="Sí, intensa">Sí, intensa</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="discapacidad" class="block text-sm font-medium text-gray-700">¿Tiene usted alguna discapacidad registrada?</label>
+                                        <select id="discapacidad" name="discapacidad" formControlName="discapacidad"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="No">No</option>
+                                            <option value="Sí">Sí</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--footer-->
+                        <div class="flex items-center justify-end p-5 border-t border-solid border-blueGray-200 rounded-b">
+                            <button (click)="goToPreviousTab()" class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" >
+                                Regresar
+                            </button>
+                            <button *ngIf="openTab !== getLastEnabledTabIndex()" (click)="goToNextTab()" class="bg-color3 text-white active:bg-color4 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" >
+                                Siguiente
+                            </button>
+                            <button *ngIf="openTab === getLastEnabledTabIndex()" (click)="guardar()" class="bg-color3 text-white active:bg-color4 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" >
+                                Finalizar
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+                <div *ngIf="openTab === 2" >
+                    <div class="text-lg font-light leading-relaxed text-gray-700" >
+
+                        <!-- Título del modal -->
+                        <div class="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+                            <h3 class="text-2xl font-semibold">
+                                Conducción y Transporte
+                            </h3>
+                        </div>
+
+                        <div class="relative p-6 flex-auto">
+                            <h3 class="text-lg font-semibold mb-4 pb-2 border-b text-gray-700">Experiencia y hábitos de conducción</h3>
+                    
+                            <div class="flex flex-wrap mb-4">
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="conduceVehiculos" class="block text-sm font-medium text-gray-700">¿Conduce vehículos como parte de sus funciones laborales?</label>
+                                        <select id="conduceVehiculos" name="conduceVehiculos" formControlName="conduceVehiculos"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="No">No</option>
+                                            <option value="Sí">Sí</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <span class="block text-sm font-medium text-gray-700">¿Qué tipo de vehículos conduce en la empresa?</span>
+                                        <div class="flex flex-wrap gap-4 mt-1">
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="vehiculo-motocicleta" name="tipoVehiculos" 
+                                                    [checked]="isChecked('Motocicleta', 'tipoVehiculos')"
+                                                    (change)="onCheckboxChange($event, 'tipoVehiculos')" 
+                                                    value="Motocicleta"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="vehiculo-motocicleta" class="ml-2 text-base text-gray-700">Motocicleta</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="vehiculo-liviano" name="tipoVehiculos" 
+                                                    [checked]="isChecked('Vehículo liviano (carro particular, camioneta)', 'tipoVehiculos')"
+                                                    (change)="onCheckboxChange($event, 'tipoVehiculos')" 
+                                                    value="Vehículo liviano (carro particular, camioneta)"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="vehiculo-liviano" class="ml-2 text-base text-gray-700">Vehículo liviano (carro particular, camioneta)</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="vehiculo-pesado" name="tipoVehiculos" 
+                                                    [checked]="isChecked('Vehículo pesado (camión, volqueta, bus)', 'tipoVehiculos')"
+                                                    (change)="onCheckboxChange($event, 'tipoVehiculos')" 
+                                                    value="Vehículo pesado (camión, volqueta, bus)"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="vehiculo-pesado" class="ml-2 text-base text-gray-700">Vehículo pesado (camión, volqueta, bus)</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="maquinaria-amarilla" name="tipoVehiculos" 
+                                                    [checked]="isChecked('Maquinaria amarilla', 'tipoVehiculos')"
+                                                    (change)="onCheckboxChange($event, 'tipoVehiculos')" 
+                                                    value="Maquinaria amarilla"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="maquinaria-amarilla" class="ml-2 text-base text-gray-700">Maquinaria amarilla</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="vehiculo-otro" name="tipoVehiculos" 
+                                                    [checked]="isChecked('Otro', 'tipoVehiculos')"
+                                                    (change)="onCheckboxChange($event, 'tipoVehiculos')" 
+                                                    value="Otro"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="vehiculo-otro" class="ml-2 text-base text-gray-700">Otro</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="vehiculo-no-aplica" name="tipoVehiculos" 
+                                                    [checked]="isChecked('No aplica', 'tipoVehiculos')"
+                                                    (change)="onCheckboxChange($event, 'tipoVehiculos')" 
+                                                    value="No aplica"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="vehiculo-no-aplica" class="ml-2 text-base text-gray-700">No aplica</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap mb-4">
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="licenciaConduccion" class="block text-sm font-medium text-gray-700">¿Tiene licencia de conducción vigente?</label>
+                                        <select id="licenciaConduccion" name="licenciaConduccion" formControlName="licenciaConduccion"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="No">No</option>
+                                            <option value="Sí">Sí</option>
+                                            <option value="No aplica">No aplica</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="categoriaLicencia" class="block text-sm font-medium text-gray-700">¿En qué categoría está su licencia?</label>
+                                        <select id="categoriaLicencia" name="categoriaLicencia" formControlName="categoriaLicencia"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="A1">A1</option>
+                                            <option value="A2">A2</option>
+                                            <option value="B1">B1</option>
+                                            <option value="B2">B2</option>
+                                            <option value="B3">B3</option>
+                                            <option value="C1">C1</option>
+                                            <option value="C2">C2</option>
+                                            <option value="C3">C3</option>
+                                            <option value="No aplica / No tiene licencia">No aplica / No tiene licencia</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap mb-4">
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="frecuenciaConduccion" class="block text-sm font-medium text-gray-700">¿Con qué frecuencia conduce fuera del horario laboral?</label>
+                                        <select id="frecuenciaConduccion" name="frecuenciaConduccion" formControlName="frecuenciaConduccion"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="Nunca">Nunca</option>
+                                            <option value="Ocasionalmente">Ocasionalmente</option>
+                                            <option value="Frecuentemente">Frecuentemente</option>
+                                            <option value="Todos los días">Todos los días</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="experienciaConduccion" class="block text-sm font-medium text-gray-700">¿Cuántos años de experiencia tiene conduciendo?</label>
+                                        <select id="experienciaConduccion" name="experienciaConduccion" formControlName="experienciaConduccion"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="Menos de 1 año">Menos de 1 año</option>
+                                            <option value="1 a 3 años">1 a 3 años</option>
+                                            <option value="4 a 10 años">4 a 10 años</option>
+                                            <option value="Más de 10 años">Más de 10 años</option>
+                                            <option value="No aplica">No aplica</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap mb-4">
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="usoCinturon" class="block text-sm font-medium text-gray-700">¿Usa siempre el cinturón de seguridad al conducir?</label>
+                                        <select id="usoCinturon" name="usoCinturon" formControlName="usoCinturon"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="No">No</option>
+                                            <option value="Sí">Sí</option>
+                                            <option value="No aplica">No aplica</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="accidenteTransito" class="block text-sm font-medium text-gray-700">¿Ha estado involucrado en un accidente de tránsito en el último año?</label>
+                                        <select id="accidenteTransito" name="accidenteTransito" formControlName="accidenteTransito"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="No">No</option>
+                                            <option value="Sí, sin lesiones">Sí, sin lesiones</option>
+                                            <option value="Sí, con lesiones menores">Sí, con lesiones menores</option>
+                                            <option value="Sí, con lesiones graves">Sí, con lesiones graves</option>
+                                            <option value="Sí, con daños materiales únicamente">Sí, con daños materiales únicamente</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap mb-4">
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="conocimientoNormas" class="block text-sm font-medium text-gray-700">¿Conoce y aplica las normas de tránsito vigentes?</label>
+                                        <select id="conocimientoNormas" name="conocimientoNormas" formControlName="conocimientoNormas"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="No">No</option>
+                                            <option value="Sí, en parte">Sí, en parte</option>
+                                            <option value="Sí, completamente">Sí, completamente</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="capacidadEmergencia" class="block text-sm font-medium text-gray-700">¿Se siente capacitado para reaccionar ante una emergencia vial?</label>
+                                        <select id="capacidadEmergencia" name="capacidadEmergencia" formControlName="capacidadEmergencia"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="No">No</option>
+                                            <option value="Sí">Sí</option>
+                                            <option value="No estoy seguro/a">No estoy seguro/a</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--footer-->
+                        <div class="flex items-center justify-end p-5 border-t border-solid border-blueGray-200 rounded-b">
+                            <button (click)="goToPreviousTab()" class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" >
+                                Regresar
+                            </button>
+                            <button *ngIf="openTab !== getLastEnabledTabIndex()" (click)="goToNextTab()" class="bg-color3 text-white active:bg-color4 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" >
+                                Siguiente
+                            </button>
+                            <button *ngIf="openTab === getLastEnabledTabIndex()" (click)="guardar()" class="bg-color3 text-white active:bg-color4 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" >
+                                Finalizar
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+                <div *ngIf="openTab === 3" >
+                    <div class="text-lg font-light leading-relaxed text-gray-700" >
+
+                        <!-- Título del modal -->
+                        <div class="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+                            <h3 class="text-2xl font-semibold">
+                                Desplazamientos Laborales
+                            </h3>
+                        </div>
+
+                        <div class="relative p-6 flex-auto">
+                            <h3 class="text-lg font-semibold mb-4 pb-2 border-b text-gray-700">Rutas y medios de transporte al trabajo</h3>
+                    
+                            <div class="flex flex-wrap mb-4">
+                                <div class="w-full lg:w-12/12 px-2">
+                                    <div class="space-y-2">
+                                        <span class="block text-sm font-medium text-gray-700">¿Qué medio(s) de transporte utiliza para llegar al trabajo?</span>
+                                        <div class="flex flex-wrap gap-4 mt-1">
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="transporte-pie-trabajo" name="transporteTrabajo" 
+                                                    [checked]="isChecked('A pie', 'mediosTransporte')"
+                                                    (change)="onCheckboxChange($event, 'mediosTransporte')" 
+                                                    value="A pie"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="transporte-pie-trabajo" class="ml-2 text-base text-gray-700">A pie</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="transporte-bicicleta-trabajo" name="transporteTrabajo" 
+                                                    [checked]="isChecked('Bicicleta', 'mediosTransporte')"
+                                                    (change)="onCheckboxChange($event, 'mediosTransporte')" 
+                                                    value="Bicicleta"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="transporte-bicicleta-trabajo" class="ml-2 text-base text-gray-700">Bicicleta</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="transporte-moto-trabajo" name="transporteTrabajo" 
+                                                    [checked]="isChecked('Moto', 'mediosTransporte')"
+                                                    (change)="onCheckboxChange($event, 'mediosTransporte')" 
+                                                    value="Moto"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="transporte-moto-trabajo" class="ml-2 text-base text-gray-700">Moto</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="transporte-particular-trabajo" name="transporteTrabajo" 
+                                                    [checked]="isChecked('Vehículo particular', 'mediosTransporte')"
+                                                    (change)="onCheckboxChange($event, 'mediosTransporte')" 
+                                                    value="Vehículo particular"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="transporte-particular-trabajo" class="ml-2 text-base text-gray-700">Vehículo particular</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="transporte-publico-trabajo" name="transporteTrabajo" 
+                                                    [checked]="isChecked('Transporte público (bus, colectivo.)', 'mediosTransporte')"
+                                                    (change)="onCheckboxChange($event, 'mediosTransporte')" 
+                                                    value="Transporte público (bus, colectivo.)"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="transporte-publico-trabajo" class="ml-2 text-base text-gray-700">Transporte público (bus, colectivo.)</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="transporte-empresa-trabajo" name="transporteTrabajo" 
+                                                    [checked]="isChecked('Transporte proporcionado por la empresa', 'mediosTransporte')"
+                                                    (change)="onCheckboxChange($event, 'mediosTransporte')" 
+                                                    value="Transporte proporcionado por la empresa"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="transporte-empresa-trabajo" class="ml-2 text-base text-gray-700">Transporte proporcionado por la empresa</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="transporte-otro-trabajo" name="transporteTrabajo" 
+                                                    [checked]="isChecked('Otro', 'mediosTransporte')"
+                                                    (change)="onCheckboxChange($event, 'mediosTransporte')" 
+                                                    value="Otro"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="transporte-otro-trabajo" class="ml-2 text-base text-gray-700">Otro</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap mb-4">
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="tiempoDesplazamiento" class="block text-sm font-medium text-gray-700">¿Cuánto tiempo tarda habitualmente en llegar al trabajo (solo ida)?</label>
+                                        <select id="tiempoDesplazamiento" name="tiempoDesplazamiento" formControlName="tiempoDesplazamiento"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="Menos de 15 minutos">Menos de 15 minutos</option>
+                                            <option value="15 a 30 minutos">15 a 30 minutos</option>
+                                            <option value="31 a 60 minutos">31 a 60 minutos</option>
+                                            <option value="Más de 1 hora">Más de 1 hora</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="estadoVias" class="block text-sm font-medium text-gray-700">¿Cuál es el estado general de las vías por las que se desplaza?</label>
+                                        <select id="estadoVias" name="estadoVias" formControlName="estadoVias"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="Bueno">Bueno</option>
+                                            <option value="Regular">Regular</option>
+                                            <option value="Malo">Malo</option>
+                                            <option value="Muy malo">Muy malo</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap mb-4">
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="incidentesDesplazamiento" class="block text-sm font-medium text-gray-700">¿Ha tenido incidentes o dificultades durante su desplazamiento en el último año?</label>
+                                        <select id="incidentesDesplazamiento" name="incidentesDesplazamiento" formControlName="incidentesDesplazamiento"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="No">No</option>
+                                            <option value="Sí, leves (retrasos, congestión, clima)">Sí, leves (retrasos, congestión, clima)</option>
+                                            <option value="Sí, moderados (caídas, choques menores)">Sí, moderados (caídas, choques menores)</option>
+                                            <option value="Sí, graves (accidentes)">Sí, graves (accidentes)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="seguridadDesplazamiento" class="block text-sm font-medium text-gray-700">¿Se siente seguro/a durante sus desplazamientos?</label>
+                                        <select id="seguridadDesplazamiento" name="seguridadDesplazamiento" formControlName="seguridadDesplazamiento"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="Sí, completamente">Sí, completamente</option>
+                                            <option value="Parcialmente">Parcialmente</option>
+                                            <option value="No">No</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--footer-->
+                        <div class="flex items-center justify-end p-5 border-t border-solid border-blueGray-200 rounded-b">
+                            <button (click)="goToPreviousTab()" class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" >
+                                Regresar
+                            </button>
+                            <button *ngIf="openTab !== getLastEnabledTabIndex()" (click)="goToNextTab()" class="bg-color3 text-white active:bg-color4 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" >
+                                Siguiente
+                            </button>
+                            <button *ngIf="openTab === getLastEnabledTabIndex()" (click)="guardar()" class="bg-color3 text-white active:bg-color4 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" >
+                                Finalizar
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+                <div *ngIf="openTab === 4" >
+                    <div class="text-lg font-light leading-relaxed text-gray-700" >
+
+                        <!-- Título del modal -->
+                        <div class="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+                            <h3 class="text-2xl font-semibold">
+                                Identificación de Riesgos
+                            </h3>
+                        </div>
+
+                        <div class="relative p-6 flex-auto">
+                            <h3 class="text-lg font-semibold mb-4 pb-2 border-b text-gray-700">Percepción y experiencia con riesgos viales</h3>
+                    
+                            <div class="flex flex-wrap mb-4">
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="exposicionRiesgos" class="block text-sm font-medium text-gray-700">¿Considera que está expuesto a riesgos viales durante su jornada laboral o desplazamiento?</label>
+                                        <select id="exposicionRiesgos" name="exposicionRiesgos" formControlName="exposicionRiesgos"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="Sí">Sí</option>
+                                            <option value="No">No</option>
+                                            <option value="No estoy seguro/a">No estoy seguro/a</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="experienciaRiesgos" class="block text-sm font-medium text-gray-700">¿Ha experimentado o visto situaciones de riesgo vial en trayectos laborales?</label>
+                                        <select id="experienciaRiesgos" name="experienciaRiesgos" formControlName="experienciaRiesgos"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="No">No</option>
+                                            <option value="Sí, como testigo">Sí, como testigo</option>
+                                            <option value="Sí, como involucrado directo">Sí, como involucrado directo</option>
+                                            <option value="Sí, ambas">Sí, ambas</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap mb-4">
+                                <div class="w-full lg:w-12/12 px-2">
+                                    <div class="space-y-2">
+                                        <span class="block text-sm font-medium text-gray-700">¿En qué situaciones ha percibido mayor riesgo vial?</span>
+                                        <div class="flex flex-wrap gap-4 mt-1">
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="riesgo-via-mal-estado" name="riesgoVialSituacion" 
+                                                    [checked]="isChecked('Conducción en vía en mal estado', 'situacionesRiesgo')"
+                                                    (change)="onCheckboxChange($event, 'situacionesRiesgo')" 
+                                                    value="Conducción en vía en mal estado"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="riesgo-via-mal-estado" class="ml-2 text-base text-gray-700">Conducción en vía en mal estado</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="riesgo-exceso-velocidad" name="riesgoVialSituacion" 
+                                                    [checked]="isChecked('Exceso de velocidad (propia o de otros)', 'situacionesRiesgo')"
+                                                    (change)="onCheckboxChange($event, 'situacionesRiesgo')" 
+                                                    value="Exceso de velocidad (propia o de otros)"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="riesgo-exceso-velocidad" class="ml-2 text-base text-gray-700">Exceso de velocidad (propia o de otros)</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="riesgo-falta-senalizacion" name="riesgoVialSituacion" 
+                                                    [checked]="isChecked('Falta de señalización o iluminación', 'situacionesRiesgo')"
+                                                    (change)="onCheckboxChange($event, 'situacionesRiesgo')" 
+                                                    value="Falta de señalización o iluminación"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="riesgo-falta-senalizacion" class="ml-2 text-base text-gray-700">Falta de señalización o iluminación</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="riesgo-fatiga-cansancio" name="riesgoVialSituacion" 
+                                                    [checked]="isChecked('Fatiga o cansancio durante el trayecto', 'situacionesRiesgo')"
+                                                    (change)="onCheckboxChange($event, 'situacionesRiesgo')" 
+                                                    value="Fatiga o cansancio durante el trayecto"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="riesgo-fatiga-cansancio" class="ml-2 text-base text-gray-700">Fatiga o cansancio durante el trayecto</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="riesgo-condiciones-climaticas" name="riesgoVialSituacion" 
+                                                    [checked]="isChecked('Condiciones climáticas adversas', 'situacionesRiesgo')"
+                                                    (change)="onCheckboxChange($event, 'situacionesRiesgo')" 
+                                                    value="Condiciones climáticas adversas"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="riesgo-condiciones-climaticas" class="ml-2 text-base text-gray-700">Condiciones climáticas adversas</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="riesgo-uso-celular" name="riesgoVialSituacion" 
+                                                    [checked]="isChecked('Uso del celular mientras se conduce', 'situacionesRiesgo')"
+                                                    (change)="onCheckboxChange($event, 'situacionesRiesgo')" 
+                                                    value="Uso del celular mientras se conduce"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="riesgo-uso-celular" class="ml-2 text-base text-gray-700">Uso del celular mientras se conduce</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="riesgo-comportamientos-imprudentes" name="riesgoVialSituacion" 
+                                                    [checked]="isChecked('Comportamientos imprudentes de otros conductores o peatones', 'situacionesRiesgo')"
+                                                    (change)="onCheckboxChange($event, 'situacionesRiesgo')" 
+                                                    value="Comportamientos imprudentes de otros conductores o peatones"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="riesgo-comportamientos-imprudentes" class="ml-2 text-base text-gray-700">Comportamientos imprudentes de otros conductores o peatones</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="riesgo-cruce-animales" name="riesgoVialSituacion" 
+                                                    [checked]="isChecked('Cruce de animales o personas', 'situacionesRiesgo')"
+                                                    (change)="onCheckboxChange($event, 'situacionesRiesgo')" 
+                                                    value="Cruce de animales o personas"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="riesgo-cruce-animales" class="ml-2 text-base text-gray-700">Cruce de animales o personas</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="riesgo-transporte-mal-estado" name="riesgoVialSituacion" 
+                                                    [checked]="isChecked('Transporte en mal estado', 'situacionesRiesgo')"
+                                                    (change)="onCheckboxChange($event, 'situacionesRiesgo')" 
+                                                    value="Transporte en mal estado"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="riesgo-transporte-mal-estado" class="ml-2 text-base text-gray-700">Transporte en mal estado</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="riesgo-ninguna" name="riesgoVialSituacion" 
+                                                    [checked]="isChecked('Ninguna', 'situacionesRiesgo')"
+                                                    (change)="onCheckboxChange($event, 'situacionesRiesgo')" 
+                                                    value="Ninguna"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="riesgo-ninguna" class="ml-2 text-base text-gray-700">Ninguna</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap mb-4">
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="reporteRiesgo" class="block text-sm font-medium text-gray-700">¿Reportó esa situación de riesgo a la empresa?</label>
+                                        <select id="reporteRiesgo" name="reporteRiesgo" formControlName="reporteRiesgo"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="Sí">Sí</option>
+                                            <option value="No">No</option>
+                                            <option value="No aplica">No aplica</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="conocimientoReporte" class="block text-sm font-medium text-gray-700">¿Sabe cómo reportar un riesgo vial dentro de la empresa?</label>
+                                        <select id="conocimientoReporte" name="conocimientoReporte" formControlName="conocimientoReporte"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="No">No</option>
+                                            <option value="Sí">Sí</option>
+                                            <option value="No estoy seguro/a">No estoy seguro/a</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap mb-4">
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="culturaSeguridad" class="block text-sm font-medium text-gray-700">¿Considera que su empresa promueve una cultura de seguridad vial?</label>
+                                        <select id="culturaSeguridad" name="culturaSeguridad" formControlName="culturaSeguridad"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="Sí, de forma clara y activa">Sí, de forma clara y activa</option>
+                                            <option value="Parcialmente">Parcialmente</option>
+                                            <option value="No">No</option>
+                                            <option value="No sé">No sé</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="preparacionRiesgos" class="block text-sm font-medium text-gray-700">¿Qué tan preparado/a se siente para prevenir o actuar frente a un riesgo vial?</label>
+                                        <select id="preparacionRiesgos" name="preparacionRiesgos" formControlName="preparacionRiesgos"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="Muy preparado/a">Muy preparado/a</option>
+                                            <option value="Algo preparado/a">Algo preparado/a</option>
+                                            <option value="Poco preparado/a">Poco preparado/a</option>
+                                            <option value="Nada preparado/a">Nada preparado/a</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--footer-->
+                        <div class="flex items-center justify-end p-5 border-t border-solid border-blueGray-200 rounded-b">
+                            <button (click)="goToPreviousTab()" class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" >
+                                Regresar
+                            </button>
+                            <button *ngIf="openTab !== getLastEnabledTabIndex()" (click)="goToNextTab()" class="bg-color3 text-white active:bg-color4 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" >
+                                Siguiente
+                            </button>
+                            <button *ngIf="openTab === getLastEnabledTabIndex()" (click)="guardar()" class="bg-color3 text-white active:bg-color4 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" >
+                                Finalizar
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+                <div *ngIf="openTab === 5" >
+                    <div class="text-lg font-light leading-relaxed text-gray-700" >
+
+                        <!-- Título del modal -->
+                        <div class="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+                            <h3 class="text-2xl font-semibold">
+                                Mejora y Participación
+                            </h3>
+                        </div>
+
+                        <div class="relative p-6 flex-auto">
+                            <h3 class="text-lg font-semibold mb-4 pb-2 border-b text-gray-700">Sugerencias y compromiso con la seguridad</h3>
+                    
+                            <div class="flex flex-wrap mb-4">
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="aportarIdeas" class="block text-sm font-medium text-gray-700">¿Considera que puede aportar ideas o acciones para mejorar la seguridad vial en la empresa?</label>
+                                        <select id="aportarIdeas" name="aportarIdeas" formControlName="aportarIdeas"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="Sí">Sí</option>
+                                            <option value="No">No</option>
+                                            <option value="No estoy seguro/a">No estoy seguro/a</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="participacionActividades" class="block text-sm font-medium text-gray-700">¿Estaría dispuesto/a a participar en campañas, capacitaciones o actividades sobre seguridad vial?</label>
+                                        <select id="participacionActividades" name="participacionActividades" formControlName="participacionActividades"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="No">No</option>
+                                            <option value="Sí">Sí</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap mb-4">
+                                <div class="w-full lg:w-12/12 px-2">
+                                    <div class="space-y-2">
+                                        <span class="block text-sm font-medium text-gray-700">¿Qué tipo de acciones considera que ayudarían a mejorar la seguridad vial en la empresa?</span>
+                                        <div class="flex flex-wrap gap-4 mt-1">
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="accion-capacitaciones-practicas" name="accionesMejoraSeguridadVial" 
+                                                    [checked]="isChecked('Capacitaciones prácticas', 'accionesMejora')"
+                                                    (change)="onCheckboxChange($event, 'accionesMejora')" 
+                                                    value="Capacitaciones prácticas"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="accion-capacitaciones-practicas" class="ml-2 text-base text-gray-700">Capacitaciones prácticas</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="accion-senalizacion-adecuada" name="accionesMejoraSeguridadVial" 
+                                                    [checked]="isChecked('Señalización adecuada en las vías internas', 'accionesMejora')"
+                                                    (change)="onCheckboxChange($event, 'accionesMejora')" 
+                                                    value="Señalización adecuada en las vías internas"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="accion-senalizacion-adecuada" class="ml-2 text-base text-gray-700">Señalización adecuada en las vías internas</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="accion-mantenimiento-vehiculos" name="accionesMejoraSeguridadVial" 
+                                                    [checked]="isChecked('Mejor mantenimiento de vehículos y transporte', 'accionesMejora')"
+                                                    (change)="onCheckboxChange($event, 'accionesMejora')" 
+                                                    value="Mejor mantenimiento de vehículos y transporte"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="accion-mantenimiento-vehiculos" class="ml-2 text-base text-gray-700">Mejor mantenimiento de vehículos y transporte</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="accion-control-vigilancia" name="accionesMejoraSeguridadVial" 
+                                                    [checked]="isChecked('Mayor control y vigilancia de normas', 'accionesMejora')"
+                                                    (change)="onCheckboxChange($event, 'accionesMejora')" 
+                                                    value="Mayor control y vigilancia de normas"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="accion-control-vigilancia" class="ml-2 text-base text-gray-700">Mayor control y vigilancia de normas</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="accion-campanas-concientizacion" name="accionesMejoraSeguridadVial" 
+                                                    [checked]="isChecked('Campañas de concientización', 'accionesMejora')"
+                                                    (change)="onCheckboxChange($event, 'accionesMejora')" 
+                                                    value="Campañas de concientización"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="accion-campanas-concientizacion" class="ml-2 text-base text-gray-700">Campañas de concientización</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="accion-revision-rutas" name="accionesMejoraSeguridadVial" 
+                                                    [checked]="isChecked('Revisión de rutas y condiciones de desplazamiento', 'accionesMejora')"
+                                                    (change)="onCheckboxChange($event, 'accionesMejora')" 
+                                                    value="Revisión de rutas y condiciones de desplazamiento"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="accion-revision-rutas" class="ml-2 text-base text-gray-700">Revisión de rutas y condiciones de desplazamiento</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="accion-incentivos-practicas" name="accionesMejoraSeguridadVial" 
+                                                    [checked]="isChecked('Incentivos por buenas prácticas viales', 'accionesMejora')"
+                                                    (change)="onCheckboxChange($event, 'accionesMejora')" 
+                                                    value="Incentivos por buenas prácticas viales"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                <label for="accion-incentivos-practicas" class="ml-2 text-base text-gray-700">Incentivos por buenas prácticas viales</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap mb-4">
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="participacionAnterior" class="block text-sm font-medium text-gray-700">¿Ha participado antes en alguna actividad o capacitación sobre seguridad vial en la empresa?</label>
+                                        <select id="participacionAnterior" name="participacionAnterior" formControlName="participacionAnterior"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="Sí">Sí</option>
+                                            <option value="No">No</option>
+                                            <option value="No recuerdo">No recuerdo</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="w-full lg:w-6/12 px-2">
+                                    <div class="space-y-2">
+                                        <label for="sugerenciasMejora" class="block text-sm font-medium text-gray-700">¿Le gustaría proponer alguna mejora relacionada con la seguridad vial?</label>
+                                        <textarea id="sugerenciasMejora" name="sugerenciasMejora" rows="3" formControlName="sugerenciasMejora"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Escriba sus sugerencias aquí..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+
+                        <!--footer-->
+                        <div class="flex items-center justify-end p-5 border-t border-solid border-blueGray-200 rounded-b">
+                            <button (click)="goToPreviousTab()" class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" >
+                                Regresar
+                            </button>
+                            <button (click)="guardar()" class="bg-color3 text-white active:bg-color4 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" >
+                                Finalizar
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+                </form>
+                
+            }
+            @if(muestra404){
+                <section class="bg-white dark:bg-gray-900">
+                    <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
+                        <div class="mx-auto max-w-screen-sm text-center">
+                            <h1 class="mb-4 text-7xl tracking-tight font-extrabold lg:text-9xl text-primary-600 dark:text-primary-500">404</h1>
+                            <p class="mb-4 text-3xl tracking-tight font-bold text-gray-900 md:text-4xl dark:text-white">Encuesta no disponible.</p>
+                            <p class="mb-4 text-lg font-light text-gray-500 dark:text-gray-400">Contacta con el administrador.  </p>
+                            <a href="#" class="inline-flex text-white bg-primary-600 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-primary-900 my-4">Back to Homepage</a>
+                        </div>   
+                    </div>
+                </section>
+            }
+            @if(muestra200){
+                <section class="bg-white dark:bg-gray-900">
+                    <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
+                        <div class="mx-auto max-w-screen-sm text-center">
+                            <img src="assets/img/Success.png" class="w-96 h-96 mx-auto">
+                            <p class="mb-4 text-3xl tracking-tight font-bold text-gray-900 md:text-4xl dark:text-white">¡Encuesta completada con éxito!.</p>
+                            <p class="mb-4 text-lg font-light text-gray-500 dark:text-gray-400"> Gracias por tu participación.  </p>
+                            <a href="#" class="inline-flex text-white bg-primary-600 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-primary-900 my-4">Back to Homepage</a>
+                        </div>   
+                    </div>
+                </section>
+            }
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@if (_alerta.showAlert) {
+    <app-alerta-informativo
+        [type]="_alerta.alertType"
+        [message]="_alerta.alertMessage">
+    </app-alerta-informativo>
+    }

@@ -2,9 +2,9 @@ import { Component, inject, OnInit, Input, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { LoginService } from '../../../services/login.service';
+import { AuthenticacionService } from '../../../services/shared/authenticacion.service';
 
-import { AlertaService } from '../../../services/alerta.service';
+import { AlertaService } from '../../../services/shared/alerta.service';
 
 import { Storage, ref, uploadBytesResumable, getDownloadURL } from '@angular/fire/storage';
 import { Firestore, setDoc, doc, getDoc } from '@angular/fire/firestore';
@@ -13,7 +13,7 @@ import { AlertaInformativoComponent } from "../../alertas/alerta-informativo/ale
 import { ModalsGuiaComponent } from '../../modals/modals-guia/modals-guia.component';
 import { LoadingComponent } from '../../loading/loading/loading.component';
 import { SharedService } from '../../../shared/cargar-documentos/shared.service';
-import { EstatusGeneralService } from '../../../services/estatus-general.service';
+import { EstatusGeneralService } from '../../../services/shared/estatus-general.service';
 
 
 @Component({
@@ -45,7 +45,7 @@ export class SubirArchivosComponent implements OnInit {
 
   ///////FIN LOADING///////
   
-  private _auth = inject(LoginService);
+  private _auth = inject(AuthenticacionService);
   private _storage = inject(Storage);
   private _firestore = inject(Firestore);
   private _shared = inject(SharedService);

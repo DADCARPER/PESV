@@ -1,0 +1,81 @@
+<!-- Fondo oscuro -->
+<div *ngIf="mostrarModal()" (click)="cerrarModal()" class="fixed inset-0 z-40 bg-black opacity-25"></div>
+
+<!-- Modal -->
+<div *ngIf="mostrarModal()" class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex modal-fade-down">
+    <div (click)="$event.stopPropagation()" class="relative mx-auto my-6 bg-white rounded-lg shadow-lg max-w-3xl w-full">
+    <!-- Título del modal -->
+    <div class="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+      <h3 class="text-xl font-semibold">
+        Nueva Plan Anual de Trabajo
+      </h3>
+    </div>
+    <form [formGroup]="agregarActividadForm" (ngSubmit)="handleSave()">
+    <!-- Contenido del modal -->
+    <div class="relative p-6 flex-auto">
+
+        <div class="flex flex-wrap mb-4">
+            <div class="w-full lg:w-6/12 px-2">
+                <div class="space-y-2">
+                    <label for="anoActual" class="block text-sm font-medium text-gray-700">Año de Inicio *</label>
+                    <input type="number" id="anoActual" formControlName="anoActual" name="anoActual" required [value]="currentYear" min="1900" max="2100" step="1" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <div class="text-red-600 text-xs mt-1" *ngIf="hasError('anoActual')">
+                    {{ getErrorMessage('anoActual') }}
+                    </div>
+                </div>
+            </div>
+            <div class="w-full lg:w-6/12 px-2">
+                <div class="space-y-2">
+                  <label for="metaGestion" class="block text-sm font-medium text-gray-700">Meta (%) *
+                    <span title="Número entre 0 y 100" class="cursor-help inline-flex items-center justify-center w-4 h-4 rounded-full bg-gray-200 text-gray-600 text-xs ml-1">?</span>
+                  </label>
+                  <input type="number" id="metaGestion" formControlName="metaGestion" name="metaGestion" placeholder="ej: 90" min="0" max="100" 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                  <div class="text-red-600 text-xs mt-1" *ngIf="hasError('metaGestion')">
+                    {{ getErrorMessage('metaGestion') }}
+                  </div>
+                </div>
+              </div>
+        </div>
+
+      <div class="flex flex-wrap mb-4">
+        <div class="w-full lg:w-12/12 px-2">
+            <div class="space-y-2">
+              <label for="objetivoGestion" class="block text-sm font-medium text-gray-700">Objetivo de la Gestión *</label>
+              <textarea id="objetivoGestion" formControlName="objetivoGestion" name="objetivoGestion" placeholder="Describe el objetivo específico de esta gestión..." required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                rows="3"></textarea>
+              <div class="text-red-600 text-xs mt-1" *ngIf="hasError('objetivoGestion')">
+                {{ getErrorMessage('objetivoGestion') }}
+              </div>
+            </div>
+        </div>
+      </div> 
+
+    </div>
+    <!--footer-->
+    <div class="flex items-center justify-end p-5 border-t border-solid border-blueGray-200 rounded-b">
+      <button class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" (click)="handleCancel()">
+        Cancelar
+      </button>
+      @if (modo === 'crear') {
+        <button class="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="submit">
+          Crear
+        </button>
+      }
+      @if (modo === 'editar') {
+        <button class="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="submit">
+          Actualizar
+        </button>
+      }
+    </div>
+    </form>
+  </div>
+</div>
+
+@if (_alerta.showAlert) {
+  <app-alerta-informativo
+      [type]="_alerta.alertType"
+      [message]="_alerta.alertMessage">
+  </app-alerta-informativo>
+  }

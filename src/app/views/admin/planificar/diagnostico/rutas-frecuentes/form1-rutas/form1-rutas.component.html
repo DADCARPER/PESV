@@ -1,0 +1,104 @@
+<div *ngIf="mostrarModal()" (click)="cerrarModal()" class="fixed inset-0 z-40 bg-black opacity-25"></div>
+
+<div *ngIf="mostrarModal()" class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex">
+  <div (click)="$event.stopPropagation()" class="relative mx-auto my-6 bg-white rounded-lg shadow-lg max-w-4xl w-full">
+    <form [formGroup]="rutaForm">
+
+      <div class="flex items-center justify-between p-5 border-b rounded-t">
+        <h3 class="text-xl font-semibold">{{ modo === 'editar' ? 'Editar Ruta' : 'Registrar Ruta Frecuente' }}</h3>
+      </div>
+
+      <div class="p-6 overflow-y-auto max-h-[70vh]">
+
+        <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 pb-1 border-b">Información de la ruta</h4>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+          <div class="space-y-1 col-span-2 lg:col-span-4">
+            <label class="block text-sm font-medium text-gray-700">Nombre de la ruta *</label>
+            <input type="text" formControlName="nombreRuta" placeholder="Ej: Ruta Bogotá - Medellín"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            @if (rutaForm.get('nombreRuta').invalid && rutaForm.get('nombreRuta').touched) {
+              <span class="text-red-500 text-xs">Campo obligatorio</span>
+            }
+          </div>
+
+          <div class="space-y-1 col-span-2">
+            <label class="block text-sm font-medium text-gray-700">Origen *</label>
+            <input type="text" formControlName="origen" placeholder="Ciudad / lugar de salida"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            @if (rutaForm.get('origen').invalid && rutaForm.get('origen').touched) {
+              <span class="text-red-500 text-xs">Campo obligatorio</span>
+            }
+          </div>
+
+          <div class="space-y-1 col-span-2">
+            <label class="block text-sm font-medium text-gray-700">Destino *</label>
+            <input type="text" formControlName="destino" placeholder="Ciudad / lugar de llegada"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            @if (rutaForm.get('destino').invalid && rutaForm.get('destino').touched) {
+              <span class="text-red-500 text-xs">Campo obligatorio</span>
+            }
+          </div>
+
+          <div class="space-y-1">
+            <label class="block text-sm font-medium text-gray-700">Distancia (km)</label>
+            <input type="number" formControlName="distanciaKm" min="0" placeholder="0"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          </div>
+
+          <div class="space-y-1">
+            <label class="block text-sm font-medium text-gray-700">Tiempo estimado (min)</label>
+            <input type="number" formControlName="tiempoMinutos" min="0" placeholder="0"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          </div>
+
+          <div class="space-y-1">
+            <label class="block text-sm font-medium text-gray-700">Tipo de vía *</label>
+            <select formControlName="tipoVia"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              <option value="" disabled selected>Seleccionar</option>
+              <option value="Urbana">Urbana</option>
+              <option value="Rural">Rural</option>
+              <option value="Mixta">Mixta</option>
+              <option value="Autopista">Autopista</option>
+            </select>
+            @if (rutaForm.get('tipoVia').invalid && rutaForm.get('tipoVia').touched) {
+              <span class="text-red-500 text-xs">Campo obligatorio</span>
+            }
+          </div>
+
+          <div class="space-y-1">
+            <label class="block text-sm font-medium text-gray-700">Frecuencia *</label>
+            <select formControlName="frecuencia"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              <option value="" disabled selected>Seleccionar</option>
+              <option value="Diaria">Diaria</option>
+              <option value="Semanal">Semanal</option>
+              <option value="Quincenal">Quincenal</option>
+              <option value="Mensual">Mensual</option>
+              <option value="Ocasional">Ocasional</option>
+            </select>
+            @if (rutaForm.get('frecuencia').invalid && rutaForm.get('frecuencia').touched) {
+              <span class="text-red-500 text-xs">Campo obligatorio</span>
+            }
+          </div>
+
+          <div class="space-y-1 col-span-2 lg:col-span-4">
+            <label class="block text-sm font-medium text-gray-700">Observaciones <span class="text-gray-400 font-normal">(opcional)</span></label>
+            <textarea formControlName="observaciones" rows="2" placeholder="Condiciones especiales, puntos de riesgo, etc."
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 resize-none"></textarea>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end p-5 border-t gap-2">
+        <button type="button" (click)="handleCancel()"
+          class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none ease-linear transition-all duration-150">Cancelar</button>
+        <button type="button" (click)="handleSave()"
+          class="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150">Guardar ruta</button>
+      </div>
+
+    </form>
+  </div>
+</div>

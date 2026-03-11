@@ -1,0 +1,101 @@
+<div *ngIf="mostrarModal()" (click)="cerrarModal()" class="fixed inset-0 z-40 bg-black opacity-25"></div>
+
+<div *ngIf="mostrarModal()" class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex">
+  <div (click)="$event.stopPropagation()" class="relative mx-auto my-6 bg-white rounded-lg shadow-lg max-w-4xl w-full">
+    <form [formGroup]="planForm">
+
+      <div class="flex items-center justify-between p-5 border-b rounded-t">
+        <h3 class="text-xl font-semibold">{{ modo === 'editar' ? 'Editar Plan' : 'Registrar Plan de Emergencia' }}</h3>
+      </div>
+
+      <div class="p-6 overflow-y-auto max-h-[70vh]">
+
+        <!-- Identificación -->
+        <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 pb-1 border-b">Identificación del plan</h4>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+          <div class="space-y-1 col-span-2 lg:col-span-3">
+            <label class="block text-sm font-medium text-gray-700">Nombre del plan *</label>
+            <input type="text" formControlName="nombrePlan" placeholder="Ej: Plan de atención a accidentes de tránsito"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            @if (planForm.get('nombrePlan').invalid && planForm.get('nombrePlan').touched) {
+              <span class="text-red-500 text-xs">Campo obligatorio</span>
+            }
+          </div>
+
+          <div class="space-y-1">
+            <label class="block text-sm font-medium text-gray-700">Tipo de emergencia *</label>
+            <select formControlName="tipoEmergencia"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              <option value="" disabled selected>Seleccionar</option>
+              <option value="Accidente de tránsito">Accidente de tránsito</option>
+              <option value="Falla mecánica">Falla mecánica</option>
+              <option value="Derrumbe / Vía cerrada">Derrumbe / Vía cerrada</option>
+              <option value="Incendio vehicular">Incendio vehicular</option>
+              <option value="Derrame de sustancias">Derrame de sustancias</option>
+              <option value="Emergencia médica">Emergencia médica</option>
+              <option value="Otro">Otro</option>
+            </select>
+            @if (planForm.get('tipoEmergencia').invalid && planForm.get('tipoEmergencia').touched) {
+              <span class="text-red-500 text-xs">Campo obligatorio</span>
+            }
+          </div>
+
+          <div class="space-y-1 col-span-2 lg:col-span-4">
+            <label class="block text-sm font-medium text-gray-700">Descripción *</label>
+            <textarea formControlName="descripcion" rows="3" placeholder="Describe el alcance y objetivo del plan..."
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 resize-none"></textarea>
+            @if (planForm.get('descripcion').invalid && planForm.get('descripcion').touched) {
+              <span class="text-red-500 text-xs">Campo obligatorio</span>
+            }
+          </div>
+
+        </div>
+
+        <!-- Protocolo -->
+        <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 pb-1 border-b">Protocolo de acción</h4>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+          <div class="space-y-1 col-span-2 lg:col-span-4">
+            <label class="block text-sm font-medium text-gray-700">Pasos del protocolo <span class="text-gray-400 font-normal">(opcional)</span></label>
+            <textarea formControlName="protocoloAccion" rows="4" placeholder="1. Detener el vehículo en zona segura&#10;2. Activar señales de emergencia&#10;3. Contactar al responsable..."
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 resize-none"></textarea>
+          </div>
+
+          <div class="space-y-1 col-span-2">
+            <label class="block text-sm font-medium text-gray-700">Responsable</label>
+            <input type="text" formControlName="responsable" placeholder="Nombre del responsable del plan"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          </div>
+
+          <div class="space-y-1 col-span-2">
+            <label class="block text-sm font-medium text-gray-700">Teléfono de emergencia</label>
+            <input type="tel" formControlName="telefonoEmergencia" placeholder="Ej: 123 o 3001112222"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          </div>
+
+          <div class="space-y-1">
+            <label class="block text-sm font-medium text-gray-700">Fecha de elaboración</label>
+            <input type="date" formControlName="fechaElaboracion"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          </div>
+
+          <div class="space-y-1">
+            <label class="block text-sm font-medium text-gray-700">Fecha de revisión</label>
+            <input type="date" formControlName="fechaRevision"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          </div>
+
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end p-5 border-t gap-2">
+        <button type="button" (click)="handleCancel()"
+          class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none ease-linear transition-all duration-150">Cancelar</button>
+        <button type="button" (click)="handleSave()"
+          class="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150">Guardar plan</button>
+      </div>
+
+    </form>
+  </div>
+</div>

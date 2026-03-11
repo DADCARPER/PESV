@@ -1,5 +1,94 @@
-<app-cargar-documentos
-[coleccionFirebase]="'liderDelPesv'"
-[coleccionStorage]="'001-lider-del-pesv'"
-[rutaRetorno]="'/admin/planificar/liderdelpesv'"
-[titulobloque]="'Líder del diseño e implementación del (PESV)'"></app-cargar-documentos>
+<div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
+    <div class="rounded-t bg-amber-400  mb-0 px-6 py-6">
+        <div class="text-center flex ">
+          <button
+            [routerLink]="['..']"
+            class="bg-red-600 text-white active:bg-red-700 font-bold uppercase text-xs px-1 py-1  rounded shadow hover:shadow-md outline-none focus:outline-none mr-2 ease-linear transition-all duration-150"
+            type="button"
+          >
+          <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" /></svg>
+          </button>
+          <h6 class="text-blueGray-700 text-xl font-bold line-clamp-1">Líder del PESV - Documentos</h6>
+        </div>
+    </div>
+    <div class=" p-4">
+            
+      <div class="bg-white rounded-lg border shadow-sm">
+        <div class="p-4 border-b">
+          <div class="flex items-center justify-between">
+              <div class="relative w-80">
+                  <input 
+                  type="text" 
+                  class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                  placeholder="Buscar documento"
+                  [(ngModel)]="searchText"
+                  (input)="onSearchChange()">
+                  <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+              </div>
+              <div class="flex gap-2">
+                  <!-- <button (click)="modalFormulario.abrirModal('crear')" class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none  mb-1 ease-linear transition-all duration-150" type="button">
+                    <div class="flex items-center">
+                        <iconify-icon icon="hugeicons:plus-sign-square" width="18" height="18" class="pr-2 "></iconify-icon> Nuevo
+                    </div>
+                  </button> -->
+                  <!-- <a href="assets/documentacion/006_diagnostico/plantillaColaboradores.xlsx" class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none  mb-1 ease-linear transition-all duration-150" type="button">
+                      <div class="flex items-center">
+                          <iconify-icon icon="hugeicons:plus-sign-square" width="18" height="18" class="pr-2 "></iconify-icon> Plantilla
+                      </div>
+                  </a> -->
+                  <button (click)="modalAddFile.abrirModal()" class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none  mb-1 ease-linear transition-all duration-150" type="button">
+                      <div class="flex items-center">
+                          <iconify-icon icon="hugeicons:upload-square-01" width="18" height="18" class="pr-2 "></iconify-icon> Cargar documento
+                      </div>
+                  </button>
+                  <!-- <p class="text-sm text-gray-500">
+                      Por cada 1,000,000 de kilómetros recorridos se presentaron XX cantidad de siniestros viales.
+                  </p> -->
+                  
+              </div>
+          </div>
+        </div>
+          <div class="p-4">
+                  <!-- Grid -->
+                  <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <ag-grid-angular
+                      class="ag-theme-quartz w-full h-[422px]"
+                      [rowData]="filteredData"
+                      [columnDefs]="columnDefs"
+                      [defaultColDef]="defaultColDef"
+                      [rowHeight]="40"
+                      [headerHeight]="50"
+                      [localeText]="{noRowsToShow: 'No hay datos disponibles'}"
+                      (gridReady)="onGridReady($event)"
+                      (cellClicked)="onCellClicked($event)"
+                      [animateRows]="true">
+                    </ag-grid-angular>
+                  </div>
+                  <div class="mt-2 text-sm text-gray-600 text-right">
+                      Mostrando {{ filteredData.length }} de {{ datos.length }} registros
+                  </div>
+              
+      
+            <!-- <app-tabla-compartida 
+            [datas]="datos"
+            [headers]="heads"
+            [dataKeys]="['nombre', 'fechaNacimiento', 'genero', 'documento', 'telefono', 'email', 'escolaridad', 'estrato', 'estadoCivil', 'cargo', 'jornada', 'horasLaborales', 'tiempoEmpresa', 'tipoContrato', 'areaDepartamento']"
+            [columnConfig]="columnasConfig"
+            [accion]="true"
+            (editar)="manejarEdicion($event)"
+            (eliminar)="manejarEliminar($event)">
+            ></app-tabla-compartida> -->
+          </div>
+      </div>
+      
+      <!-- <app-form1-colaboradores #modalFormulario></app-form1-colaboradores>
+      <app-form2-colaboradores #modalEliminar></app-form2-colaboradores>
+      <app-form3-importar-excell #modalImportar></app-form3-importar-excell> -->
+            
+
+    </div>
+</div>
+
+<app-f1-add-file #modalAddFile
+[nombreModulo]="'002-diagnostico'"></app-f1-add-file>
+<app-f2-delete-file #modalDeleteFile></app-f2-delete-file>

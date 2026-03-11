@@ -1,8 +1,13 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CardsMenuComponent } from "../../../components/cards/cards-menu/cards-menu.component";
-import { EstatusGeneralService } from '../../../services/estatus-general.service';
+import { EstatusGeneralService } from '../../../services/shared/estatus-general.service';
 import { CommonModule } from '@angular/common';
+import { AuthenticacionService } from '../../../services/shared/authenticacion.service';
+import { FirestoreService } from '../../../services/shared/firestore.service';
+import { StorageService } from '../../../services/shared/storage.service';
+import { AlertaService } from '../../../services/shared/alerta.service';
+import { Models } from '../../../interfaces/models';
 
 @Component({
   selector: 'app-planificar',
@@ -12,20 +17,32 @@ import { CommonModule } from '@angular/common';
   styleUrl: './planificar.component.css'
 })
 export class PlanificarComponent implements OnInit {
+  
+  private _authcations = inject(AuthenticacionService);
+  private _firestore = inject(FirestoreService);
+  private _storage = inject(StorageService)
+  public _alerta = inject (AlertaService);
 
-  private _estatusgeneral = inject(EstatusGeneralService);
-  estatusGeneral: Record<string, any> = {};
+  nit = this._authcations.getCurrentUser().displayName; //NIT DE LA EMPRESA ACTUAL
+  empresa = this._authcations.getCurrentUser().photoURL; // NOMBRE DE LA EMREPSA
+  uid = this._authcations.getCurrentUser().uid; //UID UNICO
+
+  estatusGeneral: Partial<Models.Procesos.ProcesosCarga> = {};
 
   ngOnInit(): void {
-    this.obtenerEstatusGeneral();
+    this.getEstatusgeneral();
   }
 
-  async obtenerEstatusGeneral() {
-    const doc = await this._estatusgeneral.getEstatusGeneralFirestore();
-    if (doc) {
-      // Actualizar el Signal con los datos obtenidos de Firestore
-      this.estatusGeneral = doc;  // Almacenar los datos en estatusGeneral
-      //console.log('Estatus General:', doc);
+  async getEstatusgeneral() {
+    const periodoActivo = this._authcations.periodo();
+    const path = `EstatusGeneral/${this.nit}`;
+    const doc = await this._firestore.getDocument<Models.Procesos.ProcesosCarga>(path);
+    if (doc.exists()) {
+      const data = doc.data();
+      // Solo cargar si el documento pertenece al periodo activo
+      if (!data.periodo || data.periodo === periodoActivo) {
+        this.estatusGeneral = data;
+      }
     }
   }
 

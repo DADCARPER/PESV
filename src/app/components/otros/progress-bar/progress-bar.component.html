@@ -1,5 +1,5 @@
 <div class="flex items-center justify-between">
-  @if(mostrarProgreso){
+
 
     <div>
       <span class="text-xs" [style.color]="color">
@@ -7,11 +7,11 @@
       </span>
     </div>
     <div class="text-right">
-      <span class="text-xs font-semibold inline-block" [style.color]="color">
-        {{value}}%
+      <span class="text-xs font-semibold inline-block" [style.color]="color" id="valor-animado1">
+        0
       </span>
     </div>
-  }
+  
 </div>
 <div class="progress-bar-container" [style.height.px]="height">
 

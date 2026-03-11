@@ -1,0 +1,235 @@
+<!-- Fondo oscuro -->
+<div *ngIf="mostrarModal()" (click)="cerrarModal()" class="fixed inset-0 z-40 bg-black opacity-25"></div>
+
+<!-- Modal -->
+<div *ngIf="mostrarModal()" class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex modal-fade-down">
+  <div (click)="$event.stopPropagation()" class="relative mx-auto my-6 bg-white rounded-lg shadow-lg max-w-5xl w-full">
+    <form [formGroup]="contratistaForm">
+
+      <!-- Título -->
+      <div class="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+        <h3 class="text-2xl font-semibold">
+          {{ modo === 'editar' ? 'Editar Contratista' : 'Agregar Contratista' }}
+        </h3>
+      </div>
+
+      <!-- Contenido -->
+      <div class="relative p-6 flex-auto overflow-y-auto max-h-[75vh]">
+
+        <!-- ── Sección 1: Identificación ──────────────────────────────────── -->
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 pb-1 border-b">
+          Sección 1 – Identificación
+        </h3>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+          <div class="space-y-1">
+            <label class="block text-sm font-medium text-gray-700">Tipo de contratista *</label>
+            <select formControlName="tipoContratista"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              <option value="" disabled selected>Seleccionar</option>
+              <option value="Transportador">Transportador</option>
+              <option value="Proveedor de servicios">Proveedor de servicios</option>
+              <option value="Contratista de obra / labor">Contratista de obra / labor</option>
+              <option value="Cooperativa">Cooperativa</option>
+              <option value="Otro">Otro</option>
+            </select>
+            @if (contratistaForm.get('tipoContratista').invalid && contratistaForm.get('tipoContratista').touched) {
+              <span class="text-red-500 text-xs">Campo obligatorio</span>
+            }
+          </div>
+
+          <div class="space-y-1">
+            <label class="block text-sm font-medium text-gray-700">Tipo de persona *</label>
+            <select formControlName="tipoPersona"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              <option value="" disabled selected>Seleccionar</option>
+              <option value="Natural">Natural</option>
+              <option value="Jurídica">Jurídica</option>
+            </select>
+            @if (contratistaForm.get('tipoPersona').invalid && contratistaForm.get('tipoPersona').touched) {
+              <span class="text-red-500 text-xs">Campo obligatorio</span>
+            }
+          </div>
+
+          <div class="space-y-1 lg:col-span-2">
+            <label class="block text-sm font-medium text-gray-700">Nombre / Razón social *</label>
+            <input type="text" formControlName="nombreRazonSocial" placeholder="Razón social o nombre completo"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            @if (contratistaForm.get('nombreRazonSocial').invalid && contratistaForm.get('nombreRazonSocial').touched) {
+              <span class="text-red-500 text-xs">Campo obligatorio</span>
+            }
+          </div>
+
+          <div class="space-y-1">
+            <label class="block text-sm font-medium text-gray-700">NIT / Cédula *</label>
+            <input type="text" formControlName="nitCedula" placeholder="Ej: 900123456-1"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            @if (contratistaForm.get('nitCedula').invalid && contratistaForm.get('nitCedula').touched) {
+              <span class="text-red-500 text-xs">Campo obligatorio</span>
+            }
+          </div>
+
+        </div>
+
+        <!-- ── Sección 2: Vinculación ──────────────────────────────────────── -->
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 pb-1 border-b">
+          Sección 2 – Vinculación
+        </h3>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+          <div class="space-y-1">
+            <label class="block text-sm font-medium text-gray-700">Tipo de vinculación *</label>
+            <select formControlName="tipoVinculacion"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              <option value="" disabled selected>Seleccionar</option>
+              <option value="Tercerización">Tercerización</option>
+              <option value="Subcontratación">Subcontratación</option>
+              <option value="Outsourcing">Outsourcing</option>
+              <option value="Intermediación laboral">Intermediación laboral</option>
+              <option value="Afiliado">Afiliado</option>
+              <option value="Otro">Otro (especificar)</option>
+            </select>
+            @if (contratistaForm.get('tipoVinculacion').invalid && contratistaForm.get('tipoVinculacion').touched) {
+              <span class="text-red-500 text-xs">Campo obligatorio</span>
+            }
+          </div>
+
+          @if (mostrarOtroVinculacion) {
+            <div class="space-y-1">
+              <label class="block text-sm font-medium text-gray-700">Especificar vinculación</label>
+              <input type="text" formControlName="vinculacionOtro" placeholder="Describe el tipo de vinculación"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+          }
+
+          <div class="space-y-1 col-span-2 lg:col-span-3">
+            <label class="block text-sm font-medium text-gray-700">Servicio prestado *</label>
+            <input type="text" formControlName="servicioPrestado" placeholder="Describe el servicio que presta el contratista"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            @if (contratistaForm.get('servicioPrestado').invalid && contratistaForm.get('servicioPrestado').touched) {
+              <span class="text-red-500 text-xs">Campo obligatorio</span>
+            }
+          </div>
+
+          <!-- Fecha inicio contrato -->
+          <div class="space-y-1">
+            <label class="block text-sm font-medium text-gray-700">Fecha inicio contrato *</label>
+            <input type="date" formControlName="fechaInicioContrato"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            @if (contratistaForm.get('fechaInicioContrato').invalid && contratistaForm.get('fechaInicioContrato').touched) {
+              <span class="text-red-500 text-xs">Campo obligatorio</span>
+            }
+          </div>
+
+          <!-- Fecha fin contrato -->
+          <div class="space-y-1">
+            <label class="block text-sm font-medium text-gray-700">Fecha fin contrato</label>
+            @if (!contratoEsIndefinido) {
+              <input type="date" formControlName="fechaFinContrato"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            } @else {
+              <div class="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-sm text-gray-400 h-[42px] flex items-center">
+                Indefinido
+              </div>
+            }
+            <label class="flex items-center gap-2 mt-1 cursor-pointer">
+              <input type="checkbox" formControlName="contratoIndefinido"
+                class="h-4 w-4 text-amber-500 border-gray-300 rounded focus:ring-amber-500">
+              <span class="text-xs text-gray-500">Contrato indefinido</span>
+            </label>
+          </div>
+
+        </div>
+
+        <!-- ── Sección 3: Desplazamientos ─────────────────────────────────── -->
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 pb-1 border-b">
+          Sección 3 – Desplazamientos
+        </h3>
+
+        <div class="mb-6">
+          <p class="text-sm font-medium text-gray-700 mb-2">¿Realiza desplazamientos laborales? *</p>
+          <div class="flex gap-6">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" formControlName="realizaDesplazamientos" value="SI"
+                class="h-4 w-4 text-amber-500 border-gray-300 focus:ring-amber-500">
+              <span class="text-sm text-gray-700">Sí</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" formControlName="realizaDesplazamientos" value="NO"
+                class="h-4 w-4 text-amber-500 border-gray-300 focus:ring-amber-500">
+              <span class="text-sm text-gray-700">No</span>
+            </label>
+          </div>
+          @if (contratistaForm.get('realizaDesplazamientos').invalid && contratistaForm.get('realizaDesplazamientos').touched) {
+            <span class="text-red-500 text-xs">Selecciona una opción</span>
+          }
+        </div>
+
+        <!-- ── Sección 4: Flota (solo si realiza desplazamientos) ─────────── -->
+        @if (mostrarFlota) {
+          <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 pb-1 border-b">
+            Sección 4 – Flota
+          </h3>
+
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+
+            <div class="space-y-1">
+              <label class="block text-sm font-medium text-gray-700">Tipo de flota</label>
+              <select formControlName="tipoFlota"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                <option value="" disabled selected>Seleccionar</option>
+                <option value="Fidelizada">Fidelizada</option>
+                <option value="Ocasional">Ocasional</option>
+                <option value="No aplica">No aplica</option>
+              </select>
+            </div>
+
+            <div class="space-y-1">
+              <label class="block text-sm font-medium text-gray-700">Conductores</label>
+              <input type="number" formControlName="conductores" min="0" placeholder="0"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+
+            <div class="space-y-1">
+              <label class="block text-sm font-medium text-gray-700">Vehículos</label>
+              <input type="number" formControlName="vehiculos" min="0" placeholder="0"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+
+            <div class="space-y-1 col-span-2 lg:col-span-4">
+              <label class="block text-sm font-medium text-gray-700">
+                Observaciones <span class="text-gray-400 font-normal">(opcional)</span>
+              </label>
+              <textarea formControlName="observaciones" rows="2" placeholder="Observaciones sobre la flota"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 resize-none"></textarea>
+            </div>
+
+          </div>
+        }
+
+      </div>
+
+      <!-- Footer -->
+      <div class="flex items-center justify-end p-5 border-t border-solid border-blueGray-200 rounded-b gap-2">
+        <button type="button" (click)="handleCancel()"
+          class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none ease-linear transition-all duration-150">
+          Cancelar
+        </button>
+        <button type="button" (click)="handleSave()"
+          class="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150">
+          Guardar contratista
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+@if (_alerta.showAlert) {
+  <app-alerta-informativo
+    [type]="_alerta.alertType"
+    [message]="_alerta.alertMessage">
+  </app-alerta-informativo>
+}

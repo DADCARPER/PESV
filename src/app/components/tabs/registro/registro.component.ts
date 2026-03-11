@@ -1,36 +1,36 @@
 import { CommonModule } from '@angular/common';
-import { LoginService } from '../../../services/login.service';  // Importamos LoginService
-import { FirestoreService } from '../../../services/firestore.service';
+import { FirestoreService } from '../../../services/shared/firestore.service';
 import { Router } from "@angular/router";
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import AOS from 'aos'; // Importa AOS
-import { ArchivoService } from '../../../services/archivos.service';
-
+import AOS from 'aos';
+import { Models } from '../../../interfaces/models';
+import { AuthenticacionService } from '../../../services/shared/authenticacion.service';
+import { AlertaService } from '../../../services/shared/alerta.service';
+import { AlertaInformativoComponent } from '../../alertas/alerta-informativo/alerta-informativo.component';
 
 @Component({
   selector: 'app-registro',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AlertaInformativoComponent],
   templateUrl: './registro.component.html',
   styleUrl: './registro.component.css'
 })
-export class RegistroComponent implements OnInit {
+export class RegistroComponent implements OnInit, OnDestroy {
 
-  private _loginservice = inject(LoginService);
+  private _auth = inject(AuthenticacionService);
   private _firestore = inject(FirestoreService);
-  private _archivo = inject(ArchivoService);
   private _router = inject(Router);
- 
+  public _alerta = inject(AlertaService);
 
-  datosEmpresa:any ='';
-  
+  private authSubscription: { unsubscribe(): void } | null = null;
 
-  ngOnInit() {
-    AOS.init();
-    this.llamardocumento();
-
-  }
+  userId: string = '';
+  nivelAcceso: string = 'basico';
+  nombreEmpresa: string = '';
+  openTab = 1;
+  periodo: number = new Date().getFullYear();
+  resultado: string | null = null;
 
   form = {
     actividad: '',
@@ -38,75 +38,85 @@ export class RegistroComponent implements OnInit {
     conductores: '',
     numConductores: null as number | null,
     vehiculosTerceros: '',
-    pregunta1: '',
   };
 
-  resultado: string | null = null;
-
-  async llamardocumento(){
-
-    const userId = await this._loginservice.waitForUser();
-    // Aquí ya tienes el userId cargado
-    console.log('userId:', userId);
-
-    const documento = await this._firestore.getDocument(`users/${userId}`);
-    console.log('Documento cargado:', documento);
-    this.datosEmpresa = documento;
-
+  ngOnInit() {
+    this.authSubscription = this._auth.authState.subscribe(user => {
+      if (user) {
+        this.userId = user.uid;
+        this.llamarempresa();
+      }
+    });
+    AOS.init();
   }
 
-  onSubmit() {
+  ngOnDestroy() {
+    this.authSubscription?.unsubscribe();
+  }
 
-    // Lógica para categorizar la empresa
-    const { actividad, vehiculos, conductores, numConductores } = this.form;
-
-    //console.log("Hola"+" - "+actividad+" - "+vehiculos+" - "+numConductores+" - "+conductores+" - final"+" - ");
-
-    if (actividad === 'transporte') {
-
-      if (vehiculos > 50 || numConductores! > 50) {
-        this.resultado = 'Nivel Avanzado: Empresas dedicadas al transporte automotor con más de 50 vehículos o conductores.';
-        this._archivo.actualizarNivelAcceso("avanzado");
-      } else if (vehiculos > 20 || numConductores! > 20) {
-        this.resultado = 'Nivel Estándar: Empresas dedicadas al transporte automotor con una flota de entre 20 y 50 vehículos o entre 20 y 50 conductores.';
-        this._archivo.actualizarNivelAcceso("medio");
-      } else {
-        this.resultado = 'Nivel Básico: Empresas dedicadas al transporte automotor con una flota de entre 0 o 11 y 19 vehículos o entre 2 y 19 conductores.';
-        this._archivo.actualizarNivelAcceso("basico");
-      }
-
-    } else if (actividad === 'otra') {
-
-      if (vehiculos > 100 || numConductores! > 100) {
-        this.resultado = 'Nivel Avanzado: Organizaciones no relacionadas con el transporte, con más de 100 vehículos o conductores.';
-        this._archivo.actualizarNivelAcceso("avanzado");
-      }else if (vehiculos > 50 || numConductores! > 50) {
-        this.resultado = 'Nivel Estándar: Organizaciones no relacionadas con el transporte, con una flota de entre 50 y 100 vehículos o entre 50 y 100 conductores.';
-        this._archivo.actualizarNivelAcceso("medio");
-      }else{
-        this.resultado = 'Nivel Básico: Organizaciones no relacionadas con el transporte, con una flota de entre 11 y 49 vehículos o entre 2 y 49 conductores.';
-        this._archivo.actualizarNivelAcceso("basico");
-      }
-
+  async llamarempresa() {
+    const doc = await this._firestore.getDocument<Models.Users.Usuario>('users/' + this.userId);
+    if (doc.exists()) {
+      this.nombreEmpresa = doc.data().nombreEmpresa;
     }
   }
 
+  async onSubmit() {
+    const { actividad, vehiculos, numConductores } = this.form;
+    const c = numConductores ?? 0;
 
-  openTab = 1;
-  toggleTabs(tabNumber: number) {
-    this.openTab = tabNumber;
-    setTimeout(() => {
-      AOS.refresh(); // Reinicia AOS para detectar nuevos elementos
-      if (tabNumber == 6){
-        this.onSubmit();
+    if (actividad === 'transporte') {
+      if (vehiculos > 50 || c > 50) {
+        this.resultado = 'Nivel Avanzado: Empresas dedicadas al transporte automotor con más de 50 vehículos o conductores.';
+        this.nivelAcceso = 'avanzado';
+      } else if (vehiculos > 20 || c > 20) {
+        this.resultado = 'Nivel Estándar: Empresas dedicadas al transporte automotor con una flota de entre 20 y 50 vehículos o entre 20 y 50 conductores.';
+        this.nivelAcceso = 'medio';
+      } else {
+        this.resultado = 'Nivel Básico: Empresas dedicadas al transporte automotor con una flota de entre 0 o 11 y 19 vehículos o entre 2 y 19 conductores.';
+        this.nivelAcceso = 'basico';
       }
-    }, 200); // Dale un ligero retraso para asegurarse de que el DOM se actualiza
+    } else if (actividad === 'otra') {
+      if (vehiculos > 100 || c > 100) {
+        this.resultado = 'Nivel Avanzado: Organizaciones no relacionadas con el transporte, con más de 100 vehículos o conductores.';
+        this.nivelAcceso = 'avanzado';
+      } else if (vehiculos > 50 || c > 50) {
+        this.resultado = 'Nivel Estándar: Organizaciones no relacionadas con el transporte, con una flota de entre 50 y 100 vehículos o entre 50 y 100 conductores.';
+        this.nivelAcceso = 'medio';
+      } else {
+        this.resultado = 'Nivel Básico: Organizaciones no relacionadas con el transporte, con una flota de entre 11 y 49 vehículos o entre 2 y 49 conductores.';
+        this.nivelAcceso = 'basico';
+      }
+    }
+
+    try {
+      await this._firestore.updateDocument('users/' + this.userId, {
+        nivelAcceso: this.nivelAcceso,
+        periodo: [this.periodo],
+        encuestas: {
+          actividad: this.form.actividad,
+          numVehiculos: this.form.vehiculos.toString(),
+          contrataConductores: this.form.conductores,
+          numConductores: this.form.numConductores?.toString() ?? null,
+          vehiculosTerceros: this.form.vehiculosTerceros,
+        }
+      });
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'Error al guardar los datos';
+      console.error('[Registro] onSubmit:', error);
+      this._alerta.showError(msg);
+    }
   }
 
-  irdashboard(){
-
-    this._router.navigate(['admin/dashboardplanificar']);
-
+  async toggleTabs(tabNumber: number) {
+    this.openTab = tabNumber;
+    setTimeout(() => { AOS.refresh(); }, 200);
+    if (tabNumber === 6) {
+      await this.onSubmit();
+    }
   }
 
+  irdashboard() {
+    this._router.navigate(['admin/dashboard']);
+  }
 }

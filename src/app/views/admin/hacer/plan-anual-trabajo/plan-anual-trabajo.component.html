@@ -1,92 +1,151 @@
+@if (openTab === 0) {
 <div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
-    <div class="rounded-t bg-blueGray-100  mb-0 px-6 py-6">
-      <div class="text-center flex ">
-        <button
-          [routerLink]="['/admin/hacer']"
-          class="bg-red-600 text-white active:bg-red-700 font-bold uppercase text-xs px-1 py-1  rounded shadow hover:shadow-md outline-none focus:outline-none mr-2 ease-linear transition-all duration-150"
-          type="button"
-        >
-        <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" /></svg>
-        </button>
-        <h6 class="text-blueGray-700 text-xl font-bold">Plan anual de trabajo</h6>
-      </div>
-    </div>
-    <div class="flex-auto px-4 lg:px-10 py-10 pt-0">
-  
-      
-      <div *ngIf="openTab === 0" >
-        <div class="text-lg font-light leading-relaxed mt-6 mb-4 text-gray-700" >
-  
-          <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300" style="margin-bottom: 14px;">
-            Este módulo le permite crear y gestionar el documento de planeación anual que orienta todas las actividades de seguridad vial. Aquí podrá definir acciones, responsables, cronogramas y recursos necesarios para cumplir los objetivos de seguridad vial alineados con su plan estratégico.
-          </p>
-          
-          
-    
-          <div class="flex flex-col md:flex-row justify-center items-center mt-6 mb-6 space-y-6 md:space-y-0 md:space-x-16">
-            <div class="lg:w-1/3 sm:w-full ">
-              <a href="/admin/hacer/plan_anual_trabajo/gestion_archivos">
-                <app-cards-boton
-                [titulo]="'Cargar docmento'"
-                [descripcion]="'Ya cuento con el documento de Política de Seguridad Vial'"
-                [tipoIcono]="'fas fa-upload'"
-                [colorIcono]="'bg-blue-500'"
-                ></app-cards-boton>
-              </a>
-              </div>
-              <div class="lg:w-1/3 sm:w-full ">
-              <app-cards-boton
-              (click)="toggleTabs(1,'')"
-              [titulo]="'Crear docmento'"
-              [descripcion]="'Aún no tengo el documento. Iniciar proceso de creación ahora'"
-              [tipoIcono]="'fas fa-rocket'"
-              [colorIcono]="'bg-green-500'"></app-cards-boton>
-    
-            </div>
-          </div>
-    
-        </div>
-      </div>
-      <div *ngIf="openTab === 1" >
-  
-        <div style="text-align: justify;" class="text-xl font-light leading-relaxed mt-6 mb-4" >
-        
-            <p style="margin-bottom: 14px;"><strong>Documentos y Requisitos Necesarios</strong></p>
-  
-            <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="700" style="margin-bottom: 14px;">
-            Antes de comenzar con el formulario para la creación de Objetivos y Metas, asegúrate de tener la siguiente información:
-            </p>
-  
-            <div class="flex flex-col md:flex-row justify-between mt-6 mb-6 lg:pl-28 space-y-6 md:space-y-0 md:space-x-8">
-  
-                <!-- Lista original con subtítulo -->
-                <div class="w-full md:w-1/2">
-                    <p style="margin-bottom: 14px;"><strong>Información Específica a Tener a Mano</strong></p>
-                    <ul class="list-disc list-inside text-gray-500 space-y-1">
-                        <li>
-                            Descripcion clara y consisa de cada objetivo
-                            
-                        </li>
-                        <li>
-                          Descripcion clara y consisa de cada meta
-                          
-                      </li>
-                    </ul>
-                </div>
-            
-            </div>
-  
-        </div>
-  
-        <div class="flex justify-center">
-            <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="900" (click)="toggleTabs(2,'')" class="text-amber-500 bg-transparent border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
-            <i class="fas fa-arrow-right"></i> Comenzar a crear
-            </button>
-        </div>
-  
-      </div>
-  
-    
-  
+  <div class="rounded-t bg-sky-400  mb-0 px-6 py-6">
+    <div class="text-center flex ">
+      <button
+        [routerLink]="['/admin/hacer']"
+        class="bg-red-600 text-white active:bg-red-700 font-bold uppercase text-xs px-1 py-1  rounded shadow hover:shadow-md outline-none focus:outline-none mr-2 ease-linear transition-all duration-150"
+        type="button"
+      >
+      <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" /></svg>
+      </button>
+      <h6 class="text-blueGray-700 text-xl font-bold">Plan anual de trabajo</h6>
     </div>
   </div>
+  <div class="flex-auto px-4 lg:px-10 py-10 pt-0">
+    <div class="text-lg font-light leading-relaxed mt-6 mb-4 text-gray-700" >
+      <div class="bg-white rounded-lg border shadow-sm overflow-hidden">
+        <div class="p-4 border-b">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-medium">Plan estratégico de seguridad vial</h2>
+                    <p class="text-sm text-gray-500">
+                      Plan anual de trabajo
+                    </p>
+                </div>
+
+                <div class="flex gap-2">
+
+                    <button (click)="mostrarModalFormulario('crear')" class="text-sky-500 bg-white border border-solid border-sky-500 hover:bg-sky-500 hover:text-white active:bg-sky-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none  mb-1 ease-linear transition-all duration-150" type="button">
+                        <div class="flex items-center">
+                            <iconify-icon icon="hugeicons:plus-sign-square" width="18" height="18" class="pr-2 "></iconify-icon> Crear nuevo plan
+                        </div>
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
+        <div class="p-4">
+
+          <div class="text-lg font-light leading-relaxed  mb-2 text-gray-700" >
+            <div class="flex flex-col gap-2 mb-2">
+                @for (plan of datos009plantrabajo; track plan.id) {
+                <div class="w-full">
+                    <article class="rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200">
+                        <div class="flex items-start justify-between">
+                          <div class="flex items-end justify-start">
+                            <div class="text-gray-500 text-center inline-flex items-center  ">
+                              <iconify-icon icon="hugeicons:apple-reminder" width="28" height="28"></iconify-icon>
+                            </div>
+                            <div (click)="toggleTabs(1, plan.id)" class="cursor-pointer">
+                              <p class="text-xl font-medium text-gray-900 ml-2">
+                                Plan Anual de Trabajo {{plan.anoActual}}
+                              </p>
+                            </div>
+                            @if(plan.totalActividadesVencidas > 0){
+                            <span class="ml-4 text-xs font-semibold inline-flex items-center py-1 px-2 rounded text-white bg-red-500 last:mr-0 mr-1">
+                                {{plan.totalActividadesVencidas}} Actividades vencidas
+                            </span>
+                            }
+                          </div>
+
+                        <div class="flex gap-3">
+                            <div class="flex flex-col text-center">
+                                <span class="text-base font-bold -mb-1">{{ plan.metaGestion ?? 0 }}%</span>
+                                <span class="text-sm">Meta</span>
+                            </div>
+                        </div>
+
+                        </div>
+                        <div class="flex items-center justify-between text-gray-500 bg-gray-50 px-2 py-1 my-1 rounded ">
+                          {{plan.objetivoGestion}}
+                        </div>
+                        <div class="flex items-center justify-between ">
+                            <div class="flex gap-4">
+                                <div class="flex items-center justify-start">
+                                  <div class="text-gray-500 text-center inline-flex items-center  ">
+                                    <iconify-icon icon="hugeicons:license" width="24" height="24"></iconify-icon>
+                                  </div>
+                                  <div>
+                                      <p class="text-base  text-gray-900 ml-2">
+                                        {{plan.totalActividades}}
+                                      </p>
+                                      <p class="text-sm  text-gray-500 ml-2">
+                                        Total actividades
+                                      </p>
+                                  </div>
+                                </div>
+                                <div class="flex items-center justify-start">
+                                  <div class="text-gray-500 text-center inline-flex items-center  ">
+                                    <iconify-icon icon="hugeicons:document-validation" width="24" height="24"></iconify-icon>
+                                  </div>
+                                  <div>
+                                      <p class="text-base  text-gray-900 ml-2">
+                                        {{plan.totalActividadesCompletadas}}
+                                      </p>
+                                      <p class="text-sm  text-gray-500 ml-2">
+                                        Actividades completadas
+                                      </p>
+                                  </div>
+                                </div>
+                                <div class="flex items-center justify-start">
+                                  <div class="text-gray-500 text-center inline-flex items-center  ">
+                                    <iconify-icon icon="hugeicons:license-pin" width="24" height="24"></iconify-icon>
+                                  </div>
+                                  <div>
+                                      <p class="text-base  text-gray-900 ml-2">
+                                        {{plan.totalActividadesPendientes}}
+                                      </p>
+                                      <p class="text-sm  text-gray-500 ml-2">
+                                          Actividades pendientes
+                                      </p>
+                                  </div>
+                                </div>
+                            </div>
+                            <div class="flex gap-3">
+                                <button (click)="manejarEdicion(plan)" class="w-full text-sky-500 bg-white border border-solid border-sky-500 hover:bg-sky-500 hover:text-white active:bg-sky-600 font-bold uppercase text-xs px-2 py-2 rounded outline-none focus:outline-none  mb-1 ease-linear transition-all duration-150" type="button">
+                                    <div class="flex items-center justify-center w-full">
+                                        <iconify-icon icon="hugeicons:pencil-edit-02" width="18" height="18" class=" "></iconify-icon>
+                                    </div>
+                                </button>
+                                <button (click)="manejarEliminar(plan)" class="w-full text-sky-900 bg-white border border-solid border-sky-900 hover:bg-sky-900 hover:text-white active:bg-sky-600 font-bold uppercase text-xs px-2 py-2 rounded outline-none focus:outline-none  mb-1 ease-linear transition-all duration-150" type="button">
+                                    <div class="flex items-center justify-center w-full">
+                                        <iconify-icon icon="hugeicons:delete-03" width="18" height="18" class=""></iconify-icon>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                }
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+}
+@if (openTab === 1) {
+<div>
+  <app-form3-dashboard-plan
+  (openTabSale)="toggleTabs($event)"
+  [idPlanAnualTrabajo]="idPlanAnualTrabajo"
+  ></app-form3-dashboard-plan>
+</div>
+}
+
+<app-form1-crear-editar-plan-anual #modalAgregarEditarFormulario></app-form1-crear-editar-plan-anual>
+<app-form2-eliminar-plan-anual #modalEliminarFormulario></app-form2-eliminar-plan-anual>

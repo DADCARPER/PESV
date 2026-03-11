@@ -1,0 +1,178 @@
+<!-- Fondo oscuro -->
+<div *ngIf="mostrarModal()" (click)="cerrarModal()" class="fixed inset-0 z-40 bg-black opacity-25"></div>
+
+<!-- Modal -->
+<div *ngIf="mostrarModal()" class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex modal-fade-down">
+    <div (click)="$event.stopPropagation()" class="relative mx-auto my-6 bg-white rounded-lg shadow-lg max-w-6xl w-full">
+    <!-- 'max-w-sm':  'small',
+      'max-w-3xl':  'regular',
+      'max-w-6xl':  'large' -->
+    <!-- Título del modal -->
+    <div class="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+      <h3 class="text-xl font-semibold">
+        Crear servicio
+      </h3>
+    </div>
+    <form [formGroup]="agregarsedeForm" (ngSubmit)="handleSave()">
+    <!-- Contenido del modal -->
+    <div class="relative p-6 flex-auto">
+      <!-- <h3 class="text-lg font-semibold mb-4 pb-2 border-b text-gray-700">Establezca costo total de siniestros</h3> -->
+
+      <div class="flex flex-wrap mb-4">
+        <div class="w-full lg:w-4/12 px-2">
+            <div class="space-y-2">
+              <label for="nombreServicio" class="block text-sm font-medium text-gray-700">Nombre del Servicio *</label>
+              <input type="text" id="nombreServicio" formControlName="nombreServicio" name="nombreServicio" placeholder="" required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+        </div>
+        <div class="w-full lg:w-4/12 px-2">
+          <div class="space-y-2">
+            <label for="categoriaServicio" class="block text-sm font-medium text-gray-700">Categoría del Servicio *</label>
+            <select id="categoriaServicio" formControlName="categoriaServicio" name="categoriaServicio" required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              <option value="">Seleccione una categoría</option>
+              <option value="Transporte de Carga">Transporte de Carga</option>
+              <option value="Transporte de Personal">Transporte de Personal</option>
+              <option value="Logística y Almacenamiento">Logística y Almacenamiento</option>
+              <option value="Mantenimiento Vehicular">Mantenimiento Vehicular</option>
+              <option value="Servicios de Seguridad">Servicios de Seguridad</option>
+              <option value="Servicios Tecnológicos (GPS, Software)">Servicios Tecnológicos (GPS, Software)</option>
+              <option value="Consultoría y Asesoría">Consultoría y Asesoría</option>
+              <option value="Capacitación y Formación">Capacitación y Formación</option>
+              <option value="Otros Servicios">Otros Servicios</option>
+            </select>
+          </div>
+        </div>
+        <div class="w-full lg:w-4/12 px-2">
+            <div class="space-y-2">
+              <label for="importanciaServicio" class="block text-sm font-medium text-gray-700">Importancia del Servicio *</label>
+              <select id="importanciaServicio" formControlName="importanciaServicio" name="importanciaServicio" required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Seleccione la importancia</option>
+                <option value="Principal - Actividad core del negocio">Principal - Actividad core del negocio</option>
+                <option value="Secundario - Servicio de apoyo">Secundario - Servicio de apoyo</option>
+                <option value="Complementario - Servicio adicional">Complementario - Servicio adicional</option>
+              </select>
+            </div>
+        </div>
+
+      </div>
+      <div class="flex flex-wrap mb-4">
+        
+        <div class="w-full lg:w-6/12 px-2">
+          <div class="space-y-2">
+            <label for="frecuenciaOperacion" class="block text-sm font-medium text-gray-700">Frecuencia de Operación *</label>
+            <select id="frecuenciaOperacion" formControlName="frecuenciaOperacion" name="frecuenciaOperacion" required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              <option value="">Seleccione la frecuencia</option>
+              <option value="Diario - Todos los días">Diario - Todos los días</option>
+              <option value="Semanal - Algunas veces por semana">Semanal - Algunas veces por semana</option>
+              <option value="Mensual - Pocas veces al mes">Mensual - Pocas veces al mes</option>
+              <option value="Ocasional - Esporádico">Ocasional - Esporádico</option>
+            </select>
+          </div>
+        </div>
+        <div class="w-full lg:w-6/12 px-2">
+            <div class="space-y-2">
+              <label for="coberturaOperacion" class="block text-sm font-medium text-gray-700">Cobertura de Operación *</label>
+              <select id="coberturaOperacion" formControlName="coberturaOperacion" name="coberturaOperacion" required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Seleccione la cobertura</option>
+                <option value="Local - Una ciudad">Local - Una ciudad</option>
+                <option value="Regional - Un departamento">Regional - Un departamento</option>
+                <option value="Nacional - Todo el país">Nacional - Todo el país</option>
+                <option value="Internacional">Internacional</option>
+              </select>
+            </div>
+        </div>
+
+      </div>
+
+      <h3 class="text-lg font-semibold mb-4 pb-2 border-b text-gray-700">Características del Servicio</h3>
+
+      <div class="flex flex-wrap mb-4">
+        <div class="w-full lg:w-4/12 px-2">
+            <div class="flex items-center">
+                <input type="checkbox" id="gps" formControlName="gps" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                <label for="gps" class="ml-2 text-base text-gray-700">Seguimiento GPS</label>
+            </div>
+            <span class="ml-6 text-xs text-gray-500">Permite rastrear la ubicación del servicio en tiempo real.</span>
+            <div class="flex items-center">
+                <input type="checkbox" id="conductores" formControlName="conductores" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                <label for="conductores" class="ml-2 text-base text-gray-700">Conductores certificados</label>
+            </div>
+            <span class="ml-6 text-xs text-gray-500">Cuentan con certificaciones o licencias requeridas.</span>
+        </div>
+        <div class="w-full lg:w-4/12 px-2">
+            <div class="flex items-center">
+                <input type="checkbox" id="seguro" formControlName="seguro" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                <label for="seguro" class="ml-2 text-base text-gray-700">Seguro de carga/pasajeros</label>
+            </div>
+            <span class="ml-6 text-xs text-gray-500">Cobertura de seguro para la carga o los pasajeros transportados.</span>
+            <div class="flex items-center">
+                <input type="checkbox" id="mantenimiento" formControlName="mantenimiento" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                <label for="mantenimiento" class="ml-2 text-base text-gray-700">Mantenimiento incluido</label>
+            </div>
+            <span class="ml-6 text-xs text-gray-500">El servicio incluye mantenimiento preventivo o correctivo.</span>
+        </div>
+
+        <div class="w-full lg:w-4/12 px-2">
+            <div class="flex items-center">
+                <input type="checkbox" id="monitoreo" formControlName="monitoreo" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                <label for="monitoreo" class="ml-2 text-base text-gray-700">Monitoreo 24/7</label>
+            </div>
+            <span class="ml-6 text-xs text-gray-500">Es supervisado de manera continua, las 24 horas del día.</span>
+            <div class="flex items-center">
+                <input type="checkbox" id="soporte" formControlName="soporte" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                <label for="soporte" class="ml-2 text-base text-gray-700">Soporte 24/7</label>
+            </div>
+            <span class="ml-6 text-xs text-gray-500">Asistencia técnica o atención al cliente en cualquier momento.</span>
+        </div>
+
+        <div class="flex flex-wrap gap-4 mt-1">
+            
+            
+            
+            
+            
+            
+        </div>
+      </div>
+
+      <div class="flex flex-wrap">
+        <div class="w-full lg:w-12/12 px-2">
+            <div>
+              <label for="descripcion" class="block text-sm font-medium text-gray-700">Descripción del Servicio</label>
+              <textarea id="descripcion" formControlName="descripcion" name="descripcion" placeholder="Describa detalladamente el servicio..."
+              type="text"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              rows="4"></textarea>
+
+            </div>
+        </div>
+      </div>
+
+      
+      
+
+    </div>
+    </form>
+    <!--footer-->
+    <div class="flex items-center justify-end p-5 border-t border-solid border-blueGray-200 rounded-b">
+      <button class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" (click)="handleCancel()">
+        Cancelar
+      </button>
+      <button class="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="submit" (click)="handleSave()">
+        Agregar
+      </button>
+    </div>
+  </div>
+</div>
+
+@if (_alerta.showAlert) {
+  <app-alerta-informativo
+      [type]="_alerta.alertType"
+      [message]="_alerta.alertMessage">
+  </app-alerta-informativo>
+  }

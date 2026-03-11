@@ -1,4 +1,5 @@
-import { Component, Input, OnInit, AfterViewInit, ElementRef, ViewChild, signal } from '@angular/core';
+import { Component, Input, OnInit, AfterViewInit, ElementRef, ViewChild, signal, OnChanges, SimpleChanges } from '@angular/core';
+import { CountUp } from 'countup.js';
 
 @Component({
   selector: 'app-progress-bar',
@@ -7,7 +8,7 @@ import { Component, Input, OnInit, AfterViewInit, ElementRef, ViewChild, signal 
   templateUrl: './progress-bar.component.html',
   styleUrl: './progress-bar.component.css'
 })
-export class ProgressBarComponent {
+export class ProgressBarComponent implements OnInit, AfterViewInit, OnChanges {
 
   @Input() value: number = 0;
   @Input() maxValue: number = 100;
@@ -17,7 +18,6 @@ export class ProgressBarComponent {
   @Input() animate: boolean = true;
   @Input() animationDelay: number = 300;
   @Input() showLabels: boolean = false;
-  @Input() mostrarProgreso: boolean = true; // Mostrar progreso en la barra
   @Input() customLabels: {value: number, text: string, bold?: boolean}[] = [];
   
   @ViewChild('progressFill') progressFill!: ElementRef;
@@ -42,6 +42,7 @@ export class ProgressBarComponent {
     } else {
       this.labels = this.customLabels;
     }
+    
   }
   
   ngAfterViewInit() {
@@ -57,6 +58,7 @@ export class ProgressBarComponent {
       const progress = (this.value / this.maxValue) * 100;
       this.progressWidth.set(progress);
     }
+    
   }
   
   // Método para actualizar el valor programáticamente
@@ -64,6 +66,18 @@ export class ProgressBarComponent {
     this.value = newValue;
     const progress = (this.value / this.maxValue) * 100;
     this.progressWidth.set(progress);
+    
+  }
+  
+  ngOnChanges(changes: SimpleChanges) {
+    
+    new CountUp('valor-animado1', this.value,  {duration: 2, suffix: '%', enableScrollSpy: true,}).start();
+    
+    if (changes['value'] && !changes['value'].firstChange) {
+      // Actualizar el progreso cuando cambie el valor
+      const progress = (this.value / this.maxValue) * 100;
+      this.progressWidth.set(progress);
+    }
   }
   
 }

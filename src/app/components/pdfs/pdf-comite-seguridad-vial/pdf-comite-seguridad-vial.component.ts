@@ -2,7 +2,7 @@ import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-import { ComiteSeguridadVialService } from '../../../services/comite-seguridad-vial.service';
+import { ComiteSeguridadVialService } from '../../../services/shared/comite-seguridad-vial.service';
 
 @Component({
   selector: 'app-pdf-comite-seguridad-vial',

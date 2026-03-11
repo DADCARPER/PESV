@@ -1,0 +1,150 @@
+<div class="bg-white rounded-lg border shadow-sm overflow-hidden">
+    <div class="p-4 border-b">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-medium">Servicios de la empresa</h2>
+                <p class="text-sm text-gray-500">
+                    Información de los servicios de la empresa
+                </p>
+            </div>
+
+            <div class="flex gap-2">
+                
+                <button (click)="mostrarModalFormulario('crear')" class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none  mb-1 ease-linear transition-all duration-150" type="button">
+                    <div class="flex items-center">
+                        <iconify-icon icon="hugeicons:plus-sign-square" width="18" height="18" class="pr-2 "></iconify-icon> Crear servicio
+                    </div>
+                </button>
+                <!-- <button  class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none  mb-1 ease-linear transition-all duration-150" type="button">
+                    <div class="flex items-center">
+                        <iconify-icon icon="hugeicons:plus-sign-square" width="18" height="18" class="pr-2 "></iconify-icon> Meta
+                    </div>
+                </button> -->
+                <!-- <p class="text-sm text-gray-500">
+                    Por cada 1,000,000 de kilómetros recorridos se presentaron XX cantidad de siniestros viales.
+                </p> -->
+                
+            </div>
+
+        </div>
+    </div>
+  <div class="p-4">
+
+    <!-- <app-tabla-compartida 
+    [datas]="datos"
+    [headers]="heads"
+    [dataKeys]="['nombreSede', 'actividad', 'departamento', 'ciudad', 'direccion', 'telefono']"
+    [accion]="true"
+    (editar)="manejarEdicion($event)"
+    (eliminar)="manejarEliminar($event)">
+    ></app-tabla-compartida> -->
+    <div class="text-lg font-light leading-relaxed  mb-2 text-gray-700" >
+        <div class="flex flex-col gap-2 mb-2">
+            <div class="w-full" *ngFor="let servicio of datos">
+                <article class="rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200">
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="flex items-end justify-start">
+                            <div class="text-gray-500 text-center inline-flex items-center  ">
+                                <iconify-icon icon="hugeicons:package-03" width="28" height="28"></iconify-icon>
+                            </div>
+                            <div>
+                                <p class="text-xl font-medium text-gray-900 ml-2">
+                                    {{servicio.nombreServicio }}
+                                </p>
+                            </div>
+                            <span class="ml-4 text-xs font-semibold inline-flex items-center py-1 px-2 rounded text-amber-600 bg-amber-200 last:mr-0 mr-1">
+                                {{servicio.categoriaServicio }}
+                            </span>
+                        </div>
+                      
+                        <div class="flex gap-1">
+                            <div class="flex flex-col text-center">
+                                <span class="text-xs font-semibold inline-flex items-center py-1 px-2 rounded text-white bg-amber-500 last:mr-0 mr-1">
+                                    {{servicio.coberturaOperacion.split('-')[0].trim() }}
+                                </span>
+                            </div>
+                            <div class="flex flex-col text-center">
+                                <span class="text-xs font-semibold inline-flex items-center py-1 px-2 rounded text-white bg-amber-600 last:mr-0 mr-1">
+                                    {{servicio.frecuenciaOperacion.split('-')[0].trim()}}
+                                </span>
+                            </div>
+                            <div class="flex flex-col text-center">
+                                <span class="text-xs font-semibold inline-flex items-center py-1 px-2 rounded text-white bg-amber-800 last:mr-0 mr-1">
+                                    {{servicio.importanciaServicio.split('-')[0].trim() }}
+                                </span>
+                            </div>                            
+                        </div>
+                      
+                    </div>
+                    <div>
+                        <p class="text-base text-gray-500 ml-2 mb-2">
+                            {{servicio.descripcion}}
+                        </p>
+                    </div>
+                    <div class="flex items-center justify-between ">
+                        <div class="flex flex-col gap-2">
+                            <div class="flex items-center justify-start">
+                                @if(servicio.gps){
+                                    <iconify-icon icon="hugeicons:maps-global-01" width="18" height="18"></iconify-icon>
+                                    <p class="text-sm  text-gray-500 px-2">
+                                      Seguimiento GPS
+                                    </p>
+                                }
+                                @if(servicio.seguro){
+                                <iconify-icon icon="hugeicons:shield-user" width="18" height="18"></iconify-icon>
+                                  <p class="text-sm  text-gray-500 px-2">
+                                    Seguro de carga/pasajeros
+                                  </p>
+                                }
+                                @if(servicio.monitoreo){
+                                <iconify-icon icon="hugeicons:laptop-performance" width="18" height="18"></iconify-icon>
+                                  <p class="text-sm  text-gray-500 px-2">
+                                    Monitoreo 24/7
+                                  </p>
+                                }
+                            </div>
+                            <div class="flex items-center justify-start">
+                                @if(servicio.conductores){
+                                <iconify-icon icon="hugeicons:certificate-01" width="18" height="18"></iconify-icon>
+                                  <p class="text-sm  text-gray-500 px-2">
+                                    Conductores certificados
+                                  </p>
+                                }
+                                @if(servicio.mantenimiento){
+                                <iconify-icon icon="hugeicons:tools" width="18" height="18"></iconify-icon>
+                                  <p class="text-sm  text-gray-500 px-2">
+                                    Mantenimiento incluido
+                                  </p>
+                                }
+                                @if(servicio.soporte){
+                                <iconify-icon icon="hugeicons:customer-support" width="18" height="18"></iconify-icon>
+                                  <p class="text-sm  text-gray-500 px-2">
+                                    Soporte 24/7
+                                  </p>
+                                }
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <button (click)="manejarEdicion(servicio)" class="w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-2 py-2 rounded outline-none focus:outline-none  mb-1 ease-linear transition-all duration-150" type="button">
+                                <div class="flex items-center justify-center w-full">
+                                    <iconify-icon icon="hugeicons:pencil-edit-02" width="18" height="18" class=" "></iconify-icon> 
+                                </div>
+                            </button>
+                            <button (click)="manejarEliminar(servicio)" class="w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-2 py-2 rounded outline-none focus:outline-none  mb-1 ease-linear transition-all duration-150" type="button">
+                                <div class="flex items-center justify-center w-full">
+                                    <iconify-icon icon="hugeicons:delete-03" width="18" height="18" class=""></iconify-icon> 
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                    
+                </article>
+            </div>
+        </div>
+    </div>
+    
+  </div>
+</div>
+
+<app-form1-servicios #modalFormulario></app-form1-servicios>
+<app-form2-servicios #modalEliminar></app-form2-servicios>

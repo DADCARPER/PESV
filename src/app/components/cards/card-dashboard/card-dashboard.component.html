@@ -1,0 +1,20 @@
+<article class="rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200"
+      [routerLink]="routerLink.length > 0 ? routerLink : null"
+      [class.cursor-pointer]="routerLink.length > 0 || tabNumber"
+      (click)="onCardClick()">
+    <div class="flex items-center justify-between">
+        <div class="text-white text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full {{ colorIcono }}">
+            <iconify-icon icon="hugeicons:{{iconClass}}" width="28" height="28"></iconify-icon>
+        </div>
+        <div>
+            <p class="text-lg text-gray-500">{{ titulo }}</p>
+            <p class="text-2xl font-medium text-gray-900">
+            {{ valor }}
+            </p>
+        </div>
+        <span class="text-xs font-semibold inline-block py-1 px-2 rounded text-green-600 bg-green-200 uppercase last:mr-0 mr-1">
+            emerald
+        </span>
+      
+    </div>
+</article>
