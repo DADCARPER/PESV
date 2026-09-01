@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import AOS from 'aos';  
 import { ColumnsStrackedIconosComponent } from "../../../../../components/apexChart/columns-stracked-iconos/columns-stracked-iconos.component";
 import { CardProfidComponent } from "../../../../../components/cards/card-profid/card-profid.component";
 import { SociodemografiaComponent } from "../sociodemografia/sociodemografia.component";
@@ -23,7 +22,6 @@ export class InformeDiagnosticoComponent implements OnInit {
 
 
   constructor() {
-    AOS.init();
   }
 
   ngOnInit(): void {

@@ -6,6 +6,7 @@ import { AlertaInformativoComponent } from '../../../components/alertas/alerta-i
 import { AlertaService } from '../../../services/shared/alerta.service';
 import { FirestoreService } from '../../../services/shared/firestore.service';
 import { AuthenticacionService } from '../../../services/shared/authenticacion.service';
+import { Models } from '../../../interfaces/models';
 
 
 @Component({
@@ -52,18 +53,23 @@ export class LoginComponent {
   
         // Autenticar al usuario y obtener el objeto `user`
         const userCredential = await this._authService.signInWithEmail(email, password); // singInthEmail se encargar de activar el catch.
-        // console.log('--><<',userCredential.user.uid);
 
-        const documento = await this._firestore.getDocument<any>('users/'+userCredential.user.uid);
+        const documento = await this._firestore.getDocument<Models.Users.Usuario>('users/' + userCredential.user.uid);
         const docRef = documento.data();
-        // console.log('Documento usuario',docRef.nivelAcceso);
 
-        if(docRef.nivelAcceso === 'no'){
-          this._router.navigate(['/starting']); //INICIA EL TEST DE PREGUTAS 
-        }else{
-          this._router.navigate(['/admin/dashboard']);
+        // La cuenta existe en Firebase Auth pero no tiene ficha en Firestore:
+        // pasa si el registro se interrumpió a medias. Sin esto, la línea
+        // siguiente lanzaba un TypeError y dejaba la sesión abierta en la
+        // pantalla de login, sin forma de avanzar.
+        if (!docRef) {
+          await this._authService.logout();
+          this.alertaService.showError('Tu cuenta no tiene datos asociados. Comunícate con el administrador.');
+          return;
         }
-          
+
+        // nivelAcceso 'no' significa que aún no ha completado el registro inicial
+        this._router.navigate([docRef.nivelAcceso === 'no' ? '/starting' : '/admin/dashboard']);
+
       } catch (error:any) {
 
         // Manejo de errores basado en códigos específicos

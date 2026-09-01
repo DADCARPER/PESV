@@ -27,7 +27,8 @@ export class Form2DeleteActividadesComponent {
     console.log('ID del documento a eliminar----->>>',this.elminarDoc.id);
     const nit = this._authcations.getCurrentUser().displayName;
     try {
-      await this._firestore.updateDocument(`Empresas/${nit}/008-actividades-gestion-riesgos/${this.elminarDoc.id}`, {estado: 'NoActivo'});
+      const periodo = this._authcations.periodo();
+      await this._firestore.updateDocument(`Empresas/${nit}/periodos/${periodo}/008-actividades-gestion-riesgos/${this.elminarDoc.id}`, {estado: 'NoActivo'});
       this._alerta.showSuccess('Registro eliminado exitosamente.');
       this.cerrarModal(); // Cerrar el modal después de guardar
     } catch (error) {

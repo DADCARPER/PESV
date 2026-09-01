@@ -42,6 +42,13 @@ export namespace ModelProcesos {
     actaLiderazgo: { total: number };
   }
 
+  // Módulo 007 — Objetivos y metas
+  export interface Modulo007ObjetivosMetas extends ProgresoModulo {
+    objetivosDefinidos: { total: number };  // objetivos activos del periodo
+    objetivosCompletos: { total: number };  // con responsable, plazos y meta medible
+    metasDefinidas: { total: number };      // suma de metas de todos los objetivos
+  }
+
   // Módulo 006 — Diagnóstico
   export interface Modulo006Diagnostico extends ProgresoModulo {
     InfoOrganizacional: { total: number };
@@ -68,16 +75,43 @@ export namespace ModelProcesos {
     docActualizado?: string;
     estado?: string;
 
-    // PLANEAR — Módulos opcionales: undefined = no iniciado
-    "001-lider-pesv-documentos"?: Modulo001LiderPesv;
-    "002-comite-seguridad-vial-documentos"?: Modulo002ComiteSeguridad;
-    "003-politicas-seguridad-vial-documentos"?: Modulo003PoliticaSeguridad;
-    "004-liderazgo-compromiso-documentos"?: Modulo004LiderazgoCompromiso;
-    "005-ejemplo-control-riesgos"?: ProgresoModulo;
+    // Las claves son los slugs canónicos de data/modulos-pesv.ts.
+    // Módulos opcionales: undefined = no iniciado.
+
+    // PLANEAR — pasos 1 a 8
+    "001-lider-pesv"?: Modulo001LiderPesv;
+    "002-comite-seguridad-vial"?: Modulo002ComiteSeguridad;
+    "003-politicas-seguridad-vial"?: Modulo003PoliticaSeguridad;
+    "004-liderazgo-compromiso"?: Modulo004LiderazgoCompromiso;
+    "005-caracterizacion-control-riesgos"?: ProgresoModulo;
     "006-diagnostico"?: Modulo006Diagnostico;
-    "007-objetivos-metas"?: ProgresoModulo;
+    "007-objetivos-metas"?: Modulo007ObjetivosMetas;
     "008-programas-gestion-riesgos"?: ProgresoModulo;
-    "009-actas-reunion-comite"?: ProgresoModulo;
-    "010-matriz-legal"?: ProgresoModulo;
+
+    // HACER — pasos 9 a 19
+    "009-plan-anual-trabajo"?: ProgresoModulo;
+    "010-competencia-plan-anual-formacion"?: ProgresoModulo;
+    "011-responsabilidad-comportamiento-seguro"?: ProgresoModulo;
+    "012-preparacion-respuesta-emergencias-viales"?: ProgresoModulo;
+    "013-investigacion-interna-siniestros-viales"?: ProgresoModulo;
+    "014-vias-seguras-administradas-organizacion"?: ProgresoModulo;
+    "015-planificacion-desplazamientos-laborales"?: ProgresoModulo;
+    "016-inspeccion-vehiculos-equipos"?: ProgresoModulo;
+    "017-mantenimiento-control-vehiculos-seguros"?: ProgresoModulo;
+    "018-gestion-cambio-contratistas"?: ProgresoModulo;
+    "019-archivo-retencion-documental"?: ProgresoModulo;
+
+    // VERIFICAR — pasos 20 a 22
+    "020-indicadores-reporte-autogestion"?: ProgresoModulo;
+    "021-registro-analisis-siniestros-viales"?: ProgresoModulo;
+    "022-auditoria-anual"?: ProgresoModulo;
+
+    // ACTUAR — pasos 23 y 24
+    "023-mejora-continua-preventivas-correctivas"?: ProgresoModulo;
+    "024-mecanismos-comunicacion"?: ProgresoModulo;
+
+    // COMPLEMENTOS — fuera de la serie de la Resolución
+    "025-actas-reunion-comite"?: ProgresoModulo;
+    "026-matriz-legal"?: ProgresoModulo;
   }
 }

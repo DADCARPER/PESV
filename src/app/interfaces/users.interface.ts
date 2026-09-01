@@ -1,19 +1,5 @@
 export namespace ModelUsers {
 
-    export interface RegistrarUsuario{
-    
-        nombreCompleto: string;
-        email: string;
-        password: string;
-        nitEmpresa: string;
-        nombreEmpresa: string;
-        cargoEmpresa: string;
-        telefono: string;
-        rol: string;
-        colaboradores?: [string];
-        nivelAcceso: string;
-    }
-
     export interface Usuario{
 
         id:string;
@@ -39,17 +25,4 @@ export namespace ModelUsers {
         }[];
     }
     
-    export interface EncuestaInicial{
-        
-        nivelAcceso: string;
-        encuestas?: {   
-            actividad: string;
-            numVehiculos?: string;
-            contrataConductores: string;
-            numConductores?: string;
-            vehiculosTerceros: string;
-
-          }[];
-        
-    }
 }

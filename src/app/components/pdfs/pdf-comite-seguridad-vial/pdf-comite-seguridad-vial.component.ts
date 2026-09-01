@@ -2,7 +2,7 @@ import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-import { ComiteSeguridadVialService } from '../../../services/shared/comite-seguridad-vial.service';
+import { AsistenteFormularioService } from '../../../services/shared/asistente-formulario.service';
 
 @Component({
   selector: 'app-pdf-comite-seguridad-vial',
@@ -13,7 +13,7 @@ import { ComiteSeguridadVialService } from '../../../services/shared/comite-segu
 })
 export class PdfComiteSeguridadVialComponent implements OnInit {
 
-  private  _comiteSeguridadVial = inject(ComiteSeguridadVialService);
+  private _asistente = inject(AsistenteFormularioService);
 
   @Input() subirBlob: boolean = false;
   @Input() descargaOprevia: string = "vista"; //True es igual a vista previa false a descargar
@@ -45,7 +45,7 @@ export class PdfComiteSeguridadVialComponent implements OnInit {
     if (this.idFormulario !== "0"){
 
    
-        const dataCruda = await this._comiteSeguridadVial.getfomularioEdit(this.idFormulario);
+        const dataCruda = await this._asistente.getFormulario('002-comite-seguridad-vial', this.idFormulario);
 
           console.log("datacrudaaaaaaaaaaa",dataCruda);
         if (dataCruda['departamento'] != "") {// valido si un parametro obligatorio esta en el objeto. en caso de no estar es por que no existe el docuemnto
@@ -642,7 +642,7 @@ export class PdfComiteSeguridadVialComponent implements OnInit {
     if (subirBlob){
       pdfMake.createPdf(documentDefinition).getBlob((blob:any) => {
       
-        this._comiteSeguridadVial.uploadPdfToFirebase(blob,this.idFormulario);
+        this._asistente.uploadPdf('002-comite-seguridad-vial', this.idFormulario, blob);
 
       });
     }

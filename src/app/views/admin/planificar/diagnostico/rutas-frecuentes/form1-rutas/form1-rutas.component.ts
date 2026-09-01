@@ -30,7 +30,7 @@ export class Form1RutasComponent {
       origen:           ['', Validators.required],
       destino:          ['', Validators.required],
       distanciaKm:      [0, Validators.min(0)],
-      tiempoMinutos:    [0, Validators.min(0)],
+      tiempoEstimado:    [''],
       tipoVia:          ['', Validators.required],
       frecuencia:       ['', Validators.required],
       observaciones:    [''],
@@ -40,7 +40,7 @@ export class Form1RutasComponent {
   cerrarModal() {
     this.rutaForm.reset({
       nombreRuta: '', origen: '', destino: '',
-      distanciaKm: 0, tiempoMinutos: 0,
+      distanciaKm: 0, tiempoEstimado: '',
       tipoVia: '', frecuencia: '', observaciones: '',
     });
     this.mostrarModal.set(false);

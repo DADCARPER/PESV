@@ -47,9 +47,16 @@
           </div>
 
           <div class="space-y-1">
-            <label class="block text-sm font-medium text-gray-700">Tiempo estimado (min)</label>
-            <input type="number" formControlName="tiempoMinutos" min="0" placeholder="0"
+            <label class="block text-sm font-medium text-gray-700">Tiempo estimado</label>
+            <select formControlName="tiempoEstimado"
               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              <option value="" disabled selected>Seleccionar</option>
+              <option value="Menos de 1 hora">Menos de 1 hora</option>
+              <option value="Entre 1 a 2 horas">Entre 1 a 2 horas</option>
+              <option value="Entre 2 a 3 horas">Entre 2 a 3 horas</option>
+              <option value="Entre 3 a 4 horas">Entre 3 a 4 horas</option>
+              <option value="Más de 6 horas">Más de 6 horas</option>
+            </select>
           </div>
 
           <div class="space-y-1">

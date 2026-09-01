@@ -17,7 +17,7 @@
   </div>
 
   <!-- Contenido -->
-  <div class="flex-auto px-4 lg:px-10 py-8">
+  <div class="flex-auto px-4 lg:px-4 py-4">
 
     @if (cargando) {
       <div class="flex items-center justify-center py-20 text-gray-400">
@@ -50,7 +50,7 @@
                 </span>
               }
             </div>
-            <div class="h-[440px]">
+            <div class="h-auto">
               <app-mapa-colombia [departamentos]="departamentos" [muestraBorde]="true"></app-mapa-colombia>
             </div>
           </div>
@@ -97,7 +97,7 @@
 
       <!-- Gráficas de servicios -->
       @if (servicios.length > 0) {
-        <div class="mt-6">
+        <div class="mt-4">
           <div class="flex items-center gap-2 mb-4">
             <h3 class="text-base font-semibold text-gray-800">Análisis de Servicios</h3>
             <span class="text-xs bg-amber-100 text-amber-700 font-medium px-2 py-0.5 rounded-full">
@@ -105,57 +105,53 @@
             </span>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Gráfica 1: Categoría de servicio (ancho completo) -->
+          <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+            <p class="text-sm font-semibold text-gray-700 mb-1">Servicios por categoría</p>
+            <p class="text-xs text-gray-400 mb-3">Distribución de servicios según su categoría</p>
+            @if (categoriaData.length > 0) {
+              <app-columns-datalabels-bar [data]="categoriaData" [colores]="categoriaColores"></app-columns-datalabels-bar>
+            } @else {
+              <div class="flex items-center justify-center h-40 text-sm text-gray-400">Sin datos de categoría</div>
+            }
+          </div>
 
-            <!-- Gráfica 1: Categoría de servicio -->
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
-              <p class="text-sm font-semibold text-gray-700 mb-1">Servicios por categoría</p>
-              <p class="text-xs text-gray-400 mb-3">Distribución de servicios según su categoría</p>
-              @if (categoriaLabels.length > 0) {
-                <app-donut
-                  [labels]="categoriaLabels"
-                  [series]="categoriaSeries"
-                  [muestraBorde]="false"
-                  titulo="">
-                </app-donut>
-              } @else {
-                <div class="flex items-center justify-center h-40 text-sm text-gray-400">Sin datos de categoría</div>
-              }
-            </div>
-
-            <!-- Gráfica 2: Cobertura de operación -->
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
-              <p class="text-sm font-semibold text-gray-700 mb-1">Servicios por cobertura de operación</p>
-              <p class="text-xs text-gray-400 mb-3">Alcance geográfico o funcional de cada servicio</p>
-              @if (coberturaLabels.length > 0) {
-                <app-donut
-                  [labels]="coberturaLabels"
-                  [series]="coberturaSeries"
-                  [muestraBorde]="false"
-                  titulo="">
-                </app-donut>
-              } @else {
-                <div class="flex items-center justify-center h-40 text-sm text-gray-400">Sin datos de cobertura</div>
-              }
-            </div>
+          <div class="flex flex-col lg:flex-row gap-4 mt-4">
 
             <!-- Gráfica 3: Frecuencia de operación -->
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
-              <p class="text-sm font-semibold text-gray-700 mb-1">Servicios por frecuencia de operación</p>
-              <p class="text-xs text-gray-400 mb-3">Con qué periodicidad se presta cada servicio</p>
+            <div class="w-full lg:w-4/12 bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+              <p class="text-sm font-semibold text-gray-700 mb-1">Frecuencia de operación</p>
+              <p class="text-xs text-gray-400 mb-3">Periodicidad de cada servicio</p>
               @if (frecuenciaLabels.length > 0) {
                 <app-donut
                   [labels]="frecuenciaLabels"
                   [series]="frecuenciaSeries"
                   [muestraBorde]="false"
-                  titulo="">
+                  titulo=""
+                  [colores]="frecuenciaColores">
                 </app-donut>
               } @else {
-                <div class="flex items-center justify-center h-40 text-sm text-gray-400">Sin datos de frecuencia</div>
+                <div class="flex items-center justify-center h-32 text-sm text-gray-400">Sin datos</div>
               }
             </div>
 
+            <!-- Gráfica: Características del Servicio -->
+            @if (caracteristicasLabels.length > 0) {
+              <div class="w-full lg:w-8/12 bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+                <p class="text-sm font-semibold text-gray-700 mb-1">Características del Servicio</p>
+                <p class="text-xs text-gray-400 mb-3">Porcentaje de servicios que incluyen cada característica</p>
+                <app-pie-monochrome
+                  [values]="caracteristicasSeries"
+                  [labels]="caracteristicasLabels"
+                  [colores]="frecuenciaColores"
+                  [muestraBorde]="false"
+                  titulo="">
+                </app-pie-monochrome>
+              </div>
+            }
+
           </div>
+
         </div>
       }
 

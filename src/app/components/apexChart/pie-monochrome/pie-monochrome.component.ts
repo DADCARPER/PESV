@@ -7,7 +7,7 @@ import {
   ApexPlotOptions,
   ApexLegend,
   ApexDataLabels,
-  ApexTheme
+  ApexStates
 } from "ng-apexcharts";
 
 export type ChartOptions = {
@@ -18,6 +18,7 @@ export type ChartOptions = {
   legend: ApexLegend;
   dataLabels: ApexDataLabels;
   colors: string[];
+  states: ApexStates;
 };
 
 @Component({
@@ -36,6 +37,7 @@ export type ChartOptions = {
         [plotOptions]="chartOptions.plotOptions"
         [legend]="chartOptions.legend"
         [dataLabels]="chartOptions.dataLabels"
+        [states]="chartOptions.states"
       ></apx-chart>
     </div>
   </div>
@@ -44,15 +46,20 @@ export type ChartOptions = {
 export class PieMonochromeComponent implements OnChanges {
   @Input() values: number[] = [];
   @Input() labels: string[] = [];
+  @Input() colores: string[] = [];
   @Input() muestraBorde: boolean = true;
-  @Input() titulo:string='';
+  @Input() titulo: string = '';
+
+  private readonly _defaultColors = ['#5892d8', '#3374c4', '#2661b3', '#1e4886', '#1c3f70', '#1d375d'];
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['values']) {
-      this.chartOptions.series = changes['values'].currentValue;
-    }
-    if (changes['labels']) {
-      this.chartOptions.labels = changes['labels'].currentValue;
+    if (changes['values'] || changes['labels'] || changes['colores']) {
+      this.chartOptions = {
+        ...this.chartOptions,
+        series: this.values,
+        labels: this.labels,
+        colors: this.colores.length > 0 ? this.colores : this._defaultColors,
+      };
     }
   }
 
@@ -64,13 +71,18 @@ export class PieMonochromeComponent implements OnChanges {
       animations: {
         enabled: true,
         speed: 400,
-        animateGradually: {
-          enabled: true,
-          delay: 150
+        animateGradually: { enabled: true, delay: 150 },
+        dynamicAnimation: { enabled: false }
+      }
+    },
+    states: {
+      hover: {
+        filter: {
+          type: 'desaturate', // lighten | darken | desaturate | brighten | none
         }
       }
     },
-    colors: ['#5892d8', '#3374c4', '#2661b3', '#1e4886', '#1c3f70', '#1d375d'],
+    colors: ['#5892d8', '#3374c4', '#2661b3', '#1e4886', '#1c3f70', '#1d375d'], // sobreescrito en ngOnChanges
     labels: [],
     plotOptions: {
       pie: {
@@ -98,7 +110,9 @@ export class PieMonochromeComponent implements OnChanges {
     dataLabels: {
       enabled: true,
       formatter: function(val: number, opts) {
-        return opts.w.config.series[opts.seriesIndex] + ' (' + val.toFixed(1) + '%)';
+        const count = opts.w.config.series[opts.seriesIndex];
+        const pct = val % 1 === 0 ? val.toFixed(0) : val.toFixed(2);
+        return count + ' (' + pct + '%)';
       },
       style: {
         fontSize: '12px',

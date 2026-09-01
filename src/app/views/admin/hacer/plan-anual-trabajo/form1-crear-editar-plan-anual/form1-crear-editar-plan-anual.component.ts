@@ -70,7 +70,8 @@ export class Form1CrearEditarPlanAnualComponent {
 
     const uid = this._authcations.getCurrentUser().uid;
     const nit = this._authcations.getCurrentUser().displayName;
-    const path = `Empresas/${nit}/009-plan-anual-trabajo`;
+    const periodo = this._authcations.periodo();
+    const path = `Empresas/${nit}/periodos/${periodo}/009-plan-anual-trabajo`;
     const valorFormulario = this.agregarActividadForm.value;
     
     try {

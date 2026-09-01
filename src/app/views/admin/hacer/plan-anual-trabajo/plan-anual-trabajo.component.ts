@@ -6,7 +6,6 @@ import { Form1CrearEditarPlanAnualComponent } from "./form1-crear-editar-plan-an
 import { Form2EliminarPlanAnualComponent } from "./form2-eliminar-plan-anual/form2-eliminar-plan-anual.component";
 import { AuthenticacionService } from '../../../../services/shared/authenticacion.service';
 import { FirestoreService } from '../../../../services/shared/firestore.service';
-import { ProgresoService } from '../../../../services/shared/progreso.service';
 import { Models } from '../../../../interfaces/models';
 import { Form3DashboardPlanComponent } from "./form3-dashboard-plan/form3-dashboard-plan.component";
 
@@ -25,7 +24,6 @@ export class PlanAnualTrabajoComponent implements OnInit {
 
   private _authcations = inject(AuthenticacionService);
   private _firebaseservice = inject(FirestoreService);
-  private _procesos = inject(ProgresoService);
 
   @Input() datos: unknown[] = [];
 
@@ -54,7 +52,8 @@ export class PlanAnualTrabajoComponent implements OnInit {
   async consultarPlanestrabajo(){
     const nit = this._authcations.getCurrentUser().displayName;
     const uid = this._authcations.getCurrentUser().uid;
-    const path = `Empresas/${nit}/009-plan-anual-trabajo`;
+    const periodo = this._authcations.periodo();
+    const path = `Empresas/${nit}/periodos/${periodo}/009-plan-anual-trabajo`;
     let q: Models.Firebases.whereQuery[];
   
     q = [['estado', '==', 'Activo']];
@@ -77,7 +76,8 @@ export class PlanAnualTrabajoComponent implements OnInit {
   async consultarActividades(){
     const nit = this._authcations.getCurrentUser().displayName;
     const uid = this._authcations.getCurrentUser().uid;
-    const path = `Empresas/${nit}/009-plan-anual-trabajo-actividades`;
+    const periodo = this._authcations.periodo();
+    const path = `Empresas/${nit}/periodos/${periodo}/009-plan-anual-trabajo-actividades`;
     let q: Models.Firebases.whereQuery[];
   
     q = [['estado', '==', 'Activo']];

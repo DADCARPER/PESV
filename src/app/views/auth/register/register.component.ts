@@ -6,7 +6,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { AlertaInformativoComponent } from "../../../components/alertas/alerta-informativo/alerta-informativo.component";
 import { AlertaService } from "../../../services/shared/alerta.service";
 import { FirestoreService } from "../../../services/shared/firestore.service";
-import { ProgresoService } from "../../../services/shared/progreso.service";
+import { EstatusGeneralService } from "../../../services/shared/estatus-general.service";
 import { AaDatosDefaultService } from "../../../services/shared/aa-datos-default.service";
 
 
@@ -20,7 +20,7 @@ export class RegisterComponent {
 
   private _auth = inject(AuthenticacionService);
   private _firestore = inject(FirestoreService);
-  private _progreso = inject(ProgresoService);
+  private _progreso = inject(EstatusGeneralService);
   private _iniciardatos = inject(AaDatosDefaultService);
   private router = inject(Router);
   public _alerta = inject(AlertaService);
@@ -61,11 +61,13 @@ export class RegisterComponent {
 
       await this._firestore.createDocument('users', datosGuardar, uid);
       await this._firestore.createDocument('Empresas', datosGuardar, nitEmpresa);
-      await this._progreso.inicializarProgreso(nitEmpresa);
-      await this._iniciardatos.inicializarDatos008Programas(nitEmpresa);
+      await this._progreso.inicializarProgreso(nitEmpresa, new Date().getFullYear());
+      await this._iniciardatos.inicializarDatos008Programas(nitEmpresa, new Date().getFullYear());
 
       this._alerta.showSuccess('Cuenta creada exitosamente.');
-      this.router.navigate(['/auth/login']);
+      // createUserWithEmailAndPassword ya deja la sesion abierta: va al onboarding,
+      // no al formulario de login.
+      this.router.navigate(['/starting']);
 
     } catch (error: unknown) {
       const code = (error as { code?: string }).code;

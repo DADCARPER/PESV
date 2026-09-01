@@ -1,10 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, ViewChild, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import AOS from 'aos';
-
 import { CardsBotonComponent } from "../../../../components/cards/cards-boton/cards-boton.component";
-import { PoliticaSeguridadVialService } from '../../../../services/shared/politica-seguridad-vial.service';
+import { AsistenteFormularioService } from '../../../../services/shared/asistente-formulario.service';
 import { PasopasoComponent } from '../../../../components/tabs/pasopaso/pasopaso.component';
 import { UploadArchivosComponent } from "../../../../components/otros/upload-archivos/upload-archivos.component";
 import { PdfPoliticasSeguridadVialComponent } from "../../../../components/pdfs/pdf-politicas-seguridad-vial/pdf-politicas-seguridad-vial.component";
@@ -13,6 +11,7 @@ import { LoadingComponent } from "../../../../components/loading/loading/loading
 import { AuthenticacionService } from '../../../../services/shared/authenticacion.service';
 import { AlertaService } from '../../../../services/shared/alerta.service';
 import { GestionDocumentosService } from '../../../../services/shared/gestion-documentos.service';
+import { EstatusGeneralService } from '../../../../services/shared/estatus-general.service';
 import { FirestoreService } from '../../../../services/shared/firestore.service';
 import { ReftourlPipe } from '../../../../pipes/reftourl.pipe';
 import { LimpiarnombrePipe } from '../../../../pipes/limpiarnombre.pipe';
@@ -35,6 +34,7 @@ export class PoliticaseguridadvialComponent {
 
   private _authcations = inject(AuthenticacionService);
   private _gestDoc = inject(GestionDocumentosService);
+  private _estatus = inject(EstatusGeneralService);
   private _firestore = inject(FirestoreService);
   public _alerta = inject(AlertaService);
 
@@ -65,7 +65,7 @@ export class PoliticaseguridadvialComponent {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private _politicaSeguVial: PoliticaSeguridadVialService,
+    private _asistente: AsistenteFormularioService,
   ){
     this.iniciarformulariolimpio();
     this.isLoading = false;
@@ -73,7 +73,6 @@ export class PoliticaseguridadvialComponent {
 
   ngOnInit(): void {
     this.id_formulario = sessionStorage.getItem('id_formulario_politica_s_vial') || "0";
-    AOS.init();
     this.consultarDocumentos();
   }
 
@@ -127,19 +126,11 @@ export class PoliticaseguridadvialComponent {
   }
 
   private async actualizarEstatusGeneral(): Promise<void> {
-    const periodo = this._authcations.periodo();
     const modulo: Models.Procesos.Modulo003PoliticaSeguridad = {
       total_progreso: this.documento1.length > 0 ? 100 : 0,
       actaPolitica: { total: this.documento1.length > 0 ? 1 : 0 },
     };
-    try {
-      await this._firestore.upsertDocument(`EstatusGeneral/${this.nit}`, {
-        periodo,
-        '003-politicas-seguridad-vial-documentos': modulo,
-      });
-    } catch (error: unknown) {
-      console.error('[PoliticaSeguridad] actualizarEstatusGeneral:', error);
-    }
+    await this._estatus.registrarProgreso('003-politicas-seguridad-vial', modulo);
   }
 
   iniciarformulariolimpio() {
@@ -150,13 +141,12 @@ export class PoliticaseguridadvialComponent {
 
   async toggleTabs(tabNumber: number, porce: string) {
     this.openTab = tabNumber;
-    setTimeout(() => { AOS.refresh(); }, 200);
 
     if(this.openTab > 1 && this.openTab < 4){
 
       if(this.openTab == 2){
         if (this.id_formulario !== "0") {
-          const dataCruda = await this._politicaSeguVial.getfomularioEdit(this.id_formulario);
+          const dataCruda = await this._asistente.getFormulario('003-politicas-seguridad-vial', this.id_formulario);
           this.form.patchValue(dataCruda);
         } else {
           sessionStorage.setItem('id_formulario_politica_s_vial', Date.now().toString());
@@ -172,7 +162,7 @@ export class PoliticaseguridadvialComponent {
         this.pasoPaso.prevStep();
       }
 
-      this._politicaSeguVial.autoGuardar(this.form.value, "Asistente", this.porcentaje, this.id_formulario ?? "");
+      this._asistente.autoGuardar('003-politicas-seguridad-vial', this.id_formulario ?? "", this.form.value, { estado: this.porcentaje });
     }
   }
 
@@ -189,7 +179,7 @@ export class PoliticaseguridadvialComponent {
 
   async vistaPrevia(){
     if (this.form.valid) {
-      await this._politicaSeguVial.autoGuardar(this.form.value, "Asistente", 100, this.id_formulario ?? "");
+      await this._asistente.autoGuardar('003-politicas-seguridad-vial', this.id_formulario ?? "", this.form.value, { estado: 100 });
       this.crearPdf.generatePdf(true);
     } else {
       this.form.markAllAsTouched();

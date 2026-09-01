@@ -29,7 +29,7 @@
     } @else {
 
       <!-- Stats rápidas -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div class="grid grid-cols-4 lg:grid-cols-4 gap-4 mb-8">
         <div class="bg-amber-50 border border-amber-100 rounded-xl p-4 text-center">
           <p class="text-2xl font-bold text-amber-700">{{ totalVehiculos }}</p>
           <p class="text-xs text-gray-500 mt-1 uppercase tracking-wide">Vehículos</p>
@@ -65,18 +65,25 @@
           <p class="text-xs text-gray-400">Distribución de vehículos según tipo, relación con la empresa y mantenimiento</p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-1 gap-6 mb-8">
 
           <!-- Gráfica 1: Tipo de vehículo -->
           <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
             <p class="text-sm font-semibold text-gray-700 mb-1">Por tipo de vehículo</p>
             <p class="text-xs text-gray-400 mb-3">Composición de la flota por categoría de vehículo</p>
             @if (tipoLabels.length > 0) {
-              <app-donut [labels]="tipoLabels" [series]="tipoSeries" [muestraBorde]="false" titulo=""></app-donut>
+              <app-columns-stracked-iconos
+                [data]="tipoPctData"
+                [categories]="tipoLabels">
+              </app-columns-stracked-iconos>
             } @else {
               <div class="flex items-center justify-center h-40 text-sm text-gray-400">Sin datos</div>
             }
           </div>
+
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
 
           <!-- Gráfica 2: Relación con la empresa -->
           <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
@@ -88,6 +95,22 @@
               <div class="flex items-center justify-center h-40 text-sm text-gray-400">Sin datos</div>
             }
           </div>
+
+          <!-- Gráfica siniestros -->
+          
+          <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+            <p class="text-sm font-semibold text-gray-700 mb-1">Siniestros viales</p>
+            <p class="text-xs text-gray-400 mb-3">Vehículos que han tenido siniestros</p>
+            @if (siniestrosSeries[0] > 0 || siniestrosSeries[1] > 0) {
+              <app-columns-stracked-numerico
+                [data]="siniestrosSeries"
+                [categories]="siniestrosLabels">
+              </app-columns-stracked-numerico>
+            } @else {
+              <div class="flex items-center justify-center h-40 text-sm text-gray-400">Sin datos</div>
+            }
+          </div>
+          
 
           <!-- Gráfica 3: Plan de mantenimiento -->
           <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
@@ -101,6 +124,7 @@
           </div>
 
         </div>
+        
 
         <!-- Tabla resumen -->
         <div>

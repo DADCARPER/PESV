@@ -7,6 +7,7 @@ import { PasopasoComponent } from "../../../../components/tabs/pasopaso/pasopaso
 import { AuthenticacionService } from '../../../../services/shared/authenticacion.service';
 import { AlertaService } from '../../../../services/shared/alerta.service';
 import { GestionDocumentosService } from '../../../../services/shared/gestion-documentos.service';
+import { EstatusGeneralService } from '../../../../services/shared/estatus-general.service';
 import { FirestoreService } from '../../../../services/shared/firestore.service';
 import { AlertaInformativoComponent } from "../../../../components/alertas/alerta-informativo/alerta-informativo.component";
 import { LoadingComponent } from "../../../../components/loading/loading/loading.component";
@@ -30,6 +31,7 @@ export class LiderDelPesvComponent implements OnInit {
 
   private _authcations = inject(AuthenticacionService);
   private _gestDoc = inject(GestionDocumentosService);
+  private _estatus = inject(EstatusGeneralService);
   private _firestore = inject(FirestoreService);
   public _alerta = inject(AlertaService);
 
@@ -120,7 +122,6 @@ export class LiderDelPesvComponent implements OnInit {
   }
 
   private async actualizarEstatusGeneral(): Promise<void> {
-    const periodo = this._authcations.periodo();
     const modulo: Models.Procesos.Modulo001LiderPesv = {
       total_progreso: [this.documento1, this.documento2, this.documento3, this.documento4]
         .filter(d => d.length > 0).length * 25,
@@ -129,13 +130,6 @@ export class LiderDelPesvComponent implements OnInit {
       certificadoCompetencia:    { total: this.documento3.length > 0 ? 1 : 0 },
       docExperienciaProfesional: { total: this.documento4.length > 0 ? 1 : 0 },
     };
-    try {
-      await this._firestore.upsertDocument(`EstatusGeneral/${this.nit}`, {
-        periodo,
-        '001-lider-pesv-documentos': modulo,
-      });
-    } catch (error: unknown) {
-      console.error('[LiderPesv] actualizarEstatusGeneral:', error);
-    }
+    await this._estatus.registrarProgreso('001-lider-pesv', modulo);
   }
 }

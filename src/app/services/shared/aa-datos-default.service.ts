@@ -11,7 +11,7 @@ export class AaDatosDefaultService {
 
   constructor() { }
 
-  async inicializarDatos008Programas(nitEmpresa: string) {
+  async inicializarDatos008Programas(nitEmpresa: string, periodo: number) {
     const programasDefault: Models.Programas.NuevoPrograma[] = [
       {
         nom_programa: 'Gestión de la Velocidad Segura',
@@ -55,14 +55,14 @@ export class AaDatosDefaultService {
     try {
       for (const programa of programasDefault) {
         const idPrograma = await this._firestore.createDocumentDevolverId<Models.Programas.NuevoPrograma>(
-          `Empresas/${nitEmpresa}/008-programas-gestion-riesgos`,
+          `Empresas/${nitEmpresa}/periodos/${periodo}/008-programas-gestion-riesgos`,
           programa
         );
         console.log(`Programa '${programa.nom_programa}' creado exitosamente.`, idPrograma.id);
         programasCreados.push(idPrograma.id);
         
         // Crear actividades para cada programa
-        await this.inicializarDatos008Actividades(nitEmpresa, idPrograma.id, programa.nom_programa);
+        await this.inicializarDatos008Actividades(nitEmpresa, periodo, idPrograma.id, programa.nom_programa);
       }
       
       console.log('Todos los programas por defecto han sido creados exitosamente.');
@@ -74,13 +74,13 @@ export class AaDatosDefaultService {
     }
   }
   
-  async inicializarDatos008Actividades(nitEmpresa: string, idprograma: string, nombrePrograma: string) {
+  async inicializarDatos008Actividades(nitEmpresa: string, periodo: number, idprograma: string, nombrePrograma: string) {
     const actividadesPorPrograma = this.obtenerActividadesPorPrograma(nombrePrograma, idprograma);
     
     try {
       for (const actividad of actividadesPorPrograma) {
         await this._firestore.createDocument<Models.Programas.NuevoActividad>(
-          `Empresas/${nitEmpresa}/008-actividades-gestion-riesgos`,
+          `Empresas/${nitEmpresa}/periodos/${periodo}/008-actividades-gestion-riesgos`,
           actividad
         );
         console.log(`Actividad '${actividad.name}' creada exitosamente para ${nombrePrograma}.`);

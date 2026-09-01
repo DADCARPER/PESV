@@ -7,7 +7,8 @@ import {
   ApexPlotOptions,
   ApexLegend,
   ApexDataLabels,
-  ApexResponsive
+  ApexResponsive,
+  ApexStates
 } from "ng-apexcharts";
 
 export type ChartOptions = {
@@ -19,6 +20,7 @@ export type ChartOptions = {
   dataLabels: ApexDataLabels;
   responsive: ApexResponsive[];
   colors: string[];
+  states: ApexStates;
 };
 
 @Component({
@@ -38,6 +40,7 @@ export type ChartOptions = {
         [dataLabels]="chartOptions.dataLabels"
         [responsive]="chartOptions.responsive"
         [colors]="chartOptions.colors"
+        [states]="chartOptions.states"
       ></apx-chart>
     </div>
   </div>
@@ -49,12 +52,21 @@ export class DonutComponent implements OnChanges {
   @Input() series: number[] = [];
   @Input() muestraBorde: boolean = true;
   @Input() titulo: string = '';
+  @Input() colores: string[] = [];
 
   chartOptions: ChartOptions = {
     series: [],
     chart: {
       type: "donut",
-      height: 287
+      height: 287,
+      animations: { dynamicAnimation: { enabled: false } }
+    },
+    states: {
+      hover: {
+        filter: {
+          type: 'darken', // lighten | darken | desaturate | brighten | none
+        }
+      }
     },
     labels: [],
     plotOptions: {
@@ -62,17 +74,20 @@ export class DonutComponent implements OnChanges {
         donut: {
           size: '54%',
           labels: {
-            show: true,
-            total: {
-              show: true,
-              label: 'Total',
-              formatter: (w) => {
-                // Suma de los conteos reales → número entero sin símbolo %
-                const total = w.globals.seriesTotals.reduce((a: number, b: number) => a + b, 0);
-                return total.toString();
-              }
-            }
+        show: true,
+        value: {
+          show: false  // ← oculta el label individual al hacer hover
+        },
+        total: {
+          show: true,
+          showAlways: true,  // ← esto es la clave, mantiene el total siempre visible
+          label: 'Total',
+          formatter: (w) => {
+            const total = w.globals.seriesTotals.reduce((a: number, b: number) => a + b, 0);
+            return total.toString();
           }
+        }
+      }
         }
       }
     },
@@ -82,7 +97,8 @@ export class DonutComponent implements OnChanges {
         // val = porcentaje calculado por ApexCharts (0-100)
         // series[i] = conteo real del segmento
         const count = opts.w.config.series[opts.seriesIndex];
-        return `${count} (${val.toFixed(1)}%)`;
+        const pct = val % 1 === 0 ? val.toFixed(0) : val.toFixed(2);
+        return [count, `(${pct}%)`];
       }
     },
     legend: {
@@ -116,10 +132,16 @@ export class DonutComponent implements OnChanges {
     colors: ['#5892d8', '#3374c4', '#2661b3', '#1e4886', '#1c3f70', '#1d375d']
   };
 
+  private readonly _defaultColors = ['#5892d8', '#3374c4', '#2661b3', '#1e4886', '#1c3f70', '#1d375d'];
+
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['labels'] || changes['series']) {
-      this.chartOptions.labels = this.labels;
-      this.chartOptions.series = this.series;
+    if (changes['labels'] || changes['series'] || changes['colores']) {
+      this.chartOptions = {
+        ...this.chartOptions,
+        labels: this.labels,
+        series: this.series,
+        colors: this.colores.length > 0 ? this.colores : this._defaultColors
+      };
     }
   }
 

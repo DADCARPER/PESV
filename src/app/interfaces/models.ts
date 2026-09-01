@@ -6,6 +6,7 @@ import { ModelProcesos } from './procesosCarga.interface';
 import { ModelDocumentos } from './documentos.interface';
 import { ModelProgramas } from './programas.interface';
 import { ModelPlanTrabajo } from './planTrabajo';
+import { ModelObjetivosMetas } from './objetivosMetas.interface';
 export namespace Models{
 
     export import Empresa = ModelEmpresa
@@ -16,4 +17,5 @@ export namespace Models{
     export import Documentos = ModelDocumentos
     export import Programas = ModelProgramas
     export import PlanTrabajo = ModelPlanTrabajo
+    export import ObjetivosMetas = ModelObjetivosMetas
 }

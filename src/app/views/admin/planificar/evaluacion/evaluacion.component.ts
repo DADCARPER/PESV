@@ -5,7 +5,6 @@ import { ComboselectComponent } from "../../../../components/controlesFormulario
 import { CommonModule } from '@angular/common';
 import { CardsBotonComponent } from "../../../../components/cards/cards-boton/cards-boton.component";
 import { RouterLink } from '@angular/router';
-import AOS from 'aos'; // Importa AOS
 
 
 @Component({
@@ -20,7 +19,7 @@ export class EvaluacionComponent {
   openTab = 0;
 
   constructor(){
-    AOS.init();
+
   }
   toggleTabs(ids:number, id:string){}
 }

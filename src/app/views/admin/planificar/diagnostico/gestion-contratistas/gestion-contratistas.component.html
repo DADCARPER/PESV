@@ -70,13 +70,12 @@
           <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
             <p class="text-sm font-semibold text-gray-700 mb-1">Por tipo de vinculación</p>
             <p class="text-xs text-gray-400 mb-3">Cómo se relacionan contractualmente con la empresa</p>
-            @if (vinculacionLabels.length > 0) {
-              <app-donut
-                [labels]="vinculacionLabels"
-                [series]="vinculacionSeries"
-                [muestraBorde]="false"
+            @if (vinculacionData.length > 0) {
+              <app-columns-bar-horizontal
+                [data]="vinculacionData"
+                [colorBarra]="'#d97706'"
                 titulo="">
-              </app-donut>
+              </app-columns-bar-horizontal>
             } @else {
               <div class="flex items-center justify-center h-40 text-sm text-gray-400">Sin datos</div>
             }
@@ -87,12 +86,7 @@
             <p class="text-sm font-semibold text-gray-700 mb-1">Por tipo de persona</p>
             <p class="text-xs text-gray-400 mb-3">Persona natural vs jurídica</p>
             @if (personaLabels.length > 0) {
-              <app-donut
-                [labels]="personaLabels"
-                [series]="personaSeries"
-                [muestraBorde]="false"
-                titulo="">
-              </app-donut>
+              <app-columns-stracked [series]="personaSeriesStracked"></app-columns-stracked>
             } @else {
               <div class="flex items-center justify-center h-40 text-sm text-gray-400">Sin datos</div>
             }

@@ -40,7 +40,7 @@ export class SidebarComponent implements OnInit {
 
     // Cargar el logo inicial
     const userId = this._login.userIdSignal();
-    console.debug("aaaaaaaaaaaaaaaaaaaaaaaaaaaa"+userId);
+    //console.debug("aaaaaaaaaaaaaaaaaaaaaaaaaaaa"+userId);
     if (userId) {
       this._firestore.getDocument<UserProfile>(`users/${userId}`).then(snap => {
         const userData: any = snap.data() ?? {};

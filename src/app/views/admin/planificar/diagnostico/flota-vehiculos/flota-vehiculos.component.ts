@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { DonutComponent } from '../../../../../components/apexChart/donut/donut.component';
+import { ColumnsStrackedNumericoComponent } from '../../../../../components/apexChart/columns-stracked-numerico/columns-stracked-numerico.component';
+import { ColumnsStrackedIconosComponent } from '../../../../../components/apexChart/columns-stracked-iconos/columns-stracked-iconos.component';
 import { AuthenticacionService } from '../../../../../services/shared/authenticacion.service';
 import { FirestoreService } from '../../../../../services/shared/firestore.service';
 import { Models } from '../../../../../interfaces/models';
@@ -10,7 +12,7 @@ import { Models } from '../../../../../interfaces/models';
 @Component({
   selector: 'app-flota-vehiculos',
   standalone: true,
-  imports: [CommonModule, RouterLink, DonutComponent],
+  imports: [CommonModule, RouterLink, DonutComponent, ColumnsStrackedNumericoComponent, ColumnsStrackedIconosComponent],
   templateUrl: './flota-vehiculos.component.html',
   styleUrl: './flota-vehiculos.component.css'
 })
@@ -33,6 +35,13 @@ export class FlotaVehiculosComponent implements OnInit, OnDestroy {
   // Gráfica 3: plan de mantenimiento preventivo
   mantenimientoLabels: string[] = [];
   mantenimientoSeries: number[] = [];
+
+  // Gráfica tipo vehículo (pre-calculados para evitar re-animación)
+  tipoPctData: number[] = [];
+
+  // Gráfica 4: siniestros viales
+  siniestrosLabels: string[] = [];
+  siniestrosSeries: number[] = [];
 
   // Stats rápidas
   totalVehiculos = 0;
@@ -64,6 +73,10 @@ export class FlotaVehiculosComponent implements OnInit, OnDestroy {
     const porTipo = this._agrupar(data, 'tipoVehiculo');
     this.tipoLabels = Object.keys(porTipo);
     this.tipoSeries = Object.values(porTipo);
+    const tipoTotal = this.tipoSeries.reduce((s, v) => s + v, 0);
+    this.tipoPctData = tipoTotal > 0
+      ? this.tipoSeries.map(v => Math.round((v / tipoTotal) * 10000) / 100)
+      : this.tipoSeries.map(() => 0);
 
     // Gráfica 2: tipo de relación
     const porRelacion = this._agrupar(data, 'tipoRelacion');
@@ -76,6 +89,12 @@ export class FlotaVehiculosComponent implements OnInit, OnDestroy {
       k === 'SI' ? 'Con plan' : k === 'NO' ? 'Sin plan' : 'Sin definir'
     );
     this.mantenimientoSeries = Object.values(porMantenimiento);
+
+    // Gráfica 4: siniestros viales
+    const si  = data.filter(v => v.tieneSiniestros === 'SI').length;
+    const no  = data.filter(v => v.tieneSiniestros === 'NO').length;
+    this.siniestrosLabels = ['Con siniestros', 'Sin siniestros'];
+    this.siniestrosSeries = [si, no];
 
     // Stats
     this.conMantenimiento = data.filter(v => v.tienePlanMantenimiento === 'SI').length;
@@ -91,6 +110,18 @@ export class FlotaVehiculosComponent implements OnInit, OnDestroy {
       return acc;
     }, {} as Record<string, number>);
   }
+
+  private static readonly ICONO_VEHICULO: Record<string, string> = {
+    'automóvil': '🚗', 'automovil': '🚗', 'carro': '🚗', 'auto': '🚗',
+    'camioneta': '🚙', 'suv': '🚙',
+    'camión': '🚛', 'camion': '🚛', 'tractocamión': '🚛', 'tractocamion': '🚛',
+    'bus': '🚌', 'buseta': '🚌', 'microbus': '🚌', 'microbús': '🚌',
+    'motocicleta': '🏍️', 'moto': '🏍️', 'motocarro': '🏍️',
+    'bicicleta': '🚲', 'bici': '🚲',
+    'van': '🚐', 'furgón': '🚐', 'furgon': '🚐',
+    'volqueta': '🚚', 'volquete': '🚚',
+  };
+
 
   ngOnDestroy() {
     this._sub?.unsubscribe();

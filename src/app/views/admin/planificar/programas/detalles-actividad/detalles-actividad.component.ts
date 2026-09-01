@@ -68,7 +68,8 @@ export class DetallesActividadComponent implements OnChanges {
     this.actividades = [];
 
     //console.log('Entro a consultarDocumentos');
-    const path = `Empresas/${this.nit}/008-actividades-gestion-riesgos`;
+    const periodo = this._authcations.periodo();
+    const path = `Empresas/${this.nit}/periodos/${periodo}/008-actividades-gestion-riesgos`;
     let q: Models.Firebases.whereQuery[];
 
     q = [['estado', '==', 'Activo', 'programId', '==', this.idDocumento]];

@@ -1,187 +1,136 @@
-import { Component, ViewChild } from '@angular/core';
-import { LoadingComponent } from "../../../../components/loading/loading/loading.component";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit, OnDestroy, inject, viewChild, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule, FormArray } from '@angular/forms';
-import AOS from 'aos'; // Importa AOS
-import { CardsBotonComponent } from "../../../../components/cards/cards-boton/cards-boton.component";
-import { ObjetivosMetasService } from '../../../../services/shared/objetivos-metas.service';
-import { PasopasoComponent } from '../../../../components/tabs/pasopaso/pasopaso.component';
+import { RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
+
 import { FirestoreService } from '../../../../services/shared/firestore.service';
 import { AuthenticacionService } from '../../../../services/shared/authenticacion.service';
-import { UploadArchivosComponent } from "../../../../components/otros/upload-archivos/upload-archivos.component";
-import { PdfObjetivosMetasComponent } from '../../../../components/pdfs/pdf-objetivos-metas/pdf-objetivos-metas.component';
+import { EstatusGeneralService } from '../../../../services/shared/estatus-general.service';
+import { Models } from '../../../../interfaces/models';
 
+import { Form1ObjetivosMetasComponent } from './form1-objetivos-metas/form1-objetivos-metas.component';
+import { Form2ObjetivosMetasComponent } from './form2-objetivos-metas/form2-objetivos-metas.component';
 
 @Component({
   selector: 'app-objetivos-metas',
   standalone: true,
-  imports: [CommonModule, LoadingComponent, FormsModule, ReactiveFormsModule, CardsBotonComponent, PasopasoComponent, PdfObjetivosMetasComponent, UploadArchivosComponent, RouterLink],
+  imports: [CommonModule, RouterLink, Form1ObjetivosMetasComponent, Form2ObjetivosMetasComponent],
   templateUrl: './objetivos-metas.component.html',
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   styleUrl: './objetivos-metas.component.css'
 })
-export class ObjetivosMetasComponent {
+export class ObjetivosMetasComponent implements OnInit, OnDestroy {
 
-  @ViewChild(PasopasoComponent) pasoPaso!: PasopasoComponent;
-  @ViewChild(PdfObjetivosMetasComponent) crearPdf!: PdfObjetivosMetasComponent;
+  private _firestore = inject(FirestoreService);
+  private _authcations = inject(AuthenticacionService);
+  private _estatus = inject(EstatusGeneralService);
 
+  modalFormulario = viewChild.required<Form1ObjetivosMetasComponent>('modalFormulario');
+  modalEliminar = viewChild.required<Form2ObjetivosMetasComponent>('modalEliminar');
 
-  form!: FormGroup;
-  openTab = 0;
+  objetivos = signal<Models.ObjetivosMetas.ConsultarObjetivo[]>([]);
+  cargando = signal<boolean>(true);
+  expandidos = signal<Set<string>>(new Set<string>());
 
-  id_formulario: string = "0";
-  dataEmpresa: any = sessionStorage.getItem('empresaData');
-  dataEmpresa2 = JSON.parse(this.dataEmpresa);
-  porcentaje = 0;
+  private _subObjetivos?: Subscription;
+  private nit: string | null = null;
 
-  documentData: any;
-
-  userId: string | null = null;
-  isLoading = false; //Al terminar el modulo de ir en true
-
-  constructor(
-      private fb: FormBuilder, 
-      private router: Router,
-      private _objetivosmetas: ObjetivosMetasService,
-      private _firestore: FirestoreService,
-      //private archivoService: ArchivoService,
-      //private liderDelPesvService: LiderDelPesvService,
-    ){
-      this.iniciarformulariolimpio();
-  
-      // this.UID.user$.subscribe(user => {
-      //   this.userId = user ? user.uid : null;
-  
-      //   this._firestore.getDocumentRealTime('objetivosMetas/', this.userId)
-      //   .subscribe({
-      //     next: (data) => {
-      //       //console.log('Datos en tiempo real:', data);
-      //       this.documentData = data; // Almacenamos los datos en el componente
-      //     },
-      //     error: (error) => {
-      //       console.error('Error al recibir datos:', error);
-      //     },
-      //   });
-      
-      //   this.isLoading = false;  // El usuario ha sido autenticado
-      // });
-  
-    }
-  
   ngOnInit(): void {
-
-    AOS.init();
-    
+    this.nit = this._authcations.getCurrentUser()?.displayName ?? null;
+    this.consultarObjetivos();
   }
 
-  iniciarformulariolimpio() {
-    this.form = this.fb.group({
-   
-      //fechaDocumento: ['', Validators.required],
-      objetivo1: [false],
-      objetivo2: [false],
-      objetivo3: [false],
-      objetivo4: [false],
-      objetivo5: [false],
-      objetivo6: [false],
-      objetivo8: [''],
-      meta1: [false],
-      meta2: [false],
-      meta3: [false],
-      meta4: [false],
-      meta5: [false],
-      meta6: [false],
-      meta7: [false],
-      meta8: [''],
-      
-    });
+  ngOnDestroy(): void {
+    this._subObjetivos?.unsubscribe();
   }
 
-  async toggleTabs(tabNumber: number,porce:string ) {
+  consultarObjetivos() {
+    const periodo = this._authcations.periodo();
+    const path = `Empresas/${this.nit}/periodos/${periodo}/007-objetivos-metas`;
+    const q: Models.Firebases.whereQuery[] = [['estado', '==', 'Activo']];
+    const extras: Models.Firebases.extrasQuery = { orderParam: 'docCreado', directionSort: 'asc', limit: 50 };
 
-    this.openTab = tabNumber;
-    setTimeout(() => {
-      AOS.refresh(); // Reinicia AOS para detectar nuevos elementos
-      
-    }, 200);
-
-    
-    if(this.openTab > 1 && this.openTab < 4){ //autoguardado
-
-      if(this.openTab == 2){ //crear fomulario o carga autoguardado o carga editable
-
-        if (this.id_formulario !== "0") { //existe session de id_formulario creada?
-          //this.cargarFormulario(id_formulario);
-          const dataCruda = await this._objetivosmetas.getfomularioEdit(this.id_formulario);
-
-          console.log("datacrudaaaaaaaaaaa",dataCruda);
-          
-          this.form.patchValue(dataCruda);
-          
-        }else{
-          //creo el id_formulario por primera vez
-          sessionStorage.setItem('id_formulario_objetivos_metas', Date.now().toString());
-          this.id_formulario = sessionStorage.getItem('id_formulario_objetivos_metas') as string ;
-
+    this._subObjetivos = this._firestore
+      .getDocumentsQueryChanges<Models.ObjetivosMetas.ConsultarObjetivo>(path, q, extras)
+      .subscribe({
+        next: (res) => {
+          this.objetivos.set(res);
+          this.cargando.set(false);
+          this.actualizarEstatusGeneral();
+        },
+        error: (error: unknown) => {
+          console.error('[ObjetivosMetas] consultarObjetivos:', error);
+          this.cargando.set(false);
         }
-
-        
-      }
-
-      if (porce === "Avanza") {
-        this.porcentaje = Math.min(this.porcentaje + 20, 100);  // aumenta el porcentaje de barra IMPORTANTE INICIA EN 0
-        this.pasoPaso.nextStep();  //  ESTOS SON METODOS LLAMADOS POR @ViewChild del componenten pasopaso
-      } else if(porce === "Atras") {
-        this.porcentaje = Math.max(this.porcentaje - 20, 0);
-        this.pasoPaso.prevStep(); //  ESTOS SON METODOS LLAMADOS POR @ViewChild del componenten pasopaso
-      }
-
-      console.log("porcentaje" + this.form.value +"porcentaje" );
-
-      this._objetivosmetas.autoGuardar(this.form.value,"Asistente",this.porcentaje,this.id_formulario ?? "");
-      console.log("todododododo",this.form.value);
-
-      
-      
-    }
-
-
+      });
   }
 
-  async onSubmit(){
-
-    if (this.form.valid) {
-
-      console.log('Submittttt')
-    
-      this.crearPdf.generatePdf(true);
-      this.porcentaje = 100;
-      this.toggleTabs(4,"");
-      // this.borroSessionIdFormulario();
-
-      
-
-
-    }else{
-      this.form.markAllAsTouched();
-    }
+  /** Calcula el siguiente código consecutivo: OBJ-01, OBJ-02... */
+  siguienteCodigo(): string {
+    const consecutivo = this.objetivos().length + 1;
+    return `OBJ-${consecutivo.toString().padStart(2, '0')}`;
   }
 
-  async vistaPrevia(){
-    if (this.form.valid) {
-
-      await this._objetivosmetas.autoGuardar(this.form.value,"Asistente",100,this.id_formulario ?? "");
-      this.crearPdf.generatePdf(true);
-
-    }else{
-      this.form.markAllAsTouched();
-    }
+  mostrarModalFormulario(modo: 'crear' | 'editar', datoaEditar?: Models.ObjetivosMetas.ConsultarObjetivo): void {
+    this.modalFormulario().abrirModal(modo, datoaEditar, this.siguienteCodigo());
   }
 
-  irdashboard(){
+  manejarEdicion(objetivo: Models.ObjetivosMetas.ConsultarObjetivo) {
+    this.mostrarModalFormulario('editar', objetivo);
+  }
 
-    this.router.navigate(['admin/dashboardplanificar']);
+  manejarEliminar(objetivo: Models.ObjetivosMetas.ConsultarObjetivo) {
+    this.modalEliminar().abrirModal(objetivo);
+  }
 
+  /**
+   * Un objetivo está completo cuando es medible: tiene descripción, responsable,
+   * plazos y al menos una meta con indicador y valor definidos.
+   */
+  private esObjetivoCompleto(obj: Models.ObjetivosMetas.ConsultarObjetivo): boolean {
+    const datosBase = !!obj.descripcion?.trim()
+      && !!obj.responsable?.trim()
+      && !!obj.fechaInicio
+      && !!obj.fechaFin;
+
+    const metasMedibles = (obj.metas?.length ?? 0) > 0
+      && obj.metas.every(m => !!m.indicador?.trim() && m.valorMeta !== null && m.valorMeta !== undefined);
+
+    return datosBase && metasMedibles;
+  }
+
+  private async actualizarEstatusGeneral(): Promise<void> {
+    const objetivos = this.objetivos();
+    const completos = objetivos.filter(obj => this.esObjetivoCompleto(obj)).length;
+
+    const modulo: Models.Procesos.Modulo007ObjetivosMetas = {
+      total_progreso: objetivos.length > 0 ? Math.round((completos / objetivos.length) * 100) : 0,
+      objetivosDefinidos: { total: objetivos.length },
+      objetivosCompletos: { total: completos },
+      metasDefinidas: { total: this.totalMetas() },
+    };
+
+    await this._estatus.registrarProgreso('007-objetivos-metas', modulo);
+  }
+
+  /** Abre o cierra el detalle de metas de un objetivo. */
+  alternarExpandido(id: string) {
+    const actuales = new Set(this.expandidos());
+    if (actuales.has(id)) {
+      actuales.delete(id);
+    } else {
+      actuales.add(id);
+    }
+    this.expandidos.set(actuales);
+  }
+
+  estaExpandido(id: string): boolean {
+    return this.expandidos().has(id);
+  }
+
+  /** Total de metas de todos los objetivos, para la cabecera. */
+  totalMetas(): number {
+    return this.objetivos().reduce((acc, obj) => acc + (obj.metas?.length ?? 0), 0);
   }
 
 }

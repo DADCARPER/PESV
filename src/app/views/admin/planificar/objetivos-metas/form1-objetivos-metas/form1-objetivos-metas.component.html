@@ -1,0 +1,190 @@
+<!-- Fondo oscuro -->
+<div *ngIf="mostrarModal()" (click)="cerrarModal()" class="fixed inset-0 z-40 bg-black opacity-25"></div>
+
+<!-- Modal -->
+<div *ngIf="mostrarModal()" class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex modal-fade-down">
+  <div (click)="$event.stopPropagation()" class="relative mx-auto my-6 bg-white rounded-lg shadow-lg max-w-3xl w-full">
+
+    <!-- Título del modal -->
+    <div class="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+      <h3 class="text-xl font-semibold">
+        {{ modo === 'editar' ? 'Editar objetivo' : 'Nuevo objetivo' }}
+      </h3>
+    </div>
+
+    <form [formGroup]="objetivoForm" (ngSubmit)="handleSave()">
+
+      <!-- Contenido del modal -->
+      <div class="relative p-6 flex-auto max-h-[70vh] overflow-y-auto">
+
+        <!-- ── SECCIÓN 1: OBJETIVO ───────────────────────────────── -->
+        <h3 class="text-lg font-semibold mb-4 pb-2 border-b text-gray-700">Objetivo</h3>
+
+        <div class="flex flex-wrap mb-4">
+          <div class="w-full lg:w-3/12 px-2">
+            <div class="space-y-2">
+              <label for="codigo" class="block text-sm font-medium text-gray-700">Código *</label>
+              <input type="text" id="codigo" formControlName="codigo" placeholder="OBJ-01"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              <p *ngIf="objetivoForm.get('codigo')?.touched && objetivoForm.get('codigo')?.invalid"
+                class="text-xs text-red-500">El código es obligatorio.</p>
+            </div>
+          </div>
+          <div class="w-full lg:w-9/12 px-2">
+            <div class="space-y-2">
+              <label for="descripcion" class="block text-sm font-medium text-gray-700">Descripción del objetivo *</label>
+              <textarea id="descripcion" formControlName="descripcion" rows="3"
+                placeholder="Ej: Reducir en un 20% los siniestros viales con lesionados durante el periodo."
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+              <p *ngIf="objetivoForm.get('descripcion')?.touched && objetivoForm.get('descripcion')?.invalid"
+                class="text-xs text-red-500">La descripción es obligatoria (máx. 500 caracteres).</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── SECCIÓN 2: METAS E INDICADORES ────────────────────── -->
+        <div class="flex items-center justify-between mb-4 pb-2 border-b">
+          <h3 class="text-lg font-semibold text-gray-700">Metas e indicadores</h3>
+          <button type="button" (click)="agregarMeta()"
+            class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150">
+            <div class="flex items-center">
+              <iconify-icon icon="hugeicons:plus-sign-square" width="18" height="18" class="pr-2"></iconify-icon> Agregar meta
+            </div>
+          </button>
+        </div>
+
+        <div formArrayName="metas" class="space-y-4 mb-4">
+          @for (metaCtrl of metas.controls; track $index) {
+            <div [formGroupName]="$index" class="rounded-lg border border-gray-200 bg-gray-50 p-4">
+
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-semibold uppercase text-gray-500">Meta {{ $index + 1 }}</span>
+                <button type="button" (click)="eliminarMeta($index)" [disabled]="metas.length === 1"
+                  class="text-red-500 hover:text-red-700 disabled:opacity-30 disabled:cursor-not-allowed">
+                  <iconify-icon icon="hugeicons:delete-03" width="18" height="18"></iconify-icon>
+                </button>
+              </div>
+
+              <div class="flex flex-wrap mb-3">
+                <div class="w-full px-2">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Descripción de la meta *</label>
+                    <input type="text" formControlName="descripcion"
+                      placeholder="Ej: Disminuir los siniestros con lesionados"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap mb-3">
+                <div class="w-full lg:w-8/12 px-2">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Indicador *</label>
+                    <input type="text" formControlName="indicador"
+                      placeholder="Ej: N° de siniestros con lesionados / N° total de siniestros"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                  </div>
+                </div>
+                <div class="w-full lg:w-4/12 px-2">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Frecuencia de medición *</label>
+                    <select formControlName="frecuencia"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                      <option value="">Seleccionar</option>
+                      @for (f of frecuencias; track f) {
+                        <option [value]="f">{{ f }}</option>
+                      }
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap">
+                <div class="w-full lg:w-4/12 px-2">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Línea base</label>
+                    <input type="number" formControlName="lineaBase" placeholder="0"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                  </div>
+                </div>
+                <div class="w-full lg:w-4/12 px-2">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Valor meta *</label>
+                    <input type="number" formControlName="valorMeta" placeholder="0"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                  </div>
+                </div>
+                <div class="w-full lg:w-4/12 px-2">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Unidad *</label>
+                    <select formControlName="unidad"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                      <option value="">Seleccionar</option>
+                      @for (u of unidades; track u) {
+                        <option [value]="u">{{ u }}</option>
+                      }
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          }
+        </div>
+
+        <!-- ── SECCIÓN 3: RESPONSABLE Y PLAZOS ───────────────────── -->
+        <h3 class="text-lg font-semibold mb-4 pb-2 border-b text-gray-700">Responsable y plazos</h3>
+
+        <div class="flex flex-wrap mb-4">
+          <div class="w-full lg:w-6/12 px-2">
+            <div class="space-y-2">
+              <label for="responsable" class="block text-sm font-medium text-gray-700">Responsable *</label>
+              <input type="text" id="responsable" formControlName="responsable"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              <p *ngIf="objetivoForm.get('responsable')?.touched && objetivoForm.get('responsable')?.invalid"
+                class="text-xs text-red-500">El responsable es obligatorio.</p>
+            </div>
+          </div>
+          <div class="w-full lg:w-6/12 px-2">
+            <div class="space-y-2">
+              <label for="cargoResponsable" class="block text-sm font-medium text-gray-700">Cargo del responsable</label>
+              <input type="text" id="cargoResponsable" formControlName="cargoResponsable"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap mb-4">
+          <div class="w-full lg:w-6/12 px-2">
+            <div class="space-y-2">
+              <label for="fechaInicio" class="block text-sm font-medium text-gray-700">Fecha de inicio *</label>
+              <input type="date" id="fechaInicio" formControlName="fechaInicio"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+          </div>
+          <div class="w-full lg:w-6/12 px-2">
+            <div class="space-y-2">
+              <label for="fechaFin" class="block text-sm font-medium text-gray-700">Fecha de finalización *</label>
+              <input type="date" id="fechaFin" formControlName="fechaFin"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- footer -->
+      <div class="flex items-center justify-end p-4 border-t border-solid border-blueGray-200 rounded-b">
+        <button type="button" (click)="handleCancel()"
+          class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="guardando()"
+          class="bg-emerald-500 text-white active:bg-emerald-600 disabled:opacity-50 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">
+          {{ guardando() ? 'Guardando...' : 'Guardar' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

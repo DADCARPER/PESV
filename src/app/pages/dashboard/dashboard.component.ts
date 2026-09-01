@@ -1,5 +1,7 @@
 import { Component, inject, Input } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthenticacionService } from '../../services/shared/authenticacion.service';
+import { RUTA_LOGIN } from '../../guards/auth.guard';
 import { CommonModule } from '@angular/common';
 import { Storage, ref, uploadBytesResumable, getDownloadURL } from '@angular/fire/storage';
 import { Firestore, setDoc, doc, arrayUnion } from '@angular/fire/firestore';
@@ -44,6 +46,7 @@ export class DashboardComponent {
   private _color = 'dark';
 
   private _auth = inject(AuthenticacionService);
+  private _router = inject(Router);
   private _storage = inject(Storage);
   private _firestore = inject(Firestore);
 
@@ -114,9 +117,13 @@ export class DashboardComponent {
 
 
 
-  logout(){
-    this._auth.logout();
-    console.log("sesion cerrada");
+  async logout(){
+    try {
+      await this._auth.logout();
+    } catch (error: unknown) {
+      console.error('[Dashboard] logout:', error);
+    }
+    this._router.navigate([RUTA_LOGIN]);
   }
 
 }

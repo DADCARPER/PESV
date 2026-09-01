@@ -59,7 +59,8 @@ export class Form3DashboardPlanComponent {
     this.actividades = [];
 
     //console.log('Entro a consultarDocumentos');
-    const path = `Empresas/${nit}/009-plan-anual-trabajo-actividades`;
+    const periodo = this._authcations.periodo();
+    const path = `Empresas/${nit}/periodos/${periodo}/009-plan-anual-trabajo-actividades`;
     let q: Models.Firebases.whereQuery[];
 
     q = [['estado', '==', 'Activo', 'planAnualtrabajoId', '==', this.idPlanAnualTrabajo]];
@@ -101,7 +102,8 @@ export class Form3DashboardPlanComponent {
 
   cambiarEstadoActividad(idDocumento: string, nuevoEstado: 'Completada' | 'Pendiente' | 'Programada') {
     const nit = this._authcations.getCurrentUser().displayName;
-    this._firestore.updateDocument(`Empresas/${nit}/009-plan-anual-trabajo-actividades/${idDocumento}`, {status: nuevoEstado});
+    const periodo = this._authcations.periodo();
+    this._firestore.updateDocument(`Empresas/${nit}/periodos/${periodo}/009-plan-anual-trabajo-actividades/${idDocumento}`, {status: nuevoEstado});
   }
 
   envioTabSale(tabNumber: number) {
@@ -131,7 +133,8 @@ export class Form3DashboardPlanComponent {
 
   async actualizarEstadoActividadesPlanactual(){
     const nit = this._authcations.getCurrentUser().displayName;
-    this._firestore.updateDocument(`Empresas/${nit}/009-plan-anual-trabajo/${this.idPlanAnualTrabajo}`, {totalActividades: this.total_actividades, totalActividadesCompletadas: this.total_actividades_completadas, totalActividadesPendientes: this.total_actividades_pendientes, totalActividadesVencidas: this.total_actividades_vencidas});
+    const periodo = this._authcations.periodo();
+    this._firestore.updateDocument(`Empresas/${nit}/periodos/${periodo}/009-plan-anual-trabajo/${this.idPlanAnualTrabajo}`, {totalActividades: this.total_actividades, totalActividadesCompletadas: this.total_actividades_completadas, totalActividadesPendientes: this.total_actividades_pendientes, totalActividadesVencidas: this.total_actividades_vencidas});
   }
 
   ngOnDestroy(): void {

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { DonutComponent } from '../../../../../components/apexChart/donut/donut.component';
+import { ColumnsBarHorizontalComponent, CauseData } from '../../../../../components/apexChart/columns-bar-horizontal/columns-bar-horizontal.component';
 import { AuthenticacionService } from '../../../../../services/shared/authenticacion.service';
 import { FirestoreService } from '../../../../../services/shared/firestore.service';
 import { Models } from '../../../../../interfaces/models';
@@ -10,7 +11,7 @@ import { Models } from '../../../../../interfaces/models';
 @Component({
   selector: 'app-emergencias-plan',
   standalone: true,
-  imports: [CommonModule, RouterLink, DonutComponent],
+  imports: [CommonModule, RouterLink, DonutComponent, ColumnsBarHorizontalComponent],
   templateUrl: './emergencias-plan.component.html',
   styleUrl: './emergencias-plan.component.css'
 })
@@ -25,6 +26,7 @@ export class EmergenciasPlanComponent implements OnInit, OnDestroy {
   // Gráfica 1: por tipo de emergencia
   tipoLabels: string[] = [];
   tipoSeries: number[] = [];
+  tipoData: CauseData[] = [];
 
   // Gráfica 2: planes con protocolo documentado vs sin protocolo
   protocoloLabels: string[] = [];
@@ -64,6 +66,7 @@ export class EmergenciasPlanComponent implements OnInit, OnDestroy {
     const porTipo = this._agrupar(data, 'tipoEmergencia');
     this.tipoLabels = Object.keys(porTipo);
     this.tipoSeries = Object.values(porTipo);
+    this.tipoData = this.tipoLabels.map((causa, i) => ({ causa, porcentaje: this.tipoSeries[i] }));
 
     // Gráfica 2: protocolo de acción documentado
     const conProt  = data.filter(p => p.protocoloAccion && p.protocoloAccion.trim() !== '').length;

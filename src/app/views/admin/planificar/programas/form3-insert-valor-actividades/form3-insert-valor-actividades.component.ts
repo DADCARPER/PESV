@@ -38,7 +38,8 @@ export class Form3InsertValorActividadesComponent {
   async handleSave(){
     const uid = this._authcations.getCurrentUser().uid;
     const nit = this._authcations.getCurrentUser().displayName;
-    const path = `Empresas/${nit}/008-actividades-gestion-riesgos`;
+    const periodo = this._authcations.periodo();
+    const path = `Empresas/${nit}/periodos/${periodo}/008-actividades-gestion-riesgos`;
     console.log('Datos para guardar', this.agregarValorActividadForm.value);
     if(this.agregarValorActividadForm.valid){
       const valoractual = this._programas.calcularAvance(this.datosEdicion.valorInicial, this.datosEdicion.meta, Number(this.agregarValorActividadForm.value.valorReal), this.datosEdicion.comportamiento, this.datosEdicion.ingreso);

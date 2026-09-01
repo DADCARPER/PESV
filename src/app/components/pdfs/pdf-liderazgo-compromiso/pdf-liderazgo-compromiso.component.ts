@@ -2,7 +2,7 @@ import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-import { LiderazgoCompromisoService } from '../../../services/shared/liderazgo-compromiso.service';
+import { AsistenteFormularioService } from '../../../services/shared/asistente-formulario.service';
 
 @Component({
   selector: 'app-pdf-liderazgo-compromiso',
@@ -13,7 +13,7 @@ import { LiderazgoCompromisoService } from '../../../services/shared/liderazgo-c
 })
 export class PdfLiderazgoCompromisoComponent {
 
-  private _liderazgoCompromiso = inject(LiderazgoCompromisoService);
+  private _asistente = inject(AsistenteFormularioService);
   
     @Input() mostrarBotones: boolean = false;
     @Input() subirBlob: boolean = false;
@@ -46,7 +46,7 @@ export class PdfLiderazgoCompromisoComponent {
   
       if (this.idFormulario !== "0"){
   
-        const dataCruda = await this._liderazgoCompromiso.getfomularioEdit(this.idFormulario);
+        const dataCruda = await this._asistente.getFormulario('004-liderazgo-compromiso', this.idFormulario);
   
         console.log("datacrudaaaaaaaaaaa",dataCruda);
 
@@ -288,7 +288,7 @@ export class PdfLiderazgoCompromisoComponent {
       if (subirBlob){
         pdfMake.createPdf(documentDefinition).getBlob((blob:any) => {
         
-          this._liderazgoCompromiso.uploadPdfToFirebase(blob,this.idFormulario);
+          this._asistente.uploadPdf('004-liderazgo-compromiso', this.idFormulario, blob);
   
         });
       }

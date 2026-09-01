@@ -7,7 +7,6 @@ import { ColDef, GridApi, GridReadyEvent, Module, ICellRendererParams, ValueForm
 import { F1AddFileComponent } from '../f1-add-file/f1-add-file.component';
 import { AuthenticacionService } from '../../../../../services/shared/authenticacion.service';
 import { FirestoreService } from '../../../../../services/shared/firestore.service';
-import { ProgresoService } from '../../../../../services/shared/progreso.service';
 import { Models } from '../../../../../interfaces/models';
 import { StorageService } from '../../../../../services/shared/storage.service';
 import { F2DeleteFileComponent } from '../f2-delete-file/f2-delete-file.component';
@@ -28,7 +27,6 @@ export class GestionArchivosComponent implements OnInit, OnChanges, OnDestroy {
   private _authcations = inject(AuthenticacionService);
   private _firebaseservice = inject(FirestoreService);
   private _storage = inject(StorageService);
-  private _procesos = inject(ProgresoService);
 
   nit = this._authcations.getCurrentUser().displayName; //NIT DE LA EMPRESA ACTUAL
   empresa = this._authcations.getCurrentUser().photoURL; // NOMBRE DE LA EMREPSA

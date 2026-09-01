@@ -10,11 +10,12 @@ import { ProgressCircleComponent } from "../../../../components/otros/progress-c
 import { ModalsGuiaComponent } from '../../../../components/modals/modals-guia/modals-guia.component';
 import { UploadArchivosComponent } from "../../../../components/otros/upload-archivos/upload-archivos.component";
 // Servicios
-import { ComiteSeguridadVialService } from '../../../../services/shared/comite-seguridad-vial.service';
+import { AsistenteFormularioService } from '../../../../services/shared/asistente-formulario.service';
 import { LoadingComponent } from "../../../../components/loading/loading/loading.component";
 import { AuthenticacionService } from '../../../../services/shared/authenticacion.service';
 import { AlertaService } from '../../../../services/shared/alerta.service';
 import { GestionDocumentosService } from '../../../../services/shared/gestion-documentos.service';
+import { EstatusGeneralService } from '../../../../services/shared/estatus-general.service';
 import { FirestoreService } from '../../../../services/shared/firestore.service';
 import { Models } from '../../../../interfaces/models';
 import { ReftourlPipe } from '../../../../pipes/reftourl.pipe';
@@ -37,6 +38,7 @@ export class ComiteseguridadvialComponent implements OnInit {
 
   private _authcations = inject(AuthenticacionService);
   private _gestDoc = inject(GestionDocumentosService);
+  private _estatus = inject(EstatusGeneralService);
   private _firestore = inject(FirestoreService);
   public _alerta = inject(AlertaService);
 
@@ -70,7 +72,7 @@ export class ComiteseguridadvialComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private _comiteSeguVial: ComiteSeguridadVialService,
+    private _asistente: AsistenteFormularioService,
   ) {
     this.iniciarformulariolimpio();
     this.firmas = this.form.get('firmas') as FormArray;
@@ -138,19 +140,11 @@ export class ComiteseguridadvialComponent implements OnInit {
   }
 
   private async actualizarEstatusGeneral(): Promise<void> {
-    const periodo = this._authcations.periodo();
     const modulo: Models.Procesos.Modulo002ComiteSeguridad = {
       total_progreso: this.documento1.length > 0 ? 100 : 0,
       actacomite: { total: this.documento1.length > 0 ? 1 : 0 },
     };
-    try {
-      await this._firestore.upsertDocument(`EstatusGeneral/${this.nit}`, {
-        periodo,
-        '002-comite-seguridad-vial-documentos': modulo,
-      });
-    } catch (error: unknown) {
-      console.error('[ComiteSeguridad] actualizarEstatusGeneral:', error);
-    }
+    await this._estatus.registrarProgreso('002-comite-seguridad-vial', modulo);
   }
 
   iniciarformulariolimpio() {
@@ -197,7 +191,7 @@ export class ComiteseguridadvialComponent implements OnInit {
 
       if(this.openTab == 2){
         if (this.id_formulario !== "0") {
-          const dataCruda: any = await this._comiteSeguVial.getfomularioEdit(this.id_formulario);
+          const dataCruda: any = await this._asistente.getFormulario('002-comite-seguridad-vial', this.id_formulario);
           this.integrantes = dataCruda['integrantes'] ?? [];
 
           if (this.firmas.length === 0) {
@@ -223,7 +217,7 @@ export class ComiteseguridadvialComponent implements OnInit {
 
       const { nuevoIntegrante, ...restoFormData } = this.form.value;
       const formData = { ...restoFormData, integrantes: this.integrantes };
-      this._comiteSeguVial.autoGuardar(formData, "Asistente", this.porcentaje, this.id_formulario ?? "");
+      this._asistente.autoGuardar('002-comite-seguridad-vial', this.id_formulario ?? "", formData, { estado: this.porcentaje });
     }
   }
 

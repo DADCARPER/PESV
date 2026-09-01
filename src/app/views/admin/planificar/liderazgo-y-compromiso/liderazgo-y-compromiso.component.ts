@@ -3,15 +3,15 @@ import { LoadingComponent } from "../../../../components/loading/loading/loading
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import AOS from 'aos';
 import { CardsBotonComponent } from "../../../../components/cards/cards-boton/cards-boton.component";
-import { LiderazgoCompromisoService } from '../../../../services/shared/liderazgo-compromiso.service';
+import { AsistenteFormularioService } from '../../../../services/shared/asistente-formulario.service';
 import { PasopasoComponent } from '../../../../components/tabs/pasopaso/pasopaso.component';
 import { PdfLiderazgoCompromisoComponent } from '../../../../components/pdfs/pdf-liderazgo-compromiso/pdf-liderazgo-compromiso.component';
 import { UploadArchivosComponent } from "../../../../components/otros/upload-archivos/upload-archivos.component";
 import { AuthenticacionService } from '../../../../services/shared/authenticacion.service';
 import { AlertaService } from '../../../../services/shared/alerta.service';
 import { GestionDocumentosService } from '../../../../services/shared/gestion-documentos.service';
+import { EstatusGeneralService } from '../../../../services/shared/estatus-general.service';
 import { FirestoreService } from '../../../../services/shared/firestore.service';
 import { AlertaInformativoComponent } from "../../../../components/alertas/alerta-informativo/alerta-informativo.component";
 import { ReftourlPipe } from '../../../../pipes/reftourl.pipe';
@@ -33,6 +33,7 @@ export class LiderazgoYCompromisoComponent {
 
   private _authcations = inject(AuthenticacionService);
   private _gestDoc = inject(GestionDocumentosService);
+  private _estatus = inject(EstatusGeneralService);
   private _firestore = inject(FirestoreService);
   public _alerta = inject(AlertaService);
 
@@ -63,13 +64,12 @@ export class LiderazgoYCompromisoComponent {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private _liderazgoCompromiso: LiderazgoCompromisoService,
+    private _asistente: AsistenteFormularioService,
   ){
     this.iniciarformulariolimpio();
   }
 
   ngOnInit(): void {
-    AOS.init();
     this.consultarDocumentos();
   }
 
@@ -123,19 +123,11 @@ export class LiderazgoYCompromisoComponent {
   }
 
   private async actualizarEstatusGeneral(): Promise<void> {
-    const periodo = this._authcations.periodo();
     const modulo: Models.Procesos.Modulo004LiderazgoCompromiso = {
       total_progreso: this.documento1.length > 0 ? 100 : 0,
       actaLiderazgo: { total: this.documento1.length > 0 ? 1 : 0 },
     };
-    try {
-      await this._firestore.upsertDocument(`EstatusGeneral/${this.nit}`, {
-        periodo,
-        '004-liderazgo-compromiso-documentos': modulo,
-      });
-    } catch (error: unknown) {
-      console.error('[LiderazgoCompromiso] actualizarEstatusGeneral:', error);
-    }
+    await this._estatus.registrarProgreso('004-liderazgo-compromiso', modulo);
   }
 
   iniciarformulariolimpio() {
@@ -153,13 +145,12 @@ export class LiderazgoYCompromisoComponent {
 
   async toggleTabs(tabNumber: number, porce: string) {
     this.openTab = tabNumber;
-    setTimeout(() => { AOS.refresh(); }, 200);
 
     if(this.openTab > 1 && this.openTab < 3){
 
       if(this.openTab == 2){
         if (this.id_formulario !== "0") {
-          const dataCruda = await this._liderazgoCompromiso.getfomularioEdit(this.id_formulario);
+          const dataCruda = await this._asistente.getFormulario('004-liderazgo-compromiso', this.id_formulario);
           this.form.patchValue(dataCruda);
         } else {
           sessionStorage.setItem('id_formulario_liderazgo_compromiso', Date.now().toString());
@@ -175,7 +166,7 @@ export class LiderazgoYCompromisoComponent {
         this.pasoPaso.prevStep();
       }
 
-      this._liderazgoCompromiso.autoGuardar(this.form.value, "Asistente", this.porcentaje, this.id_formulario ?? "");
+      this._asistente.autoGuardar('004-liderazgo-compromiso', this.id_formulario ?? "", this.form.value, { estado: this.porcentaje });
     }
   }
 
@@ -191,7 +182,7 @@ export class LiderazgoYCompromisoComponent {
 
   async vistaPrevia(){
     if (this.form.valid) {
-      await this._liderazgoCompromiso.autoGuardar(this.form.value, "Asistente", 100, this.id_formulario ?? "");
+      await this._asistente.autoGuardar('004-liderazgo-compromiso', this.id_formulario ?? "", this.form.value, { estado: 100 });
       this.crearPdf.generatePdf(true);
     } else {
       this.form.markAllAsTouched();

@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CardsBotonComponent } from "../../../../components/cards/cards-boton/cards-boton.component";
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import AOS from 'aos';
 import { Indicador1Component } from "./indicador1/indicador1.component";
 import { Indicador2Component } from "./indicador2/indicador2.component";
 import { Indicador3Component } from "./indicador3/indicador3.component";
@@ -29,16 +28,11 @@ export class IndicadoresAutogestionPesvComponent implements OnInit {
   openTab = 6;
 
   ngOnInit() {
-    AOS.init(); // Inicializa AOS
   }
 
   async toggleTabs(tabNumber: number,porce?:string ) {
 
     this.openTab = tabNumber;
-    setTimeout(() => {
-      AOS.refresh(); // Reinicia AOS para detectar nuevos elementos
-      
-    }, 200);
   }
 
 }

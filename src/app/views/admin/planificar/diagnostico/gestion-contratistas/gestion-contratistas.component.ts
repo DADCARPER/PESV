@@ -1,8 +1,12 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { DonutComponent } from '../../../../../components/apexChart/donut/donut.component';
+import { ColumnsStrackedComponent } from '../../../../../components/apexChart/columns-stracked/columns-stracked.component';
+import { ColumnsBarHorizontalComponent, CauseData } from '../../../../../components/apexChart/columns-bar-horizontal/columns-bar-horizontal.component';
+import { ApexAxisChartSeries } from 'ng-apexcharts';
 import { AuthenticacionService } from '../../../../../services/shared/authenticacion.service';
 import { FirestoreService } from '../../../../../services/shared/firestore.service';
 import { Models } from '../../../../../interfaces/models';
@@ -10,7 +14,7 @@ import { Models } from '../../../../../interfaces/models';
 @Component({
   selector: 'app-gestion-contratistas',
   standalone: true,
-  imports: [CommonModule, RouterLink, DonutComponent],
+  imports: [CommonModule, RouterLink, DonutComponent, ColumnsStrackedComponent, ColumnsBarHorizontalComponent],
   templateUrl: './gestion-contratistas.component.html',
   styleUrl: './gestion-contratistas.component.css'
 })
@@ -39,20 +43,26 @@ export class GestionContratistasComponent implements OnInit, OnDestroy {
   totalVehiculos = 0;
   conDesplazamientos = 0;
 
-  private _sub?: Subscription;
+  private destroy$ = new Subject<void>();
 
   ngOnInit() {
-    const nit = this._auth.getCurrentUser().displayName;
-    const periodo = this._auth.periodo();
-    const path = `Empresas/${nit}/periodos/${periodo}/006-diagnostico-contratistas`;
-    const q: Models.Firebases.whereQuery[] = [['estado', '==', 'Activo']];
+    this._auth.authState
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(user => {
+        if (!user) return;
+        const nit = user.displayName;
+        const periodo = this._auth.periodo();
+        const path = `Empresas/${nit}/periodos/${periodo}/006-diagnostico-contratistas`;
+        const q: Models.Firebases.whereQuery[] = [['estado', '==', 'Activo']];
 
-    this._sub = this._firestore
-      .getDocumentsQueryChanges<any>(path, q)
-      .subscribe(res => {
-        this.contratistas = res;
-        this._calcularGraficas(res);
-        this.cargando = false;
+        this._firestore
+          .getDocumentsQueryChanges<any>(path, q)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe(res => {
+            this.contratistas = res;
+            this._calcularGraficas(res);
+            this.cargando = false;
+          });
       });
   }
 
@@ -81,6 +91,21 @@ export class GestionContratistasComponent implements OnInit, OnDestroy {
     this.conDesplazamientos = data.filter(c => c.realizaDesplazamientos === 'SI').length;
   }
 
+  get vinculacionData(): CauseData[] {
+    const total = this.vinculacionSeries.reduce((s, v) => s + v, 0);
+    return this.vinculacionLabels.map((label, i) => ({
+      causa: label,
+      porcentaje: total > 0 ? Math.round((this.vinculacionSeries[i] / total) * 1000) / 10 : 0
+    }));
+  }
+
+  get personaSeriesStracked(): ApexAxisChartSeries {
+    return this.personaLabels.map((label, i) => ({
+      name: label,
+      data: [this.personaSeries[i] ?? 0]
+    }));
+  }
+
   private _agrupar(items: any[], campo: string): Record<string, number> {
     return items.reduce((acc, item) => {
       const key = item[campo] || 'Sin definir';
@@ -90,6 +115,7 @@ export class GestionContratistasComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this._sub?.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

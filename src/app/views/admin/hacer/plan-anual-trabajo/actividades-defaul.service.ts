@@ -259,7 +259,8 @@ export class ActividadesDefaulService {
     ];
     
     const nit = this._authcations.getCurrentUser().displayName;
-    const path = `Empresas/${nit}/009-plan-anual-trabajo-actividades`;
+    const periodo = this._authcations.periodo();
+    const path = `Empresas/${nit}/periodos/${periodo}/009-plan-anual-trabajo-actividades`;
     try {
       actividades.forEach(async (actividad) => {
         await this._firestore.createDocument(path, actividad);

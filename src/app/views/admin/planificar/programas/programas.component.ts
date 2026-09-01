@@ -44,7 +44,8 @@ export class ProgramasComponent {
     this.programas = [];
 
     //console.log('Entro a consultarDocumentos');
-    const path = `Empresas/${this.nit}/008-programas-gestion-riesgos`;
+    const periodo = this._authcations.periodo();
+    const path = `Empresas/${this.nit}/periodos/${periodo}/008-programas-gestion-riesgos`;
     let q: Models.Firebases.whereQuery[];
 
     q = [['estado', '==', 'Activo']];

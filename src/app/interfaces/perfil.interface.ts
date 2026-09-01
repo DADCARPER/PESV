@@ -63,18 +63,3 @@ export interface Archivos {
 
 }
 
-export interface diagnosticosedes {
-  
-  nombreSede: string;
-  actividadEmpresa?: string;
-  nombreDepartamento?: string;
-  departamento: string;
-  municipio?: string; 
-  direccion?: string; 
-  telefono?: string;
-  estado?: string;     
-  createdAt?: Date | string;
-  updatedAt?: Date | string;
-  
-}
-

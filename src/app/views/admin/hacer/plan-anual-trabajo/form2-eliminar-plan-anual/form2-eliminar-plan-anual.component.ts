@@ -27,7 +27,8 @@ export class Form2EliminarPlanAnualComponent {
     console.log('ID del documento a eliminar----->>>',this.elminarDoc.id);
     const nit = this._authcations.getCurrentUser().displayName;
     try {
-      await this._firestore.updateDocument(`Empresas/${nit}/009-plan-anual-trabajo/${this.elminarDoc.id}`, {estado: 'NoActivo'});
+      const periodo = this._authcations.periodo();
+      await this._firestore.updateDocument(`Empresas/${nit}/periodos/${periodo}/009-plan-anual-trabajo/${this.elminarDoc.id}`, {estado: 'NoActivo'});
       this._alerta.showSuccess('Registro eliminado exitosamente.');
       this.cerrarModal(); // Cerrar el modal después de guardar
     } catch (error) {

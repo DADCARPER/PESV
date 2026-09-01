@@ -62,25 +62,9 @@ export class LineColumnComponent implements OnChanges {
 
   chartOptions: ChartOptions = {
     series: [
-      {
-        name: "Femenino",
-        type: "column",
-        data: this.seriesData1,
-        color: '#2661b3',
-        
-      },
-      {
-        name: "Total",
-        type: "line",
-        data: this.seriesData3,
-        color: '#1c3f70'
-      },
-      {
-        name: "Masculino",
-        type: "column",
-        data: this.seriesData2,
-        color: '#92b6e7'
-      },
+      { name: "Femenino",  type: "column", data: [], color: '#2661b3' },
+      { name: "Total",     type: "line",   data: [], color: '#1c3f70' },
+      { name: "Masculino", type: "column", data: [], color: '#92b6e7' },
     ],
     chart: {
       height: 350,
@@ -96,16 +80,15 @@ export class LineColumnComponent implements OnChanges {
           pan: false
         }
       },
-      zoom: {
-        enabled: false
-      }
+      zoom: { enabled: false },
+      animations: { dynamicAnimation: { enabled: false } }
     },
     stroke: {
       width: [0, 4, 0],
       curve: 'smooth'
     },
     title: {
-      text: this.title,
+      text: '',
       align: 'left'
     },
     dataLabels: {
@@ -123,7 +106,7 @@ export class LineColumnComponent implements OnChanges {
       
     },
     xaxis: {
-      categories: this.labels,  // Usamos 'this.labels' aquí para las categorías
+      categories: [],
       type: 'category',
       labels: {
         show: true,
@@ -174,12 +157,12 @@ export class LineColumnComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['seriesData1'] || changes['seriesData2'] || changes['seriesData3'] || changes['labels'] || changes['title']) {
-      // Actualizar las opciones del gráfico si los inputs cambian
+      // series[0]=Femenino, series[1]=Total(línea), series[2]=Masculino
       this.chartOptions.series[0].data = this.seriesData1;
-      this.chartOptions.series[1].data = this.seriesData2;
-      this.chartOptions.series[2].data = this.seriesData3;
+      this.chartOptions.series[1].data = this.seriesData3;
+      this.chartOptions.series[2].data = this.seriesData2;
       this.chartOptions.title.text = this.title;
-      this.chartOptions.xaxis.categories = this.labels;  // Asegura que las categorías se actualicen correctamente
+      this.chartOptions.xaxis.categories = this.labels;
     }
   }
 }

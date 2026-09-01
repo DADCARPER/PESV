@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 //import { LoginComponent } from './pages/login/login.component';
-import { authGuard } from './guards/auth.guard';
+import { authGuard, invitadoGuard } from './guards/auth.guard';
 //import { DashboardComponent } from './pages/dashboard/dashboard.component';
 
 import { DashboardComponent } from './views/admin/dashboard/dashboard.component';
@@ -50,7 +50,6 @@ import { GestionArchivos2Component } from './views/admin/planificar/comiteseguri
 import { GestionArchivos3Component } from './views/admin/planificar/politicaseguridadvial/gestion-archivos3/gestion-archivos3.component';
 import { GestionArchivos4Component } from './views/admin/planificar/liderazgo-y-compromiso/gestion-archivos4/gestion-archivos4.component';
 import { GestionArchivos6Component } from './views/admin/planificar/evaluacion/gestion-archivos6/gestion-archivos6.component';
-import { GestionArchivos7Component } from './views/admin/planificar/objetivos-metas/gestion-archivos7/gestion-archivos7.component';
 import { GestionArchivos8Component } from './views/admin/planificar/programas/gestion-archivos8/gestion-archivos8.component';
 import { GestionArchivos9Component } from './views/admin/planificar/actas-reunion-comite/gestion-archivos9/gestion-archivos9.component';
 import { GestionArchivos10Component } from './views/admin/planificar/matriz-legal/gestion-archivos10/gestion-archivos10.component';
@@ -95,7 +94,6 @@ import { MecanismosComunicacionComponent } from './views/admin/actuar/mecanismos
 import { GestionArchivos25Component } from './views/admin/actuar/mejora-acciones-preventivas-correctivas/gestion-archivos25/gestion-archivos25.component';
 import { GestionArchivos26Component } from './views/admin/actuar/mecanismos-comunicacion/gestion-archivos26/gestion-archivos26.component';
 import { EncuestaVistaComponent } from './views/admin/planificar/diagnostico/encuesta-vista/encuesta-vista.component';
-import { LoginEmpresaComponent } from './views/empresas/login/login.component';
 import { EmrpesaComponent } from './layouts/empresas/emrpesa/emrpesa.component';
 import { DetallesActividadComponent } from './views/admin/planificar/programas/detalles-actividad/detalles-actividad.component';
 import { GestionArchivos16Component } from './views/admin/hacer/vias-seguras-administadas-organizacion/gestion-archivos16/gestion-archivos16.component';
@@ -109,6 +107,7 @@ export const routes: Routes = [
   {
     path: 'auth',
     component: AuthComponent,
+    canActivate: [invitadoGuard],  // con sesion abierta no se vuelve al formulario
     children: [
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
@@ -161,7 +160,6 @@ export const routes: Routes = [
       { path: "planificar/evaluacion_y_control_riesgos", component: EvaluacionComponent },
       { path: "planificar/evaluacion_y_control_riesgos/gestion_archivos", component: GestionArchivos6Component },
       { path: "planificar/objetivos_y_metas", component: ObjetivosMetasComponent },
-      { path: "planificar/objetivos_y_metas/gestion_archivos", component: GestionArchivos7Component },
       { path: "planificar/programas_gestion_riesgos", component: ProgramasComponent, },
       { path: "planificar/programas_gestion_riesgos/programas_detalles/:idPrograma", component: DetallesActividadComponent },
       { path: "planificar/programas_gestion_riesgos/gestion_archivos", component: GestionArchivos8Component },
@@ -212,8 +210,8 @@ export const routes: Routes = [
     ],
   },
 
-  // Rutas protegidas (se requieren permisos con authGuard)
-  { path: "starting", component: InicioComponent,  },
+  // Onboarding: exige sesion, se llega tras registro o con nivelAcceso === "no"
+  { path: "starting", component: InicioComponent, canActivate: [authGuard] },
   // { path: 'dashboard1', component: DashboardComponent, canActivate: [authGuard] },
   // { path: 'login1', component: LoginComponent },
   // { path: 'actuar', component: ActuarComponent, canActivate: [authGuard] },
@@ -234,7 +232,7 @@ export const routes: Routes = [
 
   // Rutas sin layout
   { path: 'index', component: IndexComponent },
-  { path: 'login', component: LoginEmpresaComponent },
+  { path: 'login', redirectTo: '/auth/login', pathMatch: 'full' },
   { path: 'landing', component: LandingComponent },
   //{ path: 'profile', component: EncuestaVistaComponent },
   { path: 'encuesta/:nitEmpresa', component: EncuestaVistaComponent },

@@ -2,7 +2,7 @@ import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-import { PoliticaSeguridadVialService } from '../../../services/shared/politica-seguridad-vial.service';
+import { AsistenteFormularioService } from '../../../services/shared/asistente-formulario.service';
 
 @Component({
   selector: 'app-pdf-politicas-seguridad-vial',
@@ -13,7 +13,7 @@ import { PoliticaSeguridadVialService } from '../../../services/shared/politica-
 })
 export class PdfPoliticasSeguridadVialComponent implements OnInit {
 
-  private _politicaSeguridadVial = inject(PoliticaSeguridadVialService);
+  private _asistente = inject(AsistenteFormularioService);
 
   @Input() mostrarBotones: boolean = false;
   @Input() subirBlob: boolean = false;
@@ -46,7 +46,7 @@ export class PdfPoliticasSeguridadVialComponent implements OnInit {
 
     if (this.idFormulario !== "0"){
 
-      const dataCruda = await this._politicaSeguridadVial.getfomularioEdit(this.idFormulario);
+      const dataCruda = await this._asistente.getFormulario('003-politicas-seguridad-vial', this.idFormulario);
 
         console.log("datacrudaaaaaaaaaaa",dataCruda);
       if (dataCruda['fechaDocumento'] != "") {// valido si un parametro obligatorio esta en el objeto. en caso de no estar es por que no existe el docuemnto
@@ -161,7 +161,7 @@ export class PdfPoliticasSeguridadVialComponent implements OnInit {
     if (subirBlob){
       pdfMake.createPdf(documentDefinition).getBlob((blob:any) => {
       
-        this._politicaSeguridadVial.uploadPdfToFirebase(blob,this.idFormulario);
+        this._asistente.uploadPdf('003-politicas-seguridad-vial', this.idFormulario, blob);
 
       });
     }

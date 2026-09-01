@@ -85,7 +85,8 @@ export class Form4CrearEditarActividadComponent {
 
     const uid = this._authcations.getCurrentUser().uid;
     const nit = this._authcations.getCurrentUser().displayName;
-    const path = `Empresas/${nit}/009-plan-anual-trabajo-actividades`;
+    const periodo = this._authcations.periodo();
+    const path = `Empresas/${nit}/periodos/${periodo}/009-plan-anual-trabajo-actividades`;
     const raw = this.agregarActividadForm.value;
     // Normaliza meta y valorReal a 0 si vienen vacíos
    

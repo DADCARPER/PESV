@@ -88,7 +88,8 @@ export class Form1AddActividadesComponent {
 
     const uid = this._authcations.getCurrentUser().uid;
     const nit = this._authcations.getCurrentUser().displayName;
-    const path = `Empresas/${nit}/008-actividades-gestion-riesgos`;
+    const periodo = this._authcations.periodo();
+    const path = `Empresas/${nit}/periodos/${periodo}/008-actividades-gestion-riesgos`;
     const raw = this.agregarActividadForm.value;
     // Normaliza meta y valorReal a 0 si vienen vacíos
     const payload = {

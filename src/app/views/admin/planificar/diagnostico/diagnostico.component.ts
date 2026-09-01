@@ -13,6 +13,7 @@ import { ServiciosComponent } from './servicios/servicios.component';
 import { VehiculosComponent } from './vehiculos/vehiculos.component';
 import { RutasFrecuentesComponent } from './rutas-frecuentes/rutas-frecuentes.component';
 import { PlanEmergenciasComponent } from './plan-emergencias/plan-emergencias.component';
+import { ResultadosEncuestaComponent } from './resultados-encuesta/resultados-encuesta.component';
 
 // Componentes reutilizables
 import { CardStats2Component } from '../../../../components/cards/card-stats2/card-stats2.component';
@@ -38,6 +39,7 @@ import { Models } from '../../../../interfaces/models';
     SedesComponent, ContratistasComponent, ColaboradoresComponent, 
     EncuestaParametrosComponent, ServiciosComponent,
     VehiculosComponent, RutasFrecuentesComponent, PlanEmergenciasComponent,
+    ResultadosEncuestaComponent,
     CardStats2Component, CardsMedicionBarraProgresoComponent,
     CrearColaboradoresComponent, ImportarColaboradoresComponent,
     LoadingComponent,

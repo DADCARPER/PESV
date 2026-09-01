@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core'; // Agregamos Input
+import { Component, Input, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   NgApexchartsModule,
@@ -41,7 +41,7 @@ export type ChartOptions = {
     </div>
   `
 })
-export class ColumnsStrackedComponent {
+export class ColumnsStrackedComponent implements OnChanges {
   @Input() series: ApexAxisChartSeries = [
     {
       name: "No",
@@ -54,15 +54,14 @@ export class ColumnsStrackedComponent {
   ];
 
   chartOptions: ChartOptions = {
-    series: this.series,
+    series: [],
     chart: {
       type: 'bar',
       height: 350,
       stacked: true,
       stackType: '100%',
-      toolbar: {
-        show: false
-      },
+      toolbar: { show: false },
+      animations: { dynamicAnimation: { enabled: false } },
       defaultLocale: 'es',
       locales: [{
         name: 'es',
@@ -83,8 +82,9 @@ export class ColumnsStrackedComponent {
     },
     dataLabels: {
       enabled: true,
-      formatter: function(val) {
-        return val + "%";
+      formatter: function(val: number) {
+        const formatted = Number.isInteger(val) ? val : val.toFixed(2);
+        return formatted + "%";
       },
       style: {
         fontSize: '14px',
@@ -111,4 +111,8 @@ export class ColumnsStrackedComponent {
       horizontalAlign: 'center'
     }
   };
+
+  ngOnChanges(): void {
+    this.chartOptions = { ...this.chartOptions, series: this.series };
+  }
 }

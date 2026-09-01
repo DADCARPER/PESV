@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { DonutComponent } from '../../../../../components/apexChart/donut/donut.component';
+import { ColumnsStrackedNumericoComponent } from '../../../../../components/apexChart/columns-stracked-numerico/columns-stracked-numerico.component';
+import { ColumnsBarHorizontalComponent, CauseData } from '../../../../../components/apexChart/columns-bar-horizontal/columns-bar-horizontal.component';
+import { LineColumnComponent } from '../../../../../components/apexChart/line-column/line-column.component';
 import { AuthenticacionService } from '../../../../../services/shared/authenticacion.service';
 import { FirestoreService } from '../../../../../services/shared/firestore.service';
 import { Models } from '../../../../../interfaces/models';
@@ -10,7 +13,7 @@ import { Models } from '../../../../../interfaces/models';
 @Component({
   selector: 'app-gestion-colaboradores',
   standalone: true,
-  imports: [CommonModule, RouterLink, DonutComponent],
+  imports: [CommonModule, RouterLink, DonutComponent, ColumnsStrackedNumericoComponent, ColumnsBarHorizontalComponent, LineColumnComponent],
   templateUrl: './gestion-colaboradores.component.html',
   styleUrl: './gestion-colaboradores.component.css'
 })
@@ -27,7 +30,13 @@ export class GestionColaboradoresComponent implements OnInit, OnDestroy {
   contratoLabels: string[] = []; contratoSeries: number[] = [];
   escolaridadLabels: string[] = []; escolaridadSeries: number[] = [];
 
-  // ── Fila 2: perfil vial ────────────────────────────────────────────────
+  // ── Fila 2: género por área ────────────────────────────────────────────
+  lineColumnLabels:    string[] = [];
+  lineColumnFemenino:  number[] = [];
+  lineColumnMasculino: number[] = [];
+  lineColumnPct:       number[] = [];
+
+  // ── Fila 3: perfil vial ────────────────────────────────────────────────
   conductorLabels:     string[] = []; conductorSeries:     number[] = [];
   capacitacionLabels:  string[] = []; capacitacionSeries:  number[] = [];
   siniestrosLabels:    string[] = []; siniestrosSeries:    number[] = [];
@@ -65,7 +74,10 @@ export class GestionColaboradoresComponent implements OnInit, OnDestroy {
     this._setDonut(data, 'tipoContrato', 'contratoLabels',     'contratoSeries');
     this._setDonut(data, 'escolaridad',  'escolaridadLabels',  'escolaridadSeries');
 
-    // Fila 2
+    // Fila 2: género por área
+    this._calcularLineColumn(data);
+
+    // Fila 3
     this._setBoolDonut(data, 'rolConductorLaboral',       'conductorLabels',    'conductorSeries',    'Conductor laboral', 'No conductor');
     this._setBoolDonut(data, 'capacitacionSeguridadVial', 'capacitacionLabels', 'capacitacionSeries', 'Con capacitación',  'Sin capacitación');
     this._setBoolDonut(data, 'haTenidoSiniestros',        'siniestrosLabels',   'siniestrosSeries',   'Con siniestros',    'Sin siniestros');
@@ -76,6 +88,23 @@ export class GestionColaboradoresComponent implements OnInit, OnDestroy {
     this.conSiniestros    = data.filter(c => c.haTenidoSiniestros        === 'SI').length;
     this.conInfracciones  = data.filter(c => c.tieneInfracciones         === 'SI').length;
     this.conLicencia      = data.filter(c => c.tieneLicencia             === 'SI').length;
+  }
+
+  private _calcularLineColumn(data: any[]) {
+    const areas: Record<string, { f: number; m: number }> = {};
+    for (const c of data) {
+      const area = c.areaDepartamento || 'Sin área';
+      if (!areas[area]) areas[area] = { f: 0, m: 0 };
+      if (c.genero === 'Femenino') areas[area].f++;
+      else areas[area].m++;
+    }
+    const total = data.length || 1;
+    this.lineColumnLabels    = Object.keys(areas);
+    this.lineColumnFemenino  = this.lineColumnLabels.map(a => areas[a].f);
+    this.lineColumnMasculino = this.lineColumnLabels.map(a => areas[a].m);
+    this.lineColumnPct       = this.lineColumnLabels.map(a =>
+      Math.round(((areas[a].f + areas[a].m) / total) * 10000) / 100
+    );
   }
 
   /** Agrupa por campo libre */
@@ -98,6 +127,14 @@ export class GestionColaboradoresComponent implements OnInit, OnDestroy {
     if (no > 0) { labels.push(labelNo); series.push(no); }
     (this as any)[lKey] = labels;
     (this as any)[sKey] = series;
+  }
+
+  get contratoData(): CauseData[] {
+    const total = this.contratoSeries.reduce((s, v) => s + v, 0);
+    return this.contratoLabels.map((label, i) => ({
+      causa: label,
+      porcentaje: total > 0 ? Math.round((this.contratoSeries[i] / total) * 1000) / 10 : 0
+    }));
   }
 
   ngOnDestroy() { this._sub?.unsubscribe(); }

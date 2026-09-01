@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, inject } from '@angular/core';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-import { LiderDelPesvService } from '../../../services/shared/lider-del-pesv.service';
+import { AsistenteFormularioService } from '../../../services/shared/asistente-formulario.service';
 import { CommonModule } from '@angular/common';
 
 //pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -15,7 +15,7 @@ import { CommonModule } from '@angular/common';
 })
 export class PdfLiderPesvComponent implements OnInit {
 
-  private  liderDelPesvService = inject(LiderDelPesvService);
+  private _asistente = inject(AsistenteFormularioService);
 
   @Input() subirBlob: boolean = false;
   @Input() descargaOprevia: string = "vista"; //True es igual a vista previa false a descargar
@@ -46,26 +46,12 @@ export class PdfLiderPesvComponent implements OnInit {
   }
 
   async llamodatosFormulario(){
-    if (this.idFormulario !== "0"){
+    if (this.idFormulario === "0") return;
 
-   
-      const dataCruda = await this.liderDelPesvService.getfomularioEdit(this.idFormulario,this.idusuario);
-      console.log( dataCruda);
-        if (dataCruda.exists()) {
-          
-          this.data = dataCruda.data();
-          //console.log( 'xsxsxsxs'+this.data);
+    this.data = await this._asistente.getFormulario('001-lider-pesv', this.idFormulario);
 
-          console.log('Datos cargados en el formulario:', this.data); //data['cargoLider']
-
-        } else {
-          console.error('No se encontraron datos para este formulario');
-        }
-
-  
-      console.log('SI HAY FORMULARIO')
-    }else{
-      console.log('NO HAY FORMULARIO');
+    if (Object.keys(this.data).length === 0) {
+      console.error('[PdfLiderPesv] No se encontraron datos para el formulario', this.idFormulario);
     }
   }
 
@@ -280,7 +266,7 @@ export class PdfLiderPesvComponent implements OnInit {
     if (subirBlob){
       pdfMake.createPdf(documentDefinition).getBlob((blob:any) => {
       
-        this.liderDelPesvService.uploadPdfToFirebase(blob,this.idusuario,this.idFormulario);
+        this._asistente.uploadPdf('001-lider-pesv', this.idFormulario, blob);
   
       });
     }

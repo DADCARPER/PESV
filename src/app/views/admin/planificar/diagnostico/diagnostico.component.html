@@ -68,7 +68,9 @@
             {id: 4,  label: 'Contratistas'},
             {id: 5,  label: 'Vehículos'},
             {id: 6,  label: 'Rutas frecuentes'},
-            {id: 7,  label: 'Plan emergencias'}
+            {id: 7,  label: 'Plan emergencias'},
+            {id: 8,  label: 'Encuesta'},
+            {id: 9,  label: 'Resultados encuesta'}
           ]; track tab.id) {
             <button (click)="toggleTabs(tab.id)"
               [class]="openTab === tab.id
@@ -114,13 +116,13 @@
           </div>
 
           <!-- Progreso general -->
-          <div class="mb-4">
+          <!-- <div class="mb-4">
             <app-cards-medicion-barra-progreso
               [colorBarra]="'#d97706'"
               [textColor]="'text-amber-600'"
               [valorPorcentual]="diagnosticoBase.porcentajeTotal">
             </app-cards-medicion-barra-progreso>
-          </div>
+          </div> -->
 
           <!-- Módulos del diagnóstico -->
           <div class="flex flex-col md:flex-row gap-2 mb-2">
@@ -132,7 +134,7 @@
                 </div>
                 <a [routerLink]="['/admin/planificar/diagnostico/informacion_organizacion']"
                   class="text-xl font-medium text-gray-900 hover:text-amber-600 hover:underline cursor-pointer transition-colors">
-                  Información Organizacional
+                  Información Organización
                 </a>
               </div>
               <p class="text-base text-gray-500 mb-3">Registro de sedes, servicios y estructura organizacional básica para el diagnóstico de seguridad vial.</p>
@@ -274,22 +276,22 @@
             <!-- Plan de emergencias -->
             <article class="w-full md:w-1/3 rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200">
               <div class="flex items-center gap-3 mb-2">
-                <div class="text-white inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-red-500">
+                <div class="text-white inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-amber-600">
                   <iconify-icon icon="hugeicons:alert-02" width="28" height="28"></iconify-icon>
                 </div>
                 <a [routerLink]="['/admin/planificar/diagnostico/plan_emergencias']"
-                  class="text-xl font-medium text-gray-900 hover:text-red-500 hover:underline cursor-pointer transition-colors">
+                  class="text-xl font-medium text-gray-900 hover:text-amber-600 hover:underline cursor-pointer transition-colors">
                   Plan de Emergencias
                 </a>
               </div>
               <p class="text-base text-gray-500 mb-3">Protocolos de atención ante emergencias viales: accidentes, fallas mecánicas, incendios y emergencias médicas.</p>
               <div class="flex gap-2 mb-3">
-                <div class="flex-1 bg-red-50 p-3 rounded-lg border border-red-100 text-center">
-                  <p class="font-medium text-red-700">{{ datosPlanEmergencias.length }}</p>
+                <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
+                  <p class="font-medium text-amber-700">{{ datosPlanEmergencias.length }}</p>
                   <p class="text-sm">PLANES</p>
                 </div>
               </div>
-              <button (click)="toggleTabs(7)" class="w-full text-red-500 bg-white border border-solid border-red-400 hover:bg-red-500 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
+              <button (click)="toggleTabs(7)" class="w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
                 <div class="flex items-center justify-center gap-1">
                   <iconify-icon icon="hugeicons:plus-sign-square" width="16" height="16"></iconify-icon> Ver Detalles
                 </div>
@@ -335,10 +337,15 @@
         <app-plan-emergencias [datos]="datosPlanEmergencias"></app-plan-emergencias>
       }
 
-      <!-- Tab 9: Encuesta -->
-      <!-- @if (openTab === 9) {
+      <!-- Tab 8: Encuesta -->
+      @if (openTab === 8) {
         <app-encuesta-parametros></app-encuesta-parametros>
-      } -->
+      }
+
+      <!-- Tab 9: Resultados encuesta -->
+      @if (openTab === 9) {
+        <app-resultados-encuesta></app-resultados-encuesta>
+      }
 
     }
 

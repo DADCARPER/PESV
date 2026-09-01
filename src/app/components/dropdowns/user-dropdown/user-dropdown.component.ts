@@ -1,7 +1,8 @@
 import { Component, Input, inject } from "@angular/core";
 import { CommonModule } from '@angular/common';
 import { AuthenticacionService } from "../../../services/shared/authenticacion.service";
-import { RouterLink } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
+import { RUTA_LOGIN } from "../../../guards/auth.guard";
 
 @Component({
   selector: "app-user-dropdown",
@@ -17,6 +18,7 @@ export class UserDropdownComponent {
   @Input() email: string = '---';
 
   private _auth = inject(AuthenticacionService);
+  private _router = inject(Router);
   dropdownPopoverShow = false;
 
   getInitials(): string {
@@ -28,8 +30,15 @@ export class UserDropdownComponent {
     this.dropdownPopoverShow = !this.dropdownPopoverShow;
   }
 
-  salir(event: Event) {
-    this._auth.logout();
+  async salir(event: Event) {
     this.toggleDropdown(event);
+    try {
+      await this._auth.logout();
+    } catch (error: unknown) {
+      console.error('[UserDropdown] logout:', error);
+    }
+    // Sin esto la vista de admin seguía en pantalla con la sesión ya cerrada:
+    // el guard solo se evalúa al navegar.
+    this._router.navigate([RUTA_LOGIN]);
   }
 }

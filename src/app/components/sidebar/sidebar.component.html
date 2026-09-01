@@ -1,6 +1,7 @@
 <nav class="md:left-0 md:block md:fixed md:top-0 md:bottom-0 md:overflow-y-auto md:flex-row md:flex-nowrap md:overflow-hidden shadow-xl bg-white flex flex-wrap items-center justify-between relative md:w-64 z-10 py-4 px-4">
   <div class="md:flex-col md:items-stretch md:min-h-full md:flex-nowrap px-0 flex flex-wrap items-center justify-between w-full mx-auto">
-    <!-- Toggler -->
+
+    <!-- Toggler mobile -->
     <button
       class="cursor-pointer text-black opacity-50 md:hidden px-3 py-1 text-xl leading-none bg-transparent rounded border border-solid border-transparent"
       type="button"
@@ -8,50 +9,24 @@
     >
       <i class="fas fa-bars"></i>
     </button>
-    <!-- Brand -->
-    <!-- <a
-      [routerLink]="[]"
-      class="md:block text-left md:pb-2 text-blueGray-600 mr-0 inline-block whitespace-nowrap text-sm uppercase font-bold p-4 px-0"
-    > -->
-      <span class="block sm:hidden"> PESV INTERACTIVO </span>
-      <!-- <span class="hidden sm:block"> PESV INTERACTIVO LOGO</span> -->
-      
-        <!-- User -->
-         
-        <!-- Logo de la empresa -->
-        <div class="w-full hidden md:flex flex-col items-center justify-center py-4">
-          <img
-            [src]="_logoimagen.hasLogo() ? _logoimagen.logoUrl : 'assets/img/user.png'"
-            alt="Logo empresa"
-            class="w-28 h-28 object-contain rounded-xl shadow-sm bg-gray-50 p-1 cursor-pointer"
-            [routerLink]="['/admin/dashboard']"
-          />
-          @if (datosUser.nombreEmpresa) {
-            <p class="mt-2 text-xs font-semibold text-gray-600 text-center leading-tight px-2">
-              {{ datosUser.nombreEmpresa }}
-            </p>
-          }
-        </div>
-       
-        
-        <!-- Form -->
-        <!-- <form class="md:flex hidden flex-row flex-wrap items-center lg:ml-auto">
-          <div class="relative flex w-full flex-wrap items-stretch">
-            <span
-              class="z-10 h-full leading-snug font-normal absolute text-center text-blueGray-300 absolute bg-transparent rounded text-base items-center justify-center w-8 pl-3 py-3"
-              ><i class="fas fa-search"></i
-            ></span>
-            <input
-              type="text"
-              placeholder="Search here..."
-              class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white bg-white rounded text-sm shadow outline-none focus:outline-none focus:ring w-full pl-10"
-            />
-          </div>
-        </form> -->
-        
-      
-    <!-- </a> -->
-    <!-- User -->
+
+    <!-- Logo + nombre empresa -->
+    <span class="block sm:hidden">PESV INTERACTIVO</span>
+    <div class="w-full hidden md:flex flex-col items-center justify-center py-4">
+      <img
+        [src]="_logoimagen.hasLogo() ? _logoimagen.logoUrl : 'assets/img/user.png'"
+        alt="Logo empresa"
+        class="w-28 h-28 object-contain rounded-xl shadow-sm bg-gray-50 p-1 cursor-pointer"
+        [routerLink]="['/admin/dashboard']"
+      />
+      @if (datosUser.nombreEmpresa) {
+        <p class="mt-2 text-xs font-semibold text-gray-600 text-center leading-tight px-2">
+          {{ datosUser.nombreEmpresa }}
+        </p>
+      }
+    </div>
+
+    <!-- Mobile user -->
     <ul class="md:hidden items-center flex flex-wrap list-none">
       <li class="inline-block relative">
         <app-notification-dropdown class="block"></app-notification-dropdown>
@@ -64,828 +39,432 @@
         />
       </li>
     </ul>
+
     <!-- Collapse -->
-    <div 
+    <div
       class="md:flex md:flex-col md:items-stretch md:opacity-100 md:relative md:mt-0 md:shadow-none shadow absolute top-0 left-0 right-0 z-40 overflow-y-auto overflow-x-hidden h-auto items-center flex-1 rounded"
       [ngClass]="collapseShow"
     >
-      <!-- Collapse header -->
+      <!-- Collapse header mobile -->
       <div class="md:min-w-full md:hidden block pb-4 mb-4 border-b border-solid border-blueGray-200">
         <div class="flex flex-wrap">
           <div class="w-6/12">
-            <a
-              [routerLink]="['/']"
-              class="md:block text-left md:pb-2 text-blueGray-600 mr-0 inline-block whitespace-nowrap text-sm uppercase font-bold p-4 px-0"
-            >
+            <a [routerLink]="['/']"
+              class="md:block text-left md:pb-2 text-blueGray-600 mr-0 inline-block whitespace-nowrap text-sm uppercase font-bold p-4 px-0">
               PESV INTERACTIVO
             </a>
           </div>
           <div class="w-6/12 flex justify-end">
-            <button
-              type="button"
+            <button type="button"
               class="cursor-pointer text-black opacity-50 md:hidden px-3 py-1 text-xl leading-none bg-transparent rounded border border-solid border-transparent"
-              (click)="toggleCollapseShow('hidden')"
-            >
+              (click)="toggleCollapseShow('hidden')">
               <i class="fas fa-times"></i>
             </button>
           </div>
         </div>
       </div>
-      <!-- Form -->
+
+      <!-- Mobile search -->
       <form class="mt-6 mb-4 md:hidden">
         <div class="mb-3 pt-0">
-          <input
-            type="text"
-            placeholder="Search"
-            class="border-0 px-3 py-2 h-12 border border-solid border-blueGray-500 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-base leading-snug shadow-none outline-none focus:outline-none w-full font-normal"
-          />
+          <input type="text" placeholder="Search"
+            class="px-3 py-2 h-12 border border-solid border-blueGray-500 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-base leading-snug shadow-none outline-none focus:outline-none w-full font-normal" />
         </div>
       </form>
 
-      <!-- Divider -->
-      <!-- <hr class="my-4 md:min-w-full" /> -->
-      <!-- Heading -->
-      <!-- <h6
-        class="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline"
-      >
-        Admin Layout Pages
-      </h6> -->
       <!-- Navigation -->
+      <ul class="md:flex-col md:min-w-full pt-2 flex flex-col list-none gap-0.5">
 
-      <ul class="md:flex-col md:min-w-full pt-4 flex flex-col list-none">
-        
-        <li class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-          <iconify-icon icon="hugeicons:dashboard-browsing" width="20" height="20" ></iconify-icon>
-          <a
-            [routerLink]="['/admin/dashboard']"
-            
-            class="pl-2"
+        <!-- Dashboard -->
+        <li>
+          <a [routerLink]="['/admin/dashboard']"
             routerLinkActive
             #adminDashboard="routerLinkActive"
-            [ngClass]="
-              adminDashboard.isActive
-                ? 'text-orange-600 hover:text-orange-700'
-                : 'text-blueGray-700 hover:text-blueGray-500'
-            "
             (click)="collapseDashboard()"
-          >
-            
+            class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150"
+            [ngClass]="adminDashboard.isActive
+              ? 'bg-orange-50 text-orange-600 border-l-2 border-orange-500'
+              : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800'">
+            <iconify-icon icon="hugeicons:dashboard-browsing" width="20" height="20"></iconify-icon>
             Dashboard
-            
           </a>
-        
-          
         </li>
- 
-        <li class="items-center">
-          <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-            <iconify-icon icon="hugeicons:task-edit-01" width="20" height="20" ></iconify-icon>
-            <a
-              [routerLink]="['/admin/planificar']"
+
+        <!-- ── PLANEAR ──────────────────────────── -->
+        <li class="mt-3">
+          <div class="flex items-center gap-2 px-2 mb-1">
+            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-600 text-white text-xs font-bold shrink-0">P</span>
+            <a [routerLink]="['/admin/planificar']"
               (click)="collapsePlanificar()"
-              class="pl-2"
               routerLinkActive
               #adminSettings="routerLinkActive"
-              [ngClass]="
-                adminSettings.isActive
-                  ? 'text-orange-600 hover:text-orange-700'
-                  : 'text-blueGray-700 hover:text-blueGray-500'
-              "
-            >
+              class="flex-1 flex items-center justify-between text-sm font-semibold transition-colors duration-150"
+              [ngClass]="adminSettings.isActive ? 'text-amber-600' : 'text-gray-700 hover:text-gray-900'">
               Planear
-              <i class="fas ml-2" [ngClass]="submenuPlanificar ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+              <i class="fas text-xs text-gray-400" [ngClass]="submenuPlanificar ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
             </a>
           </div>
-            
-            <ul class="ml-4" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/planificar/liderdelpesv']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                    (click)="toggleCollapseShow('hidden')"
-                  >
-                    líder del pesv
-                  </a>
-                </div>
-              </li>
-            </ul>
-            <ul class="ml-4" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/planificar/comiteseguridadvial']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                  >
-                    Comité seguridad vial
-                  </a>
-                </div>
-              </li>
-            </ul>
-            <ul class="ml-4" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/planificar/politicaseguridadvial']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                  >
-                    Política seguridad vial
-                  </a>
-                </div>
-              </li>
-            </ul>
-            <ul class="ml-4" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/planificar/liderazgo_y_compromiso']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                  >
-                    Liderazgo compromiso
-                  </a>
-                </div>
-              </li>
-            </ul>
-            <ul class="ml-4" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    (click)="collapseDiagnostico()"
-                    [routerLink]="['/admin/planificar/diagnostico']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                  >
-                  Diagnóstico
-                  <i class="fas ml-2" [ngClass]="submenuDiagnostico ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-                  </a>
-                </div>
-                  <!-- Submenú "Diagnóstico" dentro de "Planificar" -->
-                  <ul class="ml-4" [ngClass]="submenuDiagnostico ? 'block' : 'hidden'">
-                    <li class="items-center">
-                      <a
-                        [routerLink]="['/admin/planificar/diagnostico/sociodemografia']"
-                        class="block rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                      >
-                        <i class="fas fa-user-friends text-blueGray-300 mr-1 text-sm"></i>
-                        Sociodemografia
-                        
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="ml-4" [ngClass]="submenuDiagnostico ? 'block' : 'hidden'">
-                    <li class="items-center">
-                      <a
-                        [routerLink]="['/admin/planificar/diagnostico/movilidad']"
-                        class="block rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                      >
-                        <i class="fas fa-car text-blueGray-300 mr-1 text-sm"></i>
-                        Movilidad
-                        
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="ml-4" [ngClass]="submenuDiagnostico ? 'block' : 'hidden'">
-                    <li class="items-center">
-                      <a
-                        [routerLink]="['/admin/planificar/diagnostico/factor_riesgo']"
-                        class="block rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                      >
-                        <i class="fas fa-exclamation-circle text-blueGray-300 mr-1 text-sm"></i>
-                        Factor riesgo
-                        
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="ml-4" [ngClass]="submenuDiagnostico ? 'block' : 'hidden'">
-                    <li class="items-center">
-                      <a
-                        [routerLink]="['/admin/planificar/diagnostico/accidentalidad']"
-                        class="block rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                      >
-                        <i class="fas fa-ambulance text-blueGray-300 mr-1 text-sm"></i>
-                        Accidentalidad
-                        
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="ml-4" [ngClass]="submenuDiagnostico ? 'block' : 'hidden'">
-                    <li class="items-center">
-                      <a
-                        [routerLink]="['/admin/planificar/diagnostico/encuestas']"
-                        class="block rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                      >
-                        <i class="fas fa-poll text-blueGray-300 mr-1 text-sm"></i>
-                        Encuestas
-                        
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="ml-4" [ngClass]="submenuDiagnostico ? 'block' : 'hidden'">
-                    <li class="items-center">
-                      <a
-                        [routerLink]="['/admin/planificar/diagnostico/evidencias']"
-                        class="block rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                      >
-                        <i class="fas fa-file-alt text-blueGray-300 mr-1 text-sm"></i>
-                        Evidencias
-                        
-                      </a>
-                    </li>
-                  </ul>
-              </li>
-            </ul>
-            <ul class="ml-4" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/planificar/evaluacion_y_control_riesgos']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                  >
-                    Evaluación riesgo
-                  </a>
-                </div>
-              </li>
-            </ul>
-            <ul class="ml-4" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/planificar/objetivos_y_metas']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                  >
-                    Objetivos Metas
-                  </a>
-                </div>
-              </li>
-            </ul>
-            
-            <ul class="ml-4" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/planificar/programas_gestion_riesgos']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                  >
-                    Programas riesgo
-                  </a>
-                </div>
-              </li>
-            </ul>
 
-            <ul class="ml-4" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/planificar/actas_reunion_comite']"
-                    class="p-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                  >
-                    Actas de comité
-                  </a>
-                </div>
-              </li>
-            </ul>
+          <ul class="ml-3 border-l-2 border-amber-100 pl-2 flex flex-col gap-0.5" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
 
-            <ul class="ml-4" [ngClass]="submenuPlanificar ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/planificar/matriz_legal']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuPlanificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                  >
-                    Matriz legal
-                  </a>
-                </div>
-              </li>
-            </ul>
+            <li>
+              <a [routerLink]="['/admin/planificar/liderdelpesv']"
+                routerLinkActive="!bg-amber-50 !text-amber-700 !font-semibold"
+                (click)="toggleCollapseShow('hidden')"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Líder del PESV
+              </a>
+            </li>
 
+            <li>
+              <a [routerLink]="['/admin/planificar/comiteseguridadvial']"
+                routerLinkActive="!bg-amber-50 !text-amber-700 !font-semibold"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Comité seguridad vial
+              </a>
+            </li>
+
+            <li>
+              <a [routerLink]="['/admin/planificar/politicaseguridadvial']"
+                routerLinkActive="!bg-amber-50 !text-amber-700 !font-semibold"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Política seguridad vial
+              </a>
+            </li>
+
+            <li>
+              <a [routerLink]="['/admin/planificar/liderazgo_y_compromiso']"
+                routerLinkActive="!bg-amber-50 !text-amber-700 !font-semibold"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Liderazgo y compromiso
+              </a>
+            </li>
+
+            <!-- Diagnóstico con sub-submenú -->
+            <li>
+              <a [routerLink]="['/admin/planificar/diagnostico']"
+                (click)="collapseDiagnostico()"
+                routerLinkActive="!text-amber-700 !font-semibold"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Diagnóstico
+                <i class="fas text-xs ml-auto text-gray-400" [ngClass]="submenuDiagnostico ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+              </a>
+              <ul class="ml-3 border-l border-amber-100 pl-2 mt-0.5 flex flex-col gap-0.5" [ngClass]="submenuDiagnostico ? 'block' : 'hidden'">
+                <li>
+                  <a [routerLink]="['/admin/planificar/diagnostico/gestion_colaboradores']"
+                    routerLinkActive="!bg-amber-50 !text-amber-700 !font-semibold"
+                    class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-all">
+                    <iconify-icon icon="hugeicons:user-multiple-02" width="13" height="13"></iconify-icon>
+                    Sociodemografía
+                  </a>
+                </li>
+                <li>
+                  <a [routerLink]="['/admin/planificar/diagnostico/flota_vehiculos']"
+                    routerLinkActive="!bg-amber-50 !text-amber-700 !font-semibold"
+                    class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-all">
+                    <iconify-icon icon="hugeicons:car-01" width="13" height="13"></iconify-icon>
+                    Movilidad
+                  </a>
+                </li>
+                <li>
+                  <a [routerLink]="['/admin/planificar/diagnostico/plan_emergencias']"
+                    routerLinkActive="!bg-amber-50 !text-amber-700 !font-semibold"
+                    class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-all">
+                    <iconify-icon icon="hugeicons:alert-02" width="13" height="13"></iconify-icon>
+                    Factor riesgo
+                  </a>
+                </li>
+                <li>
+                  <a [routerLink]="['/admin/planificar/diagnostico/rutas_frecuentes']"
+                    routerLinkActive="!bg-amber-50 !text-amber-700 !font-semibold"
+                    class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-all">
+                    <iconify-icon icon="hugeicons:ambulance" width="13" height="13"></iconify-icon>
+                    Accidentalidad
+                  </a>
+                </li>
+                <!-- <li>
+                  <a [routerLink]="['/admin/planificar/diagnostico/encuestas']"
+                    routerLinkActive="!bg-amber-50 !text-amber-700 !font-semibold"
+                    class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-all">
+                    <iconify-icon icon="hugeicons:task-01" width="13" height="13"></iconify-icon>
+                    Encuestas
+                  </a>
+                </li>
+                <li>
+                  <a [routerLink]="['/admin/planificar/diagnostico/evidencias']"
+                    routerLinkActive="!bg-amber-50 !text-amber-700 !font-semibold"
+                    class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-all">
+                    <iconify-icon icon="hugeicons:file-01" width="13" height="13"></iconify-icon>
+                    Evidencias
+                  </a>
+                </li> -->
+              </ul>
+            </li>
+
+            <li>
+              <a [routerLink]="['/admin/planificar/evaluacion_y_control_riesgos']"
+                routerLinkActive="!bg-amber-50 !text-amber-700 !font-semibold"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Evaluación de riesgo
+              </a>
+            </li>
+
+            <li>
+              <a [routerLink]="['/admin/planificar/objetivos_y_metas']"
+                routerLinkActive="!bg-amber-50 !text-amber-700 !font-semibold"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Objetivos y metas
+              </a>
+            </li>
+
+            <li>
+              <a [routerLink]="['/admin/planificar/programas_gestion_riesgos']"
+                routerLinkActive="!bg-amber-50 !text-amber-700 !font-semibold"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Programas de riesgo
+              </a>
+            </li>
+
+            <li>
+              <a [routerLink]="['/admin/planificar/actas_reunion_comite']"
+                routerLinkActive="!bg-amber-50 !text-amber-700 !font-semibold"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Actas de comité
+              </a>
+            </li>
+
+            <li>
+              <a [routerLink]="['/admin/planificar/matriz_legal']"
+                routerLinkActive="!bg-amber-50 !text-amber-700 !font-semibold"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Matriz legal
+              </a>
+            </li>
+
+          </ul>
         </li>
 
-        <li class="items-center">
-          <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-            <iconify-icon icon="hugeicons:configuration-02" width="24" height="24"></iconify-icon>
-            <a
-              [routerLink]="['/admin/hacer']"
+        <!-- ── HACER ──────────────────────────── -->
+        <li class="mt-3">
+          <div class="flex items-center gap-2 px-2 mb-1">
+            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-sky-600 text-white text-xs font-bold shrink-0">H</span>
+            <a [routerLink]="['/admin/hacer']"
               (click)="collapseHacer()"
-              class="pl-2"
               routerLinkActive
               #hacer="routerLinkActive"
-              [ngClass]="
-                hacer.isActive
-                  ? 'text-orange-600 hover:text-orange-700'
-                  : 'text-blueGray-700 hover:text-blueGray-500'
-              "
-            >
+              class="flex-1 flex items-center justify-between text-sm font-semibold transition-colors duration-150"
+              [ngClass]="hacer.isActive ? 'text-sky-600' : 'text-gray-700 hover:text-gray-900'">
               Hacer
-              <i class="fas ml-2" [ngClass]="submenuHacer ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+              <i class="fas text-xs text-gray-400" [ngClass]="submenuHacer ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
             </a>
           </div>
 
-            <ul class="ml-4" [ngClass]="submenuHacer ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/hacer/plan_anual_trabajo']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuHacer ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                    (click)="toggleCollapseShow('hidden')"
-                  >
-                    Plan anual de trabajo
-                  </a>
-                </div>
-              </li>
-            </ul>
-            <ul class="ml-4" [ngClass]="submenuHacer ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/hacer/competencias_plan_anual_formacion']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuHacer ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                    (click)="toggleCollapseShow('hidden')"
-                  >
-                    Competencias y plan anual de formación
-                  </a>
-                </div>
-              </li>
-            </ul>
-            <ul class="ml-4" [ngClass]="submenuHacer ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/hacer/responsabilidad_comportamiento_seguro']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuHacer ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                    (click)="toggleCollapseShow('hidden')"
-                  >
-                    Responsabilidad y comportamiento seguro
-                  </a>
-                </div>
-              </li>
-            </ul>
-            <ul class="ml-4" [ngClass]="submenuHacer ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/hacer/preparacion_respuesta_emergencias_viales']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuHacer ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                    (click)="toggleCollapseShow('hidden')"
-                  >
-                    Plan de preparación y respuesta ante emergencias viales
-                  </a>
-                </div>
-              </li>
-            </ul>
-            <ul class="ml-4" [ngClass]="submenuHacer ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/hacer/investigacion_incidentes_viales']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuHacer ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                    (click)="toggleCollapseShow('hidden')"
-                  >
-                    Investigación interna de siniestros viales
-                  </a>
-                </div>
-              </li>
-            </ul>
-            <ul class="ml-4" [ngClass]="submenuHacer ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/hacer/vias_seguras_administradas_organizacion']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuHacer ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                    (click)="toggleCollapseShow('hidden')"
-                  >
-                    Vias seguras administradas por la orgranización
-                  </a>
-                </div>
-              </li>
-            </ul>
-            <ul class="ml-4" [ngClass]="submenuHacer ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/hacer/planificacion_desplazamientos_laborales']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuHacer ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                    (click)="toggleCollapseShow('hidden')"
-                  >
-                    Planificación de desplazamientos laborales
-                  </a>
-                </div>
-              </li>
-            </ul>
-            <ul class="ml-4" [ngClass]="submenuHacer ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/hacer/inspeccion_vehiculos_equipos']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuHacer ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                    (click)="toggleCollapseShow('hidden')"
-                  >
-                    Inspección de vehículos y equipos
-                  </a>
-                </div>
-              </li>
-            </ul>
-            <ul class="ml-4" [ngClass]="submenuHacer ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/hacer/mantenimiento_control_vehiculos_seguros']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuHacer ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                    (click)="toggleCollapseShow('hidden')"
-                  >
-                    Mantenimiento y control de vehículos seguros y equipos
-                  </a>
-                </div>
-              </li>
-            </ul>
-            <ul class="ml-4" [ngClass]="submenuHacer ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/hacer/gestion_cambio_contratistas']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuHacer ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                    (click)="toggleCollapseShow('hidden')"
-                  >
-                    Gestión del cambio gestión de contratistas
-                  </a>
-                </div>
-              </li>
-            </ul>
-            <ul class="ml-4" [ngClass]="submenuHacer ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/hacer/archivo_retencion_documental']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuHacer ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                    (click)="toggleCollapseShow('hidden')"
-                  >
-                    Archivo y retención documental
-                  </a>
-                </div>
-              </li>
-            </ul>
-
+          <ul class="ml-3 border-l-2 border-sky-100 pl-2 flex flex-col gap-0.5" [ngClass]="submenuHacer ? 'block' : 'hidden'">
+            <li>
+              <a [routerLink]="['/admin/hacer/plan_anual_trabajo']"
+                routerLinkActive="!bg-sky-50 !text-sky-700 !font-semibold"
+                (click)="toggleCollapseShow('hidden')"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Plan anual de trabajo
+              </a>
+            </li>
+            <li>
+              <a [routerLink]="['/admin/hacer/competencias_plan_anual_formacion']"
+                routerLinkActive="!bg-sky-50 !text-sky-700 !font-semibold"
+                (click)="toggleCollapseShow('hidden')"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Competencias y plan de formación
+              </a>
+            </li>
+            <li>
+              <a [routerLink]="['/admin/hacer/responsabilidad_comportamiento_seguro']"
+                routerLinkActive="!bg-sky-50 !text-sky-700 !font-semibold"
+                (click)="toggleCollapseShow('hidden')"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Responsabilidad y comportamiento
+              </a>
+            </li>
+            <li>
+              <a [routerLink]="['/admin/hacer/preparacion_respuesta_emergencias_viales']"
+                routerLinkActive="!bg-sky-50 !text-sky-700 !font-semibold"
+                (click)="toggleCollapseShow('hidden')"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Preparación emergencias viales
+              </a>
+            </li>
+            <li>
+              <a [routerLink]="['/admin/hacer/investigacion_incidentes_viales']"
+                routerLinkActive="!bg-sky-50 !text-sky-700 !font-semibold"
+                (click)="toggleCollapseShow('hidden')"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Investigación de siniestros viales
+              </a>
+            </li>
+            <li>
+              <a [routerLink]="['/admin/hacer/vias_seguras_administradas_organizacion']"
+                routerLinkActive="!bg-sky-50 !text-sky-700 !font-semibold"
+                (click)="toggleCollapseShow('hidden')"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Vías seguras
+              </a>
+            </li>
+            <li>
+              <a [routerLink]="['/admin/hacer/planificacion_desplazamientos_laborales']"
+                routerLinkActive="!bg-sky-50 !text-sky-700 !font-semibold"
+                (click)="toggleCollapseShow('hidden')"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Planificación desplazamientos
+              </a>
+            </li>
+            <li>
+              <a [routerLink]="['/admin/hacer/inspeccion_vehiculos_equipos']"
+                routerLinkActive="!bg-sky-50 !text-sky-700 !font-semibold"
+                (click)="toggleCollapseShow('hidden')"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Inspección de vehículos
+              </a>
+            </li>
+            <li>
+              <a [routerLink]="['/admin/hacer/mantenimiento_control_vehiculos_seguros']"
+                routerLinkActive="!bg-sky-50 !text-sky-700 !font-semibold"
+                (click)="toggleCollapseShow('hidden')"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Mantenimiento de vehículos
+              </a>
+            </li>
+            <li>
+              <a [routerLink]="['/admin/hacer/gestion_cambio_contratistas']"
+                routerLinkActive="!bg-sky-50 !text-sky-700 !font-semibold"
+                (click)="toggleCollapseShow('hidden')"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Gestión del cambio y contratistas
+              </a>
+            </li>
+            <li>
+              <a [routerLink]="['/admin/hacer/archivo_retencion_documental']"
+                routerLinkActive="!bg-sky-50 !text-sky-700 !font-semibold"
+                (click)="toggleCollapseShow('hidden')"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Archivo y retención documental
+              </a>
+            </li>
+          </ul>
         </li>
 
-        <li class="items-center">
-          <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-            <iconify-icon icon="hugeicons:property-search" width="24" height="24"></iconify-icon>
-            <a
-              [routerLink]="['/admin/verificar']"
+        <!-- ── VERIFICAR ──────────────────────────── -->
+        <li class="mt-3">
+          <div class="flex items-center gap-2 px-2 mb-1">
+            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-600 text-white text-xs font-bold shrink-0">V</span>
+            <a [routerLink]="['/admin/verificar']"
               (click)="collapseVerificar()"
-              class="pl-2"
               routerLinkActive
               #verificar="routerLinkActive"
-              [ngClass]="
-                verificar.isActive
-                  ? 'text-orange-600 hover:text-orange-700'
-                  : 'text-blueGray-700 hover:text-blueGray-500'
-              "
-            >
+              class="flex-1 flex items-center justify-between text-sm font-semibold transition-colors duration-150"
+              [ngClass]="verificar.isActive ? 'text-emerald-600' : 'text-gray-700 hover:text-gray-900'">
               Verificar
-              <i class="fas ml-2" [ngClass]="submenuVerificar ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+              <i class="fas text-xs text-gray-400" [ngClass]="submenuVerificar ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
             </a>
           </div>
 
-            <ul class="ml-4" [ngClass]="submenuVerificar ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/verificar/indicadores_autogestion_pesv']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuVerificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                    (click)="toggleCollapseShow('hidden')"
-                  >
-                    Indicadores y reporte de autogestión PESV
-                  </a>
-                </div>
-              </li>
-            </ul>
-            <ul class="ml-4" [ngClass]="submenuVerificar ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/verificar/registro_siniestros_viales']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuVerificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                    (click)="toggleCollapseShow('hidden')"
-                  >
-                  <i class="fas fa-user-tie text-blueGray-300 mr-3 text-sm"></i>
-                    Registro y análisis estadístico de siniestros viales 
-                  </a>
-                </div>
-              </li>
-            </ul>
-            <ul class="ml-4" [ngClass]="submenuVerificar ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/verificar/auditoria_anual']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuVerificar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                    (click)="toggleCollapseShow('hidden')"
-                  >
-                  <i class="fas fa-user-tie text-blueGray-300 mr-3 text-sm"></i>
-                    Auditoria anual
-                  </a>
-                </div>
-              </li>
-            </ul>
-
+          <ul class="ml-3 border-l-2 border-emerald-100 pl-2 flex flex-col gap-0.5" [ngClass]="submenuVerificar ? 'block' : 'hidden'">
+            <li>
+              <a [routerLink]="['/admin/verificar/indicadores_autogestion_pesv']"
+                routerLinkActive="!bg-emerald-50 !text-emerald-700 !font-semibold"
+                (click)="toggleCollapseShow('hidden')"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Indicadores y autogestión PESV
+              </a>
+            </li>
+            <li>
+              <a [routerLink]="['/admin/verificar/registro_siniestros_viales']"
+                routerLinkActive="!bg-emerald-50 !text-emerald-700 !font-semibold"
+                (click)="toggleCollapseShow('hidden')"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Registro de siniestros viales
+              </a>
+            </li>
+            <li>
+              <a [routerLink]="['/admin/verificar/auditoria_anual']"
+                routerLinkActive="!bg-emerald-50 !text-emerald-700 !font-semibold"
+                (click)="toggleCollapseShow('hidden')"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Auditoría anual
+              </a>
+            </li>
+          </ul>
         </li>
 
-        <li class="items-center">
-          <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-            <iconify-icon icon="hugeicons:workout-run" width="24" height="24"></iconify-icon>
-            <a
-              [routerLink]="['/admin/actuar']"
+        <!-- ── ACTUAR ──────────────────────────── -->
+        <li class="mt-3">
+          <div class="flex items-center gap-2 px-2 mb-1">
+            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-purple-600 text-white text-xs font-bold shrink-0">A</span>
+            <a [routerLink]="['/admin/actuar']"
               (click)="collapseActuar()"
-              class="pl-2"
               routerLinkActive
               #actuar="routerLinkActive"
-              [ngClass]="
-                actuar.isActive
-                  ? 'text-orange-600 hover:text-orange-700'
-                  : 'text-blueGray-700 hover:text-blueGray-500'
-              "
-            >
+              class="flex-1 flex items-center justify-between text-sm font-semibold transition-colors duration-150"
+              [ngClass]="actuar.isActive ? 'text-purple-600' : 'text-gray-700 hover:text-gray-900'">
               Actuar
-              <i class="fas ml-2" [ngClass]="submenuActuar ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+              <i class="fas text-xs text-gray-400" [ngClass]="submenuActuar ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
             </a>
           </div>
 
-            <ul class="ml-4" [ngClass]="submenuActuar ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/actuar/mejora_acciones_preventivas_correctivas']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuActuar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                    (click)="toggleCollapseShow('hidden')"
-                  >
-                    Mejora continua, acciones preventivas y correctivas 
-                  </a>
-                </div>
-              </li>
-            </ul>
-            <ul class="ml-4" [ngClass]="submenuActuar ? 'block' : 'hidden'">
-              <li class="items-center">
-                <div class="flex items-center rounded-lg pl-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                  <iconify-icon icon="hugeicons:arrow-right-double" width="20" height="20"></iconify-icon>
-                  <a
-                    [routerLink]="['/admin/actuar/mecanismos_comunicacion']"
-                    class="pl-1"
-                    routerLinkActive="text-orange-600 hover:text-orange-700"
-                    [ngClass]="!submenuActuar ? 'text-blueGray-700 hover:text-blueGray-500' : ''"
-                    (click)="toggleCollapseShow('hidden')"
-                  >
-                  <i class="fas fa-user-tie text-blueGray-300 mr-3 text-sm"></i>
-                    Mecanismos de comunicación
-                  </a>
-                </div>
-              </li>
-            </ul>
-            
+          <ul class="ml-3 border-l-2 border-purple-100 pl-2 flex flex-col gap-0.5" [ngClass]="submenuActuar ? 'block' : 'hidden'">
+            <li>
+              <a [routerLink]="['/admin/actuar/mejora_acciones_preventivas_correctivas']"
+                routerLinkActive="!bg-purple-50 !text-purple-700 !font-semibold"
+                (click)="toggleCollapseShow('hidden')"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Mejora continua y acciones correctivas
+              </a>
+            </li>
+            <li>
+              <a [routerLink]="['/admin/actuar/mecanismos_comunicacion']"
+                routerLinkActive="!bg-purple-50 !text-purple-700 !font-semibold"
+                (click)="toggleCollapseShow('hidden')"
+                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <iconify-icon icon="hugeicons:arrow-right-double" width="14" height="14"></iconify-icon>
+                Mecanismos de comunicación
+              </a>
+            </li>
+          </ul>
         </li>
-        
+
       </ul>
-      
-        <button class="text-blueGray-500 mt-4 bg-transparent border border-solid border-blueGray-500 hover:bg-gray-500 hover:text-white uppercase text-sm px-6 py-3 rounded outline-none focus:outline-none" type="button">
-          <a href="../../../assets/Reporte de Indicadores de Autogestion 2025_ES&VA.pdf" class="" target="_blank">
-            Autoreporte
-          </a>
-        </button>
-      
 
-      <!-- Divider -->
-      <!-- <hr class="my-4 md:min-w-full" /> -->
-      <!-- Heading -->
-      <!-- <h6
-        class="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline"
-      >
-        Auth Layout Pages
-      </h6> -->
-      <!-- Navigation -->
+      <!-- Botón autoreporte -->
+      <div class="mt-6 mb-2 px-1">
+        <a href="../../../assets/Reporte de Indicadores de Autogestion 2025_ES&VA.pdf" target="_blank"
+          class="block w-full text-center text-xs font-semibold uppercase tracking-wide text-gray-500 border border-gray-300 rounded-lg py-2 px-4 hover:bg-gray-50 hover:text-gray-700 transition-all">
+          Autoreporte
+        </a>
+      </div>
 
-      <!-- <ul class="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
-        <li class="items-center">
-          <a
-            [routerLink]="['/auth/login']"
-            class="text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
-          >
-            <i class="fas fa-fingerprint text-blueGray-300 mr-2 text-sm"></i>
-            Login
-          </a>
-        </li>
-
-        <li class="items-center">
-          <a
-            [routerLink]="['/auth/register']"
-            class="text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
-          >
-            <i class="fas fa-clipboard-list text-blueGray-300 mr-2 text-sm"></i>
-            Register
-          </a>
-        </li>
-      </ul> -->
-
-      <!-- Divider -->
-      <!-- <hr class="my-4 md:min-w-full" /> -->
-      <!-- Heading -->
-      <!-- <h6
-        class="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline"
-      >
-        No Layout Pages
-      </h6> -->
-      <!-- Navigation -->
-
-      <!-- <ul class="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
-        <li class="items-center">
-          <a
-            [routerLink]="['/landing']"
-            class="text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
-          >
-            <i class="fas fa-newspaper text-blueGray-300 mr-2 text-sm"></i>
-            Landing Page
-          </a>
-        </li>
-
-        <li class="items-center">
-          <a
-            [routerLink]="['/profile']"
-            class="text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
-          >
-            <i class="fas fa-user-circle text-blueGray-300 mr-2 text-sm"></i>
-            Profile Page
-          </a>
-        </li>
-      </ul> -->
-
-      <!-- Divider
-      <hr class="my-4 md:min-w-full" /> -->
-      <!-- Heading -->
-      <!-- <h6 class="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
-        Documentation
-      </h6> -->
-      <!-- Navigation -->
-      <!-- <ul class="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
-        <li class="inline-flex">
-          <a
-            href="https://www.creative-tim.com/learning-lab/tailwind/angular/colors/notus"
-            target="_blank"
-            class="text-blueGray-700 hover:text-blueGray-500 text-sm block mb-4 no-underline font-semibold"
-          >
-            <i class="fas fa-paint-brush mr-2 text-blueGray-300 text-base"></i>
-            Styles
-          </a>
-        </li>
-
-        <li class="inline-flex">
-          <a
-            href="https://www.creative-tim.com/learning-lab/tailwind/angular/alerts/notus"
-            target="_blank"
-            class="text-blueGray-700 hover:text-blueGray-500 text-sm block mb-4 no-underline font-semibold"
-          >
-            <i class="fab fa-css3-alt mr-2 text-blueGray-300 text-base"></i>
-            CSS Components
-          </a>
-        </li>
-
-        <li class="inline-flex">
-          <a
-            href="https://www.creative-tim.com/learning-lab/tailwind/angular/overview/notus"
-            target="_blank"
-            class="text-blueGray-700 hover:text-blueGray-500 text-sm block mb-4 no-underline font-semibold"
-          >
-            <i class="fab fa-angular mr-2 text-blueGray-300 text-base"></i>
-            Angular
-          </a>
-        </li>
-
-        <li class="inline-flex">
-          <a
-            href="https://www.creative-tim.com/learning-lab/tailwind/js/overview/notus"
-            target="_blank"
-            class="text-blueGray-700 hover:text-blueGray-500 text-sm block mb-4 no-underline font-semibold"
-          >
-            <i class="fab fa-js-square mr-2 text-blueGray-300 text-base"></i>
-            Javascript
-          </a>
-        </li>
-
-        <li class="inline-flex">
-          <a
-            href="https://www.creative-tim.com/learning-lab/tailwind/nextjs/overview/notus"
-            target="_blank"
-            class="text-blueGray-700 hover:text-blueGray-500 text-sm block mb-4 no-underline font-semibold"
-          >
-            <i class="fab fa-react mr-2 text-blueGray-300 text-base"></i>
-            NextJS
-          </a>
-        </li>
-
-        <li class="inline-flex">
-          <a
-            href="https://www.creative-tim.com/learning-lab/tailwind/react/overview/notus"
-            target="_blank"
-            class="text-blueGray-700 hover:text-blueGray-500 text-sm block mb-4 no-underline font-semibold"
-          >
-            <i class="fab fa-react mr-2 text-blueGray-300 text-base"></i>
-            React
-          </a>
-        </li>
-
-        <li class="inline-flex">
-          <a
-            href="https://www.creative-tim.com/learning-lab/tailwind/svelte/overview/notus"
-            target="_blank"
-            class="text-blueGray-700 hover:text-blueGray-500 text-sm block mb-4 no-underline font-semibold"
-          >
-            <i class="fas fa-link mr-2 text-blueGray-300 text-base"></i>
-            Svelte
-          </a>
-        </li>
-
-        <li class="inline-flex">
-          <a
-            href="https://www.creative-tim.com/learning-lab/tailwind/vue/overview/notus"
-            target="_blank"
-            class="text-blueGray-700 hover:text-blueGray-500 text-sm block mb-4 no-underline font-semibold"
-          >
-            <i class="fab fa-vuejs mr-2 text-blueGray-300 text-base"></i>
-            VueJS
-          </a>
-        </li>
-      </ul> -->
     </div>
   </div>
 </nav>
