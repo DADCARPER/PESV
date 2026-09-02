@@ -1,23 +1,37 @@
 <div class="bg-white rounded-lg border shadow-sm overflow-hidden">
-    <div class="px-4 pt-2">
-        <span class="text-lg font-medium block ">{{titulo}}</span>
-        <!-- <span class="text-sm text-gray-500">Tasa de incidentes reportados</span> -->
-    </div>
-    <div class="flex flex-col md:flex-row gap-2 p-2">
- 
-      <div class="w-full flex flex-col items-center  px-4  " [ngClass]="[fondoColor, borderColor]">
-        <span class="text-lg text-gray-900 ">Metas alcanzadas</span>
-        <span class="text-2xl font-medium" [ngClass]="textColor">
-          {{valorActual}}
-        </span>
-        <span class="text-xl  text-gray-500">
-          Meta definida : {{valorMeta}}
-        </span>
-        <div class="w-full pt-1">
-          <app-progress-bar-doble>
-          </app-progress-bar-doble>
+
+  <div class="px-4 pt-2 flex items-baseline justify-between gap-2">
+    <span class="text-lg font-medium">{{ titulo }}</span>
+    @if (ano_actual) {
+      <span class="text-sm font-semibold text-gray-400">{{ ano_actual }}</span>
+    }
+  </div>
+
+  <div class="p-2">
+    <div class="w-full rounded-lg px-4 py-2" [ngClass]="[fondoColor, borderColor]">
+
+      <!-- Lo alcanzado a la izquierda, lo esperado a la derecha -->
+      <div class="flex items-end justify-between gap-3">
+        <div class="min-w-0">
+          <p class="text-sm text-gray-900 leading-tight">Acumulado del periodo</p>
+          <p class="leading-none whitespace-nowrap">
+            <span class="text-2xl font-medium" [ngClass]="textColor">{{ valorActual }}</span>
+            <span class="text-sm text-gray-500 ml-1">{{ etiquetaValor }}</span>
+          </p>
+        </div>
+
+        <div class="text-right flex-none">
+          <p class="text-xs text-gray-500 leading-tight">Meta definida</p>
+          <p class="text-xl font-semibold text-gray-700 leading-none">{{ valorMeta }}</p>
         </div>
       </div>
-      
+
+      <app-progress-bar-doble
+        [value]="anchoBarra"
+        [textoProgreso]="textoPorcentaje"
+        [targetValue]="porcentajeMeta"
+        [color]="colorBarra">
+      </app-progress-bar-doble>
     </div>
+  </div>
 </div>

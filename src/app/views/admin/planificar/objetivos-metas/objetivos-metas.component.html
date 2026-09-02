@@ -1,7 +1,7 @@
 <div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
 
   <!-- ── Cabecera ─────────────────────────────────────────────── -->
-  <div class="rounded-t bg-blueGray-100 mb-0 px-6 py-6">
+  <div class="rounded-t bg-amber-400 mb-0 px-6 py-6">
     <div class="text-center flex">
       <button
         [routerLink]="['/admin/planificar']"
@@ -15,174 +15,261 @@
 
   <div class="flex-auto px-4 lg:px-10 py-6">
 
-    <!-- ── Barra de acciones ──────────────────────────────────── -->
-    <div class="bg-white rounded-lg border shadow-sm overflow-hidden">
-      <div class="p-4 border-b">
-        <div class="flex items-center justify-between flex-wrap gap-3">
-          <div>
-            <h2 class="text-lg font-medium">Objetivos del PESV</h2>
-            <p class="text-sm text-gray-500">
-              {{ objetivos().length }} objetivo(s) · {{ totalMetas() }} meta(s) definidas para el periodo
-            </p>
+    <div class="flex items-center justify-between flex-wrap gap-3 mb-6">
+      <div>
+        <h2 class="text-lg font-medium">Objetivos del PESV</h2>
+        <p class="text-sm text-gray-500">
+          Cada objetivo general agrupa objetivos específicos, y cada específico se mide
+          con sus propios indicadores trimestrales.
+        </p>
+        <!-- Estos indicadores alimentan el IDC4 de la fase Verificar -->
+        <a [routerLink]="['/admin/verificar/indicadores_autogestion_pesv']" [queryParams]="{ idc: 4 }"
+          class="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 hover:text-emerald-700 hover:underline mt-1">
+          <iconify-icon icon="hugeicons:chart-line-data-02" width="14" height="14"></iconify-icon>
+          Ver estos datos en el IDC4 · Cumplimiento de metas PESV
+        </a>
+      </div>
+      <button (click)="crearGeneral()" type="button"
+        class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none mb-1 ease-linear transition-all duration-150">
+        <div class="flex items-center">
+          <iconify-icon icon="hugeicons:plus-sign-square" width="18" height="18" class="pr-2"></iconify-icon> Nuevo objetivo general
+        </div>
+      </button>
+    </div>
+
+    @if (cargando()) {
+      <p class="text-center text-gray-400 py-10">Cargando objetivos...</p>
+    } @else if (jerarquia().length === 0) {
+      <div class="text-center py-12">
+        <div class="text-gray-300 inline-flex items-center justify-center mb-3">
+          <iconify-icon icon="hugeicons:target-02" width="56" height="56"></iconify-icon>
+        </div>
+        <p class="text-lg font-medium text-gray-700">Aún no hay objetivos definidos</p>
+        <p class="text-sm text-gray-500 mb-6">
+          Comienza por el objetivo general de seguridad vial de la organización.
+        </p>
+        <button (click)="crearGeneral()" type="button"
+          class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150">
+          <div class="flex items-center">
+            <iconify-icon icon="hugeicons:plus-sign-square" width="18" height="18" class="pr-2"></iconify-icon> Nuevo objetivo general
+          </div>
+        </button>
+      </div>
+    } @else {
+
+      <!-- ═══════════ UN BLOQUE POR OBJETIVO GENERAL ═══════════ -->
+      @for (g of jerarquia(); track g.general.id) {
+        <div class="bg-white rounded-lg border shadow-sm overflow-hidden mb-6">
+
+          <!-- Cabecera del general -->
+          <div class="p-4 border-b bg-amber-50">
+            <div class="flex items-start justify-between flex-wrap gap-3">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-baseline gap-2 flex-wrap">
+                  <span class="text-sm font-bold text-amber-700">{{ g.general.codigo }}</span>
+                  <span class="text-xs text-gray-500">Responsable: {{ g.general.responsable }}</span>
+                </div>
+                <div class="flex items-start gap-2 mt-1">
+                  <p class="text-base text-blueGray-800 line-clamp-2">{{ g.general.descripcion }}</p>
+                  <button type="button" title="Ver descripción completa"
+                    (click)="verDescripcion(g.general.codigo, g.general.descripcion, 'Objetivo general')"
+                    class="flex-none text-gray-400 hover:text-amber-600 transition-colors duration-150 mt-0.5">
+                    <iconify-icon icon="hugeicons:view" width="18" height="18"></iconify-icon>
+                  </button>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-4">
+                <div class="text-center">
+                  <p class="text-2xl font-bold text-amber-600">{{ textoCumplimiento(g.cumplimiento) }}</p>
+                  <p class="text-xs text-gray-400 mb-1">cumplimiento</p>
+                  <span [class]="_objetivos.claseEstadoGeneral(g.estado)">{{ g.estado }}</span>
+                </div>
+                <div class="flex gap-2">
+                  <button (click)="crearEspecifico(g)" title="Agregar objetivo específico" type="button"
+                    class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-2 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150">
+                    <iconify-icon icon="hugeicons:plus-sign-square" width="18" height="18"></iconify-icon>
+                  </button>
+                  <button (click)="editarGeneral(g.general)" title="Editar" type="button"
+                    class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-2 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150">
+                    <iconify-icon icon="hugeicons:pencil-edit-02" width="18" height="18"></iconify-icon>
+                  </button>
+                  <button (click)="eliminarGeneral(g)" title="Eliminar" type="button"
+                    class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-2 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150">
+                    <iconify-icon icon="hugeicons:delete-03" width="18" height="18"></iconify-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="flex gap-2">
-            <button (click)="mostrarModalFormulario('crear')"
-              class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
-              type="button">
-              <div class="flex items-center">
-                <iconify-icon icon="hugeicons:plus-sign-square" width="18" height="18" class="pr-2"></iconify-icon> Crear nuevo objetivo
+          <!-- Objetivos específicos -->
+          <div class="p-4">
+            @if (g.especificos.length === 0) {
+              <p class="text-sm text-gray-400 text-center py-6">
+                Este objetivo general no tiene objetivos específicos todavía.
+              </p>
+            } @else {
+              <div class="overflow-x-auto">
+                <table class="items-center w-full bg-transparent border-collapse">
+                  <thead>
+                    <tr>
+                      <th class="px-3 py-3 text-xs uppercase font-semibold text-left text-blueGray-500 bg-blueGray-50 border border-solid border-blueGray-100"></th>
+                      <th class="px-3 py-3 text-xs uppercase font-semibold text-left text-blueGray-500 bg-blueGray-50 border border-solid border-blueGray-100 whitespace-nowrap">Código</th>
+                      <th class="px-3 py-3 text-xs uppercase font-semibold text-left text-blueGray-500 bg-blueGray-50 border border-solid border-blueGray-100">Objetivo específico</th>
+                      <th class="px-3 py-3 text-xs uppercase font-semibold text-center text-blueGray-500 bg-blueGray-50 border border-solid border-blueGray-100 whitespace-nowrap">Meta</th>
+                      @for (t of nombresTrimestres; track t) {
+                        <th class="px-3 py-3 text-xs uppercase font-semibold text-center text-blueGray-500 bg-blueGray-50 border border-solid border-blueGray-100">{{ t }}</th>
+                      }
+                      <th class="px-3 py-3 text-xs uppercase font-semibold text-center text-blueGray-500 bg-blueGray-50 border border-solid border-blueGray-100 whitespace-nowrap">Anual</th>
+                      <th class="px-3 py-3 text-xs uppercase font-semibold text-center text-blueGray-500 bg-blueGray-50 border border-solid border-blueGray-100 whitespace-nowrap">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (e of g.especificos; track e.especifico.id) {
+                      <tr class="hover:bg-blueGray-50 transition-colors duration-150">
+                        <td class="border-t-0 px-3 align-middle text-xs p-3">
+                          <button type="button" (click)="alternarExpandido(e.especifico.id)"
+                            class="text-gray-400 hover:text-amber-500 transition-colors duration-150">
+                            <iconify-icon
+                              [attr.icon]="estaExpandido(e.especifico.id) ? 'hugeicons:arrow-down-01' : 'hugeicons:arrow-right-01'"
+                              width="20" height="20"></iconify-icon>
+                          </button>
+                        </td>
+                        <td class="border-t-0 px-3 align-middle text-xs p-3 whitespace-nowrap">
+                          <span class="font-bold text-blueGray-600">{{ e.especifico.codigo }}</span>
+                          <p class="text-xs text-gray-400">{{ e.indicadores.length }} indicador(es)</p>
+                        </td>
+                        <td class="border-t-0 px-3 align-middle text-sm p-3 text-blueGray-700 min-w-[16rem] max-w-sm">
+                          <div class="flex items-start gap-2">
+                            <p class="line-clamp-2">{{ e.especifico.descripcion }}</p>
+                            <button type="button" title="Ver descripción completa"
+                              (click)="verDescripcion(e.especifico.codigo, e.especifico.descripcion, 'Objetivo específico')"
+                              class="flex-none text-gray-400 hover:text-amber-600 transition-colors duration-150">
+                              <iconify-icon icon="hugeicons:view" width="16" height="16"></iconify-icon>
+                            </button>
+                          </div>
+                        </td>
+                        <td class="border-t-0 px-3 align-middle text-sm p-3 text-center whitespace-nowrap text-blueGray-600">{{ e.especifico.meta }}%</td>
+                        @for (t of nombresTrimestres; track t; let i = $index) {
+                          <td class="border-t-0 px-3 align-middle text-xs p-3 text-center whitespace-nowrap">
+                            <p class="text-sm font-semibold text-blueGray-700">{{ textoAvance(e.porTrimestre[i]) }}</p>
+                            <span [class]="_objetivos.claseEstadoEspecifico(e.estados[i])">{{ e.estados[i] }}</span>
+                          </td>
+                        }
+                        <td class="border-t-0 px-3 align-middle text-sm p-3 text-center font-bold text-amber-600 whitespace-nowrap">{{ textoAvance(e.avanceAnual) }}</td>
+                        <td class="border-t-0 px-3 align-middle text-xs p-3">
+                          <div class="flex gap-2 justify-center">
+                            <button (click)="crearIndicador(e)" title="Agregar indicador" type="button"
+                              class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-2 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150">
+                              <iconify-icon icon="hugeicons:plus-sign-square" width="16" height="16"></iconify-icon>
+                            </button>
+                            <button (click)="editarEspecifico(e.especifico, contextoDe(g.general.codigo, g.general.descripcion))" title="Editar" type="button"
+                              class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-2 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150">
+                              <iconify-icon icon="hugeicons:pencil-edit-02" width="16" height="16"></iconify-icon>
+                            </button>
+                            <button (click)="eliminarEspecifico(e)" title="Eliminar" type="button"
+                              class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-2 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150">
+                              <iconify-icon icon="hugeicons:delete-03" width="16" height="16"></iconify-icon>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <!-- ── Indicadores del específico ────────── -->
+                      @if (estaExpandido(e.especifico.id)) {
+                        <tr>
+                          <td [attr.colspan]="9" class="border-t-0 px-3 py-0 bg-blueGray-50">
+                            <div class="p-4">
+                              <p class="text-xs uppercase font-semibold text-blueGray-500 mb-3">Indicadores</p>
+
+                              @if (e.indicadores.length === 0) {
+                                <p class="text-sm text-gray-400">
+                                  Sin indicadores. Un objetivo específico sin indicadores no se puede medir.
+                                </p>
+                              } @else {
+                                <div class="overflow-x-auto">
+                                  <table class="w-full bg-white rounded border border-blueGray-100">
+                                    <thead>
+                                      <tr>
+                                        <th class="px-3 py-2 text-xs uppercase font-semibold text-left text-blueGray-400 whitespace-nowrap">Código</th>
+                                        <th class="px-3 py-2 text-xs uppercase font-semibold text-left text-blueGray-400">Indicador</th>
+                                        <th class="px-3 py-2 text-xs uppercase font-semibold text-center text-blueGray-400 whitespace-nowrap">Meta</th>
+                                        @for (t of nombresTrimestres; track t) {
+                                          <th class="px-3 py-2 text-xs uppercase font-semibold text-center text-blueGray-400">{{ t }}</th>
+                                        }
+                                        <th class="px-3 py-2 text-xs uppercase font-semibold text-center text-blueGray-400 whitespace-nowrap">Anual</th>
+                                        <th class="px-3 py-2 text-xs uppercase font-semibold text-center text-blueGray-400 whitespace-nowrap">Acciones</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      @for (ind of e.indicadores; track ind.id) {
+                                        <tr class="border-t border-blueGray-100">
+                                          <td class="px-3 py-2 text-sm font-semibold text-blueGray-600 whitespace-nowrap">{{ ind.codigo }}</td>
+                                          <td class="px-3 py-2 text-sm text-blueGray-700 min-w-[16rem] max-w-sm">
+                                            <div class="flex items-start gap-2">
+                                              <div class="min-w-0">
+                                                <p class="line-clamp-2">{{ ind.nombre }}</p>
+                                              </div>
+                                              <button type="button" title="Ver indicador completo"
+                                                (click)="verDescripcion(ind.codigo, ind.nombre, 'Indicador')"
+                                                class="flex-none text-gray-400 hover:text-amber-600 transition-colors duration-150">
+                                                <iconify-icon icon="hugeicons:view" width="16" height="16"></iconify-icon>
+                                              </button>
+                                            </div>
+                                          </td>
+                                          <td class="px-3 py-2 text-sm text-center whitespace-nowrap text-blueGray-600">
+                                            {{ metaIndicador(ind) }}
+                                          </td>
+                                          @for (t of nombresTrimestres; track t; let i = $index) {
+                                            <td class="px-3 py-2 text-center whitespace-nowrap">
+                                              <p class="text-sm font-semibold text-blueGray-700">{{ valorIndicador(ind, i) }}</p>
+                                              <span [class]="claseIndicador(ind, i)">
+                                                {{ estadoIndicador(ind, i) }}
+                                              </span>
+                                            </td>
+                                          }
+                                          <td class="px-3 py-2 text-center whitespace-nowrap bg-blueGray-50">
+                                            <p class="text-sm font-bold text-blueGray-700">{{ valorAnualIndicador(ind) }}</p>
+                                            <span [class]="claseAnualIndicador(ind)">{{ estadoAnualIndicador(ind) }}</span>
+                                          </td>
+                                          <td class="px-3 py-2">
+                                            <div class="flex gap-2 justify-center">
+                                              <button (click)="editarIndicador(ind, contextoDe(e.especifico.codigo, e.especifico.descripcion))" title="Editar y medir" type="button"
+                                                class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-2 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150">
+                                                <iconify-icon icon="hugeicons:pencil-edit-02" width="16" height="16"></iconify-icon>
+                                              </button>
+                                              <button (click)="eliminarIndicador(ind)" title="Eliminar" type="button"
+                                                class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-2 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150">
+                                                <iconify-icon icon="hugeicons:delete-03" width="16" height="16"></iconify-icon>
+                                              </button>
+                                            </div>
+                                          </td>
+                                        </tr>
+                                      }
+                                    </tbody>
+                                  </table>
+                                </div>
+                              }
+                            </div>
+                          </td>
+                        </tr>
+                      }
+                    }
+                  </tbody>
+                </table>
               </div>
-            </button>
+            }
           </div>
         </div>
-      </div>
-
-      <div class="p-4">
-
-        <!-- ── Cargando ───────────────────────────────────────── -->
-        @if (cargando()) {
-          <p class="text-center text-gray-400 py-10">Cargando objetivos...</p>
-        } @else if (objetivos().length === 0) {
-          <!-- ── Estado vacío ─────────────────────────────────── -->
-          <div class="text-center py-12">
-            <div class="text-gray-300 inline-flex items-center justify-center mb-3">
-              <iconify-icon icon="hugeicons:target-02" width="56" height="56"></iconify-icon>
-            </div>
-            <p class="text-lg font-medium text-gray-700">Aún no hay objetivos definidos</p>
-            <p class="text-sm text-gray-500 mb-6">
-              Comienza creando el primer objetivo de seguridad vial de la organización.
-            </p>
-            <button (click)="mostrarModalFormulario('crear')"
-              class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150"
-              type="button">
-              <div class="flex items-center">
-                <iconify-icon icon="hugeicons:plus-sign-square" width="18" height="18" class="pr-2"></iconify-icon> Crear nuevo objetivo
-              </div>
-            </button>
-          </div>
-        } @else {
-          <!-- ── Tabla de objetivos ───────────────────────────── -->
-          <div class="overflow-x-auto">
-            <table class="items-center w-full bg-transparent border-collapse">
-              <thead>
-                <tr>
-                  <th class="px-4 py-3 text-xs uppercase font-semibold text-left text-blueGray-500 bg-blueGray-50 border border-solid border-blueGray-100 whitespace-nowrap"></th>
-                  <th class="px-4 py-3 text-xs uppercase font-semibold text-left text-blueGray-500 bg-blueGray-50 border border-solid border-blueGray-100 whitespace-nowrap">Código</th>
-                  <th class="px-4 py-3 text-xs uppercase font-semibold text-left text-blueGray-500 bg-blueGray-50 border border-solid border-blueGray-100">Objetivo</th>
-                  <th class="px-4 py-3 text-xs uppercase font-semibold text-center text-blueGray-500 bg-blueGray-50 border border-solid border-blueGray-100 whitespace-nowrap">Metas</th>
-                  <th class="px-4 py-3 text-xs uppercase font-semibold text-left text-blueGray-500 bg-blueGray-50 border border-solid border-blueGray-100 whitespace-nowrap">Responsable</th>
-                  <th class="px-4 py-3 text-xs uppercase font-semibold text-left text-blueGray-500 bg-blueGray-50 border border-solid border-blueGray-100 whitespace-nowrap">Plazo</th>
-                  <th class="px-4 py-3 text-xs uppercase font-semibold text-center text-blueGray-500 bg-blueGray-50 border border-solid border-blueGray-100 whitespace-nowrap">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (objetivo of objetivos(); track objetivo.id) {
-
-                  <tr class="hover:bg-blueGray-50 transition-colors duration-150">
-                    <!-- Expandir -->
-                    <td class="border-t-0 px-4 align-middle border-l-0 border-r-0 text-xs p-3">
-                      <button type="button" (click)="alternarExpandido(objetivo.id)"
-                        class="text-gray-400 hover:text-amber-500 transition-colors duration-150">
-                        <iconify-icon
-                          [attr.icon]="estaExpandido(objetivo.id) ? 'hugeicons:arrow-down-01' : 'hugeicons:arrow-right-01'"
-                          width="20" height="20"></iconify-icon>
-                      </button>
-                    </td>
-
-                    <td class="border-t-0 px-4 align-middle border-l-0 border-r-0 text-xs p-3 whitespace-nowrap">
-                      <span class="font-bold text-blueGray-600">{{ objetivo.codigo }}</span>
-                    </td>
-
-                    <td class="border-t-0 px-4 align-middle border-l-0 border-r-0 text-sm p-3 text-blueGray-700 max-w-md">
-                      {{ objetivo.descripcion }}
-                    </td>
-
-                    <td class="border-t-0 px-4 align-middle border-l-0 border-r-0 text-xs p-3 text-center">
-                      <span class="text-xs font-semibold inline-block py-1 px-2 rounded text-amber-600 bg-amber-100">
-                        {{ objetivo.metas?.length ?? 0 }}
-                      </span>
-                    </td>
-
-                    <td class="border-t-0 px-4 align-middle border-l-0 border-r-0 text-xs p-3">
-                      <p class="text-sm text-blueGray-700">{{ objetivo.responsable }}</p>
-                      <p class="text-xs text-gray-400">{{ objetivo.cargoResponsable }}</p>
-                    </td>
-
-                    <td class="border-t-0 px-4 align-middle border-l-0 border-r-0 text-xs p-3 whitespace-nowrap text-blueGray-600">
-                      {{ objetivo.fechaInicio }} → {{ objetivo.fechaFin }}
-                    </td>
-
-                    <td class="border-t-0 px-4 align-middle border-l-0 border-r-0 text-xs p-3">
-                      <div class="flex gap-2 justify-center">
-                        <button (click)="manejarEdicion(objetivo)" title="Editar"
-                          class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-2 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150"
-                          type="button">
-                          <iconify-icon icon="hugeicons:pencil-edit-02" width="18" height="18"></iconify-icon>
-                        </button>
-                        <button (click)="manejarEliminar(objetivo)" title="Eliminar"
-                          class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-2 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150"
-                          type="button">
-                          <iconify-icon icon="hugeicons:delete-03" width="18" height="18"></iconify-icon>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <!-- ── Detalle de metas (fila expandible) ────── -->
-                  @if (estaExpandido(objetivo.id)) {
-                    <tr>
-                      <td colspan="7" class="border-t-0 px-4 py-0 border-l-0 border-r-0 bg-blueGray-50">
-                        <div class="p-4">
-                          <p class="text-xs uppercase font-semibold text-blueGray-500 mb-3">Metas e indicadores</p>
-
-                          @if (!objetivo.metas || objetivo.metas.length === 0) {
-                            <p class="text-sm text-gray-400">Este objetivo no tiene metas registradas.</p>
-                          } @else {
-                            <div class="overflow-x-auto">
-                              <table class="w-full bg-white rounded border border-blueGray-100">
-                                <thead>
-                                  <tr>
-                                    <th class="px-3 py-2 text-xs uppercase font-semibold text-left text-blueGray-400">Meta</th>
-                                    <th class="px-3 py-2 text-xs uppercase font-semibold text-left text-blueGray-400">Indicador</th>
-                                    <th class="px-3 py-2 text-xs uppercase font-semibold text-center text-blueGray-400 whitespace-nowrap">Línea base</th>
-                                    <th class="px-3 py-2 text-xs uppercase font-semibold text-center text-blueGray-400 whitespace-nowrap">Valor meta</th>
-                                    <th class="px-3 py-2 text-xs uppercase font-semibold text-center text-blueGray-400 whitespace-nowrap">Frecuencia</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  @for (meta of objetivo.metas; track $index) {
-                                    <tr class="border-t border-blueGray-100">
-                                      <td class="px-3 py-2 text-sm text-blueGray-700">{{ meta.descripcion }}</td>
-                                      <td class="px-3 py-2 text-sm text-blueGray-600">{{ meta.indicador }}</td>
-                                      <td class="px-3 py-2 text-sm text-center text-blueGray-600 whitespace-nowrap">
-                                        {{ meta.lineaBase ?? '—' }} {{ meta.lineaBase !== null ? meta.unidad : '' }}
-                                      </td>
-                                      <td class="px-3 py-2 text-sm text-center font-semibold text-blueGray-700 whitespace-nowrap">
-                                        {{ meta.valorMeta }} {{ meta.unidad }}
-                                      </td>
-                                      <td class="px-3 py-2 text-sm text-center text-blueGray-600 whitespace-nowrap">{{ meta.frecuencia }}</td>
-                                    </tr>
-                                  }
-                                </tbody>
-                              </table>
-                            </div>
-                          }
-                        </div>
-                      </td>
-                    </tr>
-                  }
-                }
-              </tbody>
-            </table>
-          </div>
-        }
-
-      </div>
-    </div>
+      }
+    }
 
   </div>
 </div>
 
-<app-form1-objetivos-metas #modalFormulario></app-form1-objetivos-metas>
-<app-form2-objetivos-metas #modalEliminar></app-form2-objetivos-metas>
+<app-form-general #modalGeneral></app-form-general>
+<app-form-especifico #modalEspecifico></app-form-especifico>
+<app-form-indicador #modalIndicador></app-form-indicador>
+<app-form-eliminar #modalEliminar (confirmado)="confirmarEliminacion()"></app-form-eliminar>
+<app-form-descripcion #modalDescripcion></app-form-descripcion>

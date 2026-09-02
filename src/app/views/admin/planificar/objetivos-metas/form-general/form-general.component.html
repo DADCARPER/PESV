@@ -1,0 +1,77 @@
+<div *ngIf="mostrarModal()" (click)="cerrarModal()" class="fixed inset-0 z-40 bg-black opacity-25"></div>
+
+<div *ngIf="mostrarModal()" class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex modal-fade-down">
+  <div (click)="$event.stopPropagation()" class="relative mx-auto my-6 bg-white rounded-lg shadow-lg max-w-2xl w-full">
+
+    <div class="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+      <div>
+        <h3 class="text-xl font-semibold">
+          {{ modo === 'editar' ? 'Editar objetivo general' : 'Nuevo objetivo general' }}
+        </h3>
+        <p class="text-sm text-gray-500">El propósito amplio del que colgarán los objetivos específicos.</p>
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="handleSave()">
+      <div class="relative p-6 flex-auto max-h-[70vh] overflow-y-auto">
+
+        <div class="flex flex-wrap mb-4">
+          <div class="w-full lg:w-4/12 px-2">
+            <div class="space-y-2">
+              <label for="codigo" class="block text-sm font-medium text-gray-700">Código *</label>
+              <input type="text" id="codigo" formControlName="codigo" placeholder="OG-01"
+                [ngClass]="borde('codigo')"
+                class="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+              @if (error('codigo')) {
+                <p class="text-xs text-red-500">{{ error('codigo') }}</p>
+              }
+            </div>
+          </div>
+          <div class="w-full lg:w-8/12 px-2">
+            <div class="space-y-2">
+              <label for="responsable" class="block text-sm font-medium text-gray-700">Responsable *</label>
+              <input type="text" id="responsable" formControlName="responsable"
+                [ngClass]="borde('responsable')"
+                class="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+              @if (error('responsable')) {
+                <p class="text-xs text-red-500">{{ error('responsable') }}</p>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap mb-2">
+          <div class="w-full px-2">
+            <div class="space-y-2">
+              <label for="descripcion" class="block text-sm font-medium text-gray-700">Descripción *</label>
+              <textarea id="descripcion" formControlName="descripcion" rows="8" [attr.maxlength]="maxDescripcion"
+                placeholder="Ej: Reducir la siniestralidad vial asociada a la operación de la organización."
+                [ngClass]="borde('descripcion')"
+                class="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500"></textarea>
+              <div class="flex items-start justify-between gap-4">
+                <p class="text-xs text-red-500">{{ error('descripcion') }}</p>
+                <p class="text-xs ml-auto whitespace-nowrap tabular-nums"
+                  [ngClass]="usados('descripcion') >= maxDescripcion ? 'text-red-500 font-semibold'
+                           : usados('descripcion') > maxDescripcion * 0.9 ? 'text-amber-600' : 'text-gray-400'">
+                  {{ usados('descripcion') }} / {{ maxDescripcion }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="flex items-center justify-end p-4 border-t border-solid border-blueGray-200 rounded-b">
+        <button type="button" (click)="handleCancel()"
+          class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="guardando()"
+          class="bg-emerald-500 text-white active:bg-emerald-600 disabled:opacity-50 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">
+          {{ guardando() ? 'Guardando...' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

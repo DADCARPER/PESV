@@ -7,6 +7,7 @@ import { ModelDocumentos } from './documentos.interface';
 import { ModelProgramas } from './programas.interface';
 import { ModelPlanTrabajo } from './planTrabajo';
 import { ModelObjetivosMetas } from './objetivosMetas.interface';
+import { ModelFormacion } from './formacion.interface';
 export namespace Models{
 
     export import Empresa = ModelEmpresa
@@ -18,4 +19,5 @@ export namespace Models{
     export import Programas = ModelProgramas
     export import PlanTrabajo = ModelPlanTrabajo
     export import ObjetivosMetas = ModelObjetivosMetas
+    export import Formacion = ModelFormacion
 }

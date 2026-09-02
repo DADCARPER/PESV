@@ -13,12 +13,12 @@
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
 
-            @for (leftheader of leftheaders; track $index) {
+            @for (leftheader of leftheaders; track leftheader; let fila = $index) {
                 <tr>
 
                 <td class="w-[230px] min-w-[200px] px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 line-clamp-1" >{{leftheader}}</td>
 
-                @for (dato of datas; track $index) {
+                @for (dato of filaDe(fila); track $index) {
                     <!-- @if($index == 0){
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{dato}}</td>
                     } -->

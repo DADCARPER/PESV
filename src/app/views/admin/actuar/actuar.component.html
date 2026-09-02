@@ -8,7 +8,7 @@
         [descripcion]="'Orientado al cumplimiento de acciones y estrategias en seguridad vial para planificación, implementación, seguimiento y mejora del PESV.'"
         [tipoIcono]="'fas fa-user-tie'"
         [colorIcono]="'bg-sky-400'"
-        [porcentaje]="estatusGeneral['023-mejora-continua-preventivas-correctivas']?.estado || 0"
+        [porcentaje]="estatusGeneral['023-mejora-continua-preventivas-correctivas']?.total_progreso || 0"
         [colorgrafica]="'#0370a1'"
         [linkvamos]="'mejora_acciones_preventivas_correctivas'"
         ></app-cards-menu>
@@ -23,7 +23,7 @@
         [descripcion]="'Establece los lineamientos para la evaluación y seguimiento del comportamiento vial de los colaboradores que realizan desplazamientos.'"
         [tipoIcono]="'fas fa-balance-scale'"
         [colorIcono]="'bg-sky-400'"
-        [porcentaje]="estatusGeneral['024-mecanismos-comunicacion']?.estado || 0"
+        [porcentaje]="estatusGeneral['024-mecanismos-comunicacion']?.total_progreso || 0"
         [colorgrafica]="'#0370a1'"
         [linkvamos]="'mecanismos_comunicacion'"
         ></app-cards-menu>

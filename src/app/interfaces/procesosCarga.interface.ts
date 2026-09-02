@@ -49,6 +49,13 @@ export namespace ModelProcesos {
     metasDefinidas: { total: number };      // suma de metas de todos los objetivos
   }
 
+  // Módulo 010 — Competencias y plan anual de formación
+  export interface Modulo010Formacion extends ProgresoModulo {
+    competenciasDefinidas: { total: number };      // filas de la matriz por cargo
+    capacitacionesProgramadas: { total: number };  // total del plan anual
+    capacitacionesRealizadas: { total: number };   // ya ejecutadas
+  }
+
   // Módulo 006 — Diagnóstico
   export interface Modulo006Diagnostico extends ProgresoModulo {
     InfoOrganizacional: { total: number };
@@ -90,7 +97,7 @@ export namespace ModelProcesos {
 
     // HACER — pasos 9 a 19
     "009-plan-anual-trabajo"?: ProgresoModulo;
-    "010-competencia-plan-anual-formacion"?: ProgresoModulo;
+    "010-competencia-plan-anual-formacion"?: Modulo010Formacion;
     "011-responsabilidad-comportamiento-seguro"?: ProgresoModulo;
     "012-preparacion-respuesta-emergencias-viales"?: ProgresoModulo;
     "013-investigacion-interna-siniestros-viales"?: ProgresoModulo;

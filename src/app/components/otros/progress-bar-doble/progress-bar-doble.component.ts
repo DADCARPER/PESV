@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, AfterViewInit, ElementRef, ViewChild, signal } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, AfterViewInit, ElementRef, ViewChild, signal } from '@angular/core';
 
 
 @Component({
@@ -9,7 +9,7 @@ import { Component, Input, OnInit, AfterViewInit, ElementRef, ViewChild, signal 
   templateUrl: './progress-bar-doble.component.html',
   styleUrl: './progress-bar-doble.component.css'
 })
-export class ProgressBarDobleComponent implements OnInit, AfterViewInit {
+export class ProgressBarDobleComponent implements OnInit, OnChanges, AfterViewInit {
  
   @Input() value: number = 60; // Valor por defecto 30%
   @Input() targetValue: number = 70; // Valor objetivo 80%
@@ -21,6 +21,11 @@ export class ProgressBarDobleComponent implements OnInit, AfterViewInit {
   @Input() animationDelay: number = 300;
   @Input() showLabels: boolean = false;
   @Input() mostrarProgreso: boolean = true; // Mostrar progreso en la barra
+  /**
+   * Texto ya formateado para la etiqueta de progreso. Permite mostrar decimales
+   * o un guion cuando no hay medición, en vez del crudo `value`.
+   */
+  @Input() textoProgreso: string = '';
   @Input() customLabels: {value: number, text: string, bold?: boolean}[] = [];
   
   @ViewChild('progressFill') progressFill!: ElementRef;
@@ -47,25 +52,45 @@ export class ProgressBarDobleComponent implements OnInit, AfterViewInit {
     }
   }
   
+  /**
+   * El valor suele llegar después del primer render, cuando termina la consulta
+   * a Firestore. Sin esto la barra se quedaba en su ancho inicial mientras la
+   * etiqueta ya mostraba el dato nuevo.
+   */
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['value'] && !changes['value'].firstChange) {
+      this.progressWidth.set(this.anchoActual());
+    }
+  }
+
+  /**
+   * La marca de meta se desplaza en proporción a su posición: al 0% queda
+   * pegada por la izquierda, al 50% centrada y al 100% alineada por la derecha.
+   * Con el translateX(-50%) fijo anterior, la marca del 100% se salía del marco.
+   */
+  get desplazamientoMeta(): string {
+    const t = Math.min(100, Math.max(0, this.targetValue));
+    return `translateX(-${t}%)`;
+  }
+
+  private anchoActual(): number {
+    if (!this.maxValue) return 0;
+    return Math.min(100, Math.max(0, (this.value / this.maxValue) * 100));
+  }
+
   ngAfterViewInit() {
     if (this.animate) {
       // Iniciar con la barra vacía
-      setTimeout(() => {
-        // Calcular el nuevo ancho
-        const progress = (this.value / this.maxValue) * 100;
-        this.progressWidth.set(progress);
-      }, this.animationDelay);
+      setTimeout(() => this.progressWidth.set(this.anchoActual()), this.animationDelay);
     } else {
       // Sin animación, establecer directamente el valor final
-      const progress = (this.value / this.maxValue) * 100;
-      this.progressWidth.set(progress);
+      this.progressWidth.set(this.anchoActual());
     }
   }
   
   // Método para actualizar el valor programáticamente
   updateValue(newValue: number) {
     this.value = newValue;
-    const progress = (this.value / this.maxValue) * 100;
-    this.progressWidth.set(progress);
+    this.progressWidth.set(this.anchoActual());
   }
 }

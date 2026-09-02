@@ -8,7 +8,7 @@
         [descripcion]="'En esta sección te ayudaremos a establecer y gestionar los indicadores clave para medir el desempeño, realizar seguimiento periódico y generar reportes de autogestión que demuestren el progreso de tu plan'"
         [tipoIcono]="'fas fa-user-tie'"
         [colorIcono]="'bg-emerald-400'"
-        [porcentaje]="estatusGeneral['020-indicadores-reporte-autogestion']?.estado || 0"
+        [porcentaje]="estatusGeneral['020-indicadores-reporte-autogestion']?.total_progreso || 0"
         [colorgrafica]="'#10b97b'"
         [linkvamos]="'indicadores_autogestion_pesv'"
         ></app-cards-menu>
@@ -17,7 +17,7 @@
         [descripcion]="'Encontrarás las herramientas para documentar y analizar los datos históricos de siniestralidad. Podrás clasificar los siniestros según su nivel de riesgo, establecer tendencias y generar proyecciones estadísticas.'"
         [tipoIcono]="'fas fa-users'"
         [colorIcono]="'bg-emerald-400'"
-        [porcentaje]="estatusGeneral['021-registro-analisis-siniestros-viales']?.estado || 0"
+        [porcentaje]="estatusGeneral['021-registro-analisis-siniestros-viales']?.total_progreso || 0"
         [colorgrafica]="'#10b97b'"
         [linkvamos]="'registro_siniestros_viales'"
         ></app-cards-menu>
@@ -29,7 +29,7 @@
         [descripcion]="'Esta sección te guiará en la realización de auditorías internas efectivas para evaluar el cumplimiento de tu PESV. Te ayudaremos a documentar el proceso, planificar las auditorías y dar seguimiento a los hallazgos identificados.'"
         [tipoIcono]="'fas fa-balance-scale'"
         [colorIcono]="'bg-emerald-400'"
-        [porcentaje]="estatusGeneral['022-auditoria-anual']?.estado || 0"
+        [porcentaje]="estatusGeneral['022-auditoria-anual']?.total_progreso || 0"
         [colorgrafica]="'#10b97b'"
         [linkvamos]="'auditoria_anual'"
         ></app-cards-menu>

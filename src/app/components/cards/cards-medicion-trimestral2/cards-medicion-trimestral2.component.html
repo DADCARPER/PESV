@@ -1,66 +1,36 @@
 <div class="bg-white rounded-lg border shadow-sm overflow-hidden">
-    <div class="px-4 pt-2">
-        <span class="text-lg font-medium block ">{{titulo}}</span>
-        <!-- <span class="text-sm text-gray-500">Tasa de incidentes reportados</span> -->
-    </div>
-    <div class="flex flex-col md:flex-row gap-2 p-2">
- 
-      <div class="w-full flex flex-col items-center rounded-lg px-4 py-2 shadow-sm border-2" [ngClass]="[fondoColor, borderColor]">
-        <span class="text-base text-gray-900 ">1 Trimestre</span>
-        <span class="text-2xl font-medium" [ngClass]="textColor">
-          {{valorActual1}}
-        </span>
-        <span class="text-base  text-gray-500">
-          Meta definida : {{valorMeta1}}
-        </span>
-        <div class="w-full pt-1">
-          <app-progress-bar-doble
-          [color]="'#16a34d'">
-          </app-progress-bar-doble>
+  <div class="px-4 pt-2">
+    <span class="text-lg font-medium block">{{ titulo }}</span>
+  </div>
+
+  <div class="flex flex-col md:flex-row gap-2 p-2">
+    @for (t of trimestres(); track t.subtitulo) {
+      <div class="w-full rounded-lg px-4 py-2 shadow-sm border-2"
+        [ngClass]="[fondoColor, borderColor]">
+
+        <!-- Lo alcanzado a la izquierda, lo esperado a la derecha -->
+        <div class="flex items-end justify-between gap-3">
+          <div class="min-w-0">
+            <p class="text-sm text-gray-900 leading-tight">{{ t.subtitulo }}</p>
+            <p class="leading-none whitespace-nowrap">
+              <span class="text-2xl font-medium" [ngClass]="textColor">{{ textoValor(t.actual) }}</span>
+              <span class="text-sm text-gray-500 ml-1">{{ etiquetaValor }}</span>
+            </p>
+          </div>
+
+          <div class="text-right flex-none">
+            <p class="text-xs text-gray-500 leading-tight">Meta definida</p>
+            <p class="text-xl font-semibold text-gray-700 leading-none">{{ t.meta }}</p>
+          </div>
         </div>
+
+        <app-progress-bar-doble
+          [value]="anchoBarra(t.porcentaje)"
+          [textoProgreso]="t.texto"
+          [targetValue]="porcentajeMeta"
+          [color]="colorBarra">
+        </app-progress-bar-doble>
       </div>
-      <div class="w-full flex flex-col items-center rounded-lg px-4 py-2 shadow-sm border-2" [ngClass]="[fondoColor, borderColor]">
-        <span class="text-base text-gray-900 ">2 Trimestre</span>
-        <span class="text-2xl font-medium" [ngClass]="textColor">
-          {{valorActual2}}
-        </span>
-        <span class="text-base  text-gray-500">
-            Meta definida : {{valorMeta2}}
-        </span>
-        <div class="w-full pt-1">
-          <app-progress-bar-doble
-          [color]="'#16a34d'">
-          </app-progress-bar-doble>
-        </div>
-      </div>
-      <div class="w-full flex flex-col items-center rounded-lg px-4 py-2 shadow-sm border-2" [ngClass]="[fondoColor, borderColor]">
-        <span class="text-base text-gray-900 ">3 Trimestre</span>
-        <span class="text-2xl font-medium" [ngClass]="textColor">
-          {{valorActual3}}
-        </span>
-        <span class="text-base  text-gray-500">
-            Meta definida : {{valorMeta3}}
-        </span>
-        <div class="w-full pt-1">
-          <app-progress-bar-doble
-          [color]="'#16a34d'">
-          </app-progress-bar-doble>
-        </div>
-      </div>
-      <div class="w-full flex flex-col items-center rounded-lg px-4 py-2 shadow-sm border-2" [ngClass]="[fondoColor, borderColor]">
-        <span class="text-base text-gray-900 ">4 Trimestre</span>
-        <span class="text-2xl font-medium" [ngClass]="textColor">
-          {{valorActual4}}
-        </span>
-        <span class="text-base  text-gray-500">
-            Meta definida : {{valorMeta4}}
-        </span>
-        <div class="w-full pt-1">
-          <app-progress-bar-doble
-          [color]="'#16a34d'">
-          </app-progress-bar-doble>
-        </div>
-      </div>
-      
-    </div>
+    }
+  </div>
 </div>

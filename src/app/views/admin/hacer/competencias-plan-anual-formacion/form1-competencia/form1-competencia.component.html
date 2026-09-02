@@ -1,0 +1,107 @@
+<!-- Fondo oscuro -->
+<div *ngIf="mostrarModal()" (click)="cerrarModal()" class="fixed inset-0 z-40 bg-black opacity-25"></div>
+
+<!-- Modal -->
+<div *ngIf="mostrarModal()" class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex modal-fade-down">
+  <div (click)="$event.stopPropagation()" class="relative mx-auto my-6 bg-white rounded-lg shadow-lg max-w-3xl w-full">
+
+    <div class="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+      <h3 class="text-xl font-semibold">
+        {{ modo === 'editar' ? 'Editar competencia' : 'Nueva competencia' }}
+      </h3>
+    </div>
+
+    <form [formGroup]="competenciaForm" (ngSubmit)="handleSave()">
+      <div class="relative p-6 flex-auto max-h-[70vh] overflow-y-auto">
+
+        <div class="flex flex-wrap mb-4">
+          <div class="w-full lg:w-6/12 px-2">
+            <div class="space-y-2">
+              <label for="cargo" class="block text-sm font-medium text-gray-700">Cargo *</label>
+              <input type="text" id="cargo" formControlName="cargo" list="cargosDisponibles"
+                placeholder="Ej: Conductor"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              <datalist id="cargosDisponibles">
+                @for (c of cargosSugeridos(); track c) {
+                  <option [value]="c"></option>
+                }
+              </datalist>
+              @if (cargosSugeridos().length > 0) {
+                <p class="text-xs text-gray-400">Se sugieren los cargos registrados en el Diagnóstico.</p>
+              }
+              <p *ngIf="competenciaForm.get('cargo')?.touched && competenciaForm.get('cargo')?.invalid"
+                class="text-xs text-red-500">El cargo es obligatorio.</p>
+            </div>
+          </div>
+
+          <div class="w-full lg:w-6/12 px-2">
+            <div class="space-y-2">
+              <label for="nivelRequerido" class="block text-sm font-medium text-gray-700">Nivel requerido *</label>
+              <select id="nivelRequerido" formControlName="nivelRequerido"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Seleccionar nivel</option>
+                @for (n of niveles; track n) {
+                  <option [value]="n">{{ n }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap mb-4">
+          <div class="w-full px-2">
+            <div class="space-y-2">
+              <label for="competencia" class="block text-sm font-medium text-gray-700">Competencia requerida *</label>
+              <textarea id="competencia" formControlName="competencia" rows="3"
+                placeholder="Ej: Aplicar técnicas de conducción defensiva en vías urbanas y rurales."
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+              <p *ngIf="competenciaForm.get('competencia')?.touched && competenciaForm.get('competencia')?.invalid"
+                class="text-xs text-red-500">Describe la competencia (máx. 300 caracteres).</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap mb-4">
+          <div class="w-full lg:w-8/12 px-2">
+            <div class="space-y-2">
+              <label for="formaVerificacion" class="block text-sm font-medium text-gray-700">Forma de verificación *</label>
+              <select id="formaVerificacion" formControlName="formaVerificacion"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Seleccionar</option>
+                @for (v of verificaciones; track v) {
+                  <option [value]="v">{{ v }}</option>
+                }
+              </select>
+              <p class="text-xs text-gray-400">Con qué evidencia se demuestra que el cargo tiene la competencia.</p>
+            </div>
+          </div>
+
+          <div class="w-full lg:w-4/12 px-2">
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-700">¿Es obligatoria?</label>
+              <label class="inline-flex items-center cursor-pointer mt-2">
+                <input type="checkbox" class="sr-only peer" formControlName="obligatoria" />
+                <div class="relative w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sky-400"></div>
+                <span class="ml-3 text-sm text-gray-600">
+                  {{ competenciaForm.get('obligatoria')?.value ? 'Obligatoria' : 'Deseable' }}
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="flex items-center justify-end p-4 border-t border-solid border-blueGray-200 rounded-b">
+        <button type="button" (click)="handleCancel()"
+          class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="guardando()"
+          class="bg-emerald-500 text-white active:bg-emerald-600 disabled:opacity-50 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">
+          {{ guardando() ? 'Guardando...' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,138 @@
+<div *ngIf="mostrarModal()" (click)="cerrarModal()" class="fixed inset-0 z-40 bg-black opacity-25"></div>
+
+<div *ngIf="mostrarModal()" class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex modal-fade-down">
+  <div (click)="$event.stopPropagation()" class="relative mx-auto my-6 bg-white rounded-lg shadow-lg max-w-3xl w-full">
+
+    <div class="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+      <div>
+        <h3 class="text-xl font-semibold">
+          {{ modo === 'editar' ? 'Editar indicador' : 'Nuevo indicador' }}
+        </h3>
+        <p class="text-sm text-gray-500">Dentro de {{ contexto() }}</p>
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="handleSave()">
+      <div class="relative p-6 flex-auto max-h-[70vh] overflow-y-auto">
+
+        <!-- ── Definición ─────────────────────────────────────── -->
+        <h3 class="text-lg font-semibold mb-4 pb-2 border-b text-gray-700">Definición</h3>
+
+        <div class="flex flex-wrap mb-4">
+          <div class="w-full lg:w-4/12 px-2">
+            <div class="space-y-2">
+              <label for="codigoInd" class="block text-sm font-medium text-gray-700">Código *</label>
+              <input type="text" id="codigoInd" formControlName="codigo" placeholder="IND-01"
+                [ngClass]="borde('codigo')"
+                class="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+              @if (error('codigo')) {
+                <p class="text-xs text-red-500">{{ error('codigo') }}</p>
+              }
+            </div>
+          </div>
+          <div class="w-full lg:w-8/12 px-2">
+            <div class="space-y-2">
+              <label for="unidadInd" class="block text-sm font-medium text-gray-700">Unidad *</label>
+              <select id="unidadInd" formControlName="unidad"
+                [ngClass]="borde('unidad')"
+                class="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+                @for (u of unidades; track u) {
+                  <option [value]="u">{{ u }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap mb-4">
+          <div class="w-full px-2">
+            <div class="space-y-2">
+              <label for="nombreInd" class="block text-sm font-medium text-gray-700">Nombre del indicador *</label>
+              <textarea id="nombreInd" formControlName="nombre" rows="4" [attr.maxlength]="maxDescripcion"
+                placeholder="Ej: Cobertura del plan de formación en seguridad vial"
+                [ngClass]="borde('nombre')"
+                class="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500"></textarea>
+              <div class="flex items-start justify-between gap-4">
+                <p class="text-xs text-red-500">{{ error('nombre') }}</p>
+                <p class="text-xs ml-auto whitespace-nowrap tabular-nums"
+                  [ngClass]="usados('nombre') >= maxDescripcion ? 'text-red-500 font-semibold'
+                           : usados('nombre') > maxDescripcion * 0.9 ? 'text-amber-600' : 'text-gray-400'">
+                  {{ usados('nombre') }} / {{ maxDescripcion }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Meta ───────────────────────────────────────────── -->
+        <h3 class="text-lg font-semibold mb-4 pb-2 border-b text-gray-700">Meta</h3>
+
+        <div class="flex flex-wrap mb-4">
+          <div class="w-full lg:w-8/12 px-2">
+            <div class="space-y-2">
+              <label for="direccionInd" class="block text-sm font-medium text-gray-700">¿Cuándo cumple? *</label>
+              <select id="direccionInd" formControlName="direccion"
+                [ngClass]="borde('direccion')"
+                class="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+                @for (d of direcciones; track d.clave) {
+                  <option [value]="d.clave">{{ d.simbolo }} &nbsp; {{ d.nombre }}</option>
+                }
+              </select>
+              @for (d of direcciones; track d.clave) {
+                @if (d.clave === form.get('direccion')?.value) {
+                  <p class="text-xs text-gray-400">{{ d.ayuda }}</p>
+                }
+              }
+            </div>
+          </div>
+          <div class="w-full lg:w-4/12 px-2">
+            <div class="space-y-2">
+              <label for="metaInd" class="block text-sm font-medium text-gray-700">Valor meta *</label>
+              <div class="relative">
+                <span class="absolute left-3 top-2 text-sm font-semibold text-amber-600">{{ simbolo }}</span>
+                <input type="number" id="metaInd" formControlName="meta" step="0.01" placeholder="90"
+                  [ngClass]="borde('meta')"
+                  class="w-full pl-8 pr-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+              </div>
+              @if (error('meta')) {
+                <p class="text-xs text-red-500">{{ error('meta') }}</p>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Medición trimestral ────────────────────────────── -->
+        <h3 class="text-lg font-semibold mb-4 pb-2 border-b text-gray-700">Medición trimestral</h3>
+        <p class="text-sm text-gray-500 mb-4 px-2">
+          Deja en blanco el trimestre que aún no se ha medido. El estado se calcula al vuelo.
+        </p>
+
+        <div class="flex flex-wrap">
+          @for (t of nombresTrimestres; track t; let i = $index) {
+            <div class="w-full lg:w-3/12 px-2 mb-4">
+              <div class="space-y-2">
+                <label [for]="'trim-' + i" class="block text-sm font-medium text-gray-700">{{ t }}</label>
+                <input type="number" [id]="'trim-' + i" [(ngModel)]="trimestres[i]" [ngModelOptions]="{standalone: true}"
+                  step="0.01" placeholder="Sin medir"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+                <span [class]="claseEstado(i)">{{ estadoTrimestre(i) }}</span>
+              </div>
+            </div>
+          }
+        </div>
+
+      </div>
+
+      <div class="flex items-center justify-end p-4 border-t border-solid border-blueGray-200 rounded-b">
+        <button type="button" (click)="handleCancel()"
+          class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="guardando()"
+          class="bg-emerald-500 text-white active:bg-emerald-600 disabled:opacity-50 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">
+          {{ guardando() ? 'Guardando...' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -2,276 +2,68 @@
 <div *ngIf="mostrarModal()" (click)="cerrarModal()" class="fixed inset-0 z-40 bg-black opacity-25"></div>
 
 <!-- Modal -->
-<div *ngIf="mostrarModal()" (click)="cerrarModal()" class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex modal-fade-down">
+<div *ngIf="mostrarModal()" class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex modal-fade-down">
   <div (click)="$event.stopPropagation()" class="relative mx-auto my-6 bg-white rounded-lg shadow-lg max-w-6xl w-full">
-    <!-- 'max-w-sm':  'small',
-      'max-w-3xl':  'regular',
-      'max-w-6xl':  'large' -->
-    <!-- Título del modal -->
+
     <div class="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
-      <h3 class="text-xl font-semibold">
-        Numero Siniestros - Indicador 1
-      </h3>
-    </div>
-    
-    <!-- Contenido del modal -->
-    <div class="relative p-6 flex-auto">
-      
-      <h3 class="text-lg font-semibold mb-4 pb-2 border-b text-gray-700">Ingrese la cantidad de siniestros por tipo para cada mes</h3>
-      <div class="flex flex-wrap mb-4">
-
-        <div class="w-full lg:w-12/12 px-2">
-          <div class="space-y-2">
-            <div class="rounded-md border overflow-x-auto mb-2">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
-                            <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">ENE</th>
-                            <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">FEB</th>
-                            <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">MAR</th>
-                            <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">ABR</th>
-                            <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">MAY</th>
-                            <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">JUN</th>
-                            <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">JUL</th>
-                            <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">AGO</th>
-                            <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">SEP</th>
-                            <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">OCT</th>
-                            <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">NOV</th>
-                            <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">DIC</th>
-
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr>
-                            <td class="px-2 py-4 whitespace-nowrap text-sm font-medium text-gray-900">TSV Fatales</td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-
-                        </tr>
-                        <tr>
-                            <td class="px-2 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Heridos Graves</td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-
-                        </tr>
-                        <tr>
-                            <td class="px-2 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Heridos Leves</td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-
-                        </tr>
-                        <tr>
-                            <td class="px-2 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Choques Simples</td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                                <input type="number" name="siniestro" placeholder="0" min="0" max="99" 
-                                class="w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            </td>
-
-                        </tr>
-                       
-                    </tbody>
-                </table>
-            </div>
-          </div>
-        </div>
-
+      <div>
+        <h3 class="text-xl font-semibold">Siniestros por nivel de pérdida</h3>
+        <p class="text-sm text-gray-500">
+          Tomados del registro interno de incidentes y accidentes viales.
+        </p>
       </div>
-    
-     
-
-
     </div>
-    
-    <!--footer-->
-    <div class="flex items-center justify-end p-5 border-t border-solid border-blueGray-200 rounded-b">
-      <button class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" (click)="handleCancel()">
+
+    <div class="relative p-6 flex-auto max-h-[65vh] overflow-y-auto">
+      <div class="overflow-x-auto">
+        <table class="min-w-full border-collapse">
+          <thead>
+            <tr>
+              <th class="px-3 py-2 text-xs uppercase font-semibold text-left text-blueGray-500 bg-blueGray-50 sticky left-0 z-10">Mes</th>
+              @for (nivel of niveles; track nivel.clave) {
+                <th class="px-3 py-2 text-xs uppercase font-semibold text-center text-blueGray-500 bg-blueGray-50 whitespace-nowrap">
+                  {{ nivel.nombre }}
+                  <p class="text-[10px] normal-case font-normal text-gray-400">{{ nivel.criterio }}</p>
+                </th>
+              }
+              <th class="px-3 py-2 text-xs uppercase font-semibold text-center text-blueGray-500 bg-blueGray-50">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (mes of meses; track mes; let i = $index) {
+              <tr class="border-t border-gray-100">
+                <td class="px-3 py-2 text-sm font-medium text-gray-700 whitespace-nowrap bg-white sticky left-0">{{ mes }}</td>
+                @for (nivel of niveles; track nivel.clave) {
+                  <td class="px-2 py-1">
+                    <input type="number" [(ngModel)]="siniestros[i][nivel.clave]" min="0" placeholder="0"
+                      class="w-20 px-2 py-1 border border-gray-300 rounded text-center text-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
+                  </td>
+                }
+                <td class="px-3 py-2 text-sm text-center font-semibold text-gray-600">{{ totalMes(i) }}</td>
+              </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr class="border-t-2 border-gray-300 bg-blueGray-50">
+              <td class="px-3 py-2 text-sm font-bold text-gray-700 sticky left-0 bg-blueGray-50">Total año</td>
+              @for (nivel of niveles; track nivel.clave) {
+                <td class="px-3 py-2 text-sm text-center font-bold text-emerald-600">{{ totalNivel(nivel.clave) }}</td>
+              }
+              <td class="px-3 py-2"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-end p-4 border-t border-solid border-blueGray-200 rounded-b">
+      <button type="button" (click)="handleCancel()"
+        class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">
         Cancelar
       </button>
-      <button class="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" (click)="handleSave()">
-        Agregar
+      <button type="button" (click)="handleSave()" [disabled]="guardando()"
+        class="bg-emerald-500 text-white active:bg-emerald-600 disabled:opacity-50 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">
+        {{ guardando() ? 'Guardando...' : 'Guardar' }}
       </button>
     </div>
   </div>

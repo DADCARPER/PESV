@@ -11,7 +11,7 @@
           [colorIcono]="'bg-sky-400'"
           [colorgrafica]="'#0370a1'"
           [linkvamos]="'plan_anual_trabajo'"
-          [porcentaje]="estatusGeneral['009-plan-anual-trabajo']?.estado || 0"
+          [porcentaje]="estatusGeneral['009-plan-anual-trabajo']?.total_progreso || 0"
           ></app-cards-menu>
           <app-cards-menu class="w-full md:w-1/2"
           [titulo]="'Competencias y plan anual de formación'"
@@ -20,7 +20,7 @@
           [colorIcono]="'bg-sky-400'"
           [colorgrafica]="'#0370a1'"
           [linkvamos]="'competencias_plan_anual_formacion'"
-          [porcentaje]="estatusGeneral['010-competencia-plan-anual-formacion']?.estado || 0"
+          [porcentaje]="estatusGeneral['010-competencia-plan-anual-formacion']?.total_progreso || 0"
           ></app-cards-menu>
 
       </div>
@@ -34,7 +34,7 @@
       [colorIcono]="'bg-sky-400'"
       [colorgrafica]="'#0370a1'"
       [linkvamos]="'responsabilidad_comportamiento_seguro'"
-      [porcentaje]="estatusGeneral['011-responsabilidad-comportamiento-seguro']?.estado || 0"
+      [porcentaje]="estatusGeneral['011-responsabilidad-comportamiento-seguro']?.total_progreso || 0"
       ></app-cards-menu>
 
       <app-cards-menu class="w-full md:w-1/2"
@@ -44,7 +44,7 @@
       [colorIcono]="'bg-sky-400'"
       [colorgrafica]="'#0370a1'"
       [linkvamos]="'preparacion_respuesta_emergencias_viales'"
-      [porcentaje]="estatusGeneral['012-preparacion-respuesta-emergencias-viales']?.estado || 0"
+      [porcentaje]="estatusGeneral['012-preparacion-respuesta-emergencias-viales']?.total_progreso || 0"
       ></app-cards-menu>
       </div>
       <div class="flex flex-col md:flex-row gap-6 mb-4">
@@ -57,7 +57,7 @@
       [colorIcono]="'bg-sky-400'"
       [colorgrafica]="'#0370a1'"
       [linkvamos]="'investigacion_incidentes_viales'"
-      [porcentaje]="estatusGeneral['013-investigacion-interna-siniestros-viales']?.estado || 0"
+      [porcentaje]="estatusGeneral['013-investigacion-interna-siniestros-viales']?.total_progreso || 0"
       ></app-cards-menu>
 
       <app-cards-menu class="w-full md:w-1/2"
@@ -66,7 +66,7 @@
       [colorIcono]="'bg-sky-400'"
       [colorgrafica]="'#0370a1'"
       [linkvamos]="'vias_seguras_administradas_organizacion'"
-      [porcentaje]="estatusGeneral['014-vias-seguras-administradas-organizacion']?.estado || 0"
+      [porcentaje]="estatusGeneral['014-vias-seguras-administradas-organizacion']?.total_progreso || 0"
       ></app-cards-menu>
     
       </div>
@@ -79,7 +79,7 @@
       [colorIcono]="'bg-sky-400'"
       [colorgrafica]="'#0370a1'"
       [linkvamos]="'planificacion_desplazamientos_laborales'"
-      [porcentaje]="estatusGeneral['015-planificacion-desplazamientos-laborales']?.estado || 0"
+      [porcentaje]="estatusGeneral['015-planificacion-desplazamientos-laborales']?.total_progreso || 0"
       ></app-cards-menu>
       
       <app-cards-menu class="w-full md:w-1/2"
@@ -88,7 +88,7 @@
       [colorIcono]="'bg-sky-400'"
       [colorgrafica]="'#0370a1'"
       [linkvamos]="'inspeccion_vehiculos_equipos'"
-      [porcentaje]="estatusGeneral['016-inspeccion-vehiculos-equipos']?.estado || 0"
+      [porcentaje]="estatusGeneral['016-inspeccion-vehiculos-equipos']?.total_progreso || 0"
       ></app-cards-menu>
 
       </div>
@@ -101,7 +101,7 @@
       [colorIcono]="'bg-sky-400'"
       [colorgrafica]="'#0370a1'"
       [linkvamos]="'mantenimiento_control_vehiculos_seguros'"
-      [porcentaje]="estatusGeneral['017-mantenimiento-control-vehiculos-seguros']?.estado || 0"
+      [porcentaje]="estatusGeneral['017-mantenimiento-control-vehiculos-seguros']?.total_progreso || 0"
       ></app-cards-menu>
       <app-cards-menu class="w-full md:w-1/2"
       [titulo]="'Gestión del cambio y gestión de contratistas'"
@@ -109,7 +109,7 @@
       [colorIcono]="'bg-sky-400'"
       [colorgrafica]="'#0370a1'"
       [linkvamos]="'gestion_cambio_contratistas'"
-      [porcentaje]="estatusGeneral['018-gestion-cambio-contratistas']?.estado || 0"
+      [porcentaje]="estatusGeneral['018-gestion-cambio-contratistas']?.total_progreso || 0"
       ></app-cards-menu>
       
       </div>
@@ -122,7 +122,7 @@
       [colorIcono]="'bg-sky-400'"
       [colorgrafica]="'#0370a1'"
       [linkvamos]="'archivo_retencion_documental'"
-      [porcentaje]="estatusGeneral['019-archivo-retencion-documental']?.estado || 0"
+      [porcentaje]="estatusGeneral['019-archivo-retencion-documental']?.total_progreso || 0"
       ></app-cards-menu>
       
       </div>

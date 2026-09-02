@@ -1,0 +1,30 @@
+<div *ngIf="mostrarModal()" (click)="cerrarModal()" class="fixed inset-0 z-40 bg-black opacity-25"></div>
+
+<div *ngIf="mostrarModal()" class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex modal-fade-down">
+  <div (click)="$event.stopPropagation()" class="relative mx-auto my-6 bg-white rounded-lg shadow-lg max-w-3xl w-full">
+
+    <div class="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+      <div>
+        <h3 class="text-xl font-semibold">{{ titulo() }}</h3>
+        @if (subtitulo()) {
+          <p class="text-sm text-gray-500">{{ subtitulo() }}</p>
+        }
+      </div>
+      <button type="button" (click)="cerrarModal()" title="Cerrar"
+        class="text-gray-400 hover:text-gray-600 transition-colors duration-150">
+        <iconify-icon icon="hugeicons:cancel-01" width="22" height="22"></iconify-icon>
+      </button>
+    </div>
+
+    <div class="relative p-6 flex-auto max-h-[65vh] overflow-y-auto">
+      <p class="text-base leading-relaxed text-blueGray-700 whitespace-pre-line">{{ texto() }}</p>
+    </div>
+
+    <div class="flex items-center justify-end p-4 border-t border-solid border-blueGray-200 rounded-b">
+      <button type="button" (click)="cerrarModal()"
+        class="bg-blueGray-500 text-white active:bg-blueGray-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mb-1 ease-linear transition-all duration-150">
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>

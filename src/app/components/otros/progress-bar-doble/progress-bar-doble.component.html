@@ -1,5 +1,7 @@
 <div class="progress-container">
-  <div class="progress-label">Progreso Actual: {{value}}%</div>
+  @if (mostrarProgreso) {
+    <div class="progress-label">Progreso Actual: {{ textoProgreso || (value + '%') }}</div>
+  }
 
   <div class="progress-bar-wrapper">
     <!-- Barra base -->
@@ -16,11 +18,14 @@
       </div>
       
       <!-- Marcador de meta -->
-      <div class="target-marker" 
+      <div class="target-marker"
            [style.left.%]="targetValue"
+           [style.transform]="desplazamientoMeta"
            [style.height.px]="height + 20">
         <div class="target-icon" [style.background-color]="color"></div>
-        <div class="target-label" [style.color]="color">Meta: {{targetValue}}%</div>
+        <div class="target-label"
+             [style.transform]="desplazamientoMeta"
+             [style.color]="color">Meta: {{targetValue}}%</div>
       </div>
     </div>
     

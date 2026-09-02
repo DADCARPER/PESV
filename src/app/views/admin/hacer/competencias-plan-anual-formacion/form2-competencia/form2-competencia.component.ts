@@ -6,30 +6,26 @@ import { AlertaService } from '../../../../../services/shared/alerta.service';
 import { Models } from '../../../../../interfaces/models';
 
 @Component({
-  selector: 'app-form2-objetivos-metas',
+  selector: 'app-form2-competencia',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './form2-objetivos-metas.component.html',
-  styleUrl: './form2-objetivos-metas.component.css'
+  templateUrl: './form2-competencia.component.html',
+  styleUrl: './form2-competencia.component.css'
 })
-export class Form2ObjetivosMetasComponent {
+export class Form2CompetenciaComponent {
 
   private _authcations = inject(AuthenticacionService);
   private _firestore = inject(FirestoreService);
   public _alerta = inject(AlertaService);
 
-  eliminarDoc: Models.ObjetivosMetas.ConsultarObjetivo | null = null;
-
-  // Signal para controlar la visibilidad del modal
+  eliminarDoc: Models.Formacion.ConsultarCompetencia | null = null;
   mostrarModal = signal<boolean>(false);
 
-  // Método para abrir el modal
-  abrirModal(objetivo: Models.ObjetivosMetas.ConsultarObjetivo) {
-    this.eliminarDoc = objetivo;
+  abrirModal(dato: Models.Formacion.ConsultarCompetencia) {
+    this.eliminarDoc = dato;
     this.mostrarModal.set(true);
   }
 
-  // Método para cerrar el modal
   cerrarModal() {
     this.eliminarDoc = null;
     this.mostrarModal.set(false);
@@ -43,21 +39,19 @@ export class Form2ObjetivosMetasComponent {
 
     try {
       await this._firestore.updateDocument(
-        `Empresas/${nit}/periodos/${periodo}/007-objetivos-metas/${this.eliminarDoc.id}`,
+        `Empresas/${nit}/periodos/${periodo}/010-competencia-plan-anual-formacion-competencias/${this.eliminarDoc.id}`,
         { estado: 'NoActivo' }
       );
-      this._alerta.showSuccess('Objetivo eliminado exitosamente.');
+      this._alerta.showSuccess('Competencia eliminada exitosamente.');
       this.cerrarModal();
     } catch (error: unknown) {
-      const msg = error instanceof Error ? error.message : 'Error al eliminar el objetivo';
-      console.error('[Form2ObjetivosMetas] eliminar:', error);
+      const msg = error instanceof Error ? error.message : 'Error al eliminar';
+      console.error('[Form2Competencia] eliminar:', error);
       this._alerta.showError(msg);
     }
   }
 
-  // Método para manejar el clic en "Cancelar"
   handleCancel() {
     this.cerrarModal();
   }
-
 }
