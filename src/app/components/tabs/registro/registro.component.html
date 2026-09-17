@@ -1,397 +1,273 @@
-<div class="flex flex-wrap">
-  <div class="w-full">
-    
-    <div class="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">
-      <div class="px-7 pb-5 flex-auto">
-        <div class="tab-content tab-space">
-          <div *ngIf="openTab === 1" >
+<div class="overflow-hidden rounded-2xl bg-white text-left shadow-2xl">
 
-            <h1 data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" class="text-3xl font-normal leading-normal mt-0 mb-2 text-blueGray-700">Bienvenido {{nombreEmpresa}}</h1><br>
-      
-            <div style="text-align: justify;">
-            <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300">
-              En el marco de la Ley 1503 de 2011, las organizaciones en Colombia tienen el compromiso de promover la seguridad vial como parte de su responsabilidad social. Este enfoque implica que las empresas fomenten hábitos y conductas seguras en sus colaboradores, ya sea que se desplacen como peatones, pasajeros, ciclistas, motociclistas o conductores.
-            </p><br>
-            <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="500">
-              El <strong>Plan Estratégico de Seguridad Vial (PESV)</strong> se presenta como una herramienta clave para gestionar los riesgos asociados a la seguridad vial, no solo dentro de las organizaciones, sino también en sus comunidades. Implementar un PESV efectivo contribuye a crear un entorno más seguro y responsable, alineado con los objetivos de sostenibilidad y bienestar de las personas.
-            </p><br>
-            <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="700">
-              A través de la herramienta PESV interactivo, las empresas pueden reducir los accidentes de tránsito, proteger la vida de sus colaboradores y garantizar el cumplimiento de la normativa legal. Además, esta estrategia permite mejorar la reputación de las organizaciones, destacándose por su compromiso con la seguridad y el bienestar de sus empleados y las comunidades donde operan.
-            </p><br>
-            </div>
-            <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="900" (click)="toggleTabs(2)" class="text-amber-500 bg-transparent border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
-              <i class="fas fa-arrow-right"></i> Siguiente
-            </button>
-
-          </div>
-          <form (ngSubmit)="onSubmit()">
-          <div *ngIf="openTab === 2">
-            <div class="container mt-5" style="text-align: center;">
-              
-              
-                <h6 data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" class="text-3xl font-normal leading-normal mt-0 mb-2 text-blueGray-800">
-                  Cuestionario de Categorización PESV
-                </h6>
-              
-                <!-- Pregunta 1 -->
-                <div class="flex flex-wrap" style="text-align: left;margin-top: 20px;margin-bottom: 20px;">
-                  <div class="w-full lg:w-6/12 px-4">
-                    <div data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300" class="relative w-full mb-3">
-                      <label class="text-lg block uppercase text-blueGray-600 font-bold mb-2">
-                        1. ¿Cuál es la principal actividad de su empresa?
-                      </label>
-                      <div>
-                        <label class="text-lg">
-                        <input
-                          type="radio"
-                          name="actividad"
-                          [(ngModel)]="form.actividad"
-                          value="transporte"
-                          class="mr-2"
-                          required
-                        /> Prestación de servicios de transporte terrestre automotor</label>
-                      </div>
-                      <div>
-                        <label class="text-lg">
-                        <input
-                          type="radio"
-                          name="actividad"
-                          [(ngModel)]="form.actividad"
-                          value="otra"
-                          class="mr-2"
-                          required
-                        /> Actividades no relacionadas con el transporte</label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="500" [disabled]="!form.actividad" (click)="toggleTabs(3)" 
-                [ngClass]="{
-                  'text-blueGray-500 bg-transparent border-blueGray-500 hover:bg-blueGray-500': !form.actividad,
-                  'text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white': form.actividad }"
-                   class="border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
-
-                <i class="fas fa-arrow-right"></i> Siguiente
-                </button>
-            
-
-            </div>
-          </div>
-          <div *ngIf="openTab === 3">
-            <!-- Pregunta 2 -->
-            <div class="flex flex-wrap" style="text-align: left;margin-top: 20px;margin-bottom: 20px;">
-              <div class="w-full lg:w-12/12 px-4">
-                <div class="relative w-full mb-3">
-                  <label data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" class="text-lg block uppercase text-blueGray-600 font-bold mb-2">
-                    2. ¿Cuantos vehículos se emplean para desarrollar la actividad económica de la organización?
-                  </label>
-                  <div data-aos="fade-right" data-aos-duration="1000" data-aos-delay="200">
-                    <label class="text-lg">
-                    <input
-                      type="radio"
-                      name="vehiculos"
-                      [(ngModel)]="form.vehiculos"
-                      value="0"
-                      class="mr-2"
-                      required
-                    /> Cero vehículos </label>
-                  </div>
-                  <div data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300">
-                    <label class="text-lg">
-                    <input
-                      type="radio"
-                      name="vehiculos"
-                      [(ngModel)]="form.vehiculos"
-                      value=10
-                      class="mr-2"
-                      required
-                    /> Menos de 11 vehículos </label>
-                  </div>
-                  <div data-aos="fade-right" data-aos-duration="1000" data-aos-delay="400">
-                    <label class="text-lg">
-                    <input
-                      type="radio"
-                      name="vehiculos"
-                      [(ngModel)]="form.vehiculos"
-                      value=18
-                      class="mr-2"
-                      required
-                    /> Entre 11 y 19 vehículos </label>
-                  </div>
-                  <div data-aos="fade-right" data-aos-duration="1000" data-aos-delay="500">
-                    <label class="text-lg">
-                    <input
-                      type="radio"
-                      name="vehiculos"
-                      [(ngModel)]="form.vehiculos"
-                      value=49
-                      class="mr-2"
-                      required
-                    /> Entre 20 y 50 vehículos </label>
-                  </div>
-                  <div data-aos="fade-right" data-aos-duration="1000" data-aos-delay="600">
-                    <label class="text-lg">
-                    <input
-                      type="radio"
-                      name="vehiculos"
-                      [(ngModel)]="form.vehiculos"
-                      value=99
-                      class="mr-2"
-                      required
-                    /> Entre 51 y 100 vehículos </label>
-                  </div>
-                  <div data-aos="fade-right" data-aos-duration="1000" data-aos-delay="700">
-                    <label class="text-lg">
-                    <input
-                      type="radio"
-                      name="vehiculos"
-                      [(ngModel)]="form.vehiculos"
-                      value=101
-                      class="mr-2"
-                      required
-                    /> Más de 100 vehículos </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="900" (click)="toggleTabs(2)" class="text-blueGray-500 bg-transparent border border-solid border-blueGray-500 hover:bg-blueGray-300 active:bg-blueGray-500 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
-              <i class="fas fa-arrow-left"></i> Regresar
-            </button>
-
-            <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="700" [disabled]="!form.vehiculos" (click)="toggleTabs(4)" 
-                [ngClass]="{
-                  'text-blueGray-500 bg-transparent border-blueGray-500 hover:bg-blueGray-500': !form.vehiculos,
-                  'text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white': form.vehiculos }"
-                   class="border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
-
-                <i class="fas fa-arrow-right"></i> Siguiente
-            </button>
-          
-          </div>
-          <div *ngIf="openTab === 4">
-            <!-- Pregunta 3 -->
-            <div class="flex flex-wrap" style="text-align: left;margin-top: 20px;margin-bottom: 20px;">
-              <div class="w-full lg:w-12/12 px-4">
-                <div class="relative w-full mb-3">
-                  <label data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" class="text-lg block uppercase text-blueGray-600 font-bold mb-2">
-                    3. ¿Su empresa contrata o administra conductores para operar vehículos?
-                  </label>
-                  <div data-aos="fade-right" data-aos-duration="1000" data-aos-delay="200">
-                    <label class="text-lg">
-                    <input
-                      type="radio"
-                      name="conductores"
-                      [(ngModel)]="form.conductores"
-                      value="si"
-                      class="mr-2"
-                      required
-                    /> Sí </label>
-                  </div>
-                  <div data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300">
-                    <label class="text-lg">
-                    <input
-                      type="radio"
-                      name="conductores"
-                      [(ngModel)]="form.conductores"
-                      (change)="form.numConductores = null"
-                      value="no"
-                      class="mr-2"
-                      required
-                    /> No </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-          
-            <!-- Pregunta 4: Solo visible si la empresa contrata conductores -->
-            <div class="flex flex-wrap" *ngIf="form.conductores === 'si'" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" style="text-align: left;margin-top: 20px;margin-bottom: 20px;">
-              <div class="w-full lg:w-12/12 px-4">
-                <div class="relative w-full mb-3">
-                  <label class="text-lg block uppercase text-blueGray-600 font-bold mb-2">
-                    4. ¿Cuántos conductores son contratados o administrados?
-                  </label>
-                  <div>
-                    <label class="text-lg">
-                    <input
-                      type="radio"
-                      name="numConductores"
-                      [(ngModel)]="form.numConductores"
-                      value=1
-                      class="mr-2"
-                      required
-                    /> Menos de 2 conductores </label>
-                  </div>
-                  <div>
-                    <label class="text-lg">
-                    <input
-                      type="radio"
-                      name="numConductores"
-                      [(ngModel)]="form.numConductores"
-                      value=3
-                      class="mr-2"
-                      required
-                    /> Entre 2 y 19 conductores </label>
-                  </div>
-                  <div>
-                    <label class="text-lg">
-                    <input
-                      type="radio"
-                      name="numConductores"
-                      [(ngModel)]="form.numConductores"
-                      value=21
-                      class="mr-2"
-                      required
-                    /> Entre 20 y 50 conductores </label>
-                  </div>
-                  <div>
-                    <label class="text-lg">
-                    <input
-                      type="radio"
-                      name="numConductores"
-                      [(ngModel)]="form.numConductores"
-                      value=51
-                      class="mr-2"
-                      required
-                    /> Entre 50 y 100 conductores </label>
-                  </div>
-                  <div>
-                    <label class="text-lg">
-                    <input
-                      type="radio"
-                      name="numConductores"
-                      [(ngModel)]="form.numConductores"
-                      value=101
-                      class="mr-2"
-                      required
-                    /> Más de 100 conductores </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="400" (click)="toggleTabs(3)" class="text-blueGray-500 bg-transparent border border-solid border-blueGray-500 hover:bg-blueGray-300 active:bg-blueGray-500 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
-              <i class="fas fa-arrow-left"></i> Regresar
-            </button>
-
-            <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="400" [disabled]="!form.conductores" (click)="toggleTabs(5)" 
-                [ngClass]="{
-                  'text-blueGray-500 bg-transparent border-blueGray-500 hover:bg-blueGray-500': !form.conductores,
-                  'text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white': form.conductores }"
-                   class="border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
-
-                <i class="fas fa-arrow-right"></i> Siguiente
-            </button>
-          
-          </div>
-          <div *ngIf="openTab === 5">
-
-            <!-- Pregunta 5 -->
-            <div class="flex flex-wrap" style="text-align: left;margin-top: 20px;margin-bottom: 20px;">
-              <div class="w-full lg:w-12/12 px-4">
-                <div class="relative w-full mb-3">
-                  <label data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" class="text-lg block uppercase text-blueGray-600 font-bold mb-2">
-                    5. ¿Su empresa utiliza vehículos que pertenecen a terceros (alquiler, leasing, renting, etc.)?
-                  </label>
-                  <div data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300">
-                    <label class="text-lg">
-                    <input
-                      type="radio"
-                      name="vehiculosTerceros"
-                      [(ngModel)]="form.vehiculosTerceros"
-                      value="si"
-                      class="mr-2"
-                      required
-                    /> Sí </label>
-                  </div>
-                  <div data-aos="fade-right" data-aos-duration="1000" data-aos-delay="400">
-                    <label class="text-lg">
-                    <input
-                      type="radio"
-                      name="vehiculosTerceros"
-                      [(ngModel)]="form.vehiculosTerceros"
-                      value="no"
-                      class="mr-2"
-                      required
-                    /> No </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="600" (click)="toggleTabs(4)" class="text-blueGray-500 bg-transparent border border-solid border-blueGray-500 hover:bg-blueGray-300 active:bg-blueGray-500 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
-              <i class="fas fa-arrow-left"></i> Regresar
-            </button>
-
-            <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="600" [disabled]="!form.vehiculosTerceros" (click)="toggleTabs(6)" 
-                [ngClass]="{
-                  'text-blueGray-500 bg-transparent border-blueGray-500 hover:bg-blueGray-500': !form.vehiculosTerceros,
-                  'text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white': form.vehiculosTerceros }"
-                   class="border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
-
-                <i class="fas fa-arrow-right"></i> Siguiente
-            </button>
-
-          </div>
-          <div *ngIf="openTab === 6">
-
-            @if (_alerta.showAlert) {
-              <app-alerta-informativo [type]="_alerta.alertType" [message]="_alerta.alertMessage"></app-alerta-informativo>
-            }
-
-            <!-- Mostrar resultado -->
-            <div *ngIf="resultado" class="mt-4 alert alert-info">
-              <h6 data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" class="text-3xl font-normal leading-normal mt-0 mb-2 text-blueGray-800">
-                {{ resultado }}
-              </h6>
-            </div>
-
-            
-            <h6 data-aos="fade-right" data-aos-duration="1000" data-aos-delay="600">Período en curos {{periodo}}</h6>
-            
-
-            <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="600" (click)="irdashboard()" class="text-blueGray-500 bg-transparent border border-solid border-blueGray-500 hover:bg-blueGray-300 active:bg-blueGray-500 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
-              <i class="fas fa-cog"></i> Finalizar
-            </button>
-
-          </div>
-          </form>
-        </div>
-      </div>
+  <!-- ── Cabecera: marca y avance ───────────────────────────────── -->
+  <header class="border-b border-gray-100 px-6 pt-7 pb-6 sm:px-10">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <img src="assets/img/logo.png" alt="PESV Interactivo, Plan Estratégico de Seguridad Vial" class="h-11 w-auto sm:h-12">
+      <span class="text-sm font-medium text-gray-500">
+        @if (enCuestionario) {
+          Pregunta {{ indicePaso + 1 }} de {{ pasos.length }}
+        } @else if (openTab === 1) {
+          Categorización PESV
+        } @else {
+          Periodo {{ periodo }}
+        }
+      </span>
     </div>
 
-    <!-- <ul class="flex mb-0 list-none flex-wrap pt-3 pb-4 flex-row">
-      <li class="-mb-px mr-2 last:mr-0 flex-auto text-center">
-        <a class="text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal" (click)="toggleTabs(1)" [ngClass]="{'text-lightBlue-600 bg-white': openTab !== 1, 'text-white bg-lightBlue-600': openTab === 1}">
-        <i class="fas fa-space-shuttle text-base mr-1"></i> Bienvenida
-        </a>
-      </li>
-      <li class="-mb-px mr-2 last:mr-0 flex-auto text-center">
-        <a class="text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal" (click)="toggleTabs(2)" [ngClass]="{'text-lightBlue-600 bg-white': openTab !== 2, 'text-white bg-lightBlue-600': openTab === 2}">
-        <i class="fas fa-cog text-base mr-1"></i> Settings
-        </a>
-      </li>
-      <li class="-mb-px mr-2 last:mr-0 flex-auto text-center">
-        <a class="text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal" (click)="toggleTabs(3)" [ngClass]="{'text-lightBlue-600 bg-white': openTab !== 3, 'text-white bg-lightBlue-600': openTab === 3}">
-        <i class="fas fa-briefcase text-base mr-1"></i> Options
-        </a>
-      </li>
-      <li class="-mb-px mr-2 last:mr-0 flex-auto text-center">
-        <a class="text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal" (click)="toggleTabs(4)" [ngClass]="{'text-lightBlue-600 bg-white': openTab !== 4, 'text-white bg-lightBlue-600': openTab === 4}">
-        <i class="fas fa-space-shuttle text-base mr-1"></i> Bienvenida
-        </a>
-      </li>
-      <li class="-mb-px mr-2 last:mr-0 flex-auto text-center">
-        <a class="text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal" (click)="toggleTabs(5)" [ngClass]="{'text-lightBlue-600 bg-white': openTab !== 5, 'text-white bg-lightBlue-600': openTab === 5}">
-        <i class="fas fa-cog text-base mr-1"></i> Settings
-        </a>
-      </li>
-      <li class="-mb-px mr-2 last:mr-0 flex-auto text-center">
-        <a class="text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal" (click)="toggleTabs(6)" [ngClass]="{'text-lightBlue-600 bg-white': openTab !== 6, 'text-white bg-lightBlue-600': openTab === 6}">
-        <i class="fas fa-briefcase text-base mr-1"></i> Options
-        </a>
-      </li>
-    </ul> -->
+    @if (enCuestionario) {
+      <ol class="mt-6 grid grid-cols-4 gap-2" aria-label="Avance del cuestionario">
+        @for (paso of pasos; track paso; let i = $index) {
+          <li [attr.aria-current]="i === indicePaso ? 'step' : null">
+            <div class="h-1.5 rounded-full transition-colors duration-300"
+              [ngClass]="i <= indicePaso ? 'bg-orange-500' : 'bg-gray-200'"></div>
+            <p class="mt-2 hidden text-xs font-medium sm:block"
+              [ngClass]="i === indicePaso ? 'text-gray-900' : 'text-gray-400'">{{ paso }}</p>
+          </li>
+        }
+      </ol>
+    }
+  </header>
+
+  <div class="px-6 py-8 sm:px-10 sm:py-10">
+
+    @switch (openTab) {
+
+      @case (1) {
+        <!-- ═════ Bienvenida ═════ -->
+        <p class="text-sm font-semibold uppercase tracking-wider text-orange-600">Bienvenido</p>
+        @if (nombreEmpresa) {
+          <h1 class="mt-2 text-2xl font-semibold leading-tight text-color3 text-balance sm:text-3xl">{{ nombreEmpresa }}</h1>
+        } @else {
+          <span class="mt-3 block h-8 w-64 max-w-full animate-pulse rounded bg-gray-100" aria-hidden="true"></span>
+        }
+
+        <div class="mt-6 max-w-prose space-y-4 text-base leading-relaxed text-gray-600">
+          <p>
+            En el marco de la Ley 1503 de 2011, las organizaciones en Colombia tienen el compromiso de promover
+            la seguridad vial como parte de su responsabilidad social. Este enfoque implica que las empresas
+            fomenten hábitos y conductas seguras en sus colaboradores, ya sea que se desplacen como peatones,
+            pasajeros, ciclistas, motociclistas o conductores.
+          </p>
+          <p>
+            El <strong class="font-semibold text-gray-800">Plan Estratégico de Seguridad Vial (PESV)</strong> es
+            una herramienta clave para gestionar los riesgos asociados a la seguridad vial, no solo dentro de las
+            organizaciones, sino también en sus comunidades.
+          </p>
+          <p>
+            Con PESV Interactivo, las empresas pueden reducir los siniestros de tránsito, proteger la vida de sus
+            colaboradores y garantizar el cumplimiento de la normativa legal.
+          </p>
+        </div>
+
+        <div class="mt-8 flex items-start gap-4 rounded-xl border border-orange-100 bg-orange-50 p-5">
+          <i class="fas fa-clipboard-list mt-0.5 text-xl text-orange-600" aria-hidden="true"></i>
+          <div>
+            <p class="font-semibold text-gray-900">Antes de empezar</p>
+            <p class="mt-1 text-sm leading-relaxed text-gray-700">
+              Responderá cuatro preguntas sobre su operación. Con ellas se define el nivel de su PESV
+              (Básico, Estándar o Avanzado) y cuántos de los 24 pasos de la norma debe cumplir.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-8 flex justify-end">
+          <button type="button" (click)="toggleTabs(2)"
+            class="inline-flex items-center justify-center gap-2 rounded-lg bg-orange-600 px-6 py-3 text-base font-semibold text-white transition-colors duration-150 hover:bg-orange-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2">
+            Comenzar <i class="fas fa-arrow-right" aria-hidden="true"></i>
+          </button>
+        </div>
+      }
+
+      @case (2) {
+        <!-- ═════ Pregunta · Actividad ═════ -->
+        <h2 class="text-xl font-semibold leading-snug text-color3 text-balance sm:text-2xl">
+          ¿Cuál es la principal actividad de su empresa?
+        </h2>
+        <p class="mt-1 text-sm text-gray-500">Seleccione una opción.</p>
+
+        <div class="mt-6 grid gap-3">
+          @for (op of actividades; track op.valor) {
+            <label class="relative flex cursor-pointer items-center gap-3 rounded-xl border-2 px-4 py-3.5 transition-colors duration-150 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-orange-400 has-[:focus-visible]:ring-offset-2"
+              [ngClass]="claseOpcion(form.actividad === op.valor)">
+              <input type="radio" name="actividad" class="sr-only" [value]="op.valor" [(ngModel)]="form.actividad">
+              <span class="flex h-5 w-5 flex-none items-center justify-center rounded-full border-2 transition-colors duration-150"
+                [ngClass]="claseMarca(form.actividad === op.valor)" aria-hidden="true">
+                @if (form.actividad === op.valor) { <span class="h-2 w-2 rounded-full bg-white"></span> }
+              </span>
+              <span class="text-base text-gray-800">{{ op.titulo }}</span>
+            </label>
+          }
+        </div>
+      }
+
+      @case (3) {
+        <!-- ═════ Pregunta · Vehículos ═════ -->
+        <h2 class="text-xl font-semibold leading-snug text-color3 text-balance sm:text-2xl">
+          ¿Cuántos vehículos se emplean para desarrollar la actividad económica de la organización?
+        </h2>
+        <p class="mt-1 text-sm text-gray-500">Cuente todos los vehículos con los que opera.</p>
+
+        <div class="mt-6 grid gap-3 sm:grid-cols-2">
+          @for (op of rangosVehiculos; track op.valor) {
+            <label class="relative flex cursor-pointer items-center gap-3 rounded-xl border-2 px-4 py-3.5 transition-colors duration-150 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-orange-400 has-[:focus-visible]:ring-offset-2"
+              [ngClass]="claseOpcion(form.vehiculos === op.valor)">
+              <input type="radio" name="vehiculos" class="sr-only" [value]="op.valor" [(ngModel)]="form.vehiculos">
+              <span class="flex h-5 w-5 flex-none items-center justify-center rounded-full border-2 transition-colors duration-150"
+                [ngClass]="claseMarca(form.vehiculos === op.valor)" aria-hidden="true">
+                @if (form.vehiculos === op.valor) { <span class="h-2 w-2 rounded-full bg-white"></span> }
+              </span>
+              <span class="text-base text-gray-800">{{ op.titulo }}</span>
+            </label>
+          }
+        </div>
+      }
+
+      @case (4) {
+        <!-- ═════ Pregunta · Conductores ═════ -->
+        <h2 class="text-xl font-semibold leading-snug text-color3 text-balance sm:text-2xl">
+          ¿Su empresa contrata o administra conductores para operar vehículos?
+        </h2>
+        <p class="mt-1 text-sm text-gray-500">Incluya personal propio y conductores contratados.</p>
+
+        <div class="mt-6 grid grid-cols-2 gap-3">
+          @for (op of siNo; track op.valor) {
+            <label class="relative flex cursor-pointer items-center gap-3 rounded-xl border-2 px-4 py-3.5 transition-colors duration-150 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-orange-400 has-[:focus-visible]:ring-offset-2"
+              [ngClass]="claseOpcion(form.conductores === op.valor)">
+              <input type="radio" name="conductores" class="sr-only" [value]="op.valor"
+                [(ngModel)]="form.conductores" (change)="alElegirConductores(op.valor)">
+              <span class="flex h-5 w-5 flex-none items-center justify-center rounded-full border-2 transition-colors duration-150"
+                [ngClass]="claseMarca(form.conductores === op.valor)" aria-hidden="true">
+                @if (form.conductores === op.valor) { <span class="h-2 w-2 rounded-full bg-white"></span> }
+              </span>
+              <span class="text-base text-gray-800">{{ op.titulo }}</span>
+            </label>
+          }
+        </div>
+
+        @if (form.conductores === 'si') {
+          <div class="mt-8 border-t border-gray-100 pt-6">
+            <h3 class="text-lg font-semibold text-color3">¿Cuántos conductores contrata o administra?</h3>
+            <div class="mt-4 grid gap-3 sm:grid-cols-2">
+              @for (op of rangosConductores; track op.valor) {
+                <label class="relative flex cursor-pointer items-center gap-3 rounded-xl border-2 px-4 py-3.5 transition-colors duration-150 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-orange-400 has-[:focus-visible]:ring-offset-2"
+                  [ngClass]="claseOpcion(form.numConductores === op.valor)">
+                  <input type="radio" name="numConductores" class="sr-only" [value]="op.valor" [(ngModel)]="form.numConductores">
+                  <span class="flex h-5 w-5 flex-none items-center justify-center rounded-full border-2 transition-colors duration-150"
+                    [ngClass]="claseMarca(form.numConductores === op.valor)" aria-hidden="true">
+                    @if (form.numConductores === op.valor) { <span class="h-2 w-2 rounded-full bg-white"></span> }
+                  </span>
+                  <span class="text-base text-gray-800">{{ op.titulo }}</span>
+                </label>
+              }
+            </div>
+          </div>
+        }
+      }
+
+      @case (5) {
+        <!-- ═════ Pregunta · Vehículos de terceros ═════ -->
+        <h2 class="text-xl font-semibold leading-snug text-color3 text-balance sm:text-2xl">
+          ¿Su empresa utiliza vehículos que pertenecen a terceros?
+        </h2>
+        <p class="mt-1 text-sm text-gray-500">Por ejemplo, en alquiler, leasing o renting.</p>
+
+        <div class="mt-6 grid grid-cols-2 gap-3">
+          @for (op of siNo; track op.valor) {
+            <label class="relative flex cursor-pointer items-center gap-3 rounded-xl border-2 px-4 py-3.5 transition-colors duration-150 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-orange-400 has-[:focus-visible]:ring-offset-2"
+              [ngClass]="claseOpcion(form.vehiculosTerceros === op.valor)">
+              <input type="radio" name="vehiculosTerceros" class="sr-only" [value]="op.valor" [(ngModel)]="form.vehiculosTerceros">
+              <span class="flex h-5 w-5 flex-none items-center justify-center rounded-full border-2 transition-colors duration-150"
+                [ngClass]="claseMarca(form.vehiculosTerceros === op.valor)" aria-hidden="true">
+                @if (form.vehiculosTerceros === op.valor) { <span class="h-2 w-2 rounded-full bg-white"></span> }
+              </span>
+              <span class="text-base text-gray-800">{{ op.titulo }}</span>
+            </label>
+          }
+        </div>
+      }
+
+      @case (6) {
+        <!-- ═════ Resultado ═════ -->
+        @switch (estadoGuardado) {
+
+          @case ('guardando') {
+            <div class="flex flex-col items-center py-12 text-center">
+              <span class="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-orange-500" aria-hidden="true"></span>
+              <p class="mt-4 text-base text-gray-600" role="status">Calculando y guardando el nivel de su PESV…</p>
+            </div>
+          }
+
+          @case ('error') {
+            <div class="rounded-xl border border-red-200 bg-red-50 p-5" role="alert">
+              <p class="font-semibold text-red-800">No se pudo guardar la categorización</p>
+              <p class="mt-1 text-sm text-red-700">
+                Revise su conexión e inténtelo de nuevo. Sus respuestas siguen aquí.
+              </p>
+              @if (mensajeError) {
+                <p class="mt-2 text-xs text-red-600">Detalle: {{ mensajeError }}</p>
+              }
+            </div>
+
+            <div class="mt-8 flex items-center justify-between gap-3">
+              <button type="button" (click)="toggleTabs(5)"
+                class="inline-flex items-center gap-2 rounded-lg px-4 py-3 text-base font-medium text-gray-600 transition-colors duration-150 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300">
+                <i class="fas fa-arrow-left" aria-hidden="true"></i> Revisar respuestas
+              </button>
+              <button type="button" (click)="guardar()"
+                class="inline-flex items-center justify-center gap-2 rounded-lg bg-orange-600 px-6 py-3 text-base font-semibold text-white transition-colors duration-150 hover:bg-orange-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2">
+                <i class="fas fa-redo" aria-hidden="true"></i> Reintentar
+              </button>
+            </div>
+          }
+
+          @default {
+            <p class="text-sm font-semibold uppercase tracking-wider text-gray-500">Resultado de la categorización</p>
+            <h2 class="mt-2 text-3xl font-semibold text-color3 sm:text-4xl">
+              Nivel <span [ngClass]="claseTextoNivel">{{ nombreNivel }}</span>
+            </h2>
+
+            @if (resultado) {
+              <p class="mt-4 max-w-prose text-base leading-relaxed text-gray-600">{{ resultado }}</p>
+            }
+
+            <div class="mt-8 grid gap-3 sm:grid-cols-2">
+              <div class="rounded-xl border border-gray-100 bg-gray-50 p-5">
+                <p class="text-4xl font-semibold tabular-nums text-color3">
+                  {{ pasosNivel }}<span class="text-lg font-medium text-gray-400"> / 24</span>
+                </p>
+                <p class="mt-1 text-sm text-gray-600">pasos del PESV son obligatorios para su nivel</p>
+              </div>
+              <div class="rounded-xl border border-gray-100 bg-gray-50 p-5">
+                <p class="text-4xl font-semibold tabular-nums text-color3">{{ periodo }}</p>
+                <p class="mt-1 text-sm text-gray-600">periodo en curso</p>
+              </div>
+            </div>
+
+            <div class="mt-8 flex justify-end">
+              <button type="button" (click)="irAlPerfil()"
+                class="inline-flex items-center justify-center gap-2 rounded-lg bg-orange-600 px-6 py-3 text-base font-semibold text-white transition-colors duration-150 hover:bg-orange-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2">
+                Completar mi perfil <i class="fas fa-arrow-right" aria-hidden="true"></i>
+              </button>
+            </div>
+          }
+        }
+      }
+    }
+
+    <!-- ── Navegación de las preguntas ─────────────────────────── -->
+    @if (enCuestionario) {
+      <div class="mt-10 flex items-center justify-between gap-3 border-t border-gray-100 pt-6">
+        <button type="button" (click)="toggleTabs(openTab - 1)"
+          class="inline-flex items-center gap-2 rounded-lg px-4 py-3 text-base font-medium text-gray-600 transition-colors duration-150 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300">
+          <i class="fas fa-arrow-left" aria-hidden="true"></i> Regresar
+        </button>
+        <button type="button" (click)="toggleTabs(openTab + 1)" [disabled]="!puedeAvanzar()"
+          class="inline-flex items-center justify-center gap-2 rounded-lg bg-orange-600 px-6 py-3 text-base font-semibold text-white transition-colors duration-150 hover:bg-orange-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400">
+          {{ esUltimaPregunta ? 'Ver resultado' : 'Siguiente' }} <i class="fas fa-arrow-right" aria-hidden="true"></i>
+        </button>
+      </div>
+    }
+
   </div>
 </div>

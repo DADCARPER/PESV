@@ -12,6 +12,10 @@ module.exports = {
       '2xl': '1536px',
     },
     extend: {
+      fontFamily: {
+        // Tipografía del logo; con respaldo al sistema si Google Fonts no carga
+        marca: ['Poppins', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
       colors: {
         color1: '#f46c2d', // Naranja
         color2: '#fcbc7c', // Melocotón
