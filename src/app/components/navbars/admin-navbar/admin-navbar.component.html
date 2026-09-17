@@ -17,6 +17,16 @@
         </span>
       }
 
+      <!-- Modo supervisión: sin esto, el supervisor solo se enteraria al
+           pulsar un boton y recibir un error del servidor. -->
+      @if (soloLectura()) {
+        <span class="flex items-center gap-1 px-3 py-1.5 rounded-full text-base font-semibold bg-emerald-100 text-emerald-700"
+              title="Tu cuenta revisa el PESV, no lo modifica">
+          <iconify-icon icon="hugeicons:view" width="20" height="20"></iconify-icon>
+          Modo supervisión
+        </span>
+      }
+
       <!-- Selector de período -->
       <div class="relative">
         <button

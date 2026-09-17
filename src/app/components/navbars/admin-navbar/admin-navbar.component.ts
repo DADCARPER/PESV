@@ -1,11 +1,11 @@
-import { Component, Input, OnInit, CUSTOM_ELEMENTS_SCHEMA, signal, inject, viewChild } from "@angular/core";
+import { Component, Input, OnInit, CUSTOM_ELEMENTS_SCHEMA, signal, computed, inject, viewChild } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { UserDropdownComponent } from "../../dropdowns/user-dropdown/user-dropdown.component";
 import { AuthenticacionService } from "../../../services/shared/authenticacion.service";
-import { FirestoreService } from "../../../services/shared/firestore.service";
+import { RolUsuarioService } from '../../../services/shared/rol-usuario.service';
+import { NivelPesvService } from "../../../services/shared/nivel-pesv.service";
 import { Router, RouterLink } from "@angular/router";
 import { ModalComponent } from "./modal/modal.component";
-import { Models } from "../../../interfaces/models";
 
 
 @Component({
@@ -20,11 +20,16 @@ export class AdminNavbarComponent implements OnInit {
   modalPeriodoCambia = viewChild.required<ModalComponent>('modal');
 
   private _auth = inject(AuthenticacionService);
-  private _firestore = inject(FirestoreService);
+  private _nivel = inject(NivelPesvService);
+  private _rol = inject(RolUsuarioService);
+
+  /** El supervisor no edita: conviene que lo vea siempre, no solo al fallar. */
+  soloLectura = computed(() => !this._rol.editable());
   private _router = inject(Router);
   @Input() titulopagina: string = "PESV Interactivo";
 
-  nivelAcceso = signal<string>('');
+  /** Viene del servicio compartido: lo leen también los tableros de cada fase. */
+  nivelAcceso = computed(() => this._nivel.nivel() ?? '');
   nombreEmpresa: string = '---';
   email: string = '---';
 
@@ -37,10 +42,7 @@ export class AdminNavbarComponent implements OnInit {
     if (user) {
       this.nombreEmpresa = user.photoURL ?? '---';
       this.email = user.email ?? '---';
-      const doc = await this._firestore.getDocument<Models.Users.Usuario>('users/' + user.uid);
-      if (doc.exists()) {
-        this.nivelAcceso.set(doc.data().nivelAcceso ?? '');
-      }
+      await this._nivel.cargar();
     }
   }
 
