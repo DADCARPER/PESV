@@ -1,6 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CardsMenuComponent } from "../../../components/cards/cards-menu/cards-menu.component";
+import { NivelPesvService } from '../../../services/shared/nivel-pesv.service';
 import { EstatusGeneralService } from '../../../services/shared/estatus-general.service';
 import { CommonModule } from '@angular/common';
 import { AuthenticacionService } from '../../../services/shared/authenticacion.service';
@@ -17,6 +18,13 @@ import { Models } from '../../../interfaces/models';
   styleUrl: './planificar.component.css'
 })
 export class PlanificarComponent implements OnInit {
+  private _nivel = inject(NivelPesvService);
+
+  /** ¿Se le exige este paso a la empresa según su nivel PESV? */
+  aplica(slug: string): boolean {
+    return this._nivel.aplica(slug);
+  }
+
   
   private _authcations = inject(AuthenticacionService);
   private _firestore = inject(FirestoreService);
@@ -30,6 +38,7 @@ export class PlanificarComponent implements OnInit {
   estatusGeneral: Partial<Models.Procesos.ProcesosCarga> = {};
 
   ngOnInit(): void {
+    this._nivel.cargar();
     this.getEstatusgeneral();
   }
 

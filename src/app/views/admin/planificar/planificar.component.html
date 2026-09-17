@@ -1,115 +1,128 @@
 <div class="flex">
   <div class="w-full p-4">
     <div class="relative flex-col w-full shadow-lg rounded bg-white p-8">
-      <div class="flex flex-col md:flex-row gap-6 mb-4">
-        <app-cards-menu class="w-full md:w-1/2"
+
+      <!-- Una sola rejilla en vez de cinco filas flex: las celdas de cada fila
+           comparten altura sin tener que forzarlo tarjeta por tarjeta. -->
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+
+        <app-cards-menu class="h-full"
         [titulo]="'Líder del diseño e implementación del PESV'"
         [descripcion]="'Se asigna a una persona o equipo responsable del diseño, ejecución y seguimiento del PESV.'"
         [tipoIcono]="'universal-access-circle'"
         [colorIcono]="'bg-amber-400'"
         [linkvamos]="'liderdelpesv'"
         [porcentaje]="estatusGeneral['001-lider-pesv']?.total_progreso || 0"
+        [aplica]="aplica('001-lider-pesv')"
         [iniciado]="!!estatusGeneral['001-lider-pesv']"
         [colorgrafica]="'#d99e06'"
         ></app-cards-menu>
-        <app-cards-menu class="w-full md:w-1/2"
+
+        <app-cards-menu class="h-full"
         [titulo]="'Comité de seguridad vial'"
         [descripcion]="'Se crea un comité encargado de coordinar, monitorear y ejecutar las acciones del PESV.'"
         [tipoIcono]="'share-knowledge'"
         [colorIcono]="'bg-amber-400'"
         [linkvamos]="'comiteseguridadvial'"
         [porcentaje]="estatusGeneral['002-comite-seguridad-vial']?.total_progreso || 0"
+        [aplica]="aplica('002-comite-seguridad-vial')"
         [iniciado]="!!estatusGeneral['002-comite-seguridad-vial']"
         [colorgrafica]="'#d99e06'"
         ></app-cards-menu>
-      </div>
-      <div class="flex flex-col md:flex-row gap-6 mb-4">
-        <app-cards-menu class="w-full md:w-1/2"
+
+        <app-cards-menu class="h-full"
         [titulo]="'Política de Seguridad Vial'"
         [descripcion]="'Se define y comunica una política de seguridad vial que establezca el compromiso de la alta dirección para cumplir con los objetivos del PESV.'"
         [tipoIcono]="'subpoena'"
         [colorIcono]="'bg-amber-400'"
         [linkvamos]="'politicaseguridadvial'"
         [porcentaje]="estatusGeneral['003-politicas-seguridad-vial']?.total_progreso || 0"
+        [aplica]="aplica('003-politicas-seguridad-vial')"
         [iniciado]="!!estatusGeneral['003-politicas-seguridad-vial']"
         [colorgrafica]="'#d99e06'"
         ></app-cards-menu>
 
-        <app-cards-menu class="w-full md:w-1/2"
+        <app-cards-menu class="h-full"
         [titulo]="'Liderazgo, compromiso y corresponsabilidad del nivel directivo'"
         [descripcion]="'La alta dirección debe liderar y demostrar compromiso con la seguridad vial, asignando recursos, personal y tiempo necesarios.'"
         [tipoIcono]="'validation-approval'"
         [colorIcono]="'bg-amber-400'"
         [linkvamos]="'liderazgo_y_compromiso'"
         [porcentaje]="estatusGeneral['004-liderazgo-compromiso']?.total_progreso || 0"
+        [aplica]="aplica('004-liderazgo-compromiso')"
         [iniciado]="!!estatusGeneral['004-liderazgo-compromiso']"
         [colorgrafica]="'#d99e06'"
         ></app-cards-menu>
-      </div>
-      <div class="flex flex-col md:flex-row gap-6 mb-4">
-        <app-cards-menu class="w-full md:w-1/2"
+
+        <app-cards-menu class="h-full"
         [titulo]="'Diagnóstico'"
         [descripcion]="'Se realiza un análisis de la situación actual en términos de seguridad vial (accidentes, condiciones de vehículos, comportamiento de conductores.).'"
         [tipoIcono]="'stethoscope-02'"
         [colorIcono]="'bg-amber-400'"
         [linkvamos]="'diagnostico'"
         [porcentaje]="estatusGeneral['006-diagnostico']?.total_progreso || 0"
+        [aplica]="aplica('006-diagnostico')"
         [iniciado]="!!estatusGeneral['006-diagnostico']"
         [colorgrafica]="'#d99e06'"
         ></app-cards-menu>
 
-        <app-cards-menu class="w-full md:w-1/2"
+        <app-cards-menu class="h-full"
         [titulo]="'Caracterización, evaluación y control de riesgos'"
         [descripcion]="'Se identifican y clasifican los riesgos de seguridad vial (por ejemplo: rutas peligrosas, fallas en vehículos, factores humanos).'"
         [tipoIcono]="'structure-check'"
         [colorIcono]="'bg-amber-400'"
         [linkvamos]="'evaluacion_y_control_riesgos'"
         [porcentaje]="estatusGeneral['005-caracterizacion-control-riesgos']?.total_progreso || 0"
+        [aplica]="aplica('005-caracterizacion-control-riesgos')"
         [iniciado]="!!estatusGeneral['005-caracterizacion-control-riesgos']"
         [colorgrafica]="'#d99e06'"></app-cards-menu>
-      </div>
-      <div class="flex flex-col md:flex-row gap-6 mb-4">
-        <app-cards-menu class="w-full md:w-1/2"
+
+        <app-cards-menu class="h-full"
         [titulo]="'Objetivos y metas del PESV'"
         [descripcion]="'Se establecen objetivos específicos y medibles para mejorar la seguridad vial en la organización.'"
         [tipoIcono]="'console'"
         [colorIcono]="'bg-amber-400'"
         [linkvamos]="'objetivos_y_metas'"
         [porcentaje]="estatusGeneral['007-objetivos-metas']?.total_progreso || 0"
+        [aplica]="aplica('007-objetivos-metas')"
         [iniciado]="!!estatusGeneral['007-objetivos-metas']"
         [colorgrafica]="'#d99e06'"></app-cards-menu>
 
-        <app-cards-menu class="w-full md:w-1/2"
+        <app-cards-menu class="h-full"
         [titulo]="'Programas de gestión de riesgos críticos y factores de desempeño'"
         [descripcion]="'Se desarrollan programas para controlar los riesgos más críticos, como mantenimiento de vehículos, capacitación de conductores, y condiciones laborales.'"
         [tipoIcono]="'sticky-note-02'"
         [colorIcono]="'bg-amber-400'"
         [linkvamos]="'programas_gestion_riesgos'"
         [porcentaje]="estatusGeneral['008-programas-gestion-riesgos']?.total_progreso || 0"
+        [aplica]="aplica('008-programas-gestion-riesgos')"
         [iniciado]="!!estatusGeneral['008-programas-gestion-riesgos']"
         [colorgrafica]="'#d99e06'"></app-cards-menu>
-      </div>
-      <div class="flex flex-col md:flex-row gap-6">
-        <app-cards-menu class="w-full md:w-1/2"
+
+        <app-cards-menu class="h-full"
         [titulo]="'Actas de reunión comité'"
         [descripcion]="'Se crea un comité encargado de coordinar, monitorear y ejecutar las acciones del PESV.'"
         [colorIcono]="'bg-amber-400'"
         [tipoIcono]="'news-01'"
         [linkvamos]="'actas_reunion_comite'"
         [porcentaje]="estatusGeneral['025-actas-reunion-comite']?.total_progreso || 0"
+        [aplica]="aplica('025-actas-reunion-comite')"
         [iniciado]="!!estatusGeneral['025-actas-reunion-comite']"
         [colorgrafica]="'#d99e06'"
         [muestradona]="false"></app-cards-menu>
-        <app-cards-menu class="w-full md:w-1/2"
+
+        <app-cards-menu class="h-full"
         [titulo]="'Matriz legal'"
         [descripcion]="'Se crea un comité encargado de coordinar, monitorear y ejecutar las acciones del PESV.'"
         [colorIcono]="'bg-amber-400'"
         [tipoIcono]="'sticky-note-02'"
         [linkvamos]="'matriz_legal'"
         [porcentaje]="estatusGeneral['026-matriz-legal']?.total_progreso || 0"
+        [aplica]="aplica('026-matriz-legal')"
         [iniciado]="!!estatusGeneral['026-matriz-legal']"
         [colorgrafica]="'#d99e06'"
         [muestradona]="false"></app-cards-menu>
+
       </div>
     </div>
   </div>

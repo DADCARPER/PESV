@@ -1,130 +1,143 @@
 <div class="flex">
   <div class="w-full p-4">
     <div class="relative flex-col w-full shadow-lg rounded bg-white p-8">
-      <div class="flex flex-col md:flex-row gap-6 mb-4">
-        
-          <!-- Contenido -->
-          <app-cards-menu class="w-full md:w-1/2"
-          [titulo]="'Plan anual de trabajo'"
-          [descripcion]="'Orientado al cumplimiento de acciones y estrategias en seguridad vial para planificación, implementación, seguimiento y mejora del PESV.'"
-          [tipoIcono]="'fas fa-user-tie'"
-          [colorIcono]="'bg-sky-400'"
-          [colorgrafica]="'#0370a1'"
-          [linkvamos]="'plan_anual_trabajo'"
-          [porcentaje]="estatusGeneral['009-plan-anual-trabajo']?.total_progreso || 0"
-          ></app-cards-menu>
-          <app-cards-menu class="w-full md:w-1/2"
-          [titulo]="'Competencias y plan anual de formación'"
-          [descripcion]="'Define las competencias en seguridad vial y establece programas de capacitación para todos los roles involucrados en la seguridad vial de la organización.'"
-          [tipoIcono]="'fas fa-users'"
-          [colorIcono]="'bg-sky-400'"
-          [colorgrafica]="'#0370a1'"
-          [linkvamos]="'competencias_plan_anual_formacion'"
-          [porcentaje]="estatusGeneral['010-competencia-plan-anual-formacion']?.total_progreso || 0"
-          ></app-cards-menu>
 
-      </div>
-      <div class="flex flex-col md:flex-row gap-6 mb-4">
-      
-      <!-- Contenido -->
-      <app-cards-menu class="w-full md:w-1/2"
-      [titulo]="'Responsabilidad y comportamiento seguro'"
-      [descripcion]="'Establece los lineamientos para la evaluación y seguimiento del comportamiento vial de los colaboradores que realizan desplazamientos.'"
-      [tipoIcono]="'fas fa-balance-scale'"
-      [colorIcono]="'bg-sky-400'"
-      [colorgrafica]="'#0370a1'"
-      [linkvamos]="'responsabilidad_comportamiento_seguro'"
-      [porcentaje]="estatusGeneral['011-responsabilidad-comportamiento-seguro']?.total_progreso || 0"
-      ></app-cards-menu>
+      <!-- Una sola rejilla en vez de filas flex: las celdas de cada fila
+           comparten altura sin tener que forzarlo tarjeta por tarjeta. -->
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
 
-      <app-cards-menu class="w-full md:w-1/2"
-      [titulo]="'Plan de preparación y respuesta ante emergencias viales'"
-      [descripcion]="'Procedimientos y protocolos para atender emergencias viales, incluyendo la cadena de llamado y respuesta ante siniestros viales.'"
-      [tipoIcono]="'fas fa-hands-helping'"
-      [colorIcono]="'bg-sky-400'"
-      [colorgrafica]="'#0370a1'"
-      [linkvamos]="'preparacion_respuesta_emergencias_viales'"
-      [porcentaje]="estatusGeneral['012-preparacion-respuesta-emergencias-viales']?.total_progreso || 0"
-      ></app-cards-menu>
-      </div>
-      <div class="flex flex-col md:flex-row gap-6 mb-4">
-    
-      <!-- Contenido -->
-      <app-cards-menu class="w-full md:w-1/2"
-      [titulo]="'Investigación interna de incidentes viales'"
-      [descripcion]="'Metodología para reportar, registrar, investigar y analizar los siniestros viales que involucren a colaboradores de la organización.'"
-      [tipoIcono]="'fas fa-hands-helping'"
-      [colorIcono]="'bg-sky-400'"
-      [colorgrafica]="'#0370a1'"
-      [linkvamos]="'investigacion_incidentes_viales'"
-      [porcentaje]="estatusGeneral['013-investigacion-interna-siniestros-viales']?.total_progreso || 0"
-      ></app-cards-menu>
+        <app-cards-menu class="h-full"
+        [titulo]="'Plan anual de trabajo'"
+        [descripcion]="'Orientado al cumplimiento de acciones y estrategias en seguridad vial para planificación, implementación, seguimiento y mejora del PESV.'"
+        [tipoIcono]="'calendar-03'"
+        [colorIcono]="'bg-sky-400'"
+        [colorgrafica]="'#0370a1'"
+        [linkvamos]="'plan_anual_trabajo'"
+        [porcentaje]="estatusGeneral['009-plan-anual-trabajo']?.total_progreso || 0"
+        [iniciado]="!!estatusGeneral['009-plan-anual-trabajo']"
+        [aplica]="aplica('009-plan-anual-trabajo')"
+        ></app-cards-menu>
 
-      <app-cards-menu class="w-full md:w-1/2"
-      [titulo]="'Vías seguras administradas por la organización'"
-      [descripcion]="'Protocolo para la operación y mantenimiento de las vías que administra la organización, incluyendo la identificación de puntos críticos.'"
-      [colorIcono]="'bg-sky-400'"
-      [colorgrafica]="'#0370a1'"
-      [linkvamos]="'vias_seguras_administradas_organizacion'"
-      [porcentaje]="estatusGeneral['014-vias-seguras-administradas-organizacion']?.total_progreso || 0"
-      ></app-cards-menu>
-    
-      </div>
-      <div class="flex flex-col md:flex-row gap-6 mb-4">
-    
-      <!-- Contenido -->
-      <app-cards-menu class="w-full md:w-1/2"
-      [titulo]="'Planificación de desplazamientos laborales'"
-      [descripcion]="'Procedimientos para la planificación segura de rutas y viajes, considerando riesgos y medidas preventivas en los desplazamientos.'"
-      [colorIcono]="'bg-sky-400'"
-      [colorgrafica]="'#0370a1'"
-      [linkvamos]="'planificacion_desplazamientos_laborales'"
-      [porcentaje]="estatusGeneral['015-planificacion-desplazamientos-laborales']?.total_progreso || 0"
-      ></app-cards-menu>
-      
-      <app-cards-menu class="w-full md:w-1/2"
-      [titulo]="'Inspección de vehículos y equipos'"
-      [descripcion]="'Sistema de verificación diaria del estado de los vehículos y sus condiciones de seguridad antes de iniciar operación'"
-      [colorIcono]="'bg-sky-400'"
-      [colorgrafica]="'#0370a1'"
-      [linkvamos]="'inspeccion_vehiculos_equipos'"
-      [porcentaje]="estatusGeneral['016-inspeccion-vehiculos-equipos']?.total_progreso || 0"
-      ></app-cards-menu>
+        <app-cards-menu class="h-full"
+        [titulo]="'Competencias y plan anual de formación'"
+        [descripcion]="'Define las competencias en seguridad vial y establece programas de capacitación para todos los roles involucrados en la seguridad vial de la organización.'"
+        [tipoIcono]="'teaching'"
+        [colorIcono]="'bg-sky-400'"
+        [colorgrafica]="'#0370a1'"
+        [linkvamos]="'competencias_plan_anual_formacion'"
+        [porcentaje]="estatusGeneral['010-competencia-plan-anual-formacion']?.total_progreso || 0"
+        [iniciado]="!!estatusGeneral['010-competencia-plan-anual-formacion']"
+        [aplica]="aplica('010-competencia-plan-anual-formacion')"
+        ></app-cards-menu>
 
-      </div>
-      <div class="flex flex-col md:flex-row gap-6 mb-4">
-    
-      <!-- Contenido -->
-      <app-cards-menu class="w-full md:w-1/2"
-      [titulo]="'Mantenimiento y control de vehículos seguros y equipos'"
-      [descripcion]="'Plan de mantenimiento preventivo y correctivo para garantizar la seguridad y buen funcionamiento de la flota vehicular.'"
-      [colorIcono]="'bg-sky-400'"
-      [colorgrafica]="'#0370a1'"
-      [linkvamos]="'mantenimiento_control_vehiculos_seguros'"
-      [porcentaje]="estatusGeneral['017-mantenimiento-control-vehiculos-seguros']?.total_progreso || 0"
-      ></app-cards-menu>
-      <app-cards-menu class="w-full md:w-1/2"
-      [titulo]="'Gestión del cambio y gestión de contratistas'"
-      [descripcion]="'Procedimientos para evaluar impactos en seguridad vial ante cambios organizacionales y requisitos para contratistas.'"
-      [colorIcono]="'bg-sky-400'"
-      [colorgrafica]="'#0370a1'"
-      [linkvamos]="'gestion_cambio_contratistas'"
-      [porcentaje]="estatusGeneral['018-gestion-cambio-contratistas']?.total_progreso || 0"
-      ></app-cards-menu>
-      
-      </div>
-      <div class="flex flex-col md:flex-row gap-6">
-    
-      <!-- Contenido -->
-      <app-cards-menu class="w-full"
-      [titulo]="'Archivo y retención documental'"
-      [descripcion]="'Sistema de control y archivo de toda la documentación que soporta la implementación del PESV por un período mínimo de 5 años.'"
-      [colorIcono]="'bg-sky-400'"
-      [colorgrafica]="'#0370a1'"
-      [linkvamos]="'archivo_retencion_documental'"
-      [porcentaje]="estatusGeneral['019-archivo-retencion-documental']?.total_progreso || 0"
-      ></app-cards-menu>
-      
+        <app-cards-menu class="h-full"
+        [titulo]="'Responsabilidad y comportamiento seguro'"
+        [descripcion]="'Establece los lineamientos para la evaluación y seguimiento del comportamiento vial de los colaboradores que realizan desplazamientos.'"
+        [tipoIcono]="'justice-scale-01'"
+        [colorIcono]="'bg-sky-400'"
+        [colorgrafica]="'#0370a1'"
+        [linkvamos]="'responsabilidad_comportamiento_seguro'"
+        [porcentaje]="estatusGeneral['011-responsabilidad-comportamiento-seguro']?.total_progreso || 0"
+        [iniciado]="!!estatusGeneral['011-responsabilidad-comportamiento-seguro']"
+        [aplica]="aplica('011-responsabilidad-comportamiento-seguro')"
+        ></app-cards-menu>
+
+        <app-cards-menu class="h-full"
+        [titulo]="'Plan de preparación y respuesta ante emergencias viales'"
+        [descripcion]="'Procedimientos y protocolos para atender emergencias viales, incluyendo la cadena de llamado y respuesta ante siniestros viales.'"
+        [tipoIcono]="'ambulance'"
+        [colorIcono]="'bg-sky-400'"
+        [colorgrafica]="'#0370a1'"
+        [linkvamos]="'preparacion_respuesta_emergencias_viales'"
+        [porcentaje]="estatusGeneral['012-preparacion-respuesta-emergencias-viales']?.total_progreso || 0"
+        [iniciado]="!!estatusGeneral['012-preparacion-respuesta-emergencias-viales']"
+        [aplica]="aplica('012-preparacion-respuesta-emergencias-viales')"
+        ></app-cards-menu>
+
+        <app-cards-menu class="h-full"
+        [titulo]="'Investigación interna de incidentes viales'"
+        [descripcion]="'Metodología para reportar, registrar, investigar y analizar los siniestros viales que involucren a colaboradores de la organización.'"
+        [tipoIcono]="'search-visual'"
+        [colorIcono]="'bg-sky-400'"
+        [colorgrafica]="'#0370a1'"
+        [linkvamos]="'investigacion_incidentes_viales'"
+        [porcentaje]="estatusGeneral['013-investigacion-interna-siniestros-viales']?.total_progreso || 0"
+        [iniciado]="!!estatusGeneral['013-investigacion-interna-siniestros-viales']"
+        [aplica]="aplica('013-investigacion-interna-siniestros-viales')"
+        ></app-cards-menu>
+
+        <app-cards-menu class="h-full"
+        [titulo]="'Vías seguras administradas por la organización'"
+        [descripcion]="'Protocolo para la operación y mantenimiento de las vías que administra la organización, incluyendo la identificación de puntos críticos.'"
+        [tipoIcono]="'road-01'"
+        [colorIcono]="'bg-sky-400'"
+        [colorgrafica]="'#0370a1'"
+        [linkvamos]="'vias_seguras_administradas_organizacion'"
+        [porcentaje]="estatusGeneral['014-vias-seguras-administradas-organizacion']?.total_progreso || 0"
+        [iniciado]="!!estatusGeneral['014-vias-seguras-administradas-organizacion']"
+        [aplica]="aplica('014-vias-seguras-administradas-organizacion')"
+        ></app-cards-menu>
+
+        <app-cards-menu class="h-full"
+        [titulo]="'Planificación de desplazamientos laborales'"
+        [descripcion]="'Procedimientos para la planificación segura de rutas y viajes, considerando riesgos y medidas preventivas en los desplazamientos.'"
+        [tipoIcono]="'route-01'"
+        [colorIcono]="'bg-sky-400'"
+        [colorgrafica]="'#0370a1'"
+        [linkvamos]="'planificacion_desplazamientos_laborales'"
+        [porcentaje]="estatusGeneral['015-planificacion-desplazamientos-laborales']?.total_progreso || 0"
+        [iniciado]="!!estatusGeneral['015-planificacion-desplazamientos-laborales']"
+        [aplica]="aplica('015-planificacion-desplazamientos-laborales')"
+        ></app-cards-menu>
+
+        <app-cards-menu class="h-full"
+        [titulo]="'Inspección de vehículos y equipos'"
+        [descripcion]="'Sistema de verificación diaria del estado de los vehículos y sus condiciones de seguridad antes de iniciar operación'"
+        [tipoIcono]="'checkmark-square-01'"
+        [colorIcono]="'bg-sky-400'"
+        [colorgrafica]="'#0370a1'"
+        [linkvamos]="'inspeccion_vehiculos_equipos'"
+        [porcentaje]="estatusGeneral['016-inspeccion-vehiculos-equipos']?.total_progreso || 0"
+        [iniciado]="!!estatusGeneral['016-inspeccion-vehiculos-equipos']"
+        [aplica]="aplica('016-inspeccion-vehiculos-equipos')"
+        ></app-cards-menu>
+
+        <app-cards-menu class="h-full"
+        [titulo]="'Mantenimiento y control de vehículos seguros y equipos'"
+        [descripcion]="'Plan de mantenimiento preventivo y correctivo para garantizar la seguridad y buen funcionamiento de la flota vehicular.'"
+        [tipoIcono]="'wrench-01'"
+        [colorIcono]="'bg-sky-400'"
+        [colorgrafica]="'#0370a1'"
+        [linkvamos]="'mantenimiento_control_vehiculos_seguros'"
+        [porcentaje]="estatusGeneral['017-mantenimiento-control-vehiculos-seguros']?.total_progreso || 0"
+        [iniciado]="!!estatusGeneral['017-mantenimiento-control-vehiculos-seguros']"
+        [aplica]="aplica('017-mantenimiento-control-vehiculos-seguros')"
+        ></app-cards-menu>
+
+        <app-cards-menu class="h-full"
+        [titulo]="'Gestión del cambio y gestión de contratistas'"
+        [descripcion]="'Procedimientos para evaluar impactos en seguridad vial ante cambios organizacionales y requisitos para contratistas.'"
+        [tipoIcono]="'user-group'"
+        [colorIcono]="'bg-sky-400'"
+        [colorgrafica]="'#0370a1'"
+        [linkvamos]="'gestion_cambio_contratistas'"
+        [porcentaje]="estatusGeneral['018-gestion-cambio-contratistas']?.total_progreso || 0"
+        [iniciado]="!!estatusGeneral['018-gestion-cambio-contratistas']"
+        [aplica]="aplica('018-gestion-cambio-contratistas')"
+        ></app-cards-menu>
+
+        <app-cards-menu class="h-full"
+        [titulo]="'Archivo y retención documental'"
+        [descripcion]="'Sistema de control y archivo de toda la documentación que soporta la implementación del PESV por un período mínimo de 5 años.'"
+        [tipoIcono]="'archive-02'"
+        [colorIcono]="'bg-sky-400'"
+        [colorgrafica]="'#0370a1'"
+        [linkvamos]="'archivo_retencion_documental'"
+        [porcentaje]="estatusGeneral['019-archivo-retencion-documental']?.total_progreso || 0"
+        [iniciado]="!!estatusGeneral['019-archivo-retencion-documental']"
+        [aplica]="aplica('019-archivo-retencion-documental')"
+        ></app-cards-menu>
+
       </div>
     </div>
   </div>

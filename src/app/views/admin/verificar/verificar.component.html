@@ -1,42 +1,48 @@
 <div class="flex">
   <div class="w-full p-4">
     <div class="relative flex-col w-full shadow-lg rounded bg-white p-8">
-      <div class="flex flex-col md:flex-row gap-6 mb-4">
-        <!-- Contenido -->
-        <app-cards-menu class="w-full md:w-1/2"
+
+      <!-- Una sola rejilla en vez de filas flex: las celdas de cada fila
+           comparten altura sin tener que forzarlo tarjeta por tarjeta. -->
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+
+        <app-cards-menu class="h-full"
         [titulo]="'Indicadores y reporte de autogestión PESV'"
         [descripcion]="'En esta sección te ayudaremos a establecer y gestionar los indicadores clave para medir el desempeño, realizar seguimiento periódico y generar reportes de autogestión que demuestren el progreso de tu plan'"
-        [tipoIcono]="'fas fa-user-tie'"
+        [tipoIcono]="'dashboard-speed-01'"
         [colorIcono]="'bg-emerald-400'"
         [porcentaje]="estatusGeneral['020-indicadores-reporte-autogestion']?.total_progreso || 0"
+        [iniciado]="!!estatusGeneral['020-indicadores-reporte-autogestion']"
+        [aplica]="aplica('020-indicadores-reporte-autogestion')"
         [colorgrafica]="'#10b97b'"
         [linkvamos]="'indicadores_autogestion_pesv'"
         ></app-cards-menu>
-        <app-cards-menu class="w-full md:w-1/2"
+
+        <app-cards-menu class="h-full"
         [titulo]="'Registro y análisis estadístico de siniestros viales'"
         [descripcion]="'Encontrarás las herramientas para documentar y analizar los datos históricos de siniestralidad. Podrás clasificar los siniestros según su nivel de riesgo, establecer tendencias y generar proyecciones estadísticas.'"
-        [tipoIcono]="'fas fa-users'"
+        [tipoIcono]="'alert-02'"
         [colorIcono]="'bg-emerald-400'"
         [porcentaje]="estatusGeneral['021-registro-analisis-siniestros-viales']?.total_progreso || 0"
+        [iniciado]="!!estatusGeneral['021-registro-analisis-siniestros-viales']"
+        [aplica]="aplica('021-registro-analisis-siniestros-viales')"
         [colorgrafica]="'#10b97b'"
         [linkvamos]="'registro_siniestros_viales'"
         ></app-cards-menu>
-      </div>
-      <div class="flex flex-col md:flex-row gap-6">
-        <!-- Contenido -->
-        <app-cards-menu class="w-full md:w-1/2"
+
+        <app-cards-menu class="h-full"
         [titulo]="'Auditoría anual'"
         [descripcion]="'Esta sección te guiará en la realización de auditorías internas efectivas para evaluar el cumplimiento de tu PESV. Te ayudaremos a documentar el proceso, planificar las auditorías y dar seguimiento a los hallazgos identificados.'"
-        [tipoIcono]="'fas fa-balance-scale'"
+        [tipoIcono]="'checkmark-badge-01'"
         [colorIcono]="'bg-emerald-400'"
         [porcentaje]="estatusGeneral['022-auditoria-anual']?.total_progreso || 0"
+        [iniciado]="!!estatusGeneral['022-auditoria-anual']"
+        [aplica]="aplica('022-auditoria-anual')"
         [colorgrafica]="'#10b97b'"
         [linkvamos]="'auditoria_anual'"
         ></app-cards-menu>
 
       </div>
-         
-        
     </div>
   </div>
 </div>

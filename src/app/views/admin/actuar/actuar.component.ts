@@ -1,5 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CardsMenuComponent } from "../../../components/cards/cards-menu/cards-menu.component";
+import { NivelPesvService } from '../../../services/shared/nivel-pesv.service';
 import { CommonModule } from '@angular/common';
 import { EstatusGeneralService } from '../../../services/shared/estatus-general.service';
 
@@ -11,11 +12,19 @@ import { EstatusGeneralService } from '../../../services/shared/estatus-general.
   styleUrl: './actuar.component.css'
 })
 export class ActuarComponent implements OnInit {
+  private _nivel = inject(NivelPesvService);
+
+  /** ¿Se le exige este paso a la empresa según su nivel PESV? */
+  aplica(slug: string): boolean {
+    return this._nivel.aplica(slug);
+  }
+
 
   private _estatusgeneral = inject(EstatusGeneralService);
   estatusGeneral: Record<string, any> = {};
 
   ngOnInit(): void {
+    this._nivel.cargar();
     this.obtenerEstatusGeneral();
   }
 
