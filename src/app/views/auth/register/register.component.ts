@@ -61,6 +61,20 @@ export class RegisterComponent {
 
       await this._firestore.createDocument('users', datosGuardar, uid);
       await this._firestore.createDocument('Empresas', datosGuardar, nitEmpresa);
+
+      // El servidor lee el NIT de users/{uid} y lo fija como custom claim: es
+      // lo que autoriza el acceso a Storage y el cliente no puede falsificarlo.
+      // Va después de crear el documento, porque la función lo necesita.
+      //
+      // Su fallo no puede abortar el registro: la cuenta y los documentos ya
+      // existen, y dar "Error al crear la cuenta" sería falso. Si no se asigna
+      // aquí, asegurarClaimNit() lo completa en el siguiente inicio de sesión.
+      try {
+        await this._auth.asignarClaimNit();
+      } catch (error: unknown) {
+        console.error('[Register] asignarClaimNit:', error);
+      }
+
       await this._progreso.inicializarProgreso(nitEmpresa, new Date().getFullYear());
       await this._iniciardatos.inicializarDatos008Programas(nitEmpresa, new Date().getFullYear());
 

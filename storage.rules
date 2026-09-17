@@ -1,0 +1,84 @@
+rules_version = '2';
+
+// Reglas de Cloud Storage — PESV Interactivo
+//
+// Dos espacios distintos:
+//   Empresas/{nit}/...      documentos del PESV, compartidos por la empresa
+//   uploads/{uid}/...       archivos personales del usuario (foto de perfil)
+//
+// La autorización de la empresa se apoya en los custom claims `nit` y `rol`,
+// que asigna la Cloud Function asignarClaimNit (functions/src/index.ts)
+// leyéndolos de users/{uid}. Un custom claim solo lo puede escribir el Admin
+// SDK: a diferencia de displayName, el cliente no puede reescribirlo con
+// updateProfile() para hacerse pasar por otra empresa ni para ascender de rol.
+//
+// Roles:
+//   operativo   construye el PESV: lee y escribe
+//   supervisor  revisa el avance: solo lee
+//
+// Ocultar los botones en la interfaz no basta: sin esta regla, un supervisor
+// podría subir archivos desde la consola del navegador.
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ── Documentos de la empresa ────────────────────────────────────────────
+    // Ruta que construye GestionDocumentosService:
+    //   Empresas/{nit}/periodos/{periodo}/{modulo}/{archivo}
+    match /Empresas/{nit}/{allPaths=**} {
+
+      function esDeLaEmpresa() {
+        return request.auth != null
+          && request.auth.token.nit is string
+          && request.auth.token.nit != ''
+          && request.auth.token.nit == nit;
+      }
+
+      // Sin claim de rol se asume operativo: son las cuentas creadas antes de
+      // que existieran los roles, que hasta ahora siempre podían escribir.
+      function puedeEditar() {
+        return esDeLaEmpresa() && request.auth.token.rol != 'supervisor';
+      }
+
+      // Escaneos de cédulas y certificados pueden pesar; 20 MB da margen.
+      function archivoValido() {
+        return request.resource.size <= 20 * 1024 * 1024
+          && request.resource.contentType.matches(
+               'application/pdf'
+               + '|image/.*'
+               + '|text/csv'
+               + '|application/vnd\\.openxmlformats-officedocument.*'
+               + '|application/vnd\\.ms-excel'
+             );
+      }
+
+      // Leer puede cualquiera de la empresa, incluido el supervisor.
+      allow read: if esDeLaEmpresa();
+
+      // En un borrado request.resource es null, por eso delete va aparte:
+      // si el tamaño y el tipo se exigieran en 'write' no se podría borrar nada.
+      allow create, update: if puedeEditar() && archivoValido();
+      allow delete: if puedeEditar();
+    }
+
+    // ── Archivos personales del usuario ─────────────────────────────────────
+    // La foto de perfil se sube a uploads/{uid}/perfil/ desde
+    // subir-imagen.component.ts. Aquí manda el uid, no el NIT: es del usuario,
+    // no de la empresa, y el uid del token no se puede falsificar. El rol no
+    // interviene: su foto es suya, sea operativo o supervisor.
+    match /uploads/{userId}/{allPaths=**} {
+
+      function esSuPropioEspacio() {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      allow read: if esSuPropioEspacio();
+
+      allow create, update: if esSuPropioEspacio()
+        && request.resource.size <= 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+
+      allow delete: if esSuPropioEspacio();
+    }
+  }
+}

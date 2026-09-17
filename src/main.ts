@@ -3,6 +3,7 @@ import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { provideStorage, getStorage } from '@angular/fire/storage';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+import { provideFunctions, getFunctions } from '@angular/fire/functions';
 import { AppComponent } from './app/app.component';
 import { environment } from './app/environment/environmentdesarrollo';
 import { provideRouter } from '@angular/router';
@@ -30,6 +31,7 @@ bootstrapApplication(AppComponent, {
     provideAuth(() => getAuth()),
     provideStorage(() => getStorage()), // Añadir Storage como proveedor
     provideFirestore(() => getFirestore()),
+    provideFunctions(() => getFunctions()),
     provideRouter(routes),
     
     provideLottieOptions({  // Añade la configuración para Lottie

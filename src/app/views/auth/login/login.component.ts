@@ -54,6 +54,20 @@ export class LoginComponent {
         // Autenticar al usuario y obtener el objeto `user`
         const userCredential = await this._authService.signInWithEmail(email, password); // singInthEmail se encargar de activar el catch.
 
+        // Los claims van primero: el superadministrador no pertenece a ninguna
+        // empresa y no tiene ficha en users/, asi que la comprobacion de mas
+        // abajo lo expulsaria antes de llegar a reconocerlo.
+        try {
+          await this._authService.asegurarClaimNit();
+        } catch (error: unknown) {
+          console.error('[Login] asegurarClaimNit:', error);
+        }
+
+        if (await this._authService.esSuperadmin()) {
+          this._router.navigate(['/superadmin']);
+          return;
+        }
+
         const documento = await this._firestore.getDocument<Models.Users.Usuario>('users/' + userCredential.user.uid);
         const docRef = documento.data();
 
@@ -65,6 +79,18 @@ export class LoginComponent {
           await this._authService.logout();
           this.alertaService.showError('Tu cuenta no tiene datos asociados. Comunícate con el administrador.');
           return;
+        }
+
+        // Las cuentas creadas desde el panel no traen el nombre de empresa en
+        // Auth, porque el Admin SDK rechaza photoURL si no es una URL. Se
+        // copia aqui desde Firestore: los modulos y las plantillas lo leen de
+        // Auth, y sin esto los documentos saldrian sin nombre de empresa.
+        if (!userCredential.user.photoURL && docRef.nombreEmpresa) {
+          try {
+            await this._authService.actualizarNombreEmpresa(docRef.nombreEmpresa);
+          } catch (error: unknown) {
+            console.error('[Login] sincronizar nombre de empresa:', error);
+          }
         }
 
         // nivelAcceso 'no' significa que aún no ha completado el registro inicial

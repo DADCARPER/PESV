@@ -1,9 +1,10 @@
 import { computed, inject, Injectable, OnDestroy, signal } from '@angular/core';
 import {
-  Auth, authState, createUserWithEmailAndPassword, GoogleAuthProvider,
-  sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup,
+  Auth, authState, createUserWithEmailAndPassword,
+  sendPasswordResetEmail, signInWithEmailAndPassword,
   signOut, updatePassword, updateProfile, User
 } from '@angular/fire/auth';
+import { Functions, httpsCallable } from '@angular/fire/functions';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,7 @@ import {
 export class AuthenticacionService implements OnDestroy {
 
   public auth = inject(Auth);
+  private _functions = inject(Functions);
 
   // Observable de estado de autenticación (tiempo real)
   authState = authState(this.auth);
@@ -59,11 +61,6 @@ export class AuthenticacionService implements OnDestroy {
     return signInWithEmailAndPassword(this.auth, email, password);
   }
 
-  // Inicio de sesión con Google
-  loginWithGoogle() {
-    return signInWithPopup(this.auth, new GoogleAuthProvider());
-  }
-
   // Registro con email, contraseña, nombre y empresa (guardado en displayName y photoURL)
   async registerWithEmail(email: string, password: string, displayName?: string, nombreEmpresa?: string) {
     const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
@@ -74,6 +71,60 @@ export class AuthenticacionService implements OnDestroy {
       });
     }
     return userCredential;
+  }
+
+  /**
+   * Pide al servidor que asigne el custom claim `nit` y refresca el token para
+   * que las reglas de Storage lo vean de inmediato. Sin ese refresco el claim
+   * existe en el servidor, pero el navegador sigue enviando el token anterior
+   * y toda subida se rechaza.
+   */
+  async asignarClaimNit(): Promise<void> {
+    const asignar = httpsCallable(this._functions, 'asignarClaimNit');
+    await asignar();
+    await this.auth.currentUser?.getIdToken(true);
+  }
+
+  /**
+   * Asigna el claim solo si el token todavía no lo trae. Sirve para reparar
+   * cuentas cuyo registro no llegó a asignarlo: al iniciar sesión se completa
+   * sin que el usuario tenga que hacer nada.
+   */
+  async asegurarClaimNit(): Promise<void> {
+    const user = this.auth.currentUser;
+    if (!user) return;
+
+    const token = await user.getIdTokenResult();
+    // El superadministrador no tiene NIT: sin mirar tambien el rol, se pediria
+    // el claim en cada inicio de sesion suyo.
+    if (token.claims['nit'] || token.claims['rol'] === 'superadmin') return;
+
+    await this.asignarClaimNit();
+  }
+
+  /** ¿La sesión actual es de superadministrador? Se lee del claim del token. */
+  async esSuperadmin(): Promise<boolean> {
+    const user = this.auth.currentUser;
+    if (!user) return false;
+
+    const token = await user.getIdTokenResult();
+    return token.claims['rol'] === 'superadmin';
+  }
+
+  /**
+   * Actualiza el nombre de la empresa en Auth (photoURL), que es de donde lo
+   * leen los modulos y las plantillas de documentos.
+   *
+   * El NIT (displayName) no se toca a proposito: identifica a la empresa en
+   * Firestore, en Storage y en el custom claim, y cambiarlo aqui dejaria la
+   * cuenta apuntando a datos que no son suyos.
+   */
+  async actualizarNombreEmpresa(nombreEmpresa: string): Promise<void> {
+    const user = this.auth.currentUser;
+    if (!user) throw new Error('No hay usuario autenticado');
+
+    await updateProfile(user, { photoURL: nombreEmpresa });
+    await user.getIdToken(true);
   }
 
   // Cierre de sesión
