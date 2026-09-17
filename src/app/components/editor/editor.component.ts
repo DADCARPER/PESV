@@ -8,10 +8,21 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import htmlToPdfmake  from 'html-to-pdfmake';
 import { Diseno1Service } from '../../services/pdfMake/diseno1.service';
+import { AlertaService } from '../../services/shared/alerta.service';
 import { AgregarImagenComponent } from "./agregar-imagen/agregar-imagen.component";
 
 const nuevafuente = require('../../../assets/fonts/vfs_fonts.js');
 
+/**
+ * Contenido que el editor recibe desde fuera.
+ * `reemplazar` sustituye el documento entero (una plantilla nueva);
+ * `agregar` lo concatena al final (un bloque de firmas).
+ */
+export interface ContenidoEditor {
+  texto: string;
+  time: string;
+  modo?: 'reemplazar' | 'agregar';
+}
 
 @Component({
   selector: 'app-editor',
@@ -24,8 +35,11 @@ const nuevafuente = require('../../../assets/fonts/vfs_fonts.js');
 export class EditorComponent implements OnInit, OnChanges {
 
   private _diseno1 = inject(Diseno1Service);
+  private _alerta = inject(AlertaService);
 
-  @Input() recibeContenido: any;
+  @Input() recibeContenido: ContenidoEditor | null = null;
+  /** Base del nombre con el que se descarga el PDF. */
+  @Input() nombreArchivo = 'documento';
 
 
   public imagen64: any = "";
@@ -68,21 +82,15 @@ export class EditorComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
+    // Sin texto no hay nada que hacer: evita concatenar vacíos en el primer enlace
+    if (!changes['recibeContenido'] || !this.recibeContenido?.texto) return;
 
-    // Verificamos si las propiedades 'recibeContenido' han cambiado
-    if (changes['recibeContenido']) {
-      let contenidoFinal = this.agregarDocumentoForm.get('contenido')?.value;  // Obtenemos el valor actual de 'contenido'
+    const actual = this.agregarDocumentoForm.get('contenido')?.value ?? '';
+    const modo = this.recibeContenido.modo ?? 'agregar';
 
-      // Si recibe contenido, lo agregamos al contenido final
-      if (this.recibeContenido) {
-        contenidoFinal += this.recibeContenido.texto;  // Concatenamos el nuevo contenido
-      }
-
-      // Actualizamos el valor de 'contenido' en el formulario
-      this.agregarDocumentoForm.patchValue({
-        contenido: contenidoFinal
-      });
-    }
+    this.agregarDocumentoForm.patchValue({
+      contenido: modo === 'reemplazar' ? this.recibeContenido.texto : actual + this.recibeContenido.texto
+    });
   }
 
   onReady(editor: any) {
@@ -93,59 +101,29 @@ export class EditorComponent implements OnInit, OnChanges {
     }
   }
 
-  async mostrarHtml() {
-    //console.log('URL Recibida: ->', this.recibeURL);
-    
-    if (this.agregarDocumentoForm.get('encabezado')?.value){
-      this.agregarDocumentoForm.patchValue({
-        imagen64doc: this.recibeURL,
-      });
-      
-      console.log(this.agregarDocumentoForm.value);
-
-    }else{
-      console.log("Datos por defaul sin encabezado");
-      console.log(this.agregarDocumentoForm.get('contenido')?.value);
-    }
-    
-  }
-
+  /** Genera el PDF y lo descarga. El usuario lo sube después al punto que corresponda. */
   async generarPDF() {
-    //obtener la imagen y la convierto en base64
-    if (this.recibeURL){
-      this.imagen64 = await this._diseno1.getBase64FromUrl(this.recibeURL);
-    }else{
-      this.imagen64 = await this._diseno1.getBase64FromUrl('https://firebasestorage.googleapis.com/v0/b/pesv-1ca41.appspot.com/o/Empresas%2Fdefault%2Fnoimagen.png?alt=media&token=0a9a1d74-c851-4287-b3b8-b8c64382ce10');
+    const contenido: string = this.agregarDocumentoForm.get('contenido')?.value ?? '';
+    if (!contenido.trim()) {
+      this._alerta.showWarning('El documento está vacío. Elige una plantilla o escribe el contenido antes de descargar.');
+      return;
     }
-    
-    let htmlSinParrafos = this.agregarDocumentoForm.get('contenido')?.value.replace(/<p([^>]*)>/g, '<span$1>').replace(/<\/p>/g, '</span>');
+
+    // El logo solo hace falta si se va a pintar el encabezado, y su descarga
+    // no puede impedir generar el PDF: si falla, se sigue sin logo. Antes se
+    // pedia siempre una imagen remota por defecto, y su 403 abortaba todo.
+    this.imagen64 = '';
+    if (this.agregarDocumentoForm.get('encabezado')?.value && this.recibeURL) {
+      try {
+        this.imagen64 = await this._diseno1.getBase64FromUrl(this.recibeURL);
+      } catch (error: unknown) {
+        console.error('[Editor] logo del encabezado:', error);
+        this._alerta.showWarning('No se pudo cargar el logo; el PDF se genera sin el.');
+      }
+    }
+
+    const htmlSinParrafos = contenido.replace(/<p([^>]*)>/g, '<span$1>').replace(/<\/p>/g, '</span>');
     const pdfContent = htmlToPdfmake(htmlSinParrafos);
-
-    // Bloque de firmas en PDFMake
-    
-    // const firmasPdfMake = {
-    //   columns: [
-    //     {
-    //       width: '40%',
-    //       stack: [
-    //         { canvas: [ { type: 'line', x1: 0, y1: 0, x2: 180, y2: 0, lineWidth: 0.5 } ] },
-    //         { text: 'REPRESENTANTE LEGAL', alignment: 'center', margin: [0, 5, 0, 0], fontSize: 8 }
-    //       ]
-    //     },
-    //     { width: '20%', text: '' },
-    //     {
-    //       width: '40%',
-    //       stack: [
-    //         { canvas: [ { type: 'line', x1: 0, y1: 0, x2: 180, y2: 0, lineWidth: 0.5 } ] },
-    //         { text: 'RESPONSABLE PESV', alignment: 'center', margin: [0, 5, 0, 0], fontSize: 8 }
-    //       ]
-    //     }
-    //   ],
-    //   margin: [0, 60, 0, 0]
-    // };
-
-    // // Une el contenido del editor con las firmas
-    // const contenidoFinal = Array.isArray(pdfContent) ? [...pdfContent, firmasPdfMake] : [pdfContent, firmasPdfMake];
 
     const documentDefinition = {
       pageSize: 'LETTER',
@@ -165,7 +143,6 @@ export class EditorComponent implements OnInit, OnChanges {
           return {};
         }
       },
-      //content: this._diseno1.cabecera1,
       content: pdfContent,
       defaultStyle: {
         font: 'OpenSans',
@@ -199,16 +176,6 @@ export class EditorComponent implements OnInit, OnChanges {
           italics: true,
           margin: [0, 20, 0, 0]
         },
-        // tableHeader: {
-        //   fontSize: 10,
-        //   bold: true,
-        //   color: 'black',
-        //   fillColor: '#eeeeee'
-        // },
-        // tableCell: {
-        //   fontSize: 8,
-        //   margin: [0, 5, 0, 5]
-        // },
         tableCabecera:{
           fontSize: 8
         },
@@ -221,7 +188,8 @@ export class EditorComponent implements OnInit, OnChanges {
       }
     };
 
-    pdfMake.createPdf(documentDefinition).open();
+    const fecha = new Date().toISOString().slice(0, 10);
+    pdfMake.createPdf(documentDefinition).download(`${this.nombreArchivo}-${fecha}.pdf`);
   }
 
   mostrarEncabezado() {
@@ -230,11 +198,9 @@ export class EditorComponent implements OnInit, OnChanges {
     }else{
       this.agregarDocumentoForm.get('encabezado')?.setValue(false);
     }
-    console.log(this.agregarDocumentoForm.get('encabezado')?.value);
   }
 
   limpiar() {
-    //this.agregarDocumentoForm.reset();
     this.agregarDocumentoForm.patchValue({
       contenido: ''
     });

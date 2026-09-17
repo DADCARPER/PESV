@@ -16,13 +16,16 @@ export class Diseno1Service {
         widths: [114, 270, 114],
         body: [
           [
-            { 
-              rowSpan: 4, 
-              image: imagenBase64,
-              fit: [126, 48],
-              alignment: 'center', 
-              margin: [0, 2, 0, 0] 
-            },
+            // Sin logo la celda va vacia: pdfMake falla si `image` no trae datos.
+            imagenBase64
+              ? {
+                  rowSpan: 4,
+                  image: imagenBase64,
+                  fit: [126, 48],
+                  alignment: 'center',
+                  margin: [0, 2, 0, 0]
+                }
+              : { rowSpan: 4, text: '', alignment: 'center', margin: [0, 2, 0, 0] },
             {
               rowSpan: 2,
               text: [

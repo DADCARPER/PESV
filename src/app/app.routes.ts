@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 //import { LoginComponent } from './pages/login/login.component';
-import { authGuard, invitadoGuard } from './guards/auth.guard';
+import { authGuard, invitadoGuard, onboardingGuard, onboardingCompletadoGuard, superadminGuard } from './guards/auth.guard';
 //import { DashboardComponent } from './pages/dashboard/dashboard.component';
 
 import { DashboardComponent } from './views/admin/dashboard/dashboard.component';
@@ -15,10 +15,8 @@ import { RegisterComponent } from './views/auth/register/register.component';
 
 import { AdminComponent } from './layouts/admin/admin.component';
 import { LoginComponent } from './views/auth/login/login.component';
-import { SettingsComponent } from './views/admin/settings/settings.component';
 import { TablesComponent } from './views/admin/tables/tables.component';
 import { MapsComponent } from './views/admin/maps/maps.component';
-import { DashboardplanificarComponent } from './views/admin/dashboardplanificar/dashboardplanificar.component';
 import { PlanificarComponent } from './views/admin/planificar/planificar.component';
 import { EvaluacionComponent } from './views/admin/planificar/evaluacion/evaluacion.component';
 import { DiagnosticoComponent } from './views/admin/planificar/diagnostico/diagnostico.component';
@@ -37,7 +35,7 @@ import { PoliticaseguridadvialComponent } from './views/admin/planificar/politic
 import { LiderazgoYCompromisoComponent } from './views/admin/planificar/liderazgo-y-compromiso/liderazgo-y-compromiso.component';
 import { ObjetivosMetasComponent } from './views/admin/planificar/objetivos-metas/objetivos-metas.component';
 import { PerfilComponent } from './views/admin/perfil/perfil.component';
-import { PerfilEmpresaComponent } from './views/admin/perfil-empresa/perfil-empresa.component';
+import { SuperadminComponent } from './views/admin/superadmin/superadmin.component';
 import { RestoreComponent } from './views/auth/restore/restore.component';
 import { FirmasComponent } from './views/admin/firmas/firmas.component';
 import { HacerComponent } from './views/admin/hacer/hacer.component';
@@ -45,10 +43,9 @@ import { VerificarComponent } from './views/admin/verificar/verificar.component'
 import { ActuarComponent } from './views/admin/actuar/actuar.component';
 import { DesarrolloComponent } from './components/desarrollo/desarrollo.component';
 import { ZGestionArchivosComponent } from './views/admin/planificar/diagnostico/z-gestion-archivos/z-gestion-archivos.component';
-import { GestionArchivosComponent } from './views/admin/planificar/lider-del-pesv/gestion-archivos/gestion-archivos.component';
-import { GestionArchivos2Component } from './views/admin/planificar/comiteseguridadvial/gestion-archivos2/gestion-archivos2.component';
-import { GestionArchivos3Component } from './views/admin/planificar/politicaseguridadvial/gestion-archivos3/gestion-archivos3.component';
-import { GestionArchivos4Component } from './views/admin/planificar/liderazgo-y-compromiso/gestion-archivos4/gestion-archivos4.component';
+import { CrearDocumentoComiteComponent } from './views/admin/planificar/comiteseguridadvial/crear-documento-comite/crear-documento-comite.component';
+import { CrearDocumentoPoliticaComponent } from './views/admin/planificar/politicaseguridadvial/crear-documento-politica/crear-documento-politica.component';
+import { CrearDocumentoLiderazgoComponent } from './views/admin/planificar/liderazgo-y-compromiso/crear-documento-liderazgo/crear-documento-liderazgo.component';
 import { GestionArchivos6Component } from './views/admin/planificar/evaluacion/gestion-archivos6/gestion-archivos6.component';
 import { GestionArchivos8Component } from './views/admin/planificar/programas/gestion-archivos8/gestion-archivos8.component';
 import { GestionArchivos9Component } from './views/admin/planificar/actas-reunion-comite/gestion-archivos9/gestion-archivos9.component';
@@ -120,7 +117,7 @@ export const routes: Routes = [
   {
     path: "admin",
     component: AdminComponent,
-    canActivate: [authGuard],  // Protege todo el grupo
+    canActivate: [authGuard, onboardingGuard],  // sesion + onboarding completado
     children: [
       
       { path: "dashboard", component: DashboardComponent },
@@ -134,13 +131,12 @@ export const routes: Routes = [
       },
       { path: "planificar/liderdelpesv", component: LiderDelPesvComponent,},
       { path: "planificar/liderdelpesv/crear_documento", component: CrearDocumentoComponent,},
-      { path: "planificar/liderdelpesv/gestion_archivos", component: GestionArchivosComponent },
       { path: "planificar/comiteseguridadvial", component: ComiteseguridadvialComponent },
-      { path: "planificar/comiteseguridadvial/gestion_archivos", component: GestionArchivos2Component },
+      { path: "planificar/comiteseguridadvial/crear_documento", component: CrearDocumentoComiteComponent },
       { path: "planificar/politicaseguridadvial", component: PoliticaseguridadvialComponent },
-      { path: "planificar/politicaseguridadvial/gestion_archivos", component: GestionArchivos3Component },
+      { path: "planificar/politicaseguridadvial/crear_documento", component: CrearDocumentoPoliticaComponent },
       { path: "planificar/liderazgo_y_compromiso", component: LiderazgoYCompromisoComponent },
-      { path: "planificar/liderazgo_y_compromiso/gestion_archivos", component: GestionArchivos4Component },
+      { path: "planificar/liderazgo_y_compromiso/crear_documento", component: CrearDocumentoLiderazgoComponent },
       { path: "planificar/diagnostico", component: DiagnosticoComponent },
       { path: "planificar/diagnostico/informe_diagnostico", component: InformeDiagnosticoComponent },
       { path: "planificar/diagnostico/informacion_organizacion", component: InformacionOrganizacionComponent },
@@ -210,8 +206,13 @@ export const routes: Routes = [
     ],
   },
 
+  // Administración: reservada al superadministrador. Va fuera del grupo /admin
+  // porque no pertenece a ninguna empresa y onboardingGuard, que exige nivel
+  // PESV, lo desviaria al cuestionario inicial.
+  { path: "superadmin", component: SuperadminComponent, canActivate: [authGuard, superadminGuard] },
+
   // Onboarding: exige sesion, se llega tras registro o con nivelAcceso === "no"
-  { path: "starting", component: InicioComponent, canActivate: [authGuard] },
+  { path: "starting", component: InicioComponent, canActivate: [authGuard, onboardingCompletadoGuard] },
   // { path: 'dashboard1', component: DashboardComponent, canActivate: [authGuard] },
   // { path: 'login1', component: LoginComponent },
   // { path: 'actuar', component: ActuarComponent, canActivate: [authGuard] },

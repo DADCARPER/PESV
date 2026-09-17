@@ -1,477 +1,202 @@
-<!-- <div *ngIf="isLoading">
-    <app-loading [isLoading]="isLoading" [loadingText]="'Cargando información...'"></app-loading>
-</div> -->
 <div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
-  <div class="rounded-t bg-blueGray-100 bg-amber-400 mb-0 px-6 py-6">
-    <div class="text-center flex ">
+
+  <div class="rounded-t bg-amber-400 mb-0 px-6 py-6">
+    <div class="text-center flex">
       <button
         [routerLink]="['/admin/planificar']"
-        class="bg-red-600 text-white active:bg-red-700 font-bold uppercase text-xs px-1 py-1  rounded shadow hover:shadow-md outline-none focus:outline-none mr-2 ease-linear transition-all duration-150"
-        type="button"
-      >
-      <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" /></svg>
+        title="Volver a Planificar"
+        class="bg-red-600 text-white active:bg-red-700 font-bold uppercase text-xs px-1 py-1 rounded shadow hover:shadow-md outline-none focus:outline-none mr-2 ease-linear transition-all duration-150"
+        type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" /></svg>
       </button>
-      <h6 class="text-blueGray-700 text-xl font-bold">Liderazgo y Compromiso del Nivel Directivo</h6>
+      <h6 class="text-blueGray-700 text-xl font-bold">Liderazgo, compromiso y corresponsabilidad del nivel directivo</h6>
     </div>
   </div>
-  <div class="flex-auto px-4 lg:px-10 py-10 pt-0">
 
-    <div *ngIf="openTab === 0" >
+  <div class="flex-auto px-4 lg:px-10 py-8">
 
-      <div class="text-lg font-light leading-relaxed mt-6 mb-4 text-gray-700" >
+    <!-- ── Qué pide la norma ──────────────────────────────────── -->
+    <section class="mb-8">
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mb-3">
+        <span class="text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-100 px-2 py-1 rounded">Paso 4 de 24</span>
+        <span class="text-xs font-medium text-gray-500">Fase Planear · Resolución 40595 de 2022</span>
+      </div>
 
-        <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300" class="text-justify pb-3">
-            Se detalla cómo el nivel directivo debe garantizar la definición de políticas, formación en seguridad vial, gestión de recursos, cumplimiento de normas de seguridad, seguimiento de acciones, participación en auditorías y reuniones anuales de revisión del PESV.
-        </p>
-        
-        <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="500" class="text-justify pb-3">
-            Además, se vincula este compromiso con el SG-SST (Decreto 1072 de 2015) y la ISO 39001, que establecen requisitos similares en liderazgo y compromiso para la seguridad vial.
-        </p>
+      <p class="text-gray-700 leading-relaxed">
+        La alta dirección debe <strong>demostrar por escrito su liderazgo y compromiso</strong> con el PESV. No basta
+        con aprobarlo: la norma exige que asigne recursos, participe en el Comité de Seguridad Vial y responda por los
+        resultados.
+      </p>
 
-        <article class="w-full md:w-1/3 rounded-lg border border-gray-100 bg-white p-4">
-          <div class="flex items-center justify-between mb-1">
-            <div class="flex items-center gap-2">
-              <div class="text-white inline-flex items-center justify-center w-9 h-9 shadow rounded-full bg-amber-800">
-                <p class="font-bold text-sm">1</p>
-              </div>
-              <p class="text-lg font-medium text-amber-800">Liderazgo, compromiso y corresponsabilidad del nivel directivo</p>
-            </div>
-            @if (documento1.length > 0) {
-              <span class="text-xs font-semibold px-2 py-1 rounded-full text-green-700 bg-green-100">Completado</span>
-            }
+      <p class="text-gray-700 leading-relaxed mt-3">
+        El documento debe detallar <strong>con qué acciones concretas</strong> lo demuestra —recursos financieros,
+        técnicos y humanos, formación del personal, atención a las visitas de verificación— e ir
+        <strong>firmado por el representante legal</strong>. Si aún no lo tienes, el asistente parte de un texto con
+        esas acciones ya enumeradas.
+      </p>
+    </section>
+
+      <!-- Modo supervision: se ve todo, no se toca nada -->
+      @if (!editable) {
+        <div class="mb-6 flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+          <iconify-icon icon="hugeicons:view" width="20" height="20" class="mt-0.5 shrink-0 text-emerald-600"></iconify-icon>
+          <div>
+            <p class="font-semibold text-emerald-900">Estás revisando, no editando</p>
+            <p class="mt-1 text-sm text-emerald-800">
+              Puedes consultar y descargar los documentos de este paso. Cargarlos o
+              reemplazarlos le corresponde al usuario operativo de la empresa.
+            </p>
           </div>
-          <p class="text-sm text-gray-500 mb-3">Documento firmado por la alta dirección que evidencie compromiso con el PESV: políticas, recursos, seguimiento a contratistas, auditorías y reuniones del Comité (Res. 40595/2022, Dec. 1072/2015).</p>
+        </div>
+      }
 
-          @if (cargando['Liderazgo y compromiso']) {
+    <!-- ── Progreso ───────────────────────────────────────────── -->
+    <section class="mb-6 rounded-xl border border-gray-200 bg-gray-50 p-4">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-sm font-semibold text-gray-700">
+          {{ completado ? '1 de 1 documento cargado' : 'Falta el documento firmado' }}
+        </p>
+        <span class="text-sm font-bold" [ngClass]="completado ? 'text-green-600' : 'text-amber-600'">{{ progreso }}%</span>
+      </div>
+      <div class="h-2 w-full overflow-hidden rounded-full bg-gray-200">
+        <div class="h-full rounded-full transition-all duration-500"
+          [ngClass]="completado ? 'bg-green-500' : 'bg-amber-400'"
+          [style.width.%]="progreso"></div>
+      </div>
+      @if (completado) {
+        <p class="mt-2 flex items-center gap-1.5 text-sm font-medium text-green-700">
+          <iconify-icon icon="hugeicons:checkmark-circle-02" width="16" height="16"></iconify-icon>
+          Paso completo. Puedes actualizar el documento cuando lo necesites.
+        </p>
+      }
+    </section>
+
+    <!-- ── Punto documental ───────────────────────────────────── -->
+    <ul class="space-y-4">
+      <li class="rounded-xl border-2 p-5 transition-colors duration-200"
+        [ngClass]="completado ? 'border-green-200 bg-green-50/40' : 'border-gray-200 bg-white'">
+
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex items-start gap-3 min-w-0">
+            <div class="shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-full shadow font-bold text-sm"
+              [ngClass]="completado ? 'bg-green-600 text-white' : 'bg-amber-400 text-gray-900'">
+              @if (completado) {
+                <iconify-icon icon="hugeicons:checkmark-circle-02" width="18" height="18"></iconify-icon>
+              } @else {
+                1
+              }
+            </div>
+            <div class="min-w-0">
+              <p class="text-base font-semibold text-gray-900">Liderazgo y compromiso del nivel directivo</p>
+              <p class="text-sm text-gray-600 mt-0.5">
+                Documento firmado por la alta dirección con las acciones que asume frente al PESV.
+              </p>
+            </div>
+          </div>
+          @if (completado) {
+            <span class="shrink-0 text-xs font-semibold px-2 py-1 rounded-full text-green-700 bg-green-100">Completado</span>
+          } @else {
+            <span class="shrink-0 text-xs font-semibold px-2 py-1 rounded-full text-gray-500 bg-gray-100">Pendiente</span>
+          }
+        </div>
+
+        <p class="mt-3 ml-12 flex items-start gap-2 text-sm text-gray-500">
+          <iconify-icon icon="hugeicons:alert-02" width="15" height="15" class="mt-0.5 shrink-0"></iconify-icon>
+          <span>Un solo PDF, con fecha y firma del representante legal.</span>
+        </p>
+
+        <div class="mt-4 ml-12">
+          @if (!editable) {
+            <!-- Sin acciones: el servidor tambien las rechazaria -->
+            @if (!completado) {
+              <p class="text-sm text-gray-500">Pendiente de cargar por el operativo.</p>
+            }
+          } @else if (cargando[seccion]) {
             <app-loading [isLoading]="true" loadingText="Procesando..."></app-loading>
-          } @else if (documento1.length === 0) {
-            <input type="file" id="fu1" (change)="uploadFile($event, 'Liderazgo y compromiso')" class="hidden" accept=".pdf" #fu1>
-            <button (click)="fu1.click()" type="button" class="text-amber-600 bg-white border border-amber-600 hover:bg-amber-600 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded transition-all duration-150">
-              <div class="flex items-center gap-1">
-                <iconify-icon icon="hugeicons:plus-sign-square" width="16" height="16"></iconify-icon> Seleccionar archivo
-              </div>
+          } @else if (!completado) {
+            <input type="file" (change)="uploadFile($event, seccion)" class="hidden" accept=".pdf" #inputNuevo>
+            <button (click)="inputNuevo.click()" type="button"
+              class="text-gray-800 bg-white border border-amber-400 hover:bg-amber-400 hover:text-gray-900 font-bold uppercase text-xs px-4 py-2 rounded transition-all duration-150">
+              <span class="flex items-center gap-1.5">
+                <iconify-icon icon="hugeicons:upload-square-02" width="16" height="16"></iconify-icon> Subir PDF
+              </span>
             </button>
           } @else {
-            <div class="flex flex-col gap-2">
-              <div class="bg-amber-50 border border-amber-100 px-3 py-2 rounded">
-                <a [href]="documento1[0].ruta | reftourl | async" target="_blank" class="text-amber-800 font-medium text-sm hover:underline block truncate" [title]="documento1[0].nombre | limpiarnombre">
-                  {{ documento1[0].nombre | limpiarnombre }}
-                </a>
-                <p class="text-xs text-gray-500 mt-0.5">Cargado: {{ documento1[0].docCreado | fechafirestore }}</p>
-              </div>
-              <div class="flex gap-2">
-                <input type="file" id="fu1u" (change)="uploadFile($event, 'Liderazgo y compromiso')" class="hidden" accept=".pdf" #fu1u>
-                <button (click)="fu1u.click()" type="button" class="flex-1 text-amber-800 bg-white border border-amber-800 hover:bg-amber-800 hover:text-white font-bold uppercase text-xs px-3 py-1.5 rounded transition-all duration-150">
-                  <div class="flex items-center justify-center gap-1">
-                    <iconify-icon icon="hugeicons:plus-sign-square" width="14" height="14"></iconify-icon> Actualizar
-                  </div>
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <a [href]="documento1[0].ruta | reftourl | async" target="_blank"
+                class="flex-1 min-w-0 flex items-center gap-2 rounded border border-green-200 bg-white px-3 py-2 hover:border-green-400 transition-colors duration-150"
+                [title]="documento1[0].nombre | limpiarnombre">
+                <iconify-icon icon="hugeicons:file-01" width="20" height="20" class="shrink-0 text-red-600"></iconify-icon>
+                <span class="min-w-0">
+                  <span class="block truncate text-sm font-medium text-gray-800">{{ documento1[0].nombre | limpiarnombre }}</span>
+                  <span class="block text-xs text-gray-500">Cargado: {{ documento1[0].docCreado | fechafirestore }}</span>
+                </span>
+              </a>
+              <div class="flex gap-2 shrink-0">
+                <input type="file" (change)="uploadFile($event, seccion)" class="hidden" accept=".pdf" #inputActualizar>
+                <button (click)="inputActualizar.click()" type="button" title="Reemplazar por una versión nueva"
+                  class="text-gray-800 bg-white border border-amber-400 hover:bg-amber-400 hover:text-gray-900 font-bold uppercase text-xs px-3 py-2 rounded transition-all duration-150">
+                  <span class="flex items-center justify-center gap-1">
+                    <iconify-icon icon="hugeicons:refresh" width="14" height="14"></iconify-icon> Actualizar
+                  </span>
                 </button>
-                <button (click)="eliminarVigente(documento1[0], 'Liderazgo y compromiso')" [disabled]="eliminando['Liderazgo y compromiso']" type="button" class="text-red-600 bg-white border border-red-300 hover:bg-red-600 hover:text-white font-bold uppercase text-xs px-3 py-1.5 rounded transition-all duration-150 disabled:opacity-50">
+                <button (click)="eliminarVigente(documento1[0], seccion)" [disabled]="eliminando[seccion]" type="button"
+                  title="Quitar el documento vigente (queda guardado en versiones anteriores)"
+                  class="text-red-600 bg-white border border-red-300 hover:bg-red-600 hover:text-white font-bold uppercase text-xs px-3 py-2 rounded transition-all duration-150 disabled:opacity-50">
                   <iconify-icon icon="hugeicons:delete-02" width="14" height="14"></iconify-icon>
                 </button>
               </div>
             </div>
           }
 
-          @if (historico1.length > 0) {
-            <button (click)="toggleHistorico('Liderazgo y compromiso')" type="button" class="mt-2 text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1">
-              <iconify-icon [icon]="mostrarHistorico['Liderazgo y compromiso'] ? 'hugeicons:arrow-up-01' : 'hugeicons:arrow-down-01'" width="14" height="14"></iconify-icon>
+          <!-- Atajo al asistente, solo mientras falte el documento -->
+          @if (!completado) {
+            <div class="mt-3 flex flex-wrap items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+              <iconify-icon icon="hugeicons:ai-magic" width="22" height="22" class="text-amber-600"></iconify-icon>
+              <p class="flex-1 min-w-[12rem] text-sm text-gray-700">
+                <span class="font-semibold text-gray-900">¿Todavía no lo tienes?</span>
+                Créalo desde una plantilla que ya enumera las acciones del nivel directivo.
+              </p>
+              <a [routerLink]="['/admin/planificar/liderazgo_y_compromiso/crear_documento']"
+                class="shrink-0 rounded bg-amber-400 px-4 py-2 text-xs font-bold uppercase text-gray-900 shadow hover:bg-amber-300 transition-colors duration-150">
+                Crear documento
+              </a>
+            </div>
+          }
+        </div>
+
+        <!-- Versiones anteriores -->
+        @if (historico1.length > 0) {
+          <div class="ml-12 mt-3">
+            <button (click)="toggleHistorico(seccion)" type="button"
+              class="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700">
+              <iconify-icon [icon]="mostrarHistorico[seccion] ? 'hugeicons:arrow-up-01' : 'hugeicons:arrow-down-01'" width="14" height="14"></iconify-icon>
               Versiones anteriores ({{ historico1.length }})
             </button>
-            @if (mostrarHistorico['Liderazgo y compromiso']) {
-              <div class="mt-1 space-y-1 border-l-2 border-gray-200 pl-3">
+            @if (mostrarHistorico[seccion]) {
+              <div class="mt-2 space-y-1.5 border-l-2 border-gray-200 pl-3">
                 @for (h of historico1; track h.id) {
-                  <div class="text-xs text-gray-500">
-                    <a [href]="h.ruta | reftourl | async" target="_blank" class="hover:underline text-gray-600 truncate block" [title]="h.nombre | limpiarnombre">
+                  <div class="text-xs">
+                    <a [href]="h.ruta | reftourl | async" target="_blank"
+                      class="block truncate text-gray-600 hover:underline" [title]="h.nombre | limpiarnombre">
                       {{ h.nombre | limpiarnombre }}
                     </a>
-                    <span>{{ h.docCreado | fechafirestore }}</span>
+                    <span class="text-gray-400">{{ h.docCreado | fechafirestore }}</span>
                   </div>
                 }
               </div>
             }
-          }
-        </article>
-
-        <div class="flex flex-col md:flex-row justify-center items-center mt-6 mb-6 space-y-6 md:space-y-0 md:space-x-16">
-            <!-- <div class="lg:w-1/3 sm:w-full ">
-        
-              <a href="/admin/planificar/liderazgo_y_compromiso/gestion_archivos">  
-              <app-cards-boton
-              
-              [titulo]="'Cargar docmento'"
-              [descripcion]="'Ya cuento con el documento de Política de Seguridad Vial'"
-              [tipoIcono]="'fas fa-upload'"
-              [colorIcono]="'bg-blue-500'"
-              ></app-cards-boton>
-              </a>
-            </div> -->
-            <div class="lg:w-1/3 sm:w-full ">
-            <app-cards-boton
-            (click)="toggleTabs(1,'')"
-            [titulo]="'Crear docmento'"
-            [descripcion]="'No tengo el documento. Iniciar proceso de creación ahora'"
-            [tipoIcono]="'fas fa-rocket'"
-            [colorIcono]="'bg-green-500'"></app-cards-boton>
-            </div>
-
-        </div>
-
-      </div>
-      
-    </div>
-    <div *ngIf="openTab === 1" >
-
-        <div style="text-align: justify;" class="text-xl font-light leading-relaxed mt-6 mb-4" >
-        
-            <p style="margin-bottom: 14px;"><strong>Documentos y Requisitos Necesarios</strong></p>
-
-            <p data-aos="fade-right" data-aos-duration="1000" data-aos-delay="700" style="margin-bottom: 14px;">
-            Antes de comenzar con el formulario para la creación del Liderazgo y Compromiso, asegúrate de tener la siguiente información:
-            </p>
-
-            <div class="flex flex-col md:flex-row justify-between mt-6 mb-6 lg:pl-28 space-y-6 md:space-y-0 md:space-x-8">
-
-                <!-- Lista original con subtítulo -->
-                <div class="w-full md:w-1/2">
-                    <p style="margin-bottom: 14px;"><strong>Información Específica a Tener a Mano</strong></p>
-                    <ul class="list-disc list-inside text-gray-500 space-y-1">
-                        <li>
-                            Fecha de creación del comité
-                            
-                        </li>
-                    </ul>
-                </div>
-            
-            </div>
-
-        </div>
-
-        <div class="flex justify-center">
-            <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="900" (click)="toggleTabs(2,'')" class="text-amber-500 bg-transparent border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
-            <i class="fas fa-arrow-right"></i> Comenzar a crear
-            </button>
-        </div>
-
-    </div>
-
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div *ngIf="openTab === 2">
-            <div class="flex flex-wrap" style="text-align: left;margin-top: 20px;margin-bottom: 20px;">
-              <div class="w-full lg:w-12/12 px-4">
-
-                <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">
-                    Responsabilidad 
-                </h6>
-
-                <div class="flex flex-wrap">
-
-                  <div class="w-full lg:w-12/12 px-4">
-                    <div class="relative w-full mb-3">
-                      <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">
-                        Actores Clave en la Implementación
-                        <br /><br />
-                        <div class="flex items-center">
-                          <!-- Checkbox personalizado -->
-                          <label class="inline-flex items-center me-5 cursor-pointer">
-                            <input type="checkbox" class="sr-only peer" formControlName="objetivo1" />
-                            <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-amber-500"></div>
-                          </label>
-                          
-                          <!-- Texto descriptivo -->
-                          <p class="text-base font-light leading-relaxed mt-0 text-blueGray-800 ml-2 cursor-pointer">
-                            Líder del Plan Estratégico De Seguridad Vial (PESV).
-                          </p>
-                        </div>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div class="w-full lg:w-12/12 px-4">
-                    <div class="relative w-full mb-3">
-                      <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">
-                        <div class="flex items-center">
-                          <!-- Checkbox personalizado -->
-                          <label class="inline-flex items-center me-5 cursor-pointer">
-                            <input type="checkbox" class="sr-only peer" formControlName="objetivo2" />
-                            <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-amber-500"></div>
-                          </label>
-                          
-                          <!-- Texto descriptivo -->
-                          <p class="text-base font-light leading-relaxed mt-0 text-blueGray-800 ml-2 cursor-pointer">
-                            Comité De Seguridad Vial (CSV).
-                          </p>
-                        </div>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div class="w-full lg:w-12/12 px-4">
-                    <div class="relative w-full mb-3">
-                      <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">
-                        <div class="flex items-center">
-                          <!-- Checkbox personalizado -->
-                          <label class="inline-flex items-center me-5 cursor-pointer">
-                            <input type="checkbox" class="sr-only peer" formControlName="objetivo3" />
-                            <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-amber-500"></div>
-                          </label>
-                          
-                          <!-- Texto descriptivo -->
-                          <p class="text-base font-light leading-relaxed mt-0 text-blueGray-800 ml-2 cursor-pointer">
-                            Líderes de cada regional operativa.
-                          </p>
-                        </div>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div class="w-full lg:w-12/12 px-4">
-                    <div class="relative w-full mb-3">
-                      <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">
-                        <div class="flex items-center">
-                          <!-- Checkbox personalizado -->
-                          <label class="inline-flex items-center me-5 cursor-pointer">
-                            <input type="checkbox" class="sr-only peer" formControlName="objetivo4" />
-                            <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-amber-500"></div>
-                          </label>
-                          
-                          <!-- Texto descriptivo -->
-                          <p class="text-base font-light leading-relaxed mt-0 text-blueGray-800 ml-2 cursor-pointer">
-                            COPASST o Vigía de Seguridad y Salud en el Trabajo.
-                          </p>
-                        </div>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div class="w-full lg:w-12/12 px-4">
-                    <div class="relative w-full mb-3">
-                      <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">
-                        <div class="flex items-center">
-                          <!-- Checkbox personalizado -->
-                          <label class="inline-flex items-center me-5 cursor-pointer">
-                            <input type="checkbox" class="sr-only peer" formControlName="objetivo5" />
-                            <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-amber-500"></div>
-                          </label>
-                          
-                          <!-- Texto descriptivo -->
-                          <p class="text-base font-light leading-relaxed mt-0 text-blueGray-800 ml-2 cursor-pointer">
-                            Brigada integral de seguridad.
-                          </p>
-                        </div>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div class="w-full lg:w-12/12 px-4">
-                    <div class="relative w-full mb-3">
-                      <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">
-                        <div class="flex items-center">
-                          <!-- Checkbox personalizado -->
-                          <label class="inline-flex items-center me-5 cursor-pointer">
-                            <input type="checkbox" class="sr-only peer" formControlName="objetivo6" />
-                            <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-amber-500"></div>
-                          </label>
-                          
-                          <!-- Texto descriptivo -->
-                          <p class="text-base font-light leading-relaxed mt-0 text-blueGray-800 ml-2 cursor-pointer">
-                            Empleados y colaboradores.
-                          </p>
-                        </div>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div class="w-full lg:w-12/12 px-4">
-                    <div class="relative w-full mb-3">
-                      <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2">
-                        <div class="flex items-center">
-                          <!-- Checkbox personalizado -->
-                          <label class="inline-flex items-center me-5 cursor-pointer">
-                            <input type="checkbox" class="sr-only peer" formControlName="objetivo7" />
-                            <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-amber-500"></div>
-                          </label>
-                          
-                          <!-- Texto descriptivo -->
-                          <p class="text-base font-light leading-relaxed mt-0 text-blueGray-800 ml-2 cursor-pointer">
-                            Subcontratistas y proveedores.
-                          </p>
-                        </div>
-                      </label>
-                    </div>
-                  </div>
-                  
-                  <!-- Objetivo 4 texto opcional-->
-                  <div class="w-full lg:w-12/12 px-4">
-                    <div class="relative w-full mb-3">
-                      <label class="block uppercase text-blueGray-600 text-xs font-bold mb-6">Más objetivos</label>
-                      <textarea formControlName="objetivo8" rows="3" class="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white rounded text-sm shadow outline-transparent focus:outline-none focus:shadow-outline w-full" placeholder="Opcional"></textarea>
-                      <div *ngIf="form.get('objetivo8')?.invalid && form.get('objetivo8')?.touched">
-                        <small class="text-red-500">Este campo es obligatorio</small>
-                      </div>
-                    </div>
-                  </div>
-            
-                </div>
-
-                <div class="flex justify-center">
-                  <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="900" (click)="toggleTabs(2,'Atras')" class="text-blueGray-500 bg-transparent border border-solid border-blueGray-500 hover:bg-blueGray-300 active:bg-blueGray-500 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
-                    <i class="fas fa-arrow-left"></i> Regresar
-                  </button>
-                  <button type="button" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="500" (click)="vistaPrevia()"
-                  class="text-sky-500 bg-white border-sky-500 hover:bg-sky-500 hover:text-white border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">
-                  <i class="fas fa-arrow-right"></i> Vista Previa
-                  </button>
-
-                  <app-pdf-liderazgo-compromiso
-                  [mostrarBotones]="false"
-                  [subirBlob]=false
-                  [idFormulario]= "id_formulario"
-                  [nombreBoton]="'Ver'"
-                  [disenoboton]="'diseno6'"
-                  [disenoIcono]="'fa-eye'"
-                  [descargaOprevia]="'vista'"
-                  [nombreEmpresa]="dataEmpresa2.nombreEmpresa"></app-pdf-liderazgo-compromiso>
-
-                  <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="500" 
-                    class="text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="submit">
-                    <i class="fas fa-arrow-right"></i> Siguiente
-                  </button>
-                </div>
-
-              </div>
-            </div>
           </div>
-
-    </form>
-
-    <div *ngIf="openTab === 3" class="flex flex-wrap">
-
-
-      <div class="w-full xl:w-3/12 px-4 mt-12">
-        <app-upload-archivos
-        [urlStore]="'004-liderazgo-y-compromiso'"
-        [urlFire]="'liderazgoCompromiso'"></app-upload-archivos>
-      </div>
-      <!-- Tabla de Documentos cargados o Formularios completos -->
-      <div class="w-full xl:w-10/12 mb-12 xl:mb-0 px-4">
-        <div class="rounded-t mb-0 px-4 py-3 border-0">
-          <div class="flex flex-wrap items-center">
-            <div class="relative w-full px-4 max-w-full flex-grow flex-1">
-              <h3 class="font-semibold text-lg text-blueGray-700">
-                Documentos cargados
-              </h3>
-            </div>
-          </div>
-        </div>
-
-        <div class="block w-full overflow-x-auto">
-          <table class="items-center w-full bg-transparent border-collapse">
-            <thead>
-              <tr>
-                <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
-                  No.
-                </th>
-                <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
-                  Nombre del Documento
-                </th>
-                <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
-                  Tipo
-                </th>
-                <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
-                  Estado
-                </th>
-                <th class="px-6 py-3 text-xs uppercase font-semibold text-left bg-blueGray-50 text-blueGray-500">
-                  Acciones
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let document of documento1; let i = index">
-                <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
-                  {{i + 1}}
-                </td>
-                <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
-                  {{ document.nombrePDf || 'N/A' }}
-                </td>
-                <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
-                  {{ document.tipo }}
-                </td>
-                <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
-                  {{ document.estado }} %
-                </td>
-                <td class="border-t-0 px-6 py-4 text-xs whitespace-nowrap">
-                  
-                  <ng-container *ngIf="document.nombrePDf; else noNombre">
-
-                    <ng-container *ngIf="document.tipo === 'Asistente'; else archivoCargado">
-                      <app-pdf-liderazgo-compromiso
-                      [mostrarBotones]=true
-                      [subirBlob]=false
-                      [idFormulario]="document.id"
-                      [nombreBoton]="'Ver'"
-                      [disenoboton]="'diseno6'"
-                      [disenoIcono]="'fa-eye'"
-                      [descargaOprevia]="'vista'"
-                      [nombreEmpresa]="dataEmpresa2.nombreEmpresa"></app-pdf-liderazgo-compromiso>
-                      <app-pdf-liderazgo-compromiso
-                      [mostrarBotones]=true
-                      [subirBlob]=false
-                      [idFormulario]="document.id"
-                      [nombreBoton]="''"
-                      [disenoboton]="'diseno4'"
-                      [disenoIcono]="'fa-download'"
-                      [descargaOprevia]="'descarga'"
-                      [nombreEmpresa]="dataEmpresa2.nombreEmpresa"></app-pdf-liderazgo-compromiso>
-
-                      <app-pdf-liderazgo-compromiso
-                      [mostrarBotones]=true
-                      [subirBlob]=false
-                      [idFormulario]="document.id"
-                      [nombreBoton]="''"
-                      [disenoboton]="'diseno5'"
-                      [disenoIcono]="'fa-print'"
-                      [descargaOprevia]="'imprimir'"
-                      [nombreEmpresa]="dataEmpresa2.nombreEmpresa"></app-pdf-liderazgo-compromiso>
-                    </ng-container>
-
-                    <ng-template #archivoCargado>
-
-                      <a [href]="document.URL" target="_blank" class="text-sky-500 bg-transparent border border-solid border-sky-500 hover:bg-sky-500 hover:text-white active:bg-sky-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">Ver</a>
-
-                    </ng-template>
-
-                  </ng-container>
-
-                  <ng-template #noNombre>
-                    <!-- Contenedor alternativo cuando nombrePDf no tiene valor -->
-                    <span class="text-red-500">Documento no disponible</span>
-                  </ng-template>
-
-                </td>
-              </tr>
-              <tr *ngIf="documento1.length === 0">
-                <td colspan="5" class="text-center py-4">No hay documentos disponibles.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-    
-      
-
-      <button data-aos="fade-right" data-aos-duration="1000" data-aos-delay="600" (click)="irdashboard()" class="text-blueGray-500 bg-transparent border border-solid border-blueGray-500 hover:bg-blueGray-300 active:bg-blueGray-500 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
-        <i class="fas fa-cog"></i> Finalizar
-      </button>
-
-    </div>
+        }
+      </li>
+    </ul>
 
   </div>
 </div>
+
 @if (_alerta.showAlert) {
   <app-alerta-informativo
-      [type]="_alerta.alertType"
-      [message]="_alerta.alertMessage">
+    [type]="_alerta.alertType"
+    [message]="_alerta.alertMessage">
   </app-alerta-informativo>
-  }
+}

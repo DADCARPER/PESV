@@ -1,26 +1,35 @@
 import { Component, inject, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { CardsBotonComponent } from "../../../../components/cards/cards-boton/cards-boton.component";
-import { PasopasoComponent } from "../../../../components/tabs/pasopaso/pasopaso.component";
 import { AuthenticacionService } from '../../../../services/shared/authenticacion.service';
 import { AlertaService } from '../../../../services/shared/alerta.service';
 import { GestionDocumentosService } from '../../../../services/shared/gestion-documentos.service';
 import { EstatusGeneralService } from '../../../../services/shared/estatus-general.service';
+import { RolUsuarioService } from '../../../../services/shared/rol-usuario.service';
 import { FirestoreService } from '../../../../services/shared/firestore.service';
 import { AlertaInformativoComponent } from "../../../../components/alertas/alerta-informativo/alerta-informativo.component";
 import { LoadingComponent } from "../../../../components/loading/loading/loading.component";
 import { ReftourlPipe } from '../../../../pipes/reftourl.pipe';
 import { LimpiarnombrePipe } from '../../../../pipes/limpiarnombre.pipe';
 import { FechafirestorePipe } from '../../../../pipes/fechafirestore.pipe';
-import { EditorComponent } from "../../../../components/editor/editor.component";
 import { Models } from '../../../../interfaces/models';
+
+/** Cada uno de los 4 soportes que exige el paso 1 de la Resolución 40595. */
+interface PuntoDocumental {
+  numero: number;
+  /** Clave con la que se guarda en Firestore. No cambiar: rompería los documentos ya subidos. */
+  seccion: string;
+  descripcion: string;
+  /** Qué sirve como soporte, en concreto. */
+  ayuda: string;
+  /** El asistente de plantillas solo aplica al acta. */
+  conAsistente?: boolean;
+}
 
 @Component({
   selector: 'app-lider-del-pesv',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, CardsBotonComponent, PasopasoComponent, RouterLink, AlertaInformativoComponent, LoadingComponent, ReftourlPipe, LimpiarnombrePipe, FechafirestorePipe, EditorComponent],
+  imports: [CommonModule, RouterLink, AlertaInformativoComponent, LoadingComponent, ReftourlPipe, LimpiarnombrePipe, FechafirestorePipe],
   templateUrl: './lider-del-pesv.component.html',
   schemas:[CUSTOM_ELEMENTS_SCHEMA],
   styleUrls: ['./lider-del-pesv.component.css']
@@ -34,6 +43,15 @@ export class LiderDelPesvComponent implements OnInit {
   private _estatus = inject(EstatusGeneralService);
   private _firestore = inject(FirestoreService);
   public _alerta = inject(AlertaService);
+  private _rol = inject(RolUsuarioService);
+
+  /**
+   * El supervisor revisa, no carga. Ocultar las acciones es cosmetico: quien
+   * manda son las reglas de Storage, que rechazan su escritura.
+   */
+  get editable(): boolean {
+    return this._rol.editable();
+  }
 
   nit = this._authcations.getCurrentUser().displayName;
   empresa = this._authcations.getCurrentUser().photoURL;
@@ -53,6 +71,55 @@ export class LiderDelPesvComponent implements OnInit {
   cargando: Record<string, boolean> = {};
   eliminando: Record<string, boolean> = {};
   mostrarHistorico: Record<string, boolean> = {};
+
+  /** Los textos de los 4 puntos. El orden define la numeración en pantalla. */
+  readonly definicionPuntos: PuntoDocumental[] = [
+    {
+      numero: 1,
+      seccion: 'Documento de Identificación',
+      descripcion: 'Identificación oficial del líder designado.',
+      ayuda: 'Cédula de ciudadanía por ambas caras, cédula de extranjería o PPT, en un solo PDF legible.',
+    },
+    {
+      numero: 2,
+      seccion: 'Acta de Designación del Líder del PESV',
+      descripcion: 'Documento firmado por la alta dirección que nombra al líder y fija sus responsabilidades.',
+      ayuda: 'Debe indicar nombre, cargo y funciones del líder, e ir firmada por el representante legal.',
+      conAsistente: true,
+    },
+    {
+      numero: 3,
+      seccion: 'Certificados de Competencia',
+      descripcion: 'Formación del líder en seguridad vial y en SG-SST.',
+      ayuda: 'Certificado del curso de seguridad vial (20 o 50 horas) y del curso de SG-SST. Puedes unirlos en un solo PDF.',
+    },
+    {
+      numero: 4,
+      seccion: 'Documentación de Experiencia Profesional',
+      descripcion: 'Soporte de al menos 2 años de experiencia en SG-SST o seguridad vial.',
+      ayuda: 'Certificados laborales, contratos o constancias que sumen el tiempo exigido.',
+    },
+  ];
+
+  /** Une cada punto con sus documentos para recorrerlos en la plantilla. */
+  get puntos() {
+    const docs = [this.documento1, this.documento2, this.documento3, this.documento4];
+    const hist = [this.historico1, this.historico2, this.historico3, this.historico4];
+    return this.definicionPuntos.map((p, i) => ({
+      ...p,
+      docs: docs[i] ?? [],
+      historico: hist[i] ?? [],
+    }));
+  }
+
+  get completados(): number {
+    return [this.documento1, this.documento2, this.documento3, this.documento4]
+      .filter(d => d.length > 0).length;
+  }
+
+  get progreso(): number {
+    return this.completados * 25;
+  }
 
   constructor() {}
 
@@ -123,8 +190,7 @@ export class LiderDelPesvComponent implements OnInit {
 
   private async actualizarEstatusGeneral(): Promise<void> {
     const modulo: Models.Procesos.Modulo001LiderPesv = {
-      total_progreso: [this.documento1, this.documento2, this.documento3, this.documento4]
-        .filter(d => d.length > 0).length * 25,
+      total_progreso: this.progreso,
       docIdentidad:              { total: this.documento1.length > 0 ? 1 : 0 },
       actaLiderpesv:             { total: this.documento2.length > 0 ? 1 : 0 },
       certificadoCompetencia:    { total: this.documento3.length > 0 ? 1 : 0 },

@@ -1,8 +1,10 @@
 <div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
-  <div class="rounded-t bg-blueGray-100 bg-amber-400 mb-0 px-6 py-6">
+
+  <div class="rounded-t bg-amber-400 mb-0 px-6 py-6">
     <div class="text-center flex">
       <button
         [routerLink]="['/admin/planificar']"
+        title="Volver a Planificar"
         class="bg-red-600 text-white active:bg-red-700 font-bold uppercase text-xs px-1 py-1 rounded shadow hover:shadow-md outline-none focus:outline-none mr-2 ease-linear transition-all duration-150"
         type="button"
       >
@@ -12,309 +14,186 @@
     </div>
   </div>
 
-  <div class="flex-auto px-4 lg:px-10 py-10 pt-0">
+  <div class="flex-auto px-4 lg:px-10 py-8">
 
-    <div class="text-lg font-light leading-relaxed mt-6 mb-4 text-gray-700">
+    <!-- ── Qué pide la norma ──────────────────────────────────── -->
+    <section class="mb-8">
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mb-3">
+        <span class="text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-100 px-2 py-1 rounded">Paso 1 de 24</span>
+        <span class="text-xs font-medium text-gray-500">Fase Planear · Resolución 40595 de 2022</span>
+      </div>
 
-      <p class="text-justify pb-3">
-        Bienvenido al módulo de diseño e implementación del PESV. En esta sección, te guiaremos a través de los pasos necesarios para completar la designación del líder responsable de este plan, de acuerdo con la Resolución 40595 de 2022 emitida por el Ministerio de Transporte de Colombia.
+      <p class="text-gray-700 leading-relaxed">
+        La alta dirección debe <strong>designar por escrito a un líder</strong> con poder de decisión para el diseño y
+        la implementación del PESV. Ese líder responde por la planificación, la ejecución y la mejora del plan, y debe
+        acreditar formación y experiencia en seguridad vial.
       </p>
 
-      <div class="bg-amber-50 p-4 rounded-lg border border-amber-100 mb-4">
-        <h3 class="font-medium text-amber-800 mb-2">Resumen de la Resolución 40595 de 2022</h3>
-        <p class="text-justify">
-          La resolución establece la metodología para el diseño, implementación y verificación de los Planes
-          Estratégicos de Seguridad Vial (PESV). El nivel directivo debe designar a un líder con poder de decisión
-          para la gestión de seguridad vial, quien será responsable de velar por la planificación, implementación y
-          mejora del PESV.
+      <p class="text-gray-700 leading-relaxed mt-3">
+        Para completar este paso sube los <strong>4 soportes</strong> que aparecen abajo, en formato PDF.
+        Si aún no tienes el acta de designación, el asistente te la arma a partir de una plantilla.
+      </p>
+    </section>
+
+      <!-- Modo supervision: se ve todo, no se toca nada -->
+      @if (!editable) {
+        <div class="mb-6 flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+          <iconify-icon icon="hugeicons:view" width="20" height="20" class="mt-0.5 shrink-0 text-emerald-600"></iconify-icon>
+          <div>
+            <p class="font-semibold text-emerald-900">Estás revisando, no editando</p>
+            <p class="mt-1 text-sm text-emerald-800">
+              Puedes consultar y descargar los documentos de este paso. Cargarlos o
+              reemplazarlos le corresponde al usuario operativo de la empresa.
+            </p>
+          </div>
+        </div>
+      }
+
+    <!-- ── Progreso ───────────────────────────────────────────── -->
+    <section class="mb-6 rounded-xl border border-gray-200 bg-gray-50 p-4">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-sm font-semibold text-gray-700">
+          {{ completados }} de 4 documentos cargados
         </p>
+        <span class="text-sm font-bold"
+          [ngClass]="completados === 4 ? 'text-green-600' : 'text-amber-600'">{{ progreso }}%</span>
       </div>
-
-      <p class="text-justify pb-4">
-        A continuación, encontrarás una lista de los documentos necesarios y los pasos a seguir para completar la designación del líder del PESV.
-      </p>
-
-      <article class="w-full md:w-1/3 rounded-lg border border-gray-100 bg-white p-4 space-y-6">
-
-        <!-- ─── SECCIÓN 1 ─── -->
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <div class="flex items-center gap-2">
-              <div class="text-white inline-flex items-center justify-center w-9 h-9 shadow rounded-full bg-amber-800">
-                <p class="font-bold text-sm">1</p>
-              </div>
-              <p class="text-lg font-medium text-amber-800">Documento de Identificación</p>
-            </div>
-            @if (documento1.length > 0) {
-              <span class="text-xs font-semibold px-2 py-1 rounded-full text-green-700 bg-green-100">Completado</span>
-            }
-          </div>
-          <p class="text-sm text-gray-500 mb-3">Fotocopia de la cédula o identificación oficial del representante legal.</p>
-
-          @if (cargando['Documento de Identificación']) {
-            <app-loading [isLoading]="true" loadingText="Procesando..."></app-loading>
-          } @else if (documento1.length === 0) {
-            <input type="file" id="fu1" (change)="uploadFile($event, 'Documento de Identificación')" class="hidden" accept=".pdf" #fu1>
-            <button (click)="fu1.click()" type="button" class="text-amber-600 bg-white border border-amber-600 hover:bg-amber-600 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded transition-all duration-150">
-              <div class="flex items-center gap-1">
-                <iconify-icon icon="hugeicons:plus-sign-square" width="16" height="16"></iconify-icon> Seleccionar archivo
-              </div>
-            </button>
-          } @else {
-            <div class="flex flex-col gap-2">
-              <div class="bg-amber-50 border border-amber-100 px-3 py-2 rounded">
-                <a [href]="documento1[0].ruta | reftourl | async" target="_blank" class="text-amber-800 font-medium text-sm hover:underline block truncate" [title]="documento1[0].nombre | limpiarnombre">
-                  {{ documento1[0].nombre | limpiarnombre }}
-                </a>
-                <p class="text-xs text-gray-500 mt-0.5">Cargado: {{ documento1[0].docCreado | fechafirestore }}</p>
-              </div>
-              <div class="flex gap-2">
-                <input type="file" id="fu1u" (change)="uploadFile($event, 'Documento de Identificación')" class="hidden" accept=".pdf" #fu1u>
-                <button (click)="fu1u.click()" type="button" class="flex-1 text-amber-800 bg-white border border-amber-800 hover:bg-amber-800 hover:text-white font-bold uppercase text-xs px-3 py-1.5 rounded transition-all duration-150">
-                  <div class="flex items-center justify-center gap-1">
-                    <iconify-icon icon="hugeicons:plus-sign-square" width="14" height="14"></iconify-icon> Actualizar
-                  </div>
-                </button>
-                <button (click)="eliminarVigente(documento1[0], 'Documento de Identificación')" [disabled]="eliminando['Documento de Identificación']" type="button" class="text-red-600 bg-white border border-red-300 hover:bg-red-600 hover:text-white font-bold uppercase text-xs px-3 py-1.5 rounded transition-all duration-150 disabled:opacity-50">
-                  <iconify-icon icon="hugeicons:delete-02" width="14" height="14"></iconify-icon>
-                </button>
-              </div>
-            </div>
-          }
-
-          @if (historico1.length > 0) {
-            <button (click)="toggleHistorico('Documento de Identificación')" type="button" class="mt-2 text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1">
-              <iconify-icon [icon]="mostrarHistorico['Documento de Identificación'] ? 'hugeicons:arrow-up-01' : 'hugeicons:arrow-down-01'" width="14" height="14"></iconify-icon>
-              Versiones anteriores ({{ historico1.length }})
-            </button>
-            @if (mostrarHistorico['Documento de Identificación']) {
-              <div class="mt-1 space-y-1 border-l-2 border-gray-200 pl-3">
-                @for (h of historico1; track h.id) {
-                  <div class="text-xs text-gray-500">
-                    <a [href]="h.ruta | reftourl | async" target="_blank" class="hover:underline text-gray-600 truncate block" [title]="h.nombre | limpiarnombre">
-                      {{ h.nombre | limpiarnombre }}
-                    </a>
-                    <span>{{ h.docCreado | fechafirestore }}</span>
-                  </div>
-                }
-              </div>
-            }
-          }
-        </div>
-
-        <!-- ─── SECCIÓN 2 ─── -->
-        <div class="border-t pt-4">
-          <div class="flex items-center justify-between mb-1">
-            <div class="flex items-center gap-2">
-              <div class="text-white inline-flex items-center justify-center w-9 h-9 shadow rounded-full bg-amber-800">
-                <p class="font-bold text-sm">2</p>
-              </div>
-              <p class="text-lg font-medium text-amber-800">Acta de Designación del Líder del PESV</p>
-            </div>
-            @if (documento2.length > 0) {
-              <span class="text-xs font-semibold px-2 py-1 rounded-full text-green-700 bg-green-100">Completado</span>
-            }
-          </div>
-          <p class="text-sm text-gray-500 mb-3">Documento oficial de la organización que designe al líder del PESV y establezca sus responsabilidades.</p>
-
-          @if (cargando['Acta de Designación del Líder del PESV']) {
-            <app-loading [isLoading]="true" loadingText="Procesando..."></app-loading>
-          } @else if (documento2.length === 0) {
-            <input type="file" id="fu2" (change)="uploadFile($event, 'Acta de Designación del Líder del PESV')" class="hidden" accept=".pdf" #fu2>
-            <button (click)="fu2.click()" type="button" class="text-amber-600 bg-white border border-amber-600 hover:bg-amber-600 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded transition-all duration-150">
-              <div class="flex items-center gap-1">
-                <iconify-icon icon="hugeicons:plus-sign-square" width="16" height="16"></iconify-icon> Seleccionar archivo
-              </div>
-            </button>
-          } @else {
-            <div class="flex flex-col gap-2">
-              <div class="bg-amber-50 border border-amber-100 px-3 py-2 rounded">
-                <a [href]="documento2[0].ruta | reftourl | async" target="_blank" class="text-amber-800 font-medium text-sm hover:underline block truncate" [title]="documento2[0].nombre | limpiarnombre">
-                  {{ documento2[0].nombre | limpiarnombre }}
-                </a>
-                <p class="text-xs text-gray-500 mt-0.5">Cargado: {{ documento2[0].docCreado | fechafirestore }}</p>
-              </div>
-              <div class="flex gap-2">
-                <input type="file" id="fu2u" (change)="uploadFile($event, 'Acta de Designación del Líder del PESV')" class="hidden" accept=".pdf" #fu2u>
-                <button (click)="fu2u.click()" type="button" class="flex-1 text-amber-800 bg-white border border-amber-800 hover:bg-amber-800 hover:text-white font-bold uppercase text-xs px-3 py-1.5 rounded transition-all duration-150">
-                  <div class="flex items-center justify-center gap-1">
-                    <iconify-icon icon="hugeicons:plus-sign-square" width="14" height="14"></iconify-icon> Actualizar
-                  </div>
-                </button>
-                <button (click)="eliminarVigente(documento2[0], 'Acta de Designación del Líder del PESV')" [disabled]="eliminando['Acta de Designación del Líder del PESV']" type="button" class="text-red-600 bg-white border border-red-300 hover:bg-red-600 hover:text-white font-bold uppercase text-xs px-3 py-1.5 rounded transition-all duration-150 disabled:opacity-50">
-                  <iconify-icon icon="hugeicons:delete-02" width="14" height="14"></iconify-icon>
-                </button>
-              </div>
-            </div>
-          }
-
-          @if (historico2.length > 0) {
-            <button (click)="toggleHistorico('Acta de Designación del Líder del PESV')" type="button" class="mt-2 text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1">
-              <iconify-icon [icon]="mostrarHistorico['Acta de Designación del Líder del PESV'] ? 'hugeicons:arrow-up-01' : 'hugeicons:arrow-down-01'" width="14" height="14"></iconify-icon>
-              Versiones anteriores ({{ historico2.length }})
-            </button>
-            @if (mostrarHistorico['Acta de Designación del Líder del PESV']) {
-              <div class="mt-1 space-y-1 border-l-2 border-gray-200 pl-3">
-                @for (h of historico2; track h.id) {
-                  <div class="text-xs text-gray-500">
-                    <a [href]="h.ruta | reftourl | async" target="_blank" class="hover:underline text-gray-600 truncate block" [title]="h.nombre | limpiarnombre">
-                      {{ h.nombre | limpiarnombre }}
-                    </a>
-                    <span>{{ h.docCreado | fechafirestore }}</span>
-                  </div>
-                }
-              </div>
-            }
-          }
-        </div>
-
-        <!-- ─── SECCIÓN 3 ─── -->
-        <div class="border-t pt-4">
-          <div class="flex items-center justify-between mb-1">
-            <div class="flex items-center gap-2">
-              <div class="text-white inline-flex items-center justify-center w-9 h-9 shadow rounded-full bg-amber-800">
-                <p class="font-bold text-sm">3</p>
-              </div>
-              <p class="text-lg font-medium text-amber-800">Certificados de Competencia</p>
-            </div>
-            @if (documento3.length > 0) {
-              <span class="text-xs font-semibold px-2 py-1 rounded-full text-green-700 bg-green-100">Completado</span>
-            }
-          </div>
-          <p class="text-sm text-gray-500 mb-3">Certificados de formación del líder en SG-SST y en Seguridad Vial (curso de 50 o 20 horas).</p>
-
-          @if (cargando['Certificados de Competencia']) {
-            <app-loading [isLoading]="true" loadingText="Procesando..."></app-loading>
-          } @else if (documento3.length === 0) {
-            <input type="file" id="fu3" (change)="uploadFile($event, 'Certificados de Competencia')" class="hidden" accept=".pdf" #fu3>
-            <button (click)="fu3.click()" type="button" class="text-amber-600 bg-white border border-amber-600 hover:bg-amber-600 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded transition-all duration-150">
-              <div class="flex items-center gap-1">
-                <iconify-icon icon="hugeicons:plus-sign-square" width="16" height="16"></iconify-icon> Seleccionar archivo
-              </div>
-            </button>
-          } @else {
-            <div class="flex flex-col gap-2">
-              <div class="bg-amber-50 border border-amber-100 px-3 py-2 rounded">
-                <a [href]="documento3[0].ruta | reftourl | async" target="_blank" class="text-amber-800 font-medium text-sm hover:underline block truncate" [title]="documento3[0].nombre | limpiarnombre">
-                  {{ documento3[0].nombre | limpiarnombre }}
-                </a>
-                <p class="text-xs text-gray-500 mt-0.5">Cargado: {{ documento3[0].docCreado | fechafirestore }}</p>
-              </div>
-              <div class="flex gap-2">
-                <input type="file" id="fu3u" (change)="uploadFile($event, 'Certificados de Competencia')" class="hidden" accept=".pdf" #fu3u>
-                <button (click)="fu3u.click()" type="button" class="flex-1 text-amber-800 bg-white border border-amber-800 hover:bg-amber-800 hover:text-white font-bold uppercase text-xs px-3 py-1.5 rounded transition-all duration-150">
-                  <div class="flex items-center justify-center gap-1">
-                    <iconify-icon icon="hugeicons:plus-sign-square" width="14" height="14"></iconify-icon> Actualizar
-                  </div>
-                </button>
-                <button (click)="eliminarVigente(documento3[0], 'Certificados de Competencia')" [disabled]="eliminando['Certificados de Competencia']" type="button" class="text-red-600 bg-white border border-red-300 hover:bg-red-600 hover:text-white font-bold uppercase text-xs px-3 py-1.5 rounded transition-all duration-150 disabled:opacity-50">
-                  <iconify-icon icon="hugeicons:delete-02" width="14" height="14"></iconify-icon>
-                </button>
-              </div>
-            </div>
-          }
-
-          @if (historico3.length > 0) {
-            <button (click)="toggleHistorico('Certificados de Competencia')" type="button" class="mt-2 text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1">
-              <iconify-icon [icon]="mostrarHistorico['Certificados de Competencia'] ? 'hugeicons:arrow-up-01' : 'hugeicons:arrow-down-01'" width="14" height="14"></iconify-icon>
-              Versiones anteriores ({{ historico3.length }})
-            </button>
-            @if (mostrarHistorico['Certificados de Competencia']) {
-              <div class="mt-1 space-y-1 border-l-2 border-gray-200 pl-3">
-                @for (h of historico3; track h.id) {
-                  <div class="text-xs text-gray-500">
-                    <a [href]="h.ruta | reftourl | async" target="_blank" class="hover:underline text-gray-600 truncate block" [title]="h.nombre | limpiarnombre">
-                      {{ h.nombre | limpiarnombre }}
-                    </a>
-                    <span>{{ h.docCreado | fechafirestore }}</span>
-                  </div>
-                }
-              </div>
-            }
-          }
-        </div>
-
-        <!-- ─── SECCIÓN 4 ─── -->
-        <div class="border-t pt-4">
-          <div class="flex items-center justify-between mb-1">
-            <div class="flex items-center gap-2">
-              <div class="text-white inline-flex items-center justify-center w-9 h-9 shadow rounded-full bg-amber-800">
-                <p class="font-bold text-sm">4</p>
-              </div>
-              <p class="text-lg font-medium text-amber-800">Documentación de Experiencia Profesional</p>
-            </div>
-            @if (documento4.length > 0) {
-              <span class="text-xs font-semibold px-2 py-1 rounded-full text-green-700 bg-green-100">Completado</span>
-            }
-          </div>
-          <p class="text-sm text-gray-500 mb-3">Soporte de experiencia en SG-SST y PESV de al menos 2 años.</p>
-
-          @if (cargando['Documentación de Experiencia Profesional']) {
-            <app-loading [isLoading]="true" loadingText="Procesando..."></app-loading>
-          } @else if (documento4.length === 0) {
-            <input type="file" id="fu4" (change)="uploadFile($event, 'Documentación de Experiencia Profesional')" class="hidden" accept=".pdf" #fu4>
-            <button (click)="fu4.click()" type="button" class="text-amber-600 bg-white border border-amber-600 hover:bg-amber-600 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded transition-all duration-150">
-              <div class="flex items-center gap-1">
-                <iconify-icon icon="hugeicons:plus-sign-square" width="16" height="16"></iconify-icon> Seleccionar archivo
-              </div>
-            </button>
-          } @else {
-            <div class="flex flex-col gap-2">
-              <div class="bg-amber-50 border border-amber-100 px-3 py-2 rounded">
-                <a [href]="documento4[0].ruta | reftourl | async" target="_blank" class="text-amber-800 font-medium text-sm hover:underline block truncate" [title]="documento4[0].nombre | limpiarnombre">
-                  {{ documento4[0].nombre | limpiarnombre }}
-                </a>
-                <p class="text-xs text-gray-500 mt-0.5">Cargado: {{ documento4[0].docCreado | fechafirestore }}</p>
-              </div>
-              <div class="flex gap-2">
-                <input type="file" id="fu4u" (change)="uploadFile($event, 'Documentación de Experiencia Profesional')" class="hidden" accept=".pdf" #fu4u>
-                <button (click)="fu4u.click()" type="button" class="flex-1 text-amber-800 bg-white border border-amber-800 hover:bg-amber-800 hover:text-white font-bold uppercase text-xs px-3 py-1.5 rounded transition-all duration-150">
-                  <div class="flex items-center justify-center gap-1">
-                    <iconify-icon icon="hugeicons:plus-sign-square" width="14" height="14"></iconify-icon> Actualizar
-                  </div>
-                </button>
-                <button (click)="eliminarVigente(documento4[0], 'Documentación de Experiencia Profesional')" [disabled]="eliminando['Documentación de Experiencia Profesional']" type="button" class="text-red-600 bg-white border border-red-300 hover:bg-red-600 hover:text-white font-bold uppercase text-xs px-3 py-1.5 rounded transition-all duration-150 disabled:opacity-50">
-                  <iconify-icon icon="hugeicons:delete-02" width="14" height="14"></iconify-icon>
-                </button>
-              </div>
-            </div>
-          }
-
-          @if (historico4.length > 0) {
-            <button (click)="toggleHistorico('Documentación de Experiencia Profesional')" type="button" class="mt-2 text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1">
-              <iconify-icon [icon]="mostrarHistorico['Documentación de Experiencia Profesional'] ? 'hugeicons:arrow-up-01' : 'hugeicons:arrow-down-01'" width="14" height="14"></iconify-icon>
-              Versiones anteriores ({{ historico4.length }})
-            </button>
-            @if (mostrarHistorico['Documentación de Experiencia Profesional']) {
-              <div class="mt-1 space-y-1 border-l-2 border-gray-200 pl-3">
-                @for (h of historico4; track h.id) {
-                  <div class="text-xs text-gray-500">
-                    <a [href]="h.ruta | reftourl | async" target="_blank" class="hover:underline text-gray-600 truncate block" [title]="h.nombre | limpiarnombre">
-                      {{ h.nombre | limpiarnombre }}
-                    </a>
-                    <span>{{ h.docCreado | fechafirestore }}</span>
-                  </div>
-                }
-              </div>
-            }
-          }
-        </div>
-
-      </article>
-
-      <div class="flex flex-col lg:flex-row justify-center items-center mt-6 mb-6 space-y-6 lg:space-y-0 lg:space-x-16">
-        <div class="lg:w-1/3 sm:w-full">
-          <app-cards-boton
-            [linkvamos]="'crear_documento'"
-            [titulo]="'Crear documento'"
-            [descripcion]="'Aún no tengo el documento. Iniciar proceso de creación ahora'"
-            [tipoIcono]="'fas fa-rocket'"
-            [colorIcono]="'bg-green-500'">
-          </app-cards-boton>
-        </div>
+      <div class="h-2 w-full overflow-hidden rounded-full bg-gray-200">
+        <div class="h-full rounded-full transition-all duration-500"
+          [ngClass]="completados === 4 ? 'bg-green-500' : 'bg-amber-400'"
+          [style.width.%]="progreso"></div>
       </div>
+      @if (completados === 4) {
+        <p class="mt-2 flex items-center gap-1.5 text-sm font-medium text-green-700">
+          <iconify-icon icon="hugeicons:checkmark-circle-02" width="16" height="16"></iconify-icon>
+          Paso completo. Puedes actualizar cualquier documento cuando lo necesites.
+        </p>
+      }
+    </section>
 
-    </div>
+    <!-- ── Los 4 puntos documentales ──────────────────────────── -->
+    <ul class="space-y-4">
+      @for (p of puntos; track p.seccion) {
+        <li class="rounded-xl border-2 p-5 transition-colors duration-200"
+          [ngClass]="p.docs.length > 0 ? 'border-green-200 bg-green-50/40' : 'border-gray-200 bg-white'">
+
+          <!-- Encabezado del punto -->
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-start gap-3 min-w-0">
+              <div class="shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-full shadow font-bold text-sm"
+                [ngClass]="p.docs.length > 0 ? 'bg-green-600 text-white' : 'bg-amber-400 text-gray-900'">
+                @if (p.docs.length > 0) {
+                  <iconify-icon icon="hugeicons:tick-02" width="18" height="18"></iconify-icon>
+                } @else {
+                  {{ p.numero }}
+                }
+              </div>
+              <div class="min-w-0">
+                <p class="text-base font-semibold text-gray-900">{{ p.seccion }}</p>
+                <p class="text-sm text-gray-600 mt-0.5">{{ p.descripcion }}</p>
+              </div>
+            </div>
+            @if (p.docs.length > 0) {
+              <span class="shrink-0 text-xs font-semibold px-2 py-1 rounded-full text-green-700 bg-green-100">Completado</span>
+            } @else {
+              <span class="shrink-0 text-xs font-semibold px-2 py-1 rounded-full text-gray-500 bg-gray-100">Pendiente</span>
+            }
+          </div>
+
+          <!-- Qué sirve como soporte -->
+          <p class="mt-3 ml-12 flex items-start gap-2 text-sm text-gray-500">
+            <iconify-icon icon="hugeicons:information-circle" width="15" height="15" class="mt-0.5 shrink-0"></iconify-icon>
+            <span>{{ p.ayuda }}</span>
+          </p>
+
+          <!-- Zona de acción -->
+          <div class="mt-4 ml-12">
+            @if (!editable) {
+              <!-- Sin acciones: el servidor tambien las rechazaria -->
+              @if (p.docs.length === 0) {
+                <p class="text-sm text-gray-500">Pendiente de cargar por el operativo.</p>
+              }
+            } @else if (cargando[p.seccion]) {
+              <app-loading [isLoading]="true" loadingText="Procesando..."></app-loading>
+            } @else if (p.docs.length === 0) {
+              <input type="file" (change)="uploadFile($event, p.seccion)" class="hidden" accept=".pdf" #inputNuevo>
+              <button (click)="inputNuevo.click()" type="button"
+                class="text-gray-800 bg-white border border-amber-400 hover:bg-amber-400 hover:text-gray-900 font-bold uppercase text-xs px-4 py-2 rounded transition-all duration-150">
+                <span class="flex items-center gap-1.5">
+                  <iconify-icon icon="hugeicons:upload-04" width="16" height="16"></iconify-icon> Subir PDF
+                </span>
+              </button>
+            } @else {
+              <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <a [href]="p.docs[0].ruta | reftourl | async" target="_blank"
+                  class="flex-1 min-w-0 flex items-center gap-2 rounded border border-green-200 bg-white px-3 py-2 hover:border-green-400 transition-colors duration-150"
+                  [title]="p.docs[0].nombre | limpiarnombre">
+                  <iconify-icon icon="hugeicons:pdf-02" width="20" height="20" class="shrink-0 text-red-600"></iconify-icon>
+                  <span class="min-w-0">
+                    <span class="block truncate text-sm font-medium text-gray-800">{{ p.docs[0].nombre | limpiarnombre }}</span>
+                    <span class="block text-xs text-gray-500">Cargado: {{ p.docs[0].docCreado | fechafirestore }}</span>
+                  </span>
+                </a>
+                <div class="flex gap-2 shrink-0">
+                  <input type="file" (change)="uploadFile($event, p.seccion)" class="hidden" accept=".pdf" #inputActualizar>
+                  <button (click)="inputActualizar.click()" type="button" title="Reemplazar por una versión nueva"
+                    class="text-gray-800 bg-white border border-amber-400 hover:bg-amber-400 hover:text-gray-900 font-bold uppercase text-xs px-3 py-2 rounded transition-all duration-150">
+                    <span class="flex items-center justify-center gap-1">
+                      <iconify-icon icon="hugeicons:refresh" width="14" height="14"></iconify-icon> Actualizar
+                    </span>
+                  </button>
+                  <button (click)="eliminarVigente(p.docs[0], p.seccion)" [disabled]="eliminando[p.seccion]" type="button"
+                    title="Quitar el documento vigente (queda guardado en versiones anteriores)"
+                    class="text-red-600 bg-white border border-red-300 hover:bg-red-600 hover:text-white font-bold uppercase text-xs px-3 py-2 rounded transition-all duration-150 disabled:opacity-50">
+                    <iconify-icon icon="hugeicons:delete-02" width="14" height="14"></iconify-icon>
+                  </button>
+                </div>
+              </div>
+            }
+
+            <!-- Atajo al asistente, solo en el acta -->
+            @if (p.conAsistente && p.docs.length === 0) {
+              <div class="mt-3 flex flex-wrap items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+                <iconify-icon icon="hugeicons:ai-magic" width="22" height="22" class="text-amber-600"></iconify-icon>
+                <p class="flex-1 min-w-[12rem] text-sm text-gray-700">
+                  <span class="font-semibold text-gray-900">¿Todavía no tienes el acta?</span>
+                  Créala desde una plantilla con los datos de tu empresa ya puestos.
+                </p>
+                <a [routerLink]="['/admin/planificar/liderdelpesv/crear_documento']"
+                  class="shrink-0 rounded bg-amber-400 px-4 py-2 text-xs font-bold uppercase text-gray-900 shadow hover:bg-amber-300 transition-colors duration-150">
+                  Crear documento
+                </a>
+              </div>
+            }
+          </div>
+
+          <!-- Versiones anteriores -->
+          @if (p.historico.length > 0) {
+            <div class="ml-12 mt-3">
+              <button (click)="toggleHistorico(p.seccion)" type="button"
+                class="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700">
+                <iconify-icon [icon]="mostrarHistorico[p.seccion] ? 'hugeicons:arrow-up-01' : 'hugeicons:arrow-down-01'" width="14" height="14"></iconify-icon>
+                Versiones anteriores ({{ p.historico.length }})
+              </button>
+              @if (mostrarHistorico[p.seccion]) {
+                <div class="mt-2 space-y-1.5 border-l-2 border-gray-200 pl-3">
+                  @for (h of p.historico; track h.id) {
+                    <div class="text-xs">
+                      <a [href]="h.ruta | reftourl | async" target="_blank"
+                        class="block truncate text-gray-600 hover:underline" [title]="h.nombre | limpiarnombre">
+                        {{ h.nombre | limpiarnombre }}
+                      </a>
+                      <span class="text-gray-400">{{ h.docCreado | fechafirestore }}</span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </li>
+      }
+    </ul>
+
   </div>
 </div>
 

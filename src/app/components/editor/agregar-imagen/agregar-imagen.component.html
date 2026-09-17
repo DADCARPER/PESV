@@ -17,7 +17,7 @@
         accept="image/png, image/jpeg, image/jpg"
         style="display: none"
       >
-      <div class="flex items-center border rounded-lg border-amber-500 border-dashed">
+      <div class="flex items-center border rounded-lg border-amber-400 border-dashed">
         <div class="flex-1 items-center gap-2  px-2 py-0.5 mr-2">
             @if (previewUrl) {
                 <img 
@@ -30,7 +30,7 @@
         <div class="flex flex-col items-center gap-1 me-0.5">
             <button 
                 (click)="fileInput.click()"
-                class="bg-amber-500 hover:bg-amber-600 text-white text-base p-2 rounded"
+                class="bg-amber-400 hover:bg-amber-300 text-gray-900 text-base p-2 rounded"
                 [disabled]="uploading">
                 Seleccionar Logo
             </button>
@@ -38,7 +38,7 @@
             @if (selectedFile && !uploading) {
                 <button 
                 (click)="uploadImage()"
-                class="bg-amber-500 hover:bg-amber-600 text-white text-base py-0 px-2 rounded">
+                class="bg-amber-400 hover:bg-amber-300 text-gray-900 text-base py-0 px-2 rounded">
                 Subir Logo
                 </button>
             }
