@@ -25,10 +25,12 @@
               <p class="text-sm font-medium text-gray-700">{{ nivel.nombre }}</p>
               <p class="text-xs text-gray-400">{{ nivel.criterio }}</p>
             </div>
-            <div class="relative w-40 flex-none">
+            <!-- La unidad va fuera del campo: dentro chocaba con las flechas
+                 que Chrome dibuja en los input de tipo number -->
+            <div class="flex items-center gap-2 flex-none">
               <input type="number" [(ngModel)]="metas[nivel.clave]" min="0" step="0.01" placeholder="0.00"
-                class="w-full px-3 py-2 pr-16 border border-gray-300 rounded-md shadow-sm text-right focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
-              <span class="absolute right-3 top-2.5 text-xs text-gray-400">/ M km</span>
+                class="w-28 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-right focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
+              <span class="text-xs text-gray-400 whitespace-nowrap w-20">por millón<br>de km</span>
             </div>
           </div>
         }

@@ -54,7 +54,7 @@
 
                     </div>
                 }
-                @if(programas.length === 0){
+                @if(cargando()){
                     <div class="w-full lg:w-4/12 px-2 pt-4 ">
                         <!-- Esqueleton-->
                         <div role="status" class="max-w-sm p-4 border border-gray-200 rounded-sm shadow-sm animate-pulse md:p-6 dark:border-gray-700">
@@ -78,6 +78,27 @@
                         </div>
 
 
+                    </div>
+                }
+                @if(!cargando() && programas.length === 0){
+                    <div class="w-full px-2 pt-4">
+                        <div class="text-center py-12 border border-dashed border-gray-300 rounded-lg">
+                            <div class="text-gray-300 inline-flex items-center justify-center mb-3">
+                                <iconify-icon icon="hugeicons:folder-02" width="52" height="52"></iconify-icon>
+                            </div>
+                            <p class="text-lg font-medium text-gray-700">Este periodo no tiene programas</p>
+                            <p class="text-sm text-gray-500 mb-6 max-w-lg mx-auto">
+                                Cada periodo del ciclo PHVA lleva sus propios programas. Puedes partir de los
+                                seis programas base de gestión de riesgos y ajustarlos a tu operación.
+                            </p>
+                            <button type="button" (click)="cargarProgramasBase()" [disabled]="sembrando()"
+                                class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 disabled:opacity-50 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150">
+                                <div class="flex items-center">
+                                    <iconify-icon icon="hugeicons:plus-sign-square" width="18" height="18" class="pr-2"></iconify-icon>
+                                    {{ sembrando() ? 'Cargando...' : 'Cargar programas base' }}
+                                </div>
+                            </button>
+                        </div>
                     </div>
                 }
             </div>

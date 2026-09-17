@@ -1,6 +1,5 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit, inject, viewChild, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TablaCompartidaComponent } from "../../../../../components/tablas/tabla-compartida/tabla-compartida.component";
 import { TablaLeftComponent } from "../../../../../components/tablas/tabla-left/tabla-left.component";
 import { CardsMetasResultadosComponent } from "../../../../../components/cards/cards-metas-resultados/cards-metas-resultados.component";
 import { CardsMedicionTrimestralComponent } from "../../../../../components/cards/cards-medicion-trimestral/cards-medicion-trimestral.component";
@@ -17,7 +16,7 @@ type Nivel = ModelIndicadores.NivelPerdida;
   selector: 'app-indicador1',
   standalone: true,
   imports: [
-    CommonModule, TablaCompartidaComponent, TablaLeftComponent,
+    CommonModule, TablaLeftComponent,
     CardsMetasResultadosComponent, CardsMedicionTrimestralComponent, CardsMedicionAnualComponent,
     Formulario1Component, Formulario2Component, Formulario3Component
   ],

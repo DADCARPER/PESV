@@ -41,9 +41,11 @@
 
       <h4 class="text-lg font-medium pb-1">Número de kilómetros recorridos mensualmente por todos los vehículos</h4>
 
-      <app-tabla-compartida
+      <app-tabla-left
         [headers]="datos"
-        [datas]="[filaKilometraje()]"></app-tabla-compartida>
+        [tipo]="'Concepto'"
+        [leftheaders]="['Kilómetros recorridos']"
+        [filas]="[filaKilometraje()]"></app-tabla-left>
 
       <h4 class="text-lg font-medium mt-4">Metas y Resultados</h4>
       <div class="flex flex-col md:flex-row gap-2 mb-4">

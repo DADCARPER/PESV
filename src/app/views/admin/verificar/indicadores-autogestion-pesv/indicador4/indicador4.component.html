@@ -56,6 +56,56 @@
         [valorMeta]="resumen().definidas.toString()"
         [textColor]="'text-emerald-600'"></app-cards-medicion-anual2>
 
+      <!-- ── De dónde sale cada cifra ──────────────────────────── -->
+      <div class="mt-6">
+        <h4 class="text-base font-medium text-gray-700">Metas que alimentan este indicador</h4>
+        <p class="text-sm text-gray-500 mb-3">
+          Cada indicador definido en Objetivos y metas es una meta del PESV.
+          Cuenta como alcanzada el trimestre en que cumple su propia meta.
+        </p>
+
+        <div class="overflow-x-auto">
+          <table class="items-center w-full bg-transparent border-collapse">
+            <thead>
+              <tr>
+                <th class="px-3 py-2 text-xs uppercase font-semibold text-left text-blueGray-500 bg-blueGray-50 border border-solid border-blueGray-100 whitespace-nowrap">Código</th>
+                <th class="px-3 py-2 text-xs uppercase font-semibold text-left text-blueGray-500 bg-blueGray-50 border border-solid border-blueGray-100">Meta</th>
+                <th class="px-3 py-2 text-xs uppercase font-semibold text-center text-blueGray-500 bg-blueGray-50 border border-solid border-blueGray-100 whitespace-nowrap">Objetivo</th>
+                @for (t of nombresTrimestres; track t) {
+                  <th class="px-3 py-2 text-xs uppercase font-semibold text-center text-blueGray-500 bg-blueGray-50 border border-solid border-blueGray-100">{{ t }}</th>
+                }
+                <th class="px-3 py-2 text-xs uppercase font-semibold text-center text-blueGray-500 bg-blueGray-50 border border-solid border-blueGray-100 whitespace-nowrap">Anual</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (ind of indicadores(); track ind.id) {
+                <tr class="hover:bg-blueGray-50 transition-colors duration-150">
+                  <td class="border-t-0 px-3 align-middle text-sm p-2 whitespace-nowrap font-semibold text-blueGray-600">{{ ind.codigo }}</td>
+                  <td class="border-t-0 px-3 align-middle text-sm p-2 text-blueGray-700 min-w-[16rem] max-w-md">
+                    <p class="line-clamp-2">{{ ind.nombre }}</p>
+                  </td>
+                  <td class="border-t-0 px-3 align-middle text-sm p-2 text-center whitespace-nowrap text-blueGray-600">{{ metaIndicador(ind) }}</td>
+                  @for (t of nombresTrimestres; track t; let i = $index) {
+                    <td class="border-t-0 px-3 align-middle text-xs p-2 text-center whitespace-nowrap">
+                      <p class="text-sm font-semibold text-blueGray-700">{{ valorIndicador(ind, i) }}</p>
+                      <span [class]="claseIndicador(ind, i)">{{ estadoIndicador(ind, i) }}</span>
+                    </td>
+                  }
+                  <td class="border-t-0 px-3 align-middle text-xs p-2 text-center whitespace-nowrap bg-blueGray-50">
+                    <p class="text-sm font-bold text-blueGray-700">{{ valorAnualIndicador(ind) }}</p>
+                    <span [class]="claseAnualIndicador(ind)">{{ estadoAnualIndicador(ind) }}</span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <p class="text-xs text-gray-400 mt-2">
+          Solo lectura. Las metas se definen y se miden en Objetivos y metas.
+        </p>
+      </div>
+
     }
   </div>
 </div>

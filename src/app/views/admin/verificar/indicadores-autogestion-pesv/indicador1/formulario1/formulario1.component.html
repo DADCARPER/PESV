@@ -24,10 +24,11 @@
         @for (mes of meses; track mes; let i = $index) {
           <div class="space-y-2">
             <label [for]="'km-' + i" class="block text-sm font-medium text-gray-700">{{ mes }}</label>
-            <div class="relative">
+            <!-- La unidad va fuera del campo para no chocar con las flechas del number -->
+            <div class="flex items-center gap-2">
               <input type="number" [id]="'km-' + i" [(ngModel)]="kilometraje[i]" min="0" placeholder="0"
-                class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
-              <span class="absolute right-3 top-2.5 text-xs text-gray-400">km</span>
+                class="w-full min-w-0 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-right focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
+              <span class="text-xs text-gray-400 flex-none">km</span>
             </div>
           </div>
         }

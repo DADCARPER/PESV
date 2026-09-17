@@ -72,4 +72,38 @@ export class Indicador4Component implements OnInit, OnDestroy {
     return r.porcentajeTrimestre[indice] === null ? null : r.alcanzadasTrimestre[indice];
   }
 
+  // ── Detalle: de dónde sale cada cifra ─────────────────────────────────────
+
+  nombresTrimestres = M.TRIMESTRES;
+
+  /** El $index de la plantilla llega como number; aquí se estrecha a Trimestre. */
+  estadoIndicador(ind: M.ConsultarIndicador, trimestre: number): M.EstadoIndicador {
+    return this._objetivos.estadoIndicador(ind, trimestre as M.Trimestre);
+  }
+
+  claseIndicador(ind: M.ConsultarIndicador, trimestre: number): string {
+    return this._objetivos.claseEstadoIndicador(this.estadoIndicador(ind, trimestre));
+  }
+
+  valorIndicador(ind: M.ConsultarIndicador, trimestre: number): string {
+    return this._objetivos.formatear(ind.trimestres?.[trimestre], ind.unidad);
+  }
+
+  /** Meta con su símbolo de dirección y su unidad: «≥ 90%», «≤ 5 Siniestros». */
+  metaIndicador(ind: M.ConsultarIndicador): string {
+    const simbolo = ind.direccion === 'menorIgual' ? '≤' : '≥';
+    return `${simbolo} ${this._objetivos.formatear(ind.meta, ind.unidad)}`;
+  }
+
+  valorAnualIndicador(ind: M.ConsultarIndicador): string {
+    return this._objetivos.formatear(this._objetivos.valorAnualIndicador(ind), ind.unidad);
+  }
+
+  estadoAnualIndicador(ind: M.ConsultarIndicador): M.EstadoIndicador {
+    return this._objetivos.estadoAnualIndicador(ind);
+  }
+
+  claseAnualIndicador(ind: M.ConsultarIndicador): string {
+    return this._objetivos.claseEstadoIndicador(this.estadoAnualIndicador(ind));
+  }
 }

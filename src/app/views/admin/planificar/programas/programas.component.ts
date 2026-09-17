@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FirestoreService } from '../../../../services/shared/firestore.service';
 import { AaDatosDefaultService } from '../../../../services/shared/aa-datos-default.service';
@@ -14,6 +14,7 @@ import { DetallesActividadComponent } from './detalles-actividad/detalles-activi
   standalone: true,
   imports: [CommonModule,RouterLink,FechafirestorePipe,FechaMesAnoPipe,DetallesActividadComponent],
   templateUrl: './programas.component.html',
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   styleUrl: './programas.component.css'
 })
 export class ProgramasComponent {
@@ -34,32 +35,52 @@ export class ProgramasComponent {
   objetivoPrograma: string = '';
 
   openTab = signal(0);
+  /** Distingue "consultando" de "no hay nada": antes ambos se veían igual. */
+  cargando = signal(true);
+  sembrando = signal(false);
 
   constructor(){
-    //this._iniciardatos.inicializarDatos008Programas('900089997');
     this.consultarProgramas();
   }
 
   async consultarProgramas() {
+    this.cargando.set(true);
     this.programas = [];
 
-    //console.log('Entro a consultarDocumentos');
     const periodo = this._authcations.periodo();
     const path = `Empresas/${this.nit}/periodos/${periodo}/008-programas-gestion-riesgos`;
-    let q: Models.Firebases.whereQuery[];
+    const q: Models.Firebases.whereQuery[] = [['estado', '==', 'Activo']];
 
-    q = [['estado', '==', 'Activo']];
-  
-    const snapshot = await this._firestore.getDocumentsQuery<Models.Programas.ConsultarPrograma>(path, q);
+    try {
+      const snapshot = await this._firestore.getDocumentsQuery<Models.Programas.ConsultarPrograma>(path, q);
+      this.programas = snapshot.docs.map((doc: any) => doc.data());
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'Error al consultar los programas';
+      console.error('[Programas] consultarProgramas:', error);
+      this._alerta.showError(msg);
+    } finally {
+      this.cargando.set(false);
+    }
+  }
 
-    snapshot.docs.forEach((doc: any) => {
-    const data = doc.data();
-    this.programas.push(data);
-    });
-
-    console.log('variable1', this.programas);
-    
-
+  /**
+   * Siembra los programas base en el periodo activo.
+   * Cada periodo arranca con su propia colección, así que esto resuelve tanto
+   * un módulo recién estrenado como el primer día de un año nuevo.
+   */
+  async cargarProgramasBase() {
+    this.sembrando.set(true);
+    try {
+      await this._iniciardatos.inicializarDatos008Programas(this.nit, this._authcations.periodo());
+      this._alerta.showSuccess('Programas base cargados exitosamente.');
+      await this.consultarProgramas();
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'Error al cargar los programas base';
+      console.error('[Programas] cargarProgramasBase:', error);
+      this._alerta.showError(msg);
+    } finally {
+      this.sembrando.set(false);
+    }
   }
 
   async toggleTabs(tabNumber: number, idPrograma?: string, tituloPrograma?: string, objetivoPrograma?: string ) {
