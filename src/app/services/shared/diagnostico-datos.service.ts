@@ -234,6 +234,37 @@ export class DiagnosticoDatosService {
     );
   }
 
+  /**
+   * Toda la sección, para las pantallas de análisis.
+   *
+   * Las gráficas agrupan por campos de texto libre (área, escolaridad, tipo de
+   * contrato) y cruzan unos con otros. Firestore no sabe agrupar, y las
+   * categorías no se conocen de antemano, así que no hay forma de contarlas en
+   * el servidor: hay que traer los registros y agrupar aquí.
+   *
+   * Se trae entero a propósito, sin tope. Recortarlo daría gráficas que
+   * parecen correctas y no lo son, que es justo el fallo que tenían las
+   * pestañas. Si alguna empresa llega a tantos registros que la pantalla se
+   * arrastre, la salida es precalcular el resumen al escribir, no recortar.
+   */
+  async todos<T>(seccion: SeccionDiagnostico): Promise<T[]> {
+    const path = this.ruta(seccion);
+    const acumulado: T[] = [];
+    let cursor: QueryDocumentSnapshot | null = null;
+
+    for (;;) {
+      const pagina: Models.Firebases.Pagina<T> = await this._firestore.getPagina<T>(
+        path,
+        SOLO_ACTIVOS,
+        { orderParam: 'docCreado', directionSort: 'desc', limit: 500 },
+        cursor
+      );
+      acumulado.push(...pagina.datos);
+      if (!pagina.hayMas || !pagina.cursor) return acumulado;
+      cursor = pagina.cursor;
+    }
+  }
+
   /** El diagnóstico vigente del periodo, o `null` si aún no se ha creado. */
   async diagnosticoBase(): Promise<Models.Diagnostico.DiagnosticoBase | null> {
     const snap = await this._firestore.getDocumentsQuery<Models.Diagnostico.DiagnosticoBase>(

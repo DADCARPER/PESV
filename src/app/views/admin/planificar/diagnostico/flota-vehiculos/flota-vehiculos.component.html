@@ -26,6 +26,17 @@
         </svg>
         Cargando vehículos...
       </div>
+    } @else if (error) {
+      <!-- Sin esto un fallo de lectura pintaba las graficas en cero, que se
+           lee igual que "esta empresa no tiene datos". -->
+      <div class="flex flex-col items-center justify-center py-20 gap-3 text-center">
+        <p class="font-semibold text-red-700">No se pudieron cargar los datos</p>
+        <p class="max-w-md text-sm text-gray-500">
+          Las graficas de esta pantalla no se muestran porque la consulta fallo.
+          No estan en cero: no se pudieron leer.
+        </p>
+        <p class="text-xs text-gray-400">{{ error }}</p>
+      </div>
     } @else {
 
       <!-- Stats rápidas -->

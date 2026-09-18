@@ -1,14 +1,12 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import { DonutComponent } from '../../../../../components/apexChart/donut/donut.component';
 import { ColumnsStrackedComponent } from '../../../../../components/apexChart/columns-stracked/columns-stracked.component';
 import { ColumnsBarHorizontalComponent, CauseData } from '../../../../../components/apexChart/columns-bar-horizontal/columns-bar-horizontal.component';
 import { ApexAxisChartSeries } from 'ng-apexcharts';
 import { AuthenticacionService } from '../../../../../services/shared/authenticacion.service';
-import { FirestoreService } from '../../../../../services/shared/firestore.service';
+import { DiagnosticoDatosService } from '../../../../../services/shared/diagnostico-datos.service';
 import { Models } from '../../../../../interfaces/models';
 
 @Component({
@@ -18,13 +16,16 @@ import { Models } from '../../../../../interfaces/models';
   templateUrl: './gestion-contratistas.component.html',
   styleUrl: './gestion-contratistas.component.css'
 })
-export class GestionContratistasComponent implements OnInit, OnDestroy {
+export class GestionContratistasComponent implements OnInit {
 
   private _auth = inject(AuthenticacionService);
-  private _firestore = inject(FirestoreService);
+  private _datos = inject(DiagnosticoDatosService);
 
   contratistas: any[] = [];
   cargando = true;
+
+  /** Por que no se pudieron leer los datos. Vacio si todo fue bien. */
+  error = '';
 
   // Gráfica 1: por tipo de vinculación
   vinculacionLabels: string[] = [];
@@ -43,27 +44,21 @@ export class GestionContratistasComponent implements OnInit, OnDestroy {
   totalVehiculos = 0;
   conDesplazamientos = 0;
 
-  private destroy$ = new Subject<void>();
-
-  ngOnInit() {
-    this._auth.authState
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(user => {
-        if (!user) return;
-        const nit = user.displayName;
-        const periodo = this._auth.periodo();
-        const path = `Empresas/${nit}/periodos/${periodo}/006-diagnostico-contratistas`;
-        const q: Models.Firebases.whereQuery[] = [['estado', '==', 'Activo']];
-
-        this._firestore
-          .getDocumentsQueryChanges<any>(path, q)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe(res => {
-            this.contratistas = res;
-            this._calcularGraficas(res);
-            this.cargando = false;
-          });
-      });
+  async ngOnInit() {
+    // Se espera a que Firebase resuelva la sesion: en una recarga en frio
+    // todavia no hay NIT y la ruta saldria mal formada.
+    if (!await this._auth.waitForUser()) return;
+    try {
+      const datos = await this._datos.todos<any>('contratistas');
+      this.contratistas = datos;
+      this._calcularGraficas(datos);
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'No se pudieron cargar los datos';
+      console.error('[GestionContratistas] cargar:', error);
+      this.error = msg;
+    } finally {
+      this.cargando = false;
+    }
   }
 
   private _calcularGraficas(data: any[]) {
@@ -114,8 +109,4 @@ export class GestionContratistasComponent implements OnInit, OnDestroy {
     }, {} as Record<string, number>);
   }
 
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
 }
