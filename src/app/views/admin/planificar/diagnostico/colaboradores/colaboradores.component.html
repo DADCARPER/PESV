@@ -13,11 +13,10 @@
                   <iconify-icon icon="hugeicons:plus-sign-square" width="18" height="18" class="pr-2 "></iconify-icon> Nuevo
               </div>
             </button>
-            <a href="assets/documentacion/006_diagnostico/PlantillaColaboradores.xlsx" download="PlantillaColaboradores.xlsx" class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none  mb-1 ease-linear transition-all duration-150" type="button">
-                <div class="flex items-center">
-                    <iconify-icon icon="hugeicons:plus-sign-square" width="18" height="18" class="pr-2 "></iconify-icon> Plantilla
-                </div>
-            </a>
+            <!-- La plantilla se descarga desde el modal de Importar, que la
+                 genera a partir de las columnas que la importacion espera. Un
+                 archivo suelto en assets se queda desfasado en cuanto cambia
+                 un campo y la importacion lo rechaza sin que se entienda. -->
             <button (click)="modalImportar.abrirModal()" class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none  mb-1 ease-linear transition-all duration-150" type="button">
                 <div class="flex items-center">
                     <iconify-icon icon="hugeicons:plus-sign-square" width="18" height="18" class="pr-2 "></iconify-icon> Importar

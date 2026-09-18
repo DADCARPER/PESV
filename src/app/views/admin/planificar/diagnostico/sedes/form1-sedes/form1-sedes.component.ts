@@ -37,10 +37,12 @@ export class Form1SedesComponent {
       email: ['', [Validators.required, Validators.email]],
       responsable: ['', [Validators.required, Validators.maxLength(80)]],
       cargoresponsable: ['', [Validators.maxLength(80)]],
-      totalempleados: [0, [Validators.max(999)]],
-      totalconductores: [0, [Validators.maxLength(999)]],
-      totalasignados: [0, [Validators.max(999)]],
-      totaloperacion: [0, [Validators.max(999)]],
+      // Sin tope superior: hay sedes con miles de empleados y de vehiculos.
+      // El unico limite real es que una cuenta no puede ser negativa.
+      totalempleados: [0, [Validators.min(0)]],
+      totalconductores: [0, [Validators.min(0)]],
+      totalasignados: [0, [Validators.min(0)]],
+      totaloperacion: [0, [Validators.min(0)]],
       direccion: ['', [Validators.maxLength(120)]],
       departamento: ['', [Validators.required, Validators.maxLength(50)]],
       ciudad: ['', [Validators.maxLength(50)]]
@@ -102,10 +104,47 @@ export class Form1SedesComponent {
 
       
     }else{
-      //console.log('Formulario inválido', this.registroForm.value.email);
-      this._alerta.showWarning('Por favor, completa el formulario correctamente.');
+      // Decir que hay algo mal sin decir donde obliga a ir campo por campo
+      // adivinando. Se nombran los que fallan y se marcan en rojo.
+      this.agregarsedeForm.markAllAsTouched();
+      const faltan = this.camposInvalidos();
+      this._alerta.showWarning(
+        faltan.length
+          ? `Revisa estos campos: ${faltan.join(', ')}.`
+          : 'Por favor, completa el formulario correctamente.'
+      );
     }
-    
+
+  }
+
+  /** Nombre legible de cada campo, para poder nombrarlo en los avisos. */
+  private static readonly ETIQUETAS: Record<string, string> = {
+    nombreSede: 'Nombre de la sede',
+    tiposede: 'Tipo de sede',
+    telefono: 'Teléfono',
+    email: 'Correo',
+    responsable: 'Responsable',
+    cargoresponsable: 'Cargo del responsable',
+    totalempleados: 'Total empleados',
+    totalconductores: 'Total conductores',
+    totalasignados: 'Vehículos asignados',
+    totaloperacion: 'Años en operación',
+    direccion: 'Dirección',
+    departamento: 'Departamento',
+    ciudad: 'Ciudad',
+  };
+
+  /** Los campos que impiden guardar, con su nombre tal como se ve en pantalla. */
+  private camposInvalidos(): string[] {
+    return Object.keys(this.agregarsedeForm.controls)
+      .filter((campo) => this.agregarsedeForm.get(campo)?.invalid)
+      .map((campo) => Form1SedesComponent.ETIQUETAS[campo] ?? campo);
+  }
+
+  /** El campo falla y el usuario ya pasó por él: se puede marcar en rojo. */
+  invalido(campo: string): boolean {
+    const control = this.agregarsedeForm.get(campo);
+    return !!control && control.invalid && control.touched;
   }
 
   // Método para manejar el clic en "Cancelar"

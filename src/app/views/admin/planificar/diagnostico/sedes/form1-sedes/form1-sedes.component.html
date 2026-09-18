@@ -23,14 +23,14 @@
             <div class="space-y-2">
               <label for="nombreSede" class="block text-sm font-medium text-gray-700">Nombre Sede *</label>
               <input type="text" id="nombreSede" formControlName="nombreSede" name="nombreSede" placeholder="" required
-                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                class="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" [ngClass]="invalido('nombreSede') ? 'border-red-400 bg-red-50' : 'border-gray-300'">
             </div>
         </div>
         <div class="w-full lg:w-6/12 px-2">
           <div class="space-y-2">
             <label for="tiposede" class="block text-sm font-medium text-gray-700">Tipo de Sede *</label>
             <select id="tiposede" formControlName="tiposede" name="tiposede" required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              class="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" [ngClass]="invalido('tiposede') ? 'border-red-400 bg-red-50' : 'border-gray-300'">
               <option value="">Seleccionar tipo sede</option>
               <option value="Principal - Sede Matriz">Principal - Sede Matriz</option>
               <option value="Operativa - Centro de Operaciones">Operativa - Centro de Operaciones</option>
@@ -47,14 +47,14 @@
           <div class="space-y-2">
             <label for="telefono" class="block text-sm font-medium text-gray-700">Numero telefonico principal</label>
             <input type="text" id="telefono" formControlName="telefono" name="telefono" placeholder="" required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              class="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" [ngClass]="invalido('telefono') ? 'border-red-400 bg-red-50' : 'border-gray-300'">
           </div>
         </div>
         <div class="w-full lg:w-6/12 px-2">
           <div class="space-y-2">
             <label for="email" class="block text-sm font-medium text-gray-700">Email de la Sede</label>
             <input type="text" id="email" formControlName="email" name="email" placeholder="" required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              class="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" [ngClass]="invalido('email') ? 'border-red-400 bg-red-50' : 'border-gray-300'">
           </div>
         </div>
       </div>
@@ -66,7 +66,7 @@
             <div class="space-y-2">
               <label for="responsable" class="block text-sm font-medium text-gray-700">Responsable de la Sede</label>
               <input type="text" id="responsable" formControlName="responsable" name="responsable" placeholder="" required
-                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                class="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" [ngClass]="invalido('responsable') ? 'border-red-400 bg-red-50' : 'border-gray-300'">
             </div>
         </div>
         <div class="w-full lg:w-6/12 px-2">
@@ -82,28 +82,28 @@
         <div class="w-full lg:w-3/12 px-2">
           <div class="space-y-2">
           <label for="totalempleados" class="block text-sm font-medium text-gray-700">Total Empleados</label>
-          <input type="number" id="totalempleados" formControlName="totalempleados" name="totalempleados" placeholder="0" min="0" max="999" 
+          <input type="number" id="totalempleados" formControlName="totalempleados" name="totalempleados" placeholder="0" min="0" 
             class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
           </div>
         </div>
         <div class="w-full lg:w-3/12 px-2">
           <div class="space-y-2">
           <label for="totalconductores" class="block text-sm font-medium text-gray-700">Total Conductores</label>
-          <input type="number" id="totalconductores" formControlName="totalconductores" name="totalconductores" placeholder="0" min="0" max="999" 
+          <input type="number" id="totalconductores" formControlName="totalconductores" name="totalconductores" placeholder="0" min="0" 
             class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
           </div>
         </div>
         <div class="w-full lg:w-3/12 px-2">
           <div class="space-y-2">
           <label for="totalasignados" class="block text-sm font-medium text-gray-700">Vehículos Asignados</label>
-          <input type="number" id="totalasignados" formControlName="totalasignados" name="totalasignados" placeholder="0" min="0" max="999" 
+          <input type="number" id="totalasignados" formControlName="totalasignados" name="totalasignados" placeholder="0" min="0" 
             class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
           </div>
         </div>
         <div class="w-full lg:w-3/12 px-2">
           <div class="space-y-2">
           <label for="totaloperacion" class="block text-sm font-medium text-gray-700">Total Años en Operación</label>
-          <input type="number" id="totaloperacion" formControlName="totaloperacion" name="totaloperacion" placeholder="0" min="0" max="999" 
+          <input type="number" id="totaloperacion" formControlName="totaloperacion" name="totaloperacion" placeholder="0" min="0" 
             class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
           </div>
         </div>
@@ -124,7 +124,7 @@
             <div class="space-y-2">
               <label for="departamento" class="block text-sm font-medium text-gray-700">Departamento</label>
               <select id="departamento" formControlName="departamento" name="departamento" required
-                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                class="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" [ngClass]="invalido('departamento') ? 'border-red-400 bg-red-50' : 'border-gray-300'">
                 <option value="">Seleccionar departamento</option>
                 <option value="Amazonas">Amazonas</option>
                 <option value="Antioquia">Antioquia</option>

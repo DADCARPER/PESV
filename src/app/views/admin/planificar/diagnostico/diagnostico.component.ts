@@ -19,8 +19,6 @@ import { ResultadosEncuestaComponent } from './resultados-encuesta/resultados-en
 // Componentes reutilizables
 import { CardStats2Component } from '../../../../components/cards/card-stats2/card-stats2.component';
 import { CardsMedicionBarraProgresoComponent } from '../../../../components/cards/cards-medicion-barra-progreso/cards-medicion-barra-progreso.component';
-import { CrearColaboradoresComponent } from '../../../../components/modals/crear-colaboradores/crear-colaboradores.component';
-import { ImportarColaboradoresComponent } from '../../../../components/modals/importar-colaboradores/importar-colaboradores.component';
 import { LoadingComponent } from '../../../../components/loading/loading/loading.component';
 
 // Servicios
@@ -56,7 +54,6 @@ const SECCION_POR_PESTANA: Record<number, SeccionDiagnostico> = {
     VehiculosComponent, RutasFrecuentesComponent, PlanEmergenciasComponent,
     ResultadosEncuestaComponent,
     CardStats2Component, CardsMedicionBarraProgresoComponent,
-    CrearColaboradoresComponent, ImportarColaboradoresComponent,
     LoadingComponent,
   ],
   templateUrl: './diagnostico.component.html',
