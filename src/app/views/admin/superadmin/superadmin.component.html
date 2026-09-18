@@ -10,7 +10,7 @@
           type="button">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" /></svg>
         </button>
-        <h6 class="text-white text-xl font-bold">Empresas y usuarios</h6>
+        <h6 class="text-white text-xl font-bold">Administración</h6>
       </div>
 
       <div class="flex items-center gap-2">
@@ -40,6 +40,23 @@
         </div>
       </div>
     </div>
+
+    <!-- Menú del panel. Crece por secciones: aqui van las opciones que no
+         pertenecen a una empresa concreta sino a la plataforma. -->
+    <nav class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-white/10 pt-3">
+      <a [routerLink]="['/superadmin']"
+        class="rounded bg-white/15 px-2 py-1 text-xs font-bold uppercase tracking-wider text-white">
+        Empresas y usuarios
+      </a>
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold uppercase tracking-wider text-white/40">Diagnóstico</span>
+        <span class="text-white/30">›</span>
+        <a [routerLink]="['/superadmin/encuestas']"
+          class="text-xs font-bold uppercase tracking-wider text-white/70 transition-colors hover:text-white">
+          Gestor de encuestas
+        </a>
+      </div>
+    </nav>
   </div>
 
   <div class="flex-auto px-4 lg:px-10 py-8">

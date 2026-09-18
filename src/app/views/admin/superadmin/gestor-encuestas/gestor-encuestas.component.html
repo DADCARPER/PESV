@@ -1,0 +1,315 @@
+<div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
+
+  <!-- ── Cabecera y menú ──────────────────────────────────────────────────── -->
+  <div class="rounded-t bg-color3 mb-0 px-6 py-6">
+    <div class="flex items-center justify-between gap-3">
+      <h6 class="text-white text-xl font-bold">Administración</h6>
+
+      <div class="flex items-center gap-2">
+        @if (correo) {
+          <span class="hidden text-xs text-white/70 lg:block" [title]="correo">{{ correo }}</span>
+        }
+        <button type="button" (click)="salir()" title="Cerrar sesión"
+          class="rounded border border-white/40 px-3 py-1.5 text-xs font-bold uppercase text-white transition-colors duration-150 hover:bg-red-600 hover:border-red-600">
+          <span class="flex items-center gap-1.5">
+            <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Salir
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <nav class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-white/10 pt-3">
+      <a [routerLink]="['/superadmin']"
+        class="text-xs font-bold uppercase tracking-wider text-white/70 transition-colors hover:text-white">
+        Empresas y usuarios
+      </a>
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold uppercase tracking-wider text-white/40">Diagnóstico</span>
+        <span class="text-white/30">›</span>
+        <a [routerLink]="['/superadmin/encuestas']"
+          class="rounded bg-white/15 px-2 py-1 text-xs font-bold uppercase tracking-wider text-white">
+          Gestor de encuestas
+        </a>
+      </div>
+    </nav>
+  </div>
+
+  <div class="flex-auto px-4 lg:px-10 py-8">
+
+    @if (aviso()) {
+      <div class="mb-6 flex items-start gap-3 rounded-lg border border-green-200 bg-green-50 p-4">
+        <i class="fas fa-check-circle mt-0.5 text-green-600" aria-hidden="true"></i>
+        <p class="text-sm font-medium text-green-800">{{ aviso() }}</p>
+      </div>
+    }
+
+    @if (error()) {
+      <div class="mb-6 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4">
+        <i class="fas fa-exclamation-triangle mt-0.5 text-red-600" aria-hidden="true"></i>
+        <p class="text-sm text-red-800">{{ error() }}</p>
+      </div>
+    }
+
+    @if (cargando()) {
+      <div class="space-y-3">
+        @for (n of [1,2]; track n) {
+          <div class="h-24 rounded-xl bg-gray-100 animate-pulse"></div>
+        }
+      </div>
+
+    } @else {
+
+    @if (edicion(); as encuesta) {
+
+      <!-- ── Editor ─────────────────────────────────────────────────────── -->
+      <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <button type="button" (click)="cerrar()"
+          class="text-sm font-medium text-gray-500 hover:text-gray-900">
+          ‹ Volver a la lista
+        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" (click)="guardar(false)" [disabled]="guardando()"
+            class="rounded border border-gray-300 px-4 py-2 text-xs font-bold uppercase text-gray-700 transition-colors hover:bg-gray-100 disabled:opacity-50">
+            {{ guardando() ? 'Guardando...' : 'Guardar borrador' }}
+          </button>
+          <button type="button" (click)="guardar(true)" [disabled]="guardando()"
+            title="Sube la versión y la deja disponible para las empresas"
+            class="rounded bg-color1 px-4 py-2 text-xs font-bold uppercase text-white shadow transition-opacity hover:opacity-90 disabled:opacity-50">
+            Publicar
+          </button>
+        </div>
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2 mb-8">
+        <div>
+          <label class="block text-xs font-bold uppercase text-gray-600 mb-2">Nombre</label>
+          <input type="text" [(ngModel)]="encuesta.nombre"
+            class="w-full rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-color4">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-gray-600 mb-2">Estado</label>
+          <div class="flex items-center gap-3 rounded border border-gray-200 bg-gray-50 px-3 py-2">
+            <span class="text-sm font-medium text-gray-700">{{ encuesta.estado }}</span>
+            <span class="text-xs text-gray-500">versión {{ encuesta.version }}</span>
+          </div>
+          <p class="mt-1 text-xs text-gray-500">La versión sube al publicar; las respuestas guardan con cuál se contestaron.</p>
+        </div>
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-bold uppercase text-gray-600 mb-2">Descripción</label>
+          <textarea rows="2" [(ngModel)]="encuesta.descripcion"
+            class="w-full rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-color4"></textarea>
+        </div>
+      </div>
+
+      @if (problemas().length) {
+        <div class="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <p class="font-semibold text-amber-900 mb-2">Falta algo antes de publicar</p>
+          <ul class="list-disc pl-5 text-sm text-amber-800 space-y-1">
+            @for (p of problemas(); track p) { <li>{{ p }}</li> }
+          </ul>
+        </div>
+      }
+
+      <!-- ── Módulos ────────────────────────────────────────────────────── -->
+      <div class="space-y-3">
+        @for (modulo of encuesta.modulos; track modulo.id; let iModulo = $index) {
+          <div class="rounded-xl border border-gray-200 overflow-hidden">
+
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-gray-50 px-4 py-3">
+              <button type="button" (click)="alternarModulo(modulo.id)"
+                class="flex items-center gap-2 text-left">
+                <span class="text-gray-400">{{ estaDesplegado(modulo.id) ? '▾' : '▸' }}</span>
+                <span class="font-semibold text-gray-900">{{ modulo.titulo || 'Sin título' }}</span>
+                <span class="rounded-full bg-gray-200 px-2 py-0.5 text-xs font-medium text-gray-600">
+                  {{ modulo.preguntas.length }} preguntas
+                </span>
+                @if (modulo.fijo) {
+                  <span class="rounded-full bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-700"
+                    title="Identifica a quien responde: no se puede desactivar">fijo</span>
+                }
+              </button>
+
+              @if (!modulo.fijo) {
+                <button type="button" (click)="quitarModulo(iModulo)"
+                  class="text-xs font-semibold text-red-600 hover:underline">Eliminar módulo</button>
+              }
+            </div>
+
+            @if (estaDesplegado(modulo.id)) {
+              <div class="px-4 py-4 space-y-4">
+
+                <div class="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Título del módulo</label>
+                    <input type="text" [(ngModel)]="modulo.titulo"
+                      class="w-full rounded border border-gray-300 px-3 py-2 text-sm">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Descripción</label>
+                    <input type="text" [(ngModel)]="modulo.descripcion"
+                      class="w-full rounded border border-gray-300 px-3 py-2 text-sm">
+                  </div>
+                </div>
+
+                <!-- ── Preguntas ────────────────────────────────────────── -->
+                @for (pregunta of modulo.preguntas; track pregunta.id; let iPregunta = $index) {
+                  <div class="rounded-lg border border-gray-200 p-4">
+
+                    <div class="flex items-start justify-between gap-3 mb-3">
+                      <span class="mt-2 text-xs font-mono text-gray-400">{{ iPregunta + 1 }}</span>
+                      <div class="flex items-center gap-1">
+                        <button type="button" (click)="moverPregunta(modulo, iPregunta, -1)"
+                          title="Subir" class="rounded px-2 py-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700">↑</button>
+                        <button type="button" (click)="moverPregunta(modulo, iPregunta, 1)"
+                          title="Bajar" class="rounded px-2 py-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700">↓</button>
+                        <button type="button" (click)="quitarPregunta(modulo, iPregunta)"
+                          title="Eliminar" class="rounded px-2 py-1 text-red-400 hover:bg-red-50 hover:text-red-700">✕</button>
+                      </div>
+                    </div>
+
+                    <div class="grid gap-3 sm:grid-cols-2">
+                      <div class="sm:col-span-2">
+                        <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Enunciado</label>
+                        <input type="text" [(ngModel)]="pregunta.etiqueta"
+                          class="w-full rounded border border-gray-300 px-3 py-2 text-sm">
+                      </div>
+
+                      <div class="sm:col-span-2">
+                        <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Aclaración</label>
+                        <input type="text" [(ngModel)]="pregunta.ayuda" placeholder="Opcional"
+                          class="w-full rounded border border-gray-300 px-3 py-2 text-sm">
+                      </div>
+
+                      <div>
+                        <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Tipo</label>
+                        <select [(ngModel)]="pregunta.tipo" (ngModelChange)="alCambiarTipo(pregunta)"
+                          class="w-full rounded border border-gray-300 px-3 py-2 text-sm">
+                          @for (t of tipos; track t) {
+                            <option [value]="t">{{ nombreTipo[t] }}</option>
+                          }
+                        </select>
+                      </div>
+
+                      <div>
+                        <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Identificador</label>
+                        <input type="text" [(ngModel)]="pregunta.id"
+                          class="w-full rounded border border-gray-300 px-3 py-2 text-sm font-mono">
+                        <p class="mt-1 text-xs text-gray-500">Clave con la que se guarda la respuesta. Cambiarla deja atrás las ya recogidas.</p>
+                      </div>
+
+                      <div class="sm:col-span-2 flex flex-wrap items-center gap-6">
+                        <label class="flex items-center gap-2 text-sm text-gray-700">
+                          <input type="checkbox" [(ngModel)]="pregunta.obligatoria" class="h-4 w-4">
+                          Obligatoria
+                        </label>
+                        <div class="flex items-center gap-2">
+                          <label class="text-xs font-bold uppercase text-gray-600">Alimenta el campo</label>
+                          <input type="text" [(ngModel)]="pregunta.mapaColaborador" placeholder="ninguno"
+                            class="w-44 rounded border border-gray-300 px-2 py-1 text-sm font-mono">
+                        </div>
+                      </div>
+
+                      @if (llevaOpciones(pregunta)) {
+                        <div class="sm:col-span-2">
+                          <label class="block text-xs font-bold uppercase text-gray-600 mb-2">Opciones</label>
+                          <div class="space-y-2">
+                            @for (opcion of pregunta.opciones; track opcion; let iOpcion = $index) {
+                              <div class="flex items-center gap-2">
+                                <input type="text" [(ngModel)]="opcion.etiqueta" placeholder="Lo que lee el encuestado"
+                                  (ngModelChange)="alEscribirEtiquetaOpcion(opcion, opcion.valor)"
+                                  class="flex-1 rounded border border-gray-300 px-3 py-1.5 text-sm">
+                                <input type="text" [(ngModel)]="opcion.valor" placeholder="Valor guardado"
+                                  class="w-48 rounded border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm font-mono">
+                                <button type="button" (click)="quitarOpcion(pregunta, iOpcion)"
+                                  class="rounded px-2 py-1 text-red-400 hover:bg-red-50 hover:text-red-700">✕</button>
+                              </div>
+                            }
+                          </div>
+                          <button type="button" (click)="anadirOpcion(pregunta)"
+                            class="mt-2 text-xs font-semibold text-color1 hover:underline">+ Añadir opción</button>
+                        </div>
+                      }
+
+                      @if (pregunta.condicion) {
+                        <div class="sm:col-span-2 rounded border border-sky-100 bg-sky-50 px-3 py-2 text-xs text-sky-800">
+                          Solo se muestra si <strong>{{ pregunta.condicion.pregunta }}</strong>
+                          es <strong>{{ pregunta.condicion.valores.join(' o ') }}</strong>.
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+
+                <button type="button" (click)="anadirPregunta(modulo)"
+                  class="w-full rounded-lg border border-dashed border-gray-300 py-3 text-sm font-semibold text-gray-500 hover:border-color1 hover:text-color1">
+                  + Añadir pregunta
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <button type="button" (click)="anadirModulo()"
+        class="mt-4 w-full rounded-xl border border-dashed border-gray-300 py-4 text-sm font-semibold text-gray-500 hover:border-color1 hover:text-color1">
+        + Añadir módulo
+      </button>
+
+    } @else {
+
+      <!-- ── Lista ──────────────────────────────────────────────────────── -->
+      @if (!hayEncuestas()) {
+        <div class="flex flex-col items-center justify-center py-16 gap-5 text-center">
+          <p class="text-xl font-bold text-gray-800">Todavía no hay encuestas</p>
+          <p class="max-w-md text-gray-500">
+            La encuesta de la Resolución 40595 está escrita en el código. Tráela aquí
+            para poder editarla sin tocar la aplicación.
+          </p>
+          <button type="button" (click)="traerBase()" [disabled]="guardando()"
+            class="rounded bg-color1 px-6 py-3 text-sm font-bold uppercase text-white shadow transition-opacity hover:opacity-90 disabled:opacity-50">
+            {{ guardando() ? 'Cargando...' : 'Traer la encuesta de la Resolución' }}
+          </button>
+        </div>
+
+      } @else {
+        <div class="space-y-4">
+          @for (encuesta of lista(); track encuesta.id) {
+            <div class="flex flex-wrap items-start justify-between gap-4 rounded-xl border border-gray-200 p-5">
+              <div class="min-w-0">
+                <p class="text-lg font-bold text-gray-900">{{ encuesta.nombre }}</p>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ encuesta.descripcion }}</p>
+                <div class="mt-2 flex flex-wrap items-center gap-2">
+                  <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold"
+                    [ngClass]="encuesta.estado === 'publicada'
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : encuesta.estado === 'borrador' ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-600'">
+                    {{ encuesta.estado }}
+                  </span>
+                  <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700">
+                    versión {{ encuesta.version }}
+                  </span>
+                  <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700">
+                    {{ encuesta.modulos.length }} módulos · {{ totalPreguntas(encuesta) }} preguntas
+                  </span>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-2">
+                <button type="button" (click)="abrir(encuesta)"
+                  class="whitespace-nowrap rounded border border-sky-500 px-3 py-1.5 text-xs font-semibold text-sky-700 transition-colors hover:bg-sky-500 hover:text-white">
+                  Editar
+                </button>
+                <button type="button" (click)="duplicar(encuesta)" [disabled]="guardando()"
+                  title="Copia como borrador, para cambiarla sin tocar la que están usando las empresas"
+                  class="whitespace-nowrap rounded border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-100 disabled:opacity-50">
+                  Duplicar
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+    }
+  </div>
+</div>

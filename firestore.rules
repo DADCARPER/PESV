@@ -49,6 +49,17 @@ service cloud.firestore {
     }
 
     /**
+     * Administra la plataforma.
+     *
+     * El claim `superadmin` lo concede la Cloud Function desde una lista
+     * blanca del servidor, nunca desde el documento del usuario, que el propio
+     * usuario puede escribir.
+     */
+    function esSuperadmin() {
+      return autenticado() && 'rol' in claims() && claims().rol == 'superadmin';
+    }
+
+    /**
      * Puede modificar los datos del PESV.
      *
      * El supervisor revisa sin modificar. Se compara por "distinto de
@@ -91,6 +102,17 @@ service cloud.firestore {
         allow read: if esDeLaEmpresa(nitempresa);
         allow create, update, delete: if puedeEditar(nitempresa);
       }
+    }
+
+    // ── Catalogo de encuestas ───────────────────────────────────────────────
+    // Las preguntas las fija la norma y valen para todas las empresas, asi que
+    // el catalogo es del sistema y solo lo edita el superadministrador.
+    //
+    // Leer es abierto porque el formulario publico se construye a partir de
+    // estas definiciones, y lo rellena gente sin cuenta.
+    match /Encuestas/{encuestaId} {
+      allow read: if true;
+      allow create, update, delete: if esSuperadmin();
     }
 
     // ── Encuestas publicas ──────────────────────────────────────────────────

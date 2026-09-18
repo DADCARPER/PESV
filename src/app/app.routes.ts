@@ -36,6 +36,7 @@ import { ObjetivosMetasComponent } from './views/admin/planificar/objetivos-meta
 import { PerfilComponent } from './views/admin/perfil/perfil.component';
 import { EmpresaComponent } from './views/admin/empresa/empresa.component';
 import { SuperadminComponent } from './views/admin/superadmin/superadmin.component';
+import { GestorEncuestasComponent } from './views/admin/superadmin/gestor-encuestas/gestor-encuestas.component';
 import { RestoreComponent } from './views/auth/restore/restore.component';
 import { FirmasComponent } from './views/admin/firmas/firmas.component';
 import { HacerComponent } from './views/admin/hacer/hacer.component';
@@ -210,6 +211,7 @@ export const routes: Routes = [
   // porque no pertenece a ninguna empresa y onboardingGuard, que exige nivel
   // PESV, lo desviaria al cuestionario inicial.
   { path: "superadmin", component: SuperadminComponent, canActivate: [authGuard, superadminGuard] },
+  { path: "superadmin/encuestas", component: GestorEncuestasComponent, canActivate: [authGuard, superadminGuard] },
 
   // Onboarding: exige sesion, se llega tras registro o con nivelAcceso === "no"
   { path: "starting", component: InicioComponent, canActivate: [authGuard, onboardingCompletadoGuard] },
