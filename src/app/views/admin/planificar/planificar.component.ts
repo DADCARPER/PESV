@@ -5,6 +5,7 @@ import { NivelPesvService } from '../../../services/shared/nivel-pesv.service';
 import { EstatusGeneralService } from '../../../services/shared/estatus-general.service';
 import { CommonModule } from '@angular/common';
 import { AuthenticacionService } from '../../../services/shared/authenticacion.service';
+import { EmpresaService } from '../../../services/shared/empresa.service';
 import { FirestoreService } from '../../../services/shared/firestore.service';
 import { StorageService } from '../../../services/shared/storage.service';
 import { AlertaService } from '../../../services/shared/alerta.service';
@@ -27,12 +28,16 @@ export class PlanificarComponent implements OnInit {
 
   
   private _authcations = inject(AuthenticacionService);
+  private _empresaSrv = inject(EmpresaService);
   private _firestore = inject(FirestoreService);
   private _storage = inject(StorageService)
   public _alerta = inject (AlertaService);
 
   nit = this._authcations.getCurrentUser().displayName; //NIT DE LA EMPRESA ACTUAL
-  empresa = this._authcations.getCurrentUser().photoURL; // NOMBRE DE LA EMREPSA
+  /** Razon social, leida de Empresas/{nit} y no de photoURL de Auth. */
+  get empresa(): string {
+    return this._empresaSrv.nombre();
+  }
   uid = this._authcations.getCurrentUser().uid; //UID UNICO
 
   estatusGeneral: Partial<Models.Procesos.ProcesosCarga> = {};

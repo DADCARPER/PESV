@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { EditorComponent, ContenidoEditor } from "../../../../../components/editor/editor.component";
 import { AuthenticacionService } from '../../../../../services/shared/authenticacion.service';
+import { EmpresaService } from '../../../../../services/shared/empresa.service';
 import { AlertaInformativoComponent } from "../../../../../components/alertas/alerta-informativo/alerta-informativo.component";
 import { AlertaService } from '../../../../../services/shared/alerta.service';
 
@@ -23,11 +24,19 @@ interface Plantilla {
 export class CrearDocumentoLiderazgoComponent {
 
   private _auth = inject(AuthenticacionService);
+  private _empresaSrv = inject(EmpresaService);
   /** Público: la plantilla pinta los avisos del editor (documento vacío, logo). */
   public _alerta = inject(AlertaService);
 
-  /** En Firebase Auth el NIT va en displayName y el nombre de la empresa en photoURL. */
-  readonly empresa = this._auth.getCurrentUser()?.photoURL || '[Nombre de la empresa]';
+  /**
+   * La razon social sale de Empresas/{nit}, no de photoURL de Auth: ese campo
+   * es para una URL de foto y el Admin SDK lo rechaza si no lo es.
+   * El NIT si vive en displayName, que admite cualquier texto.
+   */
+  get empresa(): string {
+    return this._empresaSrv.nombre() || '[Nombre de la empresa]';
+  }
+
   readonly nit = this._auth.getCurrentUser()?.displayName || '[NIT de la empresa]';
 
   public contenido: ContenidoEditor | null = null;

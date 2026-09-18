@@ -5,6 +5,7 @@ import { HeaderStatsComponent } from "../../components/headers/header-stats/head
 import { FooterAdminComponent } from "../../components/footers/footer-admin/footer-admin.component";
 import { RouterOutlet } from "@angular/router";
 import { RolUsuarioService } from "../../services/shared/rol-usuario.service";
+import { EmpresaService } from "../../services/shared/empresa.service";
 
 @Component({
   selector: "app-admin",
@@ -17,10 +18,14 @@ export class AdminComponent implements OnInit {
   @Input() muestramestats: boolean = false;
 
   private _rol = inject(RolUsuarioService);
+  private _empresa = inject(EmpresaService);
 
   ngOnInit(): void {
     // Se carga una vez para toda la zona de administracion: el rol decide que
     // acciones se muestran, y pedirlo en cada modulo seria repetirlo.
     this._rol.cargar();
+    // La razon social alimenta las plantillas de documentos: se carga una vez
+    // aqui en lugar de que cada modulo la pida por su cuenta.
+    this._empresa.cargar();
   }
 }

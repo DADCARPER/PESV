@@ -1,0 +1,240 @@
+<div class="flex flex-wrap mt-4">
+  <div class="w-full lg:w-9/12 px-4">
+
+    <div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
+
+      <div class="rounded-t bg-amber-400 mb-0 px-6 py-6">
+        <div class="text-center flex">
+          <button
+            [routerLink]="['/admin/dashboard']"
+            title="Volver al inicio"
+            class="bg-red-600 text-white active:bg-red-700 font-bold uppercase text-xs px-1 py-1 rounded shadow hover:shadow-md outline-none focus:outline-none mr-2 ease-linear transition-all duration-150"
+            type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" /></svg>
+          </button>
+          <h6 class="text-blueGray-700 text-xl font-bold">Datos de la empresa</h6>
+        </div>
+      </div>
+
+      <div class="flex-auto px-4 lg:px-10 py-8">
+
+        <p class="text-sm text-gray-600 mb-6">
+          Estos datos son de la organización y los comparten todos sus usuarios.
+          <strong>Aparecen impresos en las actas</strong> que generan los asistentes de los
+          primeros pasos del PESV.
+        </p>
+
+        @if (!tieneEmpresa) {
+          <div class="mb-6 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
+            <iconify-icon icon="hugeicons:alert-02" width="20" height="20" class="mt-0.5 shrink-0 text-amber-600"></iconify-icon>
+            <div>
+              <p class="font-semibold text-amber-900">Tu cuenta no pertenece a ninguna empresa</p>
+              <p class="mt-1 text-sm text-amber-800">
+                Esta pantalla es para los usuarios de una empresa. Si administras la
+                plataforma, gestiona las empresas desde el
+                <a [routerLink]="['/superadmin']" class="font-medium underline">panel de administración</a>.
+              </p>
+            </div>
+          </div>
+        } @else if (!editable) {
+          <div class="mb-6 flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+            <iconify-icon icon="hugeicons:view" width="20" height="20" class="mt-0.5 shrink-0 text-emerald-600"></iconify-icon>
+            <div>
+              <p class="font-semibold text-emerald-900">Estás revisando, no editando</p>
+              <p class="mt-1 text-sm text-emerald-800">
+                Los datos de la empresa los mantiene el usuario operativo.
+              </p>
+            </div>
+          </div>
+        }
+
+        @if (cargando()) {
+          <div class="space-y-4">
+            <div class="h-4 w-48 rounded bg-gray-200 animate-pulse"></div>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div class="h-10 rounded bg-gray-100 animate-pulse"></div>
+              <div class="h-10 rounded bg-gray-100 animate-pulse"></div>
+              <div class="h-10 rounded bg-gray-100 animate-pulse"></div>
+              <div class="h-10 rounded bg-gray-100 animate-pulse"></div>
+            </div>
+          </div>
+        } @else {
+
+          <form [formGroup]="form" (ngSubmit)="guardar()">
+
+            <!-- ── Identificación ───────────────────────────────── -->
+            <p class="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-4">Identificación</p>
+
+            <div class="grid gap-4 sm:grid-cols-2 mb-8">
+              <div>
+                <label class="block text-xs font-bold uppercase text-gray-600 mb-2">NIT</label>
+                <!-- Identifica a la empresa en Firestore, Storage y el claim:
+                     editarlo la dejaria apuntando a datos que no son suyos. -->
+                <div class="flex items-center gap-2 rounded border border-gray-200 bg-gray-100 px-3 py-2">
+                  <iconify-icon icon="hugeicons:security-check" width="16" height="16" class="shrink-0 text-gray-500"></iconify-icon>
+                  <span class="text-sm font-medium text-gray-700">{{ nit() || 'Sin NIT' }}</span>
+                </div>
+                <p class="mt-1 text-xs text-gray-500">No se edita: identifica a tu empresa en todo el sistema.</p>
+              </div>
+
+              <div>
+                <label for="nombreEmpresa" class="block text-xs font-bold uppercase text-gray-600 mb-2">
+                  Razón social <span class="text-red-500">*</span>
+                </label>
+                <input id="nombreEmpresa" type="text" formControlName="nombreEmpresa"
+                  class="w-full rounded border px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400 disabled:bg-gray-100 disabled:text-gray-600"
+                  [ngClass]="invalido('nombreEmpresa') ? 'border-red-400 bg-red-50' : 'border-gray-300'">
+                @if (invalido('nombreEmpresa')) {
+                  <p class="mt-1 text-xs text-red-600">La razón social es obligatoria.</p>
+                } @else {
+                  <p class="mt-1 text-xs text-gray-500">Encabeza cada documento que generes.</p>
+                }
+              </div>
+
+              <div class="sm:col-span-2">
+                <label for="representanteLegal" class="block text-xs font-bold uppercase text-gray-600 mb-2">
+                  Representante legal
+                </label>
+                <input id="representanteLegal" type="text" formControlName="representanteLegal"
+                  class="w-full rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400 disabled:bg-gray-100 disabled:text-gray-600">
+                <p class="mt-1 text-xs text-gray-500">Es quien firma las actas y la política de seguridad vial.</p>
+              </div>
+            </div>
+
+            <!-- ── Contacto ─────────────────────────────────────── -->
+            <p class="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-4">Contacto</p>
+
+            <div class="grid gap-4 sm:grid-cols-2 mb-8">
+              <div>
+                <label for="emailEmpresa" class="block text-xs font-bold uppercase text-gray-600 mb-2">Correo</label>
+                <input id="emailEmpresa" type="email" formControlName="emailEmpresa"
+                  class="w-full rounded border px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400 disabled:bg-gray-100 disabled:text-gray-600"
+                  [ngClass]="invalido('emailEmpresa') ? 'border-red-400 bg-red-50' : 'border-gray-300'">
+                @if (invalido('emailEmpresa')) {
+                  <p class="mt-1 text-xs text-red-600">Ese correo no tiene un formato válido.</p>
+                }
+              </div>
+
+              <div>
+                <label for="telefonoEmpresa" class="block text-xs font-bold uppercase text-gray-600 mb-2">Teléfono</label>
+                <input id="telefonoEmpresa" type="tel" formControlName="telefonoEmpresa"
+                  class="w-full rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400 disabled:bg-gray-100 disabled:text-gray-600">
+              </div>
+            </div>
+
+            <!-- ── Ubicación ────────────────────────────────────── -->
+            <p class="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-4">Ubicación</p>
+
+            <div class="grid gap-4 sm:grid-cols-2 mb-8">
+              <app-comboselect
+                [control]="departamentoControl"
+                [options]="options"
+                label="Departamento"
+                placeholder="Seleccione Departamento"></app-comboselect>
+
+              <app-comboselect
+                [control]="ciudadControl"
+                [options]="ciudades"
+                label="Ciudad"
+                placeholder="Ciudades principales"></app-comboselect>
+
+              <div class="sm:col-span-2">
+                <label for="direccion" class="block text-xs font-bold uppercase text-gray-600 mb-2">Dirección</label>
+                <input id="direccion" type="text" formControlName="direccion"
+                  class="w-full rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400 disabled:bg-gray-100 disabled:text-gray-600">
+              </div>
+            </div>
+
+            <!-- ── Actividad ────────────────────────────────────── -->
+            <p class="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-4">Actividad económica</p>
+
+            <div class="mb-8">
+              <label for="actividadEmpresa" class="block text-xs font-bold uppercase text-gray-600 mb-2">
+                A qué se dedica la empresa
+              </label>
+              <textarea id="actividadEmpresa" formControlName="actividadEmpresa" rows="4"
+                class="w-full rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400 disabled:bg-gray-100 disabled:text-gray-600"></textarea>
+            </div>
+
+            @if (editable) {
+              <div class="flex justify-end">
+                <button type="submit" [disabled]="guardando()"
+                  class="rounded bg-amber-400 px-6 py-2 text-xs font-bold uppercase text-gray-900 shadow hover:bg-amber-300 transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed">
+                  {{ guardando() ? 'Guardando...' : 'Guardar cambios' }}
+                </button>
+              </div>
+            }
+
+          </form>
+        }
+
+      </div>
+    </div>
+  </div>
+</div>
+
+@if (_alerta.showAlert) {
+  <app-alerta-informativo
+    [type]="_alerta.alertType"
+    [message]="_alerta.alertMessage">
+  </app-alerta-informativo>
+}
+
+<!-- ── Verificacion de datos tras el cuestionario inicial ───────────────── -->
+@if (mostrarBienvenida) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50" (click)="cerrarBienvenida()"></div>
+
+    <div class="relative w-full max-w-lg rounded-2xl bg-white shadow-xl"
+         role="dialog" aria-modal="true" aria-labelledby="tituloBienvenida">
+
+      <div class="rounded-t-2xl bg-amber-400 px-6 py-5">
+        <div class="flex items-center gap-3">
+          <span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/90">
+            <i class="fas fa-check text-lg text-amber-600" aria-hidden="true"></i>
+          </span>
+          <div>
+            <h3 id="tituloBienvenida" class="text-lg font-bold text-gray-900">¡Ya tienes tu nivel asignado!</h3>
+            <p class="text-sm text-gray-800">Confirma que los datos de tu empresa estén correctos.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-6 py-5">
+        <p class="text-gray-700 leading-relaxed">
+          Registramos los datos de tu empresa al crear tu cuenta. Revísalos antes de
+          empezar, porque <strong>se imprimen tal cual en las actas</strong> que generes
+          en los primeros pasos del PESV: el acta del líder, la del comité, la política
+          de seguridad vial y la carta de compromiso de la dirección.
+        </p>
+
+        <ul class="mt-4 space-y-2 text-sm text-gray-700">
+          <li class="flex items-start gap-2">
+            <i class="fas fa-building mt-0.5 w-4 text-amber-600" aria-hidden="true"></i>
+            <span><strong>Razón social y NIT</strong>, que encabezan cada documento.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <i class="fas fa-user-tie mt-0.5 w-4 text-amber-600" aria-hidden="true"></i>
+            <span><strong>Representante legal</strong>, que es quien firma.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <i class="fas fa-map-marker-alt mt-0.5 w-4 text-amber-600" aria-hidden="true"></i>
+            <span><strong>Ciudad y departamento</strong>, que las actas piden al pie.</span>
+          </li>
+        </ul>
+
+        <p class="mt-4 text-sm text-gray-500">
+          Si algo no coincide, corrígelo aquí mismo. El NIT no se edita: identifica a tu
+          empresa en todo el sistema.
+        </p>
+      </div>
+
+      <div class="flex justify-end gap-2 border-t border-gray-100 px-6 py-4">
+        <button type="button" (click)="cerrarBienvenida()"
+          class="rounded bg-amber-400 px-5 py-2 text-sm font-bold uppercase text-gray-900 shadow transition-colors duration-150 hover:bg-amber-300">
+          Revisar ahora
+        </button>
+      </div>
+    </div>
+  </div>
+}

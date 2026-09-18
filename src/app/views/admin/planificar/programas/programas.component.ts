@@ -5,6 +5,7 @@ import { FirestoreService } from '../../../../services/shared/firestore.service'
 import { AaDatosDefaultService } from '../../../../services/shared/aa-datos-default.service';
 import { AlertaService } from '../../../../services/shared/alerta.service';
 import { AuthenticacionService } from '../../../../services/shared/authenticacion.service';
+import { EmpresaService } from '../../../../services/shared/empresa.service';
 import { Models } from '../../../../interfaces/models';
 import { FechafirestorePipe, FechaMesAnoPipe } from '../../../../pipes/fechafirestore.pipe';
 import { DetallesActividadComponent } from './detalles-actividad/detalles-actividad.component';
@@ -20,12 +21,16 @@ import { DetallesActividadComponent } from './detalles-actividad/detalles-activi
 export class ProgramasComponent {
 
   private _authcations = inject(AuthenticacionService);
+  private _empresaSrv = inject(EmpresaService);
   private _firestore = inject(FirestoreService);
   private _iniciardatos = inject(AaDatosDefaultService);
   public _alerta = inject(AlertaService);
 
   nit = this._authcations.getCurrentUser().displayName; //NIT DE LA EMPRESA ACTUAL
-  empresa = this._authcations.getCurrentUser().photoURL; // NOMBRE DE LA EMREPSA
+  /** Razon social, leida de Empresas/{nit} y no de photoURL de Auth. */
+  get empresa(): string {
+    return this._empresaSrv.nombre();
+  }
   uid = this._authcations.getCurrentUser().uid; //UID UNICO
 
   // Documentos a mostrar

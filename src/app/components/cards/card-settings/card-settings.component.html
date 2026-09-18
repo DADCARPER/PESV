@@ -9,7 +9,7 @@
         type="button">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" /></svg>
       </button>
-      <h6 class="text-blueGray-700 text-xl font-bold line-clamp-1">Perfil</h6>
+      <h6 class="text-blueGray-700 text-xl font-bold line-clamp-1">Mi perfil</h6>
     </div>
   </div>
 
@@ -26,18 +26,16 @@
           <div class="h-10 rounded bg-gray-100 animate-pulse"></div>
           <div class="h-10 rounded bg-gray-100 animate-pulse"></div>
         </div>
-        <div class="h-4 w-40 rounded bg-gray-200 animate-pulse"></div>
-        <div class="grid gap-4 sm:grid-cols-2">
-          <div class="h-10 rounded bg-gray-100 animate-pulse"></div>
-          <div class="h-10 rounded bg-gray-100 animate-pulse"></div>
-        </div>
       </div>
     } @else {
 
       <form [formGroup]="formPerfil" (ngSubmit)="onSubmit()">
 
-        <!-- ── Datos de la persona ──────────────────────────────── -->
-        <p class="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-4">Tus datos</p>
+        <p class="text-sm text-gray-600 mb-6">
+          Estos son tus datos personales. Los de la empresa, que comparten todos sus
+          usuarios, están en
+          <a [routerLink]="['/admin/empresa']" class="font-medium text-amber-700 hover:underline">Datos de la empresa</a>.
+        </p>
 
         <div class="grid gap-4 sm:grid-cols-2 mb-8">
           <div>
@@ -56,6 +54,7 @@
             <label for="cargoEmpresa" class="block text-xs font-bold uppercase text-gray-600 mb-2">Cargo</label>
             <input id="cargoEmpresa" type="text" formControlName="cargoEmpresa"
               class="w-full rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+            <p class="mt-1 text-xs text-gray-500">Tu cargo dentro de la organización.</p>
           </div>
 
           <div>
@@ -76,82 +75,6 @@
               class="w-full rounded border border-gray-200 bg-gray-100 px-3 py-2 text-sm text-gray-600">
             <p class="mt-1 text-xs text-gray-500">Es el correo con el que inicias sesión. No se edita desde aquí.</p>
           </div>
-        </div>
-
-        <!-- ── Datos de la empresa ──────────────────────────────── -->
-        <p class="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-4">Tu empresa</p>
-
-        <div class="grid gap-4 sm:grid-cols-2 mb-8">
-          <div>
-            <label class="block text-xs font-bold uppercase text-gray-600 mb-2">NIT</label>
-            <!-- El NIT identifica a la empresa en Firestore, Storage y el custom
-                 claim: editarlo aquí dejaría la cuenta apuntando a otros datos. -->
-            <div class="flex items-center gap-2 rounded border border-gray-200 bg-gray-100 px-3 py-2">
-              <iconify-icon icon="hugeicons:security-check" width="16" height="16" class="shrink-0 text-gray-500"></iconify-icon>
-              <span class="text-sm font-medium text-gray-700">{{ nit || 'Sin NIT registrado' }}</span>
-            </div>
-            <p class="mt-1 text-xs text-gray-500">
-              Identifica a tu empresa en todo el sistema. Si necesitas corregirlo, escríbenos.
-            </p>
-          </div>
-
-          <div>
-            <label for="nombreEmpresa" class="block text-xs font-bold uppercase text-gray-600 mb-2">
-              Nombre de la empresa <span class="text-red-500">*</span>
-            </label>
-            <input id="nombreEmpresa" type="text" formControlName="nombreEmpresa"
-              class="w-full rounded border px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-              [ngClass]="invalido('nombreEmpresa') ? 'border-red-400 bg-red-50' : 'border-gray-300'">
-            @if (invalido('nombreEmpresa')) {
-              <p class="mt-1 text-xs text-red-600">Escribe el nombre de la empresa.</p>
-            } @else {
-              <p class="mt-1 text-xs text-gray-500">Aparece en los documentos que genera el asistente.</p>
-            }
-          </div>
-
-          <div>
-            <label for="emailEmpresa" class="block text-xs font-bold uppercase text-gray-600 mb-2">Correo de la empresa</label>
-            <input id="emailEmpresa" type="email" formControlName="emailEmpresa"
-              class="w-full rounded border px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-              [ngClass]="invalido('emailEmpresa') ? 'border-red-400 bg-red-50' : 'border-gray-300'">
-            @if (invalido('emailEmpresa')) {
-              <p class="mt-1 text-xs text-red-600">Ese correo no tiene un formato válido.</p>
-            }
-          </div>
-        </div>
-
-        <!-- ── Ubicación ────────────────────────────────────────── -->
-        <p class="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-4">Ubicación</p>
-
-        <div class="grid gap-4 sm:grid-cols-2 mb-8">
-          <app-comboselect
-            [control]="departamentoControl"
-            [options]="options"
-            label="Departamento"
-            placeholder="Seleccione Departamento"></app-comboselect>
-
-          <app-comboselect
-            [control]="ciudadControl"
-            [options]="ciudades"
-            label="Ciudad"
-            placeholder="Ciudades principales"></app-comboselect>
-
-          <div class="sm:col-span-2">
-            <label for="direccion" class="block text-xs font-bold uppercase text-gray-600 mb-2">Dirección</label>
-            <input id="direccion" type="text" formControlName="direccion"
-              class="w-full rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
-          </div>
-        </div>
-
-        <!-- ── Actividad ────────────────────────────────────────── -->
-        <p class="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-4">Actividad económica</p>
-
-        <div class="mb-8">
-          <label for="actividadEmpresa" class="block text-xs font-bold uppercase text-gray-600 mb-2">
-            A qué se dedica la empresa
-          </label>
-          <textarea id="actividadEmpresa" formControlName="actividadEmpresa" rows="4"
-            class="w-full rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400"></textarea>
         </div>
 
         <div class="flex justify-end">

@@ -10,7 +10,7 @@
           type="button">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" /></svg>
         </button>
-        <h6 class="text-white text-xl font-bold">Administración de usuarios</h6>
+        <h6 class="text-white text-xl font-bold">Empresas y usuarios</h6>
       </div>
 
       <div class="flex items-center gap-2">
@@ -24,6 +24,20 @@
           class="rounded border border-white/40 px-3 py-1.5 text-xs font-bold uppercase text-white transition-colors duration-150 hover:bg-white/10 disabled:opacity-50">
           {{ cargando() ? 'Cargando...' : 'Actualizar' }}
         </button>
+
+        <!-- Este panel vive fuera del layout de admin, asi que no hereda el
+             desplegable de usuario con el cierre de sesion. -->
+        <div class="flex items-center gap-2 border-l border-white/20 pl-2">
+          @if (correo) {
+            <span class="hidden text-xs text-white/70 lg:block" [title]="correo">{{ correo }}</span>
+          }
+          <button type="button" (click)="salir()" title="Cerrar sesión"
+            class="rounded border border-white/40 px-3 py-1.5 text-xs font-bold uppercase text-white transition-colors duration-150 hover:bg-red-600 hover:border-red-600">
+            <span class="flex items-center gap-1.5">
+              <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Salir
+            </span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -49,25 +63,25 @@
 
     @if (cargando()) {
       <div class="space-y-3">
-        @for (n of [1,2,3,4,5]; track n) {
-          <div class="h-12 rounded bg-gray-100 animate-pulse"></div>
+        @for (n of [1,2,3]; track n) {
+          <div class="h-28 rounded-xl bg-gray-100 animate-pulse"></div>
         }
       </div>
     } @else {
 
       <!-- ── Resumen ────────────────────────────────────────────── -->
-      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        <div class="rounded-xl border border-gray-200 p-4">
-          <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Usuarios</p>
-          <p class="mt-1 text-2xl font-bold text-gray-900">{{ usuarios().length }}</p>
-        </div>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <div class="rounded-xl border border-gray-200 p-4">
           <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Empresas</p>
-          <p class="mt-1 text-2xl font-bold text-gray-900">{{ totalEmpresas() }}</p>
+          <p class="mt-1 text-2xl font-bold text-gray-900">{{ empresas().length }}</p>
+        </div>
+        <div class="rounded-xl border border-gray-200 p-4">
+          <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Usuarios</p>
+          <p class="mt-1 text-2xl font-bold text-gray-900">{{ totalUsuarios() }}</p>
         </div>
         <div class="rounded-xl border border-gray-200 p-4">
           <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Operativos</p>
-          <p class="mt-1 text-2xl font-bold text-color4">{{ totalOperativos() }}</p>
+          <p class="mt-1 text-2xl font-bold text-sky-600">{{ totalOperativos() }}</p>
         </div>
         <div class="rounded-xl border border-gray-200 p-4">
           <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Supervisores</p>
@@ -75,116 +89,151 @@
         </div>
       </div>
 
-      <!-- ── Filtros ────────────────────────────────────────────── -->
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center mb-4">
-        <div class="relative flex-1">
-          <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400" aria-hidden="true"></i>
-          <input type="search" [ngModel]="filtro()" (ngModelChange)="filtro.set($event)"
-            placeholder="Buscar por nombre, correo, empresa o NIT"
-            class="w-full rounded border border-gray-300 py-2 pl-9 pr-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-color4">
-        </div>
-
-        <select [ngModel]="filtroRol()" (ngModelChange)="filtroRol.set($event)"
-          class="rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-color4">
-          <option value="">Todos los roles</option>
-          <option value="operativo">Operativos</option>
-          <option value="supervisor">Supervisores</option>
-        </select>
+      <!-- ── Buscador ───────────────────────────────────────────── -->
+      <div class="relative mb-6">
+        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400" aria-hidden="true"></i>
+        <input type="search" [ngModel]="filtro()" (ngModelChange)="filtro.set($event)"
+          placeholder="Buscar por empresa, NIT, nombre o correo"
+          class="w-full rounded border border-gray-300 py-2 pl-9 pr-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-color4">
       </div>
 
-      <!-- ── Tabla ──────────────────────────────────────────────── -->
-      <div class="overflow-x-auto">
-        <table class="w-full min-w-[56rem] border-collapse text-sm">
-          <thead>
-            <tr class="border-b border-gray-200 text-left">
-              <th class="px-3 py-3 text-xs font-bold uppercase tracking-wider text-gray-500">Usuario</th>
-              <th class="px-3 py-3 text-xs font-bold uppercase tracking-wider text-gray-500">Empresa</th>
-              <th class="px-3 py-3 text-xs font-bold uppercase tracking-wider text-gray-500">Rol</th>
-              <th class="px-3 py-3 text-xs font-bold uppercase tracking-wider text-gray-500">Nivel</th>
-              <th class="px-3 py-3 text-xs font-bold uppercase tracking-wider text-gray-500">Último acceso</th>
-              <th class="px-3 py-3"></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (u of usuariosFiltrados(); track u.uid) {
-              <tr class="border-b border-gray-100 hover:bg-gray-50">
-                <td class="px-3 py-3">
-                  <p class="font-medium text-gray-900">{{ u.nombreCompleto || 'Sin nombre' }}</p>
-                  <p class="text-xs text-gray-500">{{ u.email }}</p>
-                  @if (u.cargoEmpresa) {
-                    <p class="text-xs text-gray-400">{{ u.cargoEmpresa }}</p>
-                  }
-                </td>
+      <!-- ── Tarjetas de empresa ────────────────────────────────── -->
+      <div class="space-y-4">
+        @for (e of empresasFiltradas(); track e.nitEmpresa) {
+          <div class="rounded-xl border border-gray-200 overflow-hidden">
 
-                <td class="px-3 py-3">
-                  <p class="text-gray-800">{{ u.nombreEmpresa || '—' }}</p>
-                  <p class="text-xs text-gray-500">{{ u.nitEmpresa || 'Sin NIT' }}</p>
-                </td>
+            <div class="flex flex-wrap items-start justify-between gap-4 p-5">
+              <div class="min-w-0">
+                <p class="text-lg font-bold text-gray-900">{{ e.nombreEmpresa || 'Sin razón social' }}</p>
+                <p class="text-sm text-gray-500">NIT {{ e.nitEmpresa }}</p>
 
-                <td class="px-3 py-3">
-                  <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold"
-                    [ngClass]="u.rol === 'supervisor' ? 'bg-emerald-100 text-emerald-700' : 'bg-sky-100 text-sky-700'">
-                    {{ nombreRol(u.rol) }}
+                <div class="mt-2 flex flex-wrap items-center gap-2">
+                  <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700">
+                    {{ nombreNivel(e.nivelAcceso) }}
                   </span>
-                </td>
+                  <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold"
+                    [ngClass]="cupoAgotado(e) ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-700'">
+                    {{ ocupacion(e) }}
+                  </span>
+                  @if (cupoAgotado(e)) {
+                    <span class="text-xs font-medium text-amber-700">Cupo completo</span>
+                  }
+                </div>
+              </div>
 
-                <td class="px-3 py-3">
-                  <span class="text-gray-700">{{ nombreNivel(u.nivelAcceso) }}</span>
-                </td>
+              <div class="flex flex-wrap items-center gap-2">
+                <button type="button" (click)="abrirUsuario(e, 'operativo')" [disabled]="cupoAgotado(e)"
+                  title="Añadir alguien que cargue documentos en esta empresa"
+                  class="whitespace-nowrap rounded border border-sky-500 px-3 py-1.5 text-xs font-semibold text-sky-700 transition-colors duration-150 hover:bg-sky-500 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed">
+                  + Operativo
+                </button>
+                <button type="button" (click)="abrirUsuario(e, 'supervisor')" [disabled]="cupoAgotado(e)"
+                  title="Añadir alguien que revise esta empresa"
+                  class="whitespace-nowrap rounded border border-emerald-500 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition-colors duration-150 hover:bg-emerald-500 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed">
+                  + Supervisor
+                </button>
+                <button type="button" (click)="abrirCupo(e)"
+                  title="Cuántos usuarios tiene contratados"
+                  class="whitespace-nowrap rounded border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-100">
+                  Cupo
+                </button>
+                <button type="button" (click)="alternar(e.nitEmpresa)"
+                  class="whitespace-nowrap rounded px-2 py-1.5 text-xs font-semibold text-gray-500 transition-colors duration-150 hover:bg-gray-100">
+                  {{ estaAbierta(e.nitEmpresa) ? 'Ocultar' : 'Ver usuarios' }}
+                </button>
+              </div>
+            </div>
 
-                <td class="px-3 py-3">
-                  <span class="text-gray-600">{{ fecha(u.ultimoAcceso) }}</span>
-                  @if (u.deshabilitado) {
-                    <span class="ml-2 inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">
-                      Deshabilitado
-                    </span>
-                  }
-                  @if (u.sinCuenta) {
-                    <span class="ml-2 inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700"
-                      title="Tiene datos en Firestore pero no existe su cuenta en Authentication">
-                      Sin cuenta
-                    </span>
-                  }
-                </td>
-
-                <td class="px-3 py-3 text-right">
-                  <!-- Solo sobre un operativo: el supervisor se cuelga de una
-                       empresa que ya existe, y esa empresa es la suya. -->
-                  @if (u.rol === 'operativo' && u.nitEmpresa) {
-                    <button type="button" (click)="abrirSupervisor(u)"
-                      title="Crear un supervisor para esta empresa"
-                      class="whitespace-nowrap rounded border border-emerald-500 px-2 py-1 text-xs font-semibold text-emerald-700 transition-colors duration-150 hover:bg-emerald-500 hover:text-white">
-                      + Supervisor
-                    </button>
-                  }
-                </td>
-              </tr>
-            } @empty {
-              <tr>
-                <td colspan="6" class="px-3 py-10 text-center text-gray-500">
-                  @if (usuarios().length === 0) {
-                    No hay usuarios registrados todavía.
-                  } @else {
-                    Ningún usuario coincide con la búsqueda.
-                  }
-                </td>
-              </tr>
+            <!-- Usuarios de la empresa -->
+            @if (estaAbierta(e.nitEmpresa)) {
+              <div class="border-t border-gray-100 bg-gray-50 px-5 py-4">
+                <div class="overflow-x-auto">
+                  <table class="w-full min-w-[40rem] border-collapse text-sm">
+                    <thead>
+                      <tr class="text-left">
+                        <th class="pb-2 text-xs font-bold uppercase tracking-wider text-gray-500">Usuario</th>
+                        <th class="pb-2 text-xs font-bold uppercase tracking-wider text-gray-500">Rol</th>
+                        <th class="pb-2 text-xs font-bold uppercase tracking-wider text-gray-500">Último acceso</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (u of e.usuarios; track u.uid) {
+                        <tr class="border-t border-gray-200">
+                          <td class="py-2 pr-3">
+                            <p class="font-medium text-gray-900">{{ u.nombreCompleto || 'Sin nombre' }}</p>
+                            <p class="text-xs text-gray-500">{{ u.email }}</p>
+                            @if (u.cargoEmpresa) {
+                              <p class="text-xs text-gray-400">{{ u.cargoEmpresa }}</p>
+                            }
+                          </td>
+                          <td class="py-2 pr-3">
+                            <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold"
+                              [ngClass]="u.rol === 'supervisor' ? 'bg-emerald-100 text-emerald-700' : 'bg-sky-100 text-sky-700'">
+                              {{ nombreRol(u.rol) }}
+                            </span>
+                          </td>
+                          <td class="py-2">
+                            <span class="text-gray-600">{{ fecha(u.ultimoAcceso) }}</span>
+                            @if (u.deshabilitado) {
+                              <span class="ml-2 inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">
+                                Deshabilitado
+                              </span>
+                            }
+                            @if (u.sinCuenta) {
+                              <span class="ml-2 inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700"
+                                title="Tiene datos en Firestore pero no existe su cuenta en Authentication">
+                                Sin cuenta
+                              </span>
+                            }
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             }
-          </tbody>
-        </table>
+          </div>
+        } @empty {
+          <div class="rounded-xl border border-dashed border-gray-300 px-6 py-12 text-center">
+            @if (empresas().length === 0) {
+              <p class="text-gray-500">Todavía no hay empresas registradas.</p>
+              <button type="button" (click)="abrirEmpresa()"
+                class="mt-3 rounded bg-color3 px-4 py-2 text-xs font-bold uppercase text-white shadow hover:opacity-90">
+                Crear la primera
+              </button>
+            } @else {
+              <p class="text-gray-500">Ninguna empresa coincide con la búsqueda.</p>
+            }
+          </div>
+        }
       </div>
 
-      @if (usuariosFiltrados().length > 0) {
-        <p class="mt-4 text-xs text-gray-500">
-          Mostrando {{ usuariosFiltrados().length }} de {{ usuarios().length }} usuarios.
-        </p>
+      <!-- ── Cuentas sin empresa ────────────────────────────────── -->
+      @if (huerfanos().length > 0) {
+        <div class="mt-8 rounded-xl border border-amber-200 bg-amber-50 p-5">
+          <p class="font-semibold text-amber-900">
+            {{ huerfanos().length }} cuenta(s) sin empresa asociada
+          </p>
+          <p class="mt-1 text-sm text-amber-800">
+            Tienen documento en la base de datos pero ningún NIT, así que no pueden
+            acceder a ningún PESV. Suelen quedar de registros interrumpidos.
+          </p>
+          <ul class="mt-3 space-y-1">
+            @for (u of huerfanos(); track u.uid) {
+              <li class="text-sm text-amber-900">
+                {{ u.nombreCompleto || 'Sin nombre' }} — {{ u.email }}
+              </li>
+            }
+          </ul>
+        </div>
       }
     }
 
   </div>
 </div>
 
-<!-- ── Alta de usuarios ─────────────────────────────────────────────────── -->
+<!-- ── Formularios ───────────────────────────────────────────────────────── -->
 @if (formulario() !== 'ninguno') {
   <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
     <div class="absolute inset-0 bg-black/50" (click)="cerrarFormulario()"></div>
@@ -194,11 +243,17 @@
 
       <div class="sticky top-0 rounded-t-2xl bg-color3 px-6 py-4">
         <h3 class="text-lg font-bold text-white">
-          {{ formulario() === 'empresa' ? 'Nueva empresa' : 'Nuevo supervisor' }}
+          @if (formulario() === 'empresa') {
+            Nueva empresa
+          } @else if (formulario() === 'cupo') {
+            Usuarios contratados
+          } @else {
+            {{ nuevo.rol === 'operativo' ? 'Nuevo operativo' : 'Nuevo supervisor' }}
+          }
         </h3>
-        @if (formulario() === 'supervisor' && empresaDestino()) {
+        @if (destino()) {
           <p class="text-sm text-white/80">
-            Para {{ empresaDestino()?.nombreEmpresa }} — NIT {{ empresaDestino()?.nitEmpresa }}
+            {{ destino()?.nombreEmpresa }} — NIT {{ destino()?.nitEmpresa }}
           </p>
         } @else {
           <p class="text-sm text-white/80">Crea la cuenta operativa que construirá el PESV.</p>
@@ -214,75 +269,104 @@
           </div>
         }
 
-        <div>
-          <label class="block text-xs font-bold uppercase text-gray-600 mb-1">
-            Nombre de la persona <span class="text-red-500">*</span>
-          </label>
-          <input type="text" [(ngModel)]="nuevo.nombreCompleto"
-            class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-color4">
-        </div>
-
-        <div class="grid gap-4 sm:grid-cols-2">
+        @if (formulario() === 'cupo') {
           <div>
             <label class="block text-xs font-bold uppercase text-gray-600 mb-1">
-              Correo <span class="text-red-500">*</span>
+              Usuarios contratados
             </label>
-            <input type="email" [(ngModel)]="nuevo.email" autocomplete="off"
+            <input type="number" min="0" [(ngModel)]="cupo"
               class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-color4">
+            <p class="mt-1 text-xs text-gray-500">
+              Cero significa sin límite. No puede ser menor que los usuarios que ya tiene.
+            </p>
           </div>
+
+        } @else {
+
           <div>
             <label class="block text-xs font-bold uppercase text-gray-600 mb-1">
-              Contraseña <span class="text-red-500">*</span>
+              Nombre de la persona <span class="text-red-500">*</span>
             </label>
-            <input type="text" [(ngModel)]="nuevo.password" autocomplete="off"
+            <input type="text" [(ngModel)]="nuevo.nombreCompleto"
               class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-color4">
-            <p class="mt-1 text-xs text-gray-500">Mínimo 6 caracteres. Comunícasela a la persona.</p>
           </div>
-        </div>
 
-        @if (formulario() === 'empresa') {
           <div class="grid gap-4 sm:grid-cols-2">
             <div>
               <label class="block text-xs font-bold uppercase text-gray-600 mb-1">
-                NIT <span class="text-red-500">*</span>
+                Correo <span class="text-red-500">*</span>
               </label>
-              <input type="text" [(ngModel)]="nuevo.nitEmpresa"
+              <input type="email" [(ngModel)]="nuevo.email" autocomplete="off"
                 class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-color4">
-              <p class="mt-1 text-xs text-gray-500">Sin espacios: forma parte de la ruta de datos.</p>
             </div>
             <div>
               <label class="block text-xs font-bold uppercase text-gray-600 mb-1">
-                Empresa <span class="text-red-500">*</span>
+                Contraseña <span class="text-red-500">*</span>
               </label>
-              <input type="text" [(ngModel)]="nuevo.nombreEmpresa"
+              <input type="text" [(ngModel)]="nuevo.password" autocomplete="off"
+                class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-color4">
+              <p class="mt-1 text-xs text-gray-500">Mínimo 6 caracteres. Comunícasela a la persona.</p>
+            </div>
+          </div>
+
+          @if (formulario() === 'empresa') {
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label class="block text-xs font-bold uppercase text-gray-600 mb-1">
+                  NIT <span class="text-red-500">*</span>
+                </label>
+                <input type="text" [(ngModel)]="nuevo.nitEmpresa"
+                  class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-color4">
+                <p class="mt-1 text-xs text-gray-500">Sin espacios: forma parte de la ruta de datos.</p>
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase text-gray-600 mb-1">
+                  Empresa <span class="text-red-500">*</span>
+                </label>
+                <input type="text" [(ngModel)]="nuevo.nombreEmpresa"
+                  class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-color4">
+              </div>
+            </div>
+          } @else {
+            <div>
+              <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Rol</label>
+              <select [(ngModel)]="nuevo.rol"
+                class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-color4">
+                <option value="operativo">Operativo — construye el PESV</option>
+                <option value="supervisor">Supervisor — solo revisa</option>
+              </select>
+            </div>
+          }
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Cargo</label>
+              <input type="text" [(ngModel)]="nuevo.cargoEmpresa"
+                class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-color4">
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Teléfono</label>
+              <input type="tel" [(ngModel)]="nuevo.telefono"
                 class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-color4">
             </div>
           </div>
-        }
 
-        <div class="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Cargo</label>
-            <input type="text" [(ngModel)]="nuevo.cargoEmpresa"
-              class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-color4">
-          </div>
-          <div>
-            <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Teléfono</label>
-            <input type="tel" [(ngModel)]="nuevo.telefono"
-              class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-color4">
-          </div>
-        </div>
-
-        @if (formulario() === 'empresa') {
-          <p class="rounded bg-gray-50 p-3 text-xs text-gray-600">
-            Al entrar por primera vez, esta cuenta pasará por el cuestionario que define
-            su nivel del PESV y crea sus programas base.
-          </p>
-        } @else {
-          <p class="rounded bg-gray-50 p-3 text-xs text-gray-600">
-            El supervisor verá los mismos datos que la empresa, con su mismo nivel,
-            pero no podrá modificar nada.
-          </p>
+          @if (formulario() === 'empresa') {
+            <p class="rounded bg-gray-50 p-3 text-xs text-gray-600">
+              Al entrar por primera vez, esta cuenta pasará por el cuestionario que define
+              su nivel del PESV y crea sus programas base.
+            </p>
+          } @else if (nuevo.rol === 'operativo') {
+            <p class="rounded bg-gray-50 p-3 text-xs text-gray-600">
+              Compartirá los documentos y el nivel de la empresa, y podrá cargar y
+              modificar la información del PESV.
+            </p>
+          } @else {
+            <p class="rounded bg-gray-50 p-3 text-xs text-gray-600">
+              Verá los mismos datos que la empresa, con su mismo nivel, pero no podrá
+              modificar nada.
+            </p>
+          }
         }
       </div>
 
@@ -293,7 +377,7 @@
         </button>
         <button type="button" (click)="guardar()" [disabled]="guardando() || formularioIncompleto"
           class="rounded bg-color3 px-5 py-2 text-sm font-bold uppercase text-white shadow transition-opacity duration-150 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed">
-          {{ guardando() ? 'Creando...' : 'Crear usuario' }}
+          {{ guardando() ? 'Guardando...' : (formulario() === 'cupo' ? 'Guardar cupo' : 'Crear usuario') }}
         </button>
       </div>
     </div>

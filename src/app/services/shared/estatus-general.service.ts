@@ -1,5 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { AuthenticacionService } from './authenticacion.service';
+import { RolUsuarioService } from './rol-usuario.service';
 import { FirestoreService } from './firestore.service';
 import { Models } from '../../interfaces/models';
 import { SlugModulo } from '../../data/modulos-pesv';
@@ -17,6 +18,7 @@ import { SlugModulo } from '../../data/modulos-pesv';
 export class EstatusGeneralService {
 
   private _auth = inject(AuthenticacionService);
+  private _rol = inject(RolUsuarioService);
   private _firestore = inject(FirestoreService);
   private coleccion = 'EstatusGeneral';
 
@@ -54,6 +56,12 @@ export class EstatusGeneralService {
   ): Promise<void> {
     const nit = this.getNit();
     if (!nit) return;
+
+    // El supervisor solo revisa. Los modulos recalculan su progreso al
+    // abrirlos, asi que sin esto bastaba con mirar un paso para disparar una
+    // escritura que las reglas rechazan: un error en consola por cada visita.
+    // El avance no se pierde, lo registra el operativo al trabajar.
+    if (!this._rol.editable()) return;
 
     try {
       await this._firestore.upsertDocument(`${this.coleccion}/${nit}`, {

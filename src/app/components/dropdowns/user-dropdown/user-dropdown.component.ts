@@ -1,4 +1,4 @@
-import { Component, Input, inject } from "@angular/core";
+import { Component, Input, OnInit, inject } from "@angular/core";
 import { CommonModule } from '@angular/common';
 import { AuthenticacionService } from "../../../services/shared/authenticacion.service";
 import { Router, RouterLink } from "@angular/router";
@@ -11,7 +11,7 @@ import { RUTA_LOGIN } from "../../../guards/auth.guard";
   templateUrl: "./user-dropdown.component.html",
   styleUrl: './user-dropdown.component.css',
 })
-export class UserDropdownComponent {
+export class UserDropdownComponent implements OnInit {
 
   @Input() size: string = 'w-9 h-9';
   @Input() nameEmpresa: string = '---';
@@ -20,6 +20,16 @@ export class UserDropdownComponent {
   private _auth = inject(AuthenticacionService);
   private _router = inject(Router);
   dropdownPopoverShow = false;
+
+  /**
+   * El superadministrador no pertenece a ninguna empresa, asi que las opciones
+   * de empresa no le sirven: su sitio es el panel de administracion.
+   */
+  esSuperadmin = false;
+
+  async ngOnInit(): Promise<void> {
+    this.esSuperadmin = await this._auth.esSuperadmin();
+  }
 
   getInitials(): string {
     return (this.nameEmpresa ?? '').trim().slice(0, 2).toUpperCase();

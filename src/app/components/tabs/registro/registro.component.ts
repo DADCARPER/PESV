@@ -7,6 +7,8 @@ import { AuthenticacionService } from '../../../services/shared/authenticacion.s
 import { NivelPesvService } from '../../../services/shared/nivel-pesv.service';
 import { Models } from '../../../interfaces/models';
 import { NOMBRE_NIVEL, NivelPesv, pasosExigibles } from '../../../data/modulos-pesv';
+import { EstatusGeneralService } from '../../../services/shared/estatus-general.service';
+import { AaDatosDefaultService } from '../../../services/shared/aa-datos-default.service';
 
 interface Opcion {
   valor: string;
@@ -31,6 +33,8 @@ export class RegistroComponent implements OnInit, OnDestroy {
   private _auth = inject(AuthenticacionService);
   private _firestore = inject(FirestoreService);
   private _nivel = inject(NivelPesvService);
+  private _progreso = inject(EstatusGeneralService);
+  private _iniciardatos = inject(AaDatosDefaultService);
   private _router = inject(Router);
 
   private authSubscription: { unsubscribe(): void } | null = null;
@@ -196,13 +200,49 @@ export class RegistroComponent implements OnInit, OnDestroy {
           vehiculosTerceros: this.form.vehiculosTerceros,
         }
       });
+      // El nivel es de la empresa, no de quien responde: asi el siguiente
+      // usuario que entre no vuelve a ver el cuestionario, y no puede haber
+      // dos respuestas distintas para la misma organizacion.
+      const nit = this._auth.getCurrentUser()?.displayName;
+      if (nit) {
+        await this._firestore.upsertDocument('Empresas/' + nit, {
+          nivelAcceso: this.nivelAcceso,
+        });
+      }
+
       // Los tableros leen el nivel del servicio compartido: se lo pasamos ya
       this._nivel.establecer(this.nivelAcceso);
+
+      // La empresa queda constituida aqui, asi que este es el momento de
+      // sembrar su progreso y sus programas base. Antes lo hacia el registro
+      // publico, que deja de existir: las empresas las crea el
+      // superadministrador y sus usuarios llegan directamente a este paso.
+      await this.sembrarDatosBase();
       return true;
     } catch (error: unknown) {
       this.mensajeError = error instanceof Error ? error.message : 'Error al guardar los datos';
       console.error('[Registro] onSubmit:', error);
       return false;
+    }
+  }
+
+  /**
+   * Crea el progreso inicial y los programas base de la empresa.
+   *
+   * Su fallo no puede tumbar el cuestionario: el nivel ya esta guardado, y los
+   * programas se pueden cargar despues desde su propio modulo, que tiene un
+   * boton para ello.
+   */
+  private async sembrarDatosBase(): Promise<void> {
+    const nit = this._auth.getCurrentUser()?.displayName;
+    if (!nit) return;
+
+    const periodo = this._auth.periodo();
+    try {
+      await this._progreso.inicializarProgreso(nit, periodo);
+      await this._iniciardatos.inicializarDatos008Programas(nit, periodo);
+    } catch (error: unknown) {
+      console.error('[Registro] sembrarDatosBase:', error);
     }
   }
 
@@ -237,12 +277,14 @@ export class RegistroComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Al terminar el cuestionario se va al perfil, no al panel: los datos de la
-   * empresa (nombre, NIT, ciudad, actividad) alimentan las plantillas de
-   * documentos de los modulos 1 a 4, y conviene completarlos antes de empezar.
-   * El parametro `bienvenida` hace que el perfil salude solo esta primera vez.
+   * Al terminar el cuestionario se va a los datos de la empresa, no al panel.
+   *
+   * Esos datos (razon social, ciudad, representante legal) se imprimen en las
+   * actas de los modulos 1 a 4. Los carga el administrador al crear la cuenta,
+   * asi que lo que toca aqui es que la empresa los verifique.
+   * El parametro `bienvenida` hace que la pantalla lo explique esta vez.
    */
   irAlPerfil() {
-    this._router.navigate(['admin/perfil'], { queryParams: { bienvenida: 1 } });
+    this._router.navigate(['admin/empresa'], { queryParams: { bienvenida: 1 } });
   }
 }

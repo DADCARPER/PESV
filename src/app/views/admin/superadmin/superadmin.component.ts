@@ -1,13 +1,17 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { SuperadminService, UsuarioAdmin } from '../../../services/shared/superadmin.service';
+import { Router, RouterLink } from '@angular/router';
+import {
+  SuperadminService, EmpresaAdmin, UsuarioAdmin,
+} from '../../../services/shared/superadmin.service';
 import { NOMBRE_NIVEL, NivelPesv, esNivelPesv } from '../../../data/modulos-pesv';
 import { NOMBRE_ROL } from '../../../data/roles';
+import { AuthenticacionService } from '../../../services/shared/authenticacion.service';
+import { RUTA_LOGIN } from '../../../guards/auth.guard';
 
-/** Qué formulario de alta está abierto, si alguno. */
-type Formulario = 'ninguno' | 'empresa' | 'supervisor';
+/** Qué formulario está abierto, si alguno. */
+type Formulario = 'ninguno' | 'empresa' | 'usuario' | 'cupo';
 
 @Component({
   selector: 'app-superadmin',
@@ -18,23 +22,32 @@ type Formulario = 'ninguno' | 'empresa' | 'supervisor';
 export class SuperadminComponent implements OnInit {
 
   private _superadmin = inject(SuperadminService);
+  private _auth = inject(AuthenticacionService);
+  private _router = inject(Router);
 
-  usuarios = signal<UsuarioAdmin[]>([]);
+  /** Correo de la sesion: este panel no lleva el navbar con el desplegable. */
+  readonly correo = this._auth.getCurrentUser()?.email ?? '';
+
+  empresas = signal<EmpresaAdmin[]>([]);
+  huerfanos = signal<UsuarioAdmin[]>([]);
   cargando = signal(true);
   error = signal('');
 
+  /** Texto del buscador: empresa, NIT, nombre o correo de sus usuarios. */
   filtro = signal('');
-  filtroRol = signal('');
 
-  // ── Alta de usuarios ──────────────────────────────────────────────────────
+  /** NIT de las empresas con la lista de usuarios desplegada. */
+  abiertas = signal<Set<string>>(new Set());
+
+  // ── Formularios ───────────────────────────────────────────────────────────
 
   formulario = signal<Formulario>('ninguno');
   guardando = signal(false);
   errorFormulario = signal('');
   exito = signal('');
 
-  /** Empresa sobre la que se crea el supervisor. */
-  empresaDestino = signal<UsuarioAdmin | null>(null);
+  /** Empresa sobre la que se está actuando. */
+  destino = signal<EmpresaAdmin | null>(null);
 
   nuevo = {
     email: '',
@@ -44,65 +57,104 @@ export class SuperadminComponent implements OnInit {
     nombreEmpresa: '',
     cargoEmpresa: '',
     telefono: '',
+    rol: 'operativo' as 'operativo' | 'supervisor',
   };
 
-  readonly usuariosFiltrados = computed(() => {
+  cupo = 0;
+
+  readonly empresasFiltradas = computed(() => {
     const texto = this.filtro().trim().toLowerCase();
-    const rol = this.filtroRol();
+    if (!texto) return this.empresas();
 
-    return this.usuarios().filter(u => {
-      if (rol && u.rol !== rol) return false;
-      if (!texto) return true;
-
-      return [u.nombreCompleto, u.email, u.nombreEmpresa, u.nitEmpresa]
-        .some(campo => (campo ?? '').toLowerCase().includes(texto));
-    });
+    return this.empresas().filter(e =>
+      [e.nombreEmpresa, e.nitEmpresa].some(c => (c ?? '').toLowerCase().includes(texto))
+      || e.usuarios.some(u =>
+        [u.nombreCompleto, u.email].some(c => (c ?? '').toLowerCase().includes(texto)))
+    );
   });
 
+  readonly totalUsuarios = computed(
+    () => this.empresas().reduce((n, e) => n + e.usuarios.length, 0)
+  );
+
   readonly totalOperativos = computed(
-    () => this.usuarios().filter(u => u.rol === 'operativo').length
+    () => this.empresas().reduce(
+      (n, e) => n + e.usuarios.filter(u => u.rol === 'operativo').length, 0)
   );
 
   readonly totalSupervisores = computed(
-    () => this.usuarios().filter(u => u.rol === 'supervisor').length
-  );
-
-  readonly totalEmpresas = computed(
-    () => new Set(this.usuarios().map(u => u.nitEmpresa).filter(Boolean)).size
+    () => this.empresas().reduce(
+      (n, e) => n + e.usuarios.filter(u => u.rol === 'supervisor').length, 0)
   );
 
   ngOnInit(): void {
     this.cargar();
   }
 
+  async salir() {
+    try {
+      await this._auth.logout();
+    } catch (error: unknown) {
+      console.error('[Superadmin] logout:', error);
+    }
+    // Navegar siempre: el guard solo se evalua al cambiar de ruta, asi que sin
+    // esto el panel seguiria en pantalla con la sesion ya cerrada.
+    this._router.navigate([RUTA_LOGIN]);
+  }
+
   async cargar() {
     this.cargando.set(true);
     this.error.set('');
     try {
-      this.usuarios.set(await this._superadmin.listarUsuarios());
+      const datos = await this._superadmin.listarEmpresas();
+      this.empresas.set(datos.empresas);
+      this.huerfanos.set(datos.huerfanos);
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'No se pudo cargar la lista';
-      console.error('[Superadmin] listarUsuarios:', error);
+      console.error('[Superadmin] listarEmpresas:', error);
       this.error.set(msg);
     } finally {
       this.cargando.set(false);
     }
   }
 
+  // ── Despliegue de usuarios ────────────────────────────────────────────────
+
+  alternar(nit: string) {
+    const set = new Set(this.abiertas());
+    if (set.has(nit)) {
+      set.delete(nit);
+    } else {
+      set.add(nit);
+    }
+    this.abiertas.set(set);
+  }
+
+  estaAbierta(nit: string): boolean {
+    return this.abiertas().has(nit);
+  }
+
   // ── Formularios ───────────────────────────────────────────────────────────
 
   abrirEmpresa() {
-    this.limpiarFormulario();
-    this.empresaDestino.set(null);
+    this.limpiar();
+    this.destino.set(null);
     this.formulario.set('empresa');
   }
 
-  /** El supervisor se crea siempre sobre un operativo concreto. */
-  abrirSupervisor(operativo: UsuarioAdmin) {
-    this.limpiarFormulario();
-    this.empresaDestino.set(operativo);
-    this.nuevo.nitEmpresa = operativo.nitEmpresa;
-    this.formulario.set('supervisor');
+  abrirUsuario(empresa: EmpresaAdmin, rol: 'operativo' | 'supervisor') {
+    this.limpiar();
+    this.destino.set(empresa);
+    this.nuevo.nitEmpresa = empresa.nitEmpresa;
+    this.nuevo.rol = rol;
+    this.formulario.set('usuario');
+  }
+
+  abrirCupo(empresa: EmpresaAdmin) {
+    this.limpiar();
+    this.destino.set(empresa);
+    this.cupo = empresa.usuariosContratados ?? 0;
+    this.formulario.set('cupo');
   }
 
   cerrarFormulario() {
@@ -110,11 +162,13 @@ export class SuperadminComponent implements OnInit {
     this.errorFormulario.set('');
   }
 
-  private limpiarFormulario() {
+  private limpiar() {
     this.nuevo = {
       email: '', password: '', nombreCompleto: '',
       nitEmpresa: '', nombreEmpresa: '', cargoEmpresa: '', telefono: '',
+      rol: 'operativo',
     };
+    this.cupo = 0;
     this.errorFormulario.set('');
     this.exito.set('');
   }
@@ -123,20 +177,30 @@ export class SuperadminComponent implements OnInit {
     this.guardando.set(true);
     this.errorFormulario.set('');
     try {
-      if (this.formulario() === 'empresa') {
+      const modo = this.formulario();
+
+      if (modo === 'empresa') {
         await this._superadmin.crearUsuarioEmpresa({ ...this.nuevo });
         this.exito.set(`Empresa creada. ${this.nuevo.email} ya puede iniciar sesión.`);
-      } else {
-        await this._superadmin.crearSupervisor({ ...this.nuevo });
-        const empresa = this.empresaDestino()?.nombreEmpresa ?? 'la empresa';
-        this.exito.set(`Supervisor creado para ${empresa}.`);
+
+      } else if (modo === 'usuario') {
+        await this._superadmin.crearUsuarioEnEmpresa({ ...this.nuevo });
+        const queEs = this.nuevo.rol === 'operativo' ? 'Operativo' : 'Supervisor';
+        this.exito.set(`${queEs} creado para ${this.destino()?.nombreEmpresa ?? 'la empresa'}.`);
+
+      } else if (modo === 'cupo') {
+        const nit = this.destino()?.nitEmpresa ?? '';
+        await this._superadmin.fijarCupo(nit, this.cupo);
+        this.exito.set(this.cupo > 0
+          ? `Cupo fijado en ${this.cupo} usuarios.`
+          : 'Cupo retirado: la empresa queda sin límite.');
       }
 
       this.cerrarFormulario();
       await this.cargar();
     } catch (error: unknown) {
       // Los mensajes vienen de la función, ya en un lenguaje comprensible.
-      const msg = error instanceof Error ? error.message : 'No se pudo crear el usuario';
+      const msg = error instanceof Error ? error.message : 'No se pudo completar la operación';
       console.error('[Superadmin] guardar:', error);
       this.errorFormulario.set(msg);
     } finally {
@@ -146,6 +210,8 @@ export class SuperadminComponent implements OnInit {
 
   /** Falta algún campo obligatorio del formulario abierto. */
   get formularioIncompleto(): boolean {
+    if (this.formulario() === 'cupo') return false;
+
     const base = !this.nuevo.email.trim()
       || !this.nuevo.password.trim()
       || !this.nuevo.nombreCompleto.trim()
@@ -158,6 +224,20 @@ export class SuperadminComponent implements OnInit {
   }
 
   // ── Presentación ──────────────────────────────────────────────────────────
+
+  /** Texto del cupo: "3 de 5" o solo el número si no hay límite. */
+  ocupacion(e: EmpresaAdmin): string {
+    const usados = e.usuarios.length;
+    const cupo = e.usuariosContratados;
+    if (!cupo || cupo <= 0) return `${usados} ${usados === 1 ? 'usuario' : 'usuarios'}`;
+    return `${usados} de ${cupo} usuarios`;
+  }
+
+  /** La empresa agotó su cupo: no se pueden crear más usuarios. */
+  cupoAgotado(e: EmpresaAdmin): boolean {
+    const cupo = e.usuariosContratados;
+    return !!cupo && cupo > 0 && e.usuarios.length >= cupo;
+  }
 
   nombreRol(rol: 'operativo' | 'supervisor'): string {
     return NOMBRE_ROL[rol];

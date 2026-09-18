@@ -40,8 +40,22 @@ export class NivelPesvService {
 
   private async leer(uid: string): Promise<void> {
     try {
-      const snap = await this._firestore.getDocument<Models.Users.Usuario>('users/' + uid);
-      const valor = snap.data()?.nivelAcceso;
+      // El nivel es de la empresa: lo define el cuestionario una vez y vale
+      // para todos sus usuarios. Se mira su documento antes que el del
+      // usuario, donde vivia hasta ahora.
+      const nit = this._auth.getCurrentUser()?.displayName;
+      let valor: string | undefined;
+
+      if (nit) {
+        const empresa = await this._firestore.getDocument<{ nivelAcceso?: string }>('Empresas/' + nit);
+        valor = empresa.data()?.nivelAcceso;
+      }
+
+      if (!valor) {
+        const snap = await this._firestore.getDocument<Models.Users.Usuario>('users/' + uid);
+        valor = snap.data()?.nivelAcceso;
+      }
+
       this.nivel.set(esNivelPesv(valor) ? valor : null);
     } catch (error: unknown) {
       console.error('[NivelPesv] leer:', error);

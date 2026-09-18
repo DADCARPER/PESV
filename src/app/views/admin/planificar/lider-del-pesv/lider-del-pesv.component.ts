@@ -2,6 +2,7 @@ import { Component, inject, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthenticacionService } from '../../../../services/shared/authenticacion.service';
+import { EmpresaService } from '../../../../services/shared/empresa.service';
 import { AlertaService } from '../../../../services/shared/alerta.service';
 import { GestionDocumentosService } from '../../../../services/shared/gestion-documentos.service';
 import { EstatusGeneralService } from '../../../../services/shared/estatus-general.service';
@@ -39,6 +40,7 @@ export class LiderDelPesvComponent implements OnInit {
   nombreModulo: string = '001-lider-pesv';
 
   private _authcations = inject(AuthenticacionService);
+  private _empresaSrv = inject(EmpresaService);
   private _gestDoc = inject(GestionDocumentosService);
   private _estatus = inject(EstatusGeneralService);
   private _firestore = inject(FirestoreService);
@@ -54,7 +56,10 @@ export class LiderDelPesvComponent implements OnInit {
   }
 
   nit = this._authcations.getCurrentUser().displayName;
-  empresa = this._authcations.getCurrentUser().photoURL;
+  /** Razon social, leida de Empresas/{nit} y no de photoURL de Auth. */
+  get empresa(): string {
+    return this._empresaSrv.nombre();
+  }
   uid = this._authcations.getCurrentUser().uid;
 
   documento1: Models.Documentos.Documento[] = [];

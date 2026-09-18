@@ -3,6 +3,7 @@ import { CommonModule } from "@angular/common";
 import { UserDropdownComponent } from "../../dropdowns/user-dropdown/user-dropdown.component";
 import { AuthenticacionService } from "../../../services/shared/authenticacion.service";
 import { RolUsuarioService } from '../../../services/shared/rol-usuario.service';
+import { EmpresaService } from '../../../services/shared/empresa.service';
 import { NivelPesvService } from "../../../services/shared/nivel-pesv.service";
 import { Router, RouterLink } from "@angular/router";
 import { ModalComponent } from "./modal/modal.component";
@@ -22,6 +23,7 @@ export class AdminNavbarComponent implements OnInit {
   private _auth = inject(AuthenticacionService);
   private _nivel = inject(NivelPesvService);
   private _rol = inject(RolUsuarioService);
+  private _empresaSrv = inject(EmpresaService);
 
   /** El supervisor no edita: conviene que lo vea siempre, no solo al fallar. */
   soloLectura = computed(() => !this._rol.editable());
@@ -40,7 +42,10 @@ export class AdminNavbarComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     const user = this._auth.getCurrentUser();
     if (user) {
-      this.nombreEmpresa = user.photoURL ?? '---';
+      // De Empresas/{nit}: photoURL guardaba la razon social por comodidad,
+      // pero es un campo para una URL y el Admin SDK lo rechaza.
+      await this._empresaSrv.cargar();
+      this.nombreEmpresa = this._empresaSrv.nombre() || '---';
       this.email = user.email ?? '---';
       await this._nivel.cargar();
     }

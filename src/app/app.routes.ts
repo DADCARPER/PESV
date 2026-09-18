@@ -9,7 +9,6 @@ import { LandingComponent } from './views/landing/landing.component';
 import { ProfileComponent } from './views/profile/profile.component';
 
 import { AuthComponent } from './layouts/auth/auth.component';
-import { RegisterComponent } from './views/auth/register/register.component';
 
 
 
@@ -35,6 +34,7 @@ import { PoliticaseguridadvialComponent } from './views/admin/planificar/politic
 import { LiderazgoYCompromisoComponent } from './views/admin/planificar/liderazgo-y-compromiso/liderazgo-y-compromiso.component';
 import { ObjetivosMetasComponent } from './views/admin/planificar/objetivos-metas/objetivos-metas.component';
 import { PerfilComponent } from './views/admin/perfil/perfil.component';
+import { EmpresaComponent } from './views/admin/empresa/empresa.component';
 import { SuperadminComponent } from './views/admin/superadmin/superadmin.component';
 import { RestoreComponent } from './views/auth/restore/restore.component';
 import { FirmasComponent } from './views/admin/firmas/firmas.component';
@@ -107,7 +107,6 @@ export const routes: Routes = [
     canActivate: [invitadoGuard],  // con sesion abierta no se vuelve al formulario
     children: [
       { path: 'login', component: LoginComponent },
-      { path: 'register', component: RegisterComponent },
       { path: 'reset', component: RestoreComponent },
       { path: "", redirectTo: "login", pathMatch: "full" },
     ],
@@ -122,6 +121,7 @@ export const routes: Routes = [
       
       { path: "dashboard", component: DashboardComponent },
       { path: "perfil", component: PerfilComponent },
+      { path: "empresa", component: EmpresaComponent },
       { path: "gestor_firmas", component: FirmasComponent },
       { path: "desarrollo", component: DesarrolloComponent },
       { path: "maps", component: MapsComponent },
@@ -225,7 +225,7 @@ export const routes: Routes = [
     component: EmrpesaComponent,
     // children: [
     //   { path: 'dashboard', component: LoginComponent },
-    //   { path: 'register', component: RegisterComponent },
+    //
     //   { path: 'reset', component: RestoreComponent },
     //   { path: "", redirectTo: "login", pathMatch: "full" },
     // ],

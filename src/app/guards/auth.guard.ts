@@ -17,24 +17,40 @@ export const RUTA_ONBOARDING = '/starting';
 const SIN_NIVEL = 'no';
 
 /**
- * Lee `users/{uid}.nivelAcceso`.
+ * Lee el nivel PESV de la empresa.
+ *
+ * El nivel es de la empresa, no de la persona: lo define el cuestionario una
+ * sola vez y vale para todos sus usuarios. Guardarlo en users/{uid} hacia que
+ * cada usuario nuevo creado antes de responderlo volviera a verlo, y que dos
+ * personas de la misma empresa pudieran contestar cosas distintas.
+ *
+ * Se mira primero Empresas/{nit} y, si aun no lo tiene, el documento del
+ * usuario: es donde vivia hasta ahora y hay cuentas que solo lo tienen ahi.
  *
  * Devuelve `undefined` cuando no se pudo leer, que no es lo mismo que "el
  * onboarding está pendiente": ante un fallo de red los guards dejan pasar en
  * lugar de rebotar al usuario entre /admin y /starting.
- *
- * No usa NivelPesvService porque su signal vale null en ambos casos: cuando
- * nivelAcceso es 'no' y cuando la lectura falló.
  */
 async function leerNivelAcceso(
   firestore: FirestoreService,
-  uid: string
+  uid: string,
+  nit: string | null
 ): Promise<string | undefined> {
+  if (nit) {
+    try {
+      const empresa = await firestore.getDocument<{ nivelAcceso?: string }>('Empresas/' + nit);
+      const nivel = empresa.data()?.nivelAcceso;
+      if (nivel) return nivel;
+    } catch (error: unknown) {
+      console.error('[Guard] leerNivelAcceso (empresa):', error);
+    }
+  }
+
   try {
     const snap = await firestore.getDocument<Models.Users.Usuario>('users/' + uid);
     return snap.data()?.nivelAcceso;
   } catch (error: unknown) {
-    console.error('[Guard] leerNivelAcceso:', error);
+    console.error('[Guard] leerNivelAcceso (usuario):', error);
     return undefined;
   }
 }
@@ -74,7 +90,16 @@ export const onboardingGuard: CanActivateFn = async () => {
     return false;
   }
 
-  if (await leerNivelAcceso(firestore, uid) === SIN_NIVEL) {
+  // El superadministrador no pertenece a ninguna empresa ni tiene ficha en
+  // users/, asi que la comprobacion de abajo lo dejaba pasar por no encontrar
+  // nada. Su sitio es el panel de administracion.
+  if (await auth.esSuperadmin()) {
+    router.navigate(['/superadmin']);
+    return false;
+  }
+
+  const nit = auth.getCurrentUser()?.displayName ?? null;
+  if (await leerNivelAcceso(firestore, uid, nit) === SIN_NIVEL) {
     router.navigate([RUTA_ONBOARDING]);
     return false;
   }
@@ -97,7 +122,8 @@ export const onboardingCompletadoGuard: CanActivateFn = async () => {
     return false;
   }
 
-  const nivel = await leerNivelAcceso(firestore, uid);
+  const nit = auth.getCurrentUser()?.displayName ?? null;
+  const nivel = await leerNivelAcceso(firestore, uid, nit);
   if (nivel && nivel !== SIN_NIVEL) {
     router.navigate([RUTA_INICIO]);
     return false;

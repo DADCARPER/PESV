@@ -1,0 +1,110 @@
+rules_version = '2';
+
+// Reglas de Firestore — PESV Interactivo
+//
+// La autorizacion se apoya en los custom claims `nit` y `rol`, que asigna la
+// Cloud Function asignarClaimNit leyendolos de users/{uid}. Solo el Admin SDK
+// puede escribirlos, asi que el cliente no puede falsificarlos.
+//
+// Antes se resolvia con get(/users/$(uid)) en cada comprobacion: eso cobra una
+// lectura extra por cada documento consultado y obliga a ir a la base para
+// decidir algo que el token ya trae.
+//
+// Se conserva un camino de respaldo por ese get() para las cuentas que todavia
+// no tienen claim, porque solo se asigna al iniciar sesion. Cuando todas hayan
+// entrado al menos una vez, ese respaldo puede retirarse.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Ayudantes ───────────────────────────────────────────────────────────
+
+    function autenticado() {
+      return request.auth != null;
+    }
+
+    function claims() {
+      return request.auth.token;
+    }
+
+    function tieneClaimNit() {
+      return autenticado() && 'nit' in claims() && claims().nit is string;
+    }
+
+    /** Respaldo para cuentas sin claim todavia. */
+    function perfil(uid) {
+      return get(/databases/$(database)/documents/users/$(uid)).data;
+    }
+
+    function esDeLaEmpresaPorPerfil(nitempresa) {
+      return autenticado()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && perfil(request.auth.uid).nitEmpresa == nitempresa;
+    }
+
+    /** Pertenece a la empresa, por claim o, si aun no lo tiene, por su perfil. */
+    function esDeLaEmpresa(nitempresa) {
+      return (tieneClaimNit() && claims().nit == nitempresa)
+        || esDeLaEmpresaPorPerfil(nitempresa);
+    }
+
+    /**
+     * Puede modificar los datos del PESV.
+     *
+     * El supervisor revisa sin modificar. Se compara por "distinto de
+     * supervisor" para que una cuenta sin claim no quede bloqueada.
+     */
+    function puedeEditar(nitempresa) {
+      return esDeLaEmpresa(nitempresa)
+        && !(autenticado() && 'rol' in claims() && claims().rol == 'supervisor');
+    }
+
+    // ── Usuarios ────────────────────────────────────────────────────────────
+    // Cada quien su propio documento. Ojo: el usuario puede escribir aqui su
+    // campo `rol`, y por eso la Cloud Function nunca concede "superadmin"
+    // desde este documento: ese rol sale de una lista blanca en el servidor.
+    match /users/{userId} {
+      allow read, write: if autenticado() && request.auth.uid == userId;
+    }
+
+    // ── Empresas ────────────────────────────────────────────────────────────
+    // El documento raiz y todo lo que cuelga de el: periodos, modulos y sus
+    // documentos. Leer lo puede cualquiera de la empresa, incluido el
+    // supervisor; escribir, solo quien no lo es.
+    match /Empresas/{nitempresa} {
+      allow read: if esDeLaEmpresa(nitempresa);
+      allow create, update, delete: if puedeEditar(nitempresa);
+
+      match /{documentos=**} {
+        allow read: if esDeLaEmpresa(nitempresa);
+        allow create, update, delete: if puedeEditar(nitempresa);
+      }
+    }
+
+    // ── Estatus general ─────────────────────────────────────────────────────
+    // Avance de cada modulo. Lo escriben los modulos al recalcular su progreso.
+    match /EstatusGeneral/{nitempresa} {
+      allow read: if esDeLaEmpresa(nitempresa);
+      allow create, update, delete: if puedeEditar(nitempresa);
+
+      match /{documentos=**} {
+        allow read: if esDeLaEmpresa(nitempresa);
+        allow create, update, delete: if puedeEditar(nitempresa);
+      }
+    }
+
+    // ── Encuestas publicas ──────────────────────────────────────────────────
+    // Las responde gente sin cuenta: por eso leer la encuesta y enviar una
+    // respuesta son operaciones abiertas. Ver los resultados, no.
+    match /Encuestas_publicas/{nitempresa} {
+      allow read: if true;
+      allow create, update: if puedeEditar(nitempresa);
+
+      match /encuestas/{encuestaId} {
+        allow create: if true;
+        allow read: if esDeLaEmpresa(nitempresa);
+        allow update, delete: if puedeEditar(nitempresa);
+      }
+    }
+  }
+}
