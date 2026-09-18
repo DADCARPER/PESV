@@ -25,8 +25,32 @@
       </div>
     }
 
+    <!-- ── No se pudo comprobar ───────────────────────────────────────────
+         No se ofrece crear: si ya existe un diagnóstico y la lectura falló,
+         crear otro dejaría dos activos en el mismo periodo.              -->
+    @if (!cargandoDiagnostico && errorDiagnostico()) {
+      <div class="flex flex-col items-center justify-center py-16 gap-6">
+        <div class="text-white text-center inline-flex items-center justify-center w-20 h-20 shadow-lg rounded-full bg-red-500">
+          <iconify-icon icon="hugeicons:alert-02" width="40" height="40"></iconify-icon>
+        </div>
+        <div class="text-center max-w-md">
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">No se pudo comprobar el diagnóstico</h2>
+          <p class="text-gray-500 text-base">
+            No sabemos si esta empresa ya tiene un diagnóstico de este periodo, así que
+            no conviene crear otro. Vuelve a intentarlo en un momento.
+          </p>
+          <p class="text-xs text-gray-400 mt-3">{{ errorDiagnostico() }}</p>
+        </div>
+        <button (click)="reintentar()"
+          class="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-bold uppercase text-sm px-8 py-3 rounded-lg shadow outline-none focus:outline-none ease-linear transition-all duration-150"
+          type="button">
+          Reintentar
+        </button>
+      </div>
+    }
+
     <!-- ── Sin diagnóstico: pantalla de inicio ────────────────────────── -->
-    @if (!cargandoDiagnostico && !diagnosticoBase) {
+    @if (!cargandoDiagnostico && !diagnosticoBase && !errorDiagnostico()) {
       <div class="flex flex-col items-center justify-center py-16 gap-6">
         <div class="text-white text-center inline-flex items-center justify-center w-20 h-20 shadow-lg rounded-full bg-amber-400">
           <iconify-icon icon="hugeicons:file-add" width="40" height="40"></iconify-icon>
@@ -287,7 +311,7 @@
               <p class="text-base text-gray-500 mb-3">Protocolos de atención ante emergencias viales: accidentes, fallas mecánicas, incendios y emergencias médicas.</p>
               <div class="flex gap-2 mb-3">
                 <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
-                  <p class="font-medium text-amber-700">{{ datosPlanEmergencias.length }}</p>
+                  <p class="font-medium text-amber-700">{{ num_planes }}</p>
                   <p class="text-sm">PLANES</p>
                 </div>
               </div>
@@ -305,36 +329,43 @@
       <!-- Tab 1: Sedes -->
       @if (openTab === 1) {
         <app-sedes [datos]="datosSedes"></app-sedes>
+        <ng-container *ngTemplateOutlet="paginacion; context: { $implicit: listas['sedes'], seccion: 'sedes', nombre: 'sedes' }"></ng-container>
       }
 
       <!-- Tab 2: Servicios -->
       @if (openTab === 2) {
         <app-servicios [datos]="datos006diagnosticoServicios"></app-servicios>
+        <ng-container *ngTemplateOutlet="paginacion; context: { $implicit: listas['servicios'], seccion: 'servicios', nombre: 'servicios' }"></ng-container>
       }
 
       <!-- Tab 3: Colaboradores -->
       @if (openTab === 3) {
         <app-colaboradores [datos]="datosColaboradores"></app-colaboradores>
+        <ng-container *ngTemplateOutlet="paginacion; context: { $implicit: listas['colaboradores'], seccion: 'colaboradores', nombre: 'colaboradores' }"></ng-container>
       }
 
       <!-- Tab 4: Contratistas -->
       @if (openTab === 4) {
         <app-contratistas [datos]="datosContratistas"></app-contratistas>
+        <ng-container *ngTemplateOutlet="paginacion; context: { $implicit: listas['contratistas'], seccion: 'contratistas', nombre: 'contratistas' }"></ng-container>
       }
 
       <!-- Tab 5: Vehículos -->
       @if (openTab === 5) {
         <app-vehiculos [datos]="datosVehiculos"></app-vehiculos>
+        <ng-container *ngTemplateOutlet="paginacion; context: { $implicit: listas['vehiculos'], seccion: 'vehiculos', nombre: 'vehículos' }"></ng-container>
       }
 
       <!-- Tab 6: Rutas frecuentes -->
       @if (openTab === 6) {
         <app-rutas-frecuentes [datos]="datosRutas"></app-rutas-frecuentes>
+        <ng-container *ngTemplateOutlet="paginacion; context: { $implicit: listas['rutas'], seccion: 'rutas', nombre: 'rutas' }"></ng-container>
       }
 
       <!-- Tab 7: Plan de emergencias -->
       @if (openTab === 7) {
         <app-plan-emergencias [datos]="datosPlanEmergencias"></app-plan-emergencias>
+        <ng-container *ngTemplateOutlet="paginacion; context: { $implicit: listas['plan-emergencias'], seccion: 'plan-emergencias', nombre: 'planes' }"></ng-container>
       }
 
       <!-- Tab 8: Encuesta -->
@@ -351,6 +382,35 @@
 
   </div>
 </div>
+
+<!-- ── Pie de listado ───────────────────────────────────────────────────────
+     Dice cuántos registros hay de verdad frente a cuántos están cargados, y
+     trae el resto bajo demanda. Sin esto, una lista recortada parecía la lista
+     completa y los registros que no cabían no tenían forma de aparecer.      -->
+<ng-template #paginacion let-lista let-seccion="seccion" let-nombre="nombre">
+  @if (lista.cargada()) {
+    <div class="flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 mt-4 pt-4">
+
+      <p class="text-sm text-gray-500">
+        @if (lista.hayMas()) {
+          Mostrando {{ lista.datos().length }} de {{ lista.total() }} {{ nombre }}
+        } @else if (lista.total() > 0) {
+          {{ lista.total() }} {{ nombre }} en total
+        } @else {
+          Todavía no hay {{ nombre }} registrados
+        }
+      </p>
+
+      @if (lista.hayMas()) {
+        <button type="button" (click)="cargarMas(seccion)" [disabled]="lista.cargando()"
+          class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed">
+          {{ lista.cargando() ? 'Cargando...' : 'Cargar más' }}
+        </button>
+      }
+
+    </div>
+  }
+</ng-template>
 
 <!-- ── Modales de colaboradores ─────────────────────────────────────────── -->
 <app-crear-colaboradores #modalColaborador></app-crear-colaboradores>

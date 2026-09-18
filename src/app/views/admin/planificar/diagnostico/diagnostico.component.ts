@@ -1,8 +1,9 @@
-import { Component, OnInit, OnDestroy, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs';
 
 // Subcomponentes del diagnóstico
 import { SedesComponent } from './sedes/sedes.component';
@@ -24,19 +25,33 @@ import { LoadingComponent } from '../../../../components/loading/loading/loading
 
 // Servicios
 import { AuthenticacionService } from '../../../../services/shared/authenticacion.service';
+import { EmpresaService } from '../../../../services/shared/empresa.service';
 import { FirestoreService } from '../../../../services/shared/firestore.service';
-import { SedesDiagnosticoService } from '../../../../services/shared/sedes-diagnostico.service';
 import { AlertaService } from '../../../../services/shared/alerta.service';
+import {
+  DiagnosticoDatosService, ListaDiagnostico, ResumenDiagnostico, SeccionDiagnostico,
+} from '../../../../services/shared/diagnostico-datos.service';
 
 // Interfaces
 import { Models } from '../../../../interfaces/models';
+
+/** Qué sección alimenta cada pestaña. El tablero (0) no tiene listado propio. */
+const SECCION_POR_PESTANA: Record<number, SeccionDiagnostico> = {
+  1: 'sedes',
+  2: 'servicios',
+  3: 'colaboradores',
+  4: 'contratistas',
+  5: 'vehiculos',
+  6: 'rutas',
+  7: 'plan-emergencias',
+};
 
 @Component({
   selector: 'app-diagnostico',
   standalone: true,
   imports: [
     CommonModule, FormsModule, RouterLink,
-    SedesComponent, ContratistasComponent, ColaboradoresComponent, 
+    SedesComponent, ContratistasComponent, ColaboradoresComponent,
     EncuestaParametrosComponent, ServiciosComponent,
     VehiculosComponent, RutasFrecuentesComponent, PlanEmergenciasComponent,
     ResultadosEncuestaComponent,
@@ -48,19 +63,34 @@ import { Models } from '../../../../interfaces/models';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   styleUrl: './diagnostico.component.css',
 })
-export class DiagnosticoComponent implements OnInit, OnDestroy {
+export class DiagnosticoComponent implements OnInit {
 
-  private _authcations = inject(AuthenticacionService);
+  private _auth = inject(AuthenticacionService);
+  private _empresaSrv = inject(EmpresaService);
   private _firestore = inject(FirestoreService);
   private _alerta = inject(AlertaService);
+  private _datos = inject(DiagnosticoDatosService);
+  private _destroyRef = inject(DestroyRef);
 
-  nit = this._authcations.getCurrentUser().displayName;
-  empresa = this._authcations.getCurrentUser().photoURL;
-  uid = this._authcations.getCurrentUser().uid;
+  readonly nit = this._empresaSrv.nit;
+
+  /** Razón social, leída de Empresas/{nit} y no de photoURL de Auth. */
+  get empresa(): string {
+    return this._empresaSrv.nombre();
+  }
 
   // ── Estado del diagnóstico base ──────────────────────────────────────────
   diagnosticoBase: Models.Diagnostico.DiagnosticoBase | null = null;
   cargandoDiagnostico = true;
+
+  /**
+   * Por qué no se pudo comprobar si ya existe un diagnóstico.
+   *
+   * Es distinto de "no hay ninguno": si una lectura falla y se trata como que
+   * no existe, la pantalla invita a crear uno y la empresa acaba con dos
+   * diagnósticos activos en el mismo periodo.
+   */
+  errorDiagnostico = signal('');
 
   // ── Modal crear diagnóstico ──────────────────────────────────────────────
   mostrarModal = false;
@@ -73,69 +103,93 @@ export class DiagnosticoComponent implements OnInit, OnDestroy {
   // ── Tabs del dashboard ───────────────────────────────────────────────────
   openTab = 0;
 
-  // ── Estadísticas para el tablero ─────────────────────────────────────────
-  num_sedes = 0;
-  num_servicios = 0;
-  num_contratista = 0;
-  num_conductores = 0;
-  num_empleados = 0;
-  num_masculino = 0;
-  num_femenino = 0;
+  /**
+   * Cifras del tablero. Salen de consultas de conteo, no de contar filas
+   * descargadas, así que reflejan el total real aunque la lista de la pestaña
+   * solo tenga cargados los primeros cien.
+   */
+  resumen = signal<ResumenDiagnostico | null>(null);
 
-  datosSedes: Models.Diagnostico.Sedes[] = [];
-  datosColaboradores: Models.Diagnostico.Colaboradores[] = [];
-  datosContratistas: Models.Diagnostico.Contratistas[] = [];
-  datos006diagnosticoServicios: Models.Diagnostico.Servicio[] = [];
-  datosCodunccion: any[] = [];
-  datosCodunccionMisional: any[] = [];
-  datosRiesgosViales: any[] = [];
-  datosVehiculos: any[] = [];
-  datosRutas: any[] = [];
-  datosPlanEmergencias: any[] = [];
-
-  num_vehiculos = 0;
-  num_rutas = 0;
-
-  private _subSedes?: Subscription;
-  private _subServicios?: Subscription;
-  private _subContratistas?: Subscription;
-  private _subColaboradores?: Subscription;
-  private _subVehiculos?: Subscription;
-  private _subRutas?: Subscription;
-  private _subPlanEmergencias?: Subscription;
-
-  constructor(private _sedes: SedesDiagnosticoService) {}
+  /**
+   * Una lista por sección, cada una con su propio cursor de paginación. Se
+   * llenan al abrir su pestaña, no al entrar al módulo.
+   */
+  readonly listas: Record<SeccionDiagnostico, ListaDiagnostico<any>> = {
+    'sedes': this._datos.lista<Models.Diagnostico.Sedes>('sedes'),
+    'servicios': this._datos.lista<Models.Diagnostico.Servicio>('servicios'),
+    'colaboradores': this._datos.lista<Models.Diagnostico.Colaboradores>('colaboradores'),
+    'contratistas': this._datos.lista<Models.Diagnostico.Contratistas>('contratistas'),
+    'vehiculos': this._datos.lista<any>('vehiculos'),
+    'rutas': this._datos.lista<any>('rutas'),
+    'plan-emergencias': this._datos.lista<any>('plan-emergencias'),
+  };
 
   async ngOnInit() {
+    this.escucharEscrituras();
+    await this._empresaSrv.cargar();
     await this.consultarDiagnosticoBase();
     this.cargarParametrosEncuesta();
-    if (this.diagnosticoBase) {
-      this.consultarSedes();
-      this.consultarServicios();
-      this.consultarContratistas();
-      this.consultarColaboradores();
-      this.consultarVehiculos();
-      this.consultarRutas();
-      this.consultarPlanEmergencias();
-    }
+    if (this.diagnosticoBase) await this.cargarResumen();
+  }
+
+  /**
+   * Mantiene la pantalla al día cuando alguien crea, edita o borra.
+   *
+   * Los formularios y los modales escriben directamente en Firestore y antes
+   * se apoyaban en las suscripciones en tiempo real para que la tabla se
+   * refrescara sola. Al quitarlas hacía falta otra señal: el servicio de
+   * Firestore avisa de cada escritura y aquí se traduce a qué sección recargar.
+   */
+  private escucharEscrituras() {
+    this._firestore.escrituras
+      .pipe(
+        // La importación de Excel crea un documento por fila. Sin esperar a
+        // que la ráfaga termine se lanzaría una recarga por cada colaborador.
+        debounceTime(500),
+        takeUntilDestroyed(this._destroyRef)
+      )
+      .subscribe((path) => {
+        const seccion = this._datos.seccionDeRuta(path);
+        if (!seccion) return;
+
+        // Solo se recarga lo que ya se había abierto; el resto se traerá
+        // cuando se abra, y el resumen siempre, porque el tablero lo muestra.
+        if (this.listas[seccion].cargada()) {
+          this.listas[seccion].recargar().catch(() => undefined);
+        }
+        this.cargarResumen();
+      });
   }
 
   // ── Diagnóstico base ─────────────────────────────────────────────────────
 
   async consultarDiagnosticoBase() {
-    const periodo = this._authcations.periodo();
-    const path = `Empresas/${this.nit}/periodos/${periodo}/006-diagnostico`;
-    const q: Models.Firebases.whereQuery[] = [['estado', '==', 'Activo']];
+    this.errorDiagnostico.set('');
     try {
-      const snap = await this._firestore.getDocumentsQuery<Models.Diagnostico.DiagnosticoBase>(path, q);
-      this.diagnosticoBase = snap.docs.length > 0
-        ? (snap.docs[0].data() as Models.Diagnostico.DiagnosticoBase)
-        : null;
+      this.diagnosticoBase = await this._datos.diagnosticoBase();
     } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'No se pudo comprobar el diagnóstico';
       console.error('[Diagnostico] consultarDiagnosticoBase:', error);
       this.diagnosticoBase = null;
+      this.errorDiagnostico.set(msg);
     } finally {
       this.cargandoDiagnostico = false;
+    }
+  }
+
+  /** Reintenta la comprobación inicial tras un fallo de lectura. */
+  async reintentar() {
+    this.cargandoDiagnostico = true;
+    await this.consultarDiagnosticoBase();
+    if (this.diagnosticoBase) await this.cargarResumen();
+  }
+
+  /** Las cifras del tablero: una lectura por cifra, sin descargar listados. */
+  async cargarResumen() {
+    try {
+      this.resumen.set(await this._datos.resumen());
+    } catch (error: unknown) {
+      console.error('[Diagnostico] cargarResumen:', error);
     }
   }
 
@@ -155,7 +209,7 @@ export class DiagnosticoComponent implements OnInit, OnDestroy {
     }
     this.guardando = true;
     try {
-      const periodo = this._authcations.periodo();
+      const periodo = this._auth.periodo();
       const now = new Date();
       const fechaCreacion = now.toLocaleDateString('es-CO', {
         year: 'numeric', month: '2-digit', day: '2-digit',
@@ -170,19 +224,15 @@ export class DiagnosticoComponent implements OnInit, OnDestroy {
         version: 'v1',
         estado: 'En proceso',
         porcentajeTotal: 0,
-        nitEmpresa: this.nit as string,
+        nitEmpresa: this.nit(),
         periodo,
       };
 
-      const path = `Empresas/${this.nit}/periodos/${periodo}/006-diagnostico`;
-      await this._firestore.createDocument(path, doc);
+      await this._firestore.createDocument(this._datos.rutaBase(), doc);
       this._alerta.showSuccess('Diagnóstico creado exitosamente.');
       this.mostrarModal = false;
       await this.consultarDiagnosticoBase();
-      this.consultarSedes();
-      this.consultarServicios();
-      this.consultarContratistas();
-      this.consultarColaboradores();
+      await this.cargarResumen();
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Error al crear el diagnóstico';
       console.error('[Diagnostico] guardarDiagnostico:', error);
@@ -192,61 +242,51 @@ export class DiagnosticoComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ── Subscriptions del dashboard ──────────────────────────────────────────
+  // ── Pestañas ─────────────────────────────────────────────────────────────
 
-  consultarSedes() {
-    const periodo = this._authcations.periodo();
-    const path = `Empresas/${this.nit}/periodos/${periodo}/006-diagnostico-sedes`;
-    const q: Models.Firebases.whereQuery[] = [['estado', '==', 'Activo']];
-    const extras: Models.Firebases.extrasQuery = { orderParam: 'docCreado', directionSort: 'desc', limit: 20 };
-    this._subSedes = this._firestore.getDocumentsQueryChanges<Models.Diagnostico.Sedes>(path, q, extras).subscribe(res => {
-      this.num_sedes = res.length;
-      this.datosSedes = res;
+  /**
+   * Cambia de pestaña y, la primera vez, trae su listado.
+   *
+   * Antes el módulo abría de golpe siete suscripciones en tiempo real al
+   * entrar, aunque solo se mirara el tablero. Ahora cada sección se paga
+   * cuando se abre, y volver a ella no cuesta nada.
+   */
+  toggleTabs(tabNumber: number) {
+    this.openTab = tabNumber;
+
+    const seccion = SECCION_POR_PESTANA[tabNumber];
+    if (!seccion) return;
+
+    this.listas[seccion].cargar().catch(() => {
+      this._alerta.showError('No se pudo cargar la información de esta sección.');
     });
   }
 
-  consultarServicios() {
-    const periodo = this._authcations.periodo();
-    const path = `Empresas/${this.nit}/periodos/${periodo}/006-diagnostico-servicios`;
-    const q: Models.Firebases.whereQuery[] = [['estado', '==', 'Activo']];
-    const extras: Models.Firebases.extrasQuery = { orderParam: 'docCreado', directionSort: 'desc', limit: 20 };
-    this._subServicios = this._firestore.getDocumentsQueryChanges<Models.Diagnostico.Servicio>(path, q, extras).subscribe(res => {
-      this.num_servicios = res.length;
-      this.datos006diagnosticoServicios = res;
+  /** Trae el siguiente tramo de la sección que se está mirando. */
+  cargarMas(seccion: SeccionDiagnostico) {
+    this.listas[seccion].cargarMas().catch(() => {
+      this._alerta.showError('No se pudieron cargar más registros.');
     });
   }
 
-  consultarContratistas() {
-    const periodo = this._authcations.periodo();
-    const path = `Empresas/${this.nit}/periodos/${periodo}/006-diagnostico-contratistas`;
-    const q: Models.Firebases.whereQuery[] = [['estado', '==', 'Activo']];
-    const extras: Models.Firebases.extrasQuery = { orderParam: 'docCreado', directionSort: 'desc', limit: 20 };
-    this._subContratistas = this._firestore.getDocumentsQueryChanges<Models.Diagnostico.Contratistas>(path, q, extras).subscribe(res => {
-      this.num_contratista = res.length;
-      this.datosContratistas = res;
-      this.num_conductores = res.reduce((sum, e) => sum + (Number(e.conductores) || 0), 0);
-    });
-  }
-
-  consultarColaboradores() {
-    const periodo = this._authcations.periodo();
-    const path = `Empresas/${this.nit}/periodos/${periodo}/006-diagnostico-colaboradores`;
-    const q: Models.Firebases.whereQuery[] = [['estado', '==', 'Activo']];
-    const extras: Models.Firebases.extrasQuery = { orderParam: 'docCreado', directionSort: 'desc', limit: 20 };
-    this._subColaboradores = this._firestore.getDocumentsQueryChanges<Models.Diagnostico.Colaboradores>(path, q, extras).subscribe(res => {
-      this.num_empleados = res.length;
-      this.datosColaboradores = res;
-      this.num_masculino = res.filter(e => e.genero === 'Masculino').length;
-      this.num_femenino = res.filter(e => e.genero === 'Femenino').length;
-    });
+  /**
+   * Refresca una sección tras crear, editar o borrar en ella, y actualiza las
+   * cifras del tablero para que no queden desfasadas.
+   */
+  async refrescar(seccion: SeccionDiagnostico) {
+    await this.listas[seccion].recargar();
+    await this.cargarResumen();
   }
 
   // ── Encuesta pública (inicialización) ────────────────────────────────────
 
   async cargarParametrosEncuesta() {
-    const path = `Encuestas_publicas/${this.nit}`;
+    const nit = this.nit();
+    if (!nit) return;
     try {
-      const snap = await this._firestore.getDocument<Models.Diagnostico.encuestaParametros>(path);
+      const snap = await this._firestore.getDocument<Models.Diagnostico.encuestaParametros>(
+        `Encuestas_publicas/${nit}`
+      );
       if (!snap.exists()) {
         await this._firestore.createDocument('Encuestas_publicas', {
           nombreEmpresa: this.empresa,
@@ -255,56 +295,31 @@ export class DiagnosticoComponent implements OnInit, OnDestroy {
             modulo2: false, modulo3: false,
             modulo4: false, modulo5: false, modulo6: false,
           },
-        }, this.nit);
+        }, nit);
       }
     } catch (error: unknown) {
       console.error('[Diagnostico] cargarParametrosEncuesta:', error);
     }
   }
 
-  toggleTabs(tabNumber: number) {
-    this.openTab = tabNumber;
-  }
+  // ── Atajos para la plantilla ─────────────────────────────────────────────
 
-  consultarVehiculos() {
-    const periodo = this._authcations.periodo();
-    const path = `Empresas/${this.nit}/periodos/${periodo}/006-diagnostico-vehiculos`;
-    const q: Models.Firebases.whereQuery[] = [['estado', '==', 'Activo']];
-    const extras: Models.Firebases.extrasQuery = { orderParam: 'docCreado', directionSort: 'desc', limit: 100 };
-    this._subVehiculos = this._firestore.getDocumentsQueryChanges<any>(path, q, extras).subscribe(res => {
-      this.num_vehiculos = res.length;
-      this.datosVehiculos = res;
-    });
-  }
+  get num_sedes() { return this.resumen()?.sedes ?? 0; }
+  get num_servicios() { return this.resumen()?.servicios ?? 0; }
+  get num_empleados() { return this.resumen()?.colaboradores ?? 0; }
+  get num_contratista() { return this.resumen()?.contratistas ?? 0; }
+  get num_vehiculos() { return this.resumen()?.vehiculos ?? 0; }
+  get num_rutas() { return this.resumen()?.rutas ?? 0; }
+  get num_planes() { return this.resumen()?.planEmergencias ?? 0; }
+  get num_conductores() { return this.resumen()?.conductores ?? 0; }
+  get num_masculino() { return this.resumen()?.masculino ?? 0; }
+  get num_femenino() { return this.resumen()?.femenino ?? 0; }
 
-  consultarRutas() {
-    const periodo = this._authcations.periodo();
-    const path = `Empresas/${this.nit}/periodos/${periodo}/006-diagnostico-rutas`;
-    const q: Models.Firebases.whereQuery[] = [['estado', '==', 'Activo']];
-    const extras: Models.Firebases.extrasQuery = { orderParam: 'docCreado', directionSort: 'desc', limit: 100 };
-    this._subRutas = this._firestore.getDocumentsQueryChanges<any>(path, q, extras).subscribe(res => {
-      this.num_rutas = res.length;
-      this.datosRutas = res;
-    });
-  }
-
-  consultarPlanEmergencias() {
-    const periodo = this._authcations.periodo();
-    const path = `Empresas/${this.nit}/periodos/${periodo}/006-diagnostico-plan-emergencias`;
-    const q: Models.Firebases.whereQuery[] = [['estado', '==', 'Activo']];
-    const extras: Models.Firebases.extrasQuery = { orderParam: 'docCreado', directionSort: 'desc', limit: 100 };
-    this._subPlanEmergencias = this._firestore.getDocumentsQueryChanges<any>(path, q, extras).subscribe(res => {
-      this.datosPlanEmergencias = res;
-    });
-  }
-
-  ngOnDestroy() {
-    this._subSedes?.unsubscribe();
-    this._subServicios?.unsubscribe();
-    this._subContratistas?.unsubscribe();
-    this._subColaboradores?.unsubscribe();
-    this._subVehiculos?.unsubscribe();
-    this._subRutas?.unsubscribe();
-    this._subPlanEmergencias?.unsubscribe();
-  }
+  get datosSedes() { return this.listas['sedes'].datos(); }
+  get datos006diagnosticoServicios() { return this.listas['servicios'].datos(); }
+  get datosColaboradores() { return this.listas['colaboradores'].datos(); }
+  get datosContratistas() { return this.listas['contratistas'].datos(); }
+  get datosVehiculos() { return this.listas['vehiculos'].datos(); }
+  get datosRutas() { return this.listas['rutas'].datos(); }
+  get datosPlanEmergencias() { return this.listas['plan-emergencias'].datos(); }
 }
