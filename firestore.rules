@@ -128,5 +128,12 @@ service cloud.firestore {
         allow update, delete: if puedeEditar(nitempresa);
       }
     }
+
+    // El gestor cuenta las respuestas de una encuesta en todas las empresas
+    // para saber si todavia se puede editar. Es una consulta de grupo, que se
+    // autoriza aparte de la regla anidada de arriba.
+    match /{camino=**}/encuestas/{respuestaId} {
+      allow read: if esSuperadmin();
+    }
   }
 }

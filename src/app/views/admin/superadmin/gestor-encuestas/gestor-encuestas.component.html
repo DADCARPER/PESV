@@ -67,18 +67,48 @@
           class="text-sm font-medium text-gray-500 hover:text-gray-900">
           ‹ Volver a la lista
         </button>
-        <div class="flex items-center gap-2">
-          <button type="button" (click)="guardar(false)" [disabled]="guardando()"
-            class="rounded border border-gray-300 px-4 py-2 text-xs font-bold uppercase text-gray-700 transition-colors hover:bg-gray-100 disabled:opacity-50">
-            {{ guardando() ? 'Guardando...' : 'Guardar borrador' }}
-          </button>
-          <button type="button" (click)="guardar(true)" [disabled]="guardando()"
-            title="Sube la versión y la deja disponible para las empresas"
+        @if (edicionCongelada()) {
+          <button type="button" (click)="duplicar(encuesta)" [disabled]="guardando()"
             class="rounded bg-color1 px-4 py-2 text-xs font-bold uppercase text-white shadow transition-opacity hover:opacity-90 disabled:opacity-50">
-            Publicar
+            Duplicar para editar
           </button>
-        </div>
+        } @else {
+          <div class="flex items-center gap-2">
+            <button type="button" (click)="guardar(false)" [disabled]="guardando()"
+              class="rounded border border-gray-300 px-4 py-2 text-xs font-bold uppercase text-gray-700 transition-colors hover:bg-gray-100 disabled:opacity-50">
+              {{ guardando() ? 'Guardando...' : 'Guardar borrador' }}
+            </button>
+            <button type="button" (click)="guardar(true)" [disabled]="guardando()"
+              title="La deja disponible para las empresas"
+              class="rounded bg-color1 px-4 py-2 text-xs font-bold uppercase text-white shadow transition-opacity hover:opacity-90 disabled:opacity-50">
+              Publicar
+            </button>
+          </div>
+        }
       </div>
+
+      @if (edicionCongelada()) {
+        <!-- Congelada: un diagnostico se presenta ante la autoridad y tiene que
+             poder reproducirse tal como se respondio. Cambiar el cuestionario
+             despues dejaria respuestas contestando a preguntas que ya no
+             existen. -->
+        <div class="mb-6 flex items-start gap-3 rounded-lg border border-sky-200 bg-sky-50 p-4">
+          <i class="fas fa-lock mt-0.5 text-sky-600" aria-hidden="true"></i>
+          <div>
+            <p class="font-semibold text-sky-900">
+              Esta encuesta ya tiene {{ cuantasRespuestas(encuesta) }} respuestas
+            </p>
+            <p class="mt-1 text-sm text-sky-800">
+              A partir de la primera respuesta el cuestionario queda fijo: si se pudiera
+              cambiar, esas respuestas estarian contestando a preguntas que ya no existen
+              y el diagnostico dejaria de poder reproducirse. Para hacer cambios,
+              duplicala y trabaja sobre la copia.
+            </p>
+          </div>
+        </div>
+      }
+
+      <fieldset [disabled]="edicionCongelada()" class="disabled:opacity-90">
 
       <div class="grid gap-4 sm:grid-cols-2 mb-8">
         <div>
@@ -92,7 +122,7 @@
             <span class="text-sm font-medium text-gray-700">{{ encuesta.estado }}</span>
             <span class="text-xs text-gray-500">versión {{ encuesta.version }}</span>
           </div>
-          <p class="mt-1 text-xs text-gray-500">La versión sube al publicar; las respuestas guardan con cuál se contestaron.</p>
+          <p class="mt-1 text-xs text-gray-500">Cada duplicado sube la versión. Las respuestas quedan con la encuesta a la que contestaron.</p>
         </div>
         <div class="sm:col-span-2">
           <label class="block text-xs font-bold uppercase text-gray-600 mb-2">Descripción</label>
@@ -162,31 +192,11 @@
                           title="Subir" class="rounded px-2 py-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700">↑</button>
                         <button type="button" (click)="moverPregunta(modulo, iPregunta, 1)"
                           title="Bajar" class="rounded px-2 py-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700">↓</button>
-                        <button type="button" (click)="pedirBorrado(modulo, iPregunta)"
+                        <button type="button" (click)="quitarPregunta(modulo, iPregunta)"
                           title="Eliminar" class="rounded px-2 py-1 text-red-400 hover:bg-red-50 hover:text-red-700">✕</button>
                       </div>
                     </div>
 
-                    @if (borradoPendiente() === pregunta.id) {
-                      <div class="mb-3 rounded-lg border border-red-200 bg-red-50 p-3">
-                        <p class="text-sm font-semibold text-red-800">¿Eliminar esta pregunta?</p>
-                        <p class="mt-1 text-xs text-red-700">
-                          Ya se guardó alguna vez, así que puede tener respuestas recogidas.
-                          Seguirán en la base de datos, pero nada volverá a leerlas y no
-                          aparecerán en los resultados.
-                        </p>
-                        <div class="mt-2 flex items-center gap-2">
-                          <button type="button" (click)="quitarPregunta(modulo, iPregunta)"
-                            class="rounded bg-red-600 px-3 py-1.5 text-xs font-bold uppercase text-white hover:bg-red-700">
-                            Eliminar
-                          </button>
-                          <button type="button" (click)="cancelarBorrado()"
-                            class="rounded border border-gray-300 px-3 py-1.5 text-xs font-bold uppercase text-gray-700 hover:bg-gray-100">
-                            Cancelar
-                          </button>
-                        </div>
-                      </div>
-                    }
 
                     <div class="grid gap-3 sm:grid-cols-2">
                       <div class="sm:col-span-2">
@@ -213,26 +223,13 @@
                       </div>
 
                       <!-- El identificador no se teclea: es la clave con la que
-                           se guarda la respuesta, y cambiarla deja huerfanas
-                           las ya recogidas. Se genera del enunciado mientras la
-                           pregunta es nueva y se fija al guardar. -->
+                           se guarda la respuesta. Se genera del enunciado. -->
                       <div>
-                        <label class="block text-xs font-bold uppercase text-gray-600 mb-1">
-                          Identificador
-                        </label>
-                        <div class="flex items-center gap-2 rounded border border-gray-200 bg-gray-50 px-3 py-2">
-                          @if (idBloqueado(pregunta)) {
-                            <span class="text-gray-400" title="Fijado">🔒</span>
-                          }
+                        <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Identificador</label>
+                        <div class="rounded border border-gray-200 bg-gray-50 px-3 py-2">
                           <span class="truncate font-mono text-sm text-gray-700">{{ pregunta.id }}</span>
                         </div>
-                        <p class="mt-1 text-xs text-gray-500">
-                          @if (idBloqueado(pregunta)) {
-                            Fijado: ya puede haber respuestas guardadas con esta clave.
-                          } @else {
-                            Se genera del enunciado y queda fijo al guardar.
-                          }
-                        </p>
+                        <p class="mt-1 text-xs text-gray-500">Clave con la que se guarda la respuesta. Se genera del enunciado.</p>
                       </div>
 
                       <div class="sm:col-span-2 flex flex-wrap items-center gap-6">
@@ -293,6 +290,8 @@
         + Añadir módulo
       </button>
 
+      </fieldset>
+
     } @else {
 
       <!-- ── Lista ──────────────────────────────────────────────────────── -->
@@ -326,6 +325,15 @@
                   <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700">
                     versión {{ encuesta.version }}
                   </span>
+                  <span class="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold"
+                    [ngClass]="congelada(encuesta) ? 'bg-sky-100 text-sky-800' : 'bg-gray-100 text-gray-700'">
+                    @if (congelada(encuesta)) {
+                      <i class="fas fa-lock" aria-hidden="true"></i>
+                      {{ cuantasRespuestas(encuesta) }} respuestas · fija
+                    } @else {
+                      Sin respuestas · editable
+                    }
+                  </span>
                   <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700">
                     {{ encuesta.modulos.length }} módulos · {{ totalPreguntas(encuesta) }} preguntas
                   </span>
@@ -335,7 +343,7 @@
               <div class="flex flex-wrap items-center gap-2">
                 <button type="button" (click)="abrir(encuesta)"
                   class="whitespace-nowrap rounded border border-sky-500 px-3 py-1.5 text-xs font-semibold text-sky-700 transition-colors hover:bg-sky-500 hover:text-white">
-                  Editar
+                  {{ congelada(encuesta) ? 'Ver' : 'Editar' }}
                 </button>
                 <button type="button" (click)="duplicar(encuesta)" [disabled]="guardando()"
                   title="Copia como borrador, para cambiarla sin tocar la que están usando las empresas"

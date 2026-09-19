@@ -261,12 +261,19 @@ export class FirestoreService {
    * total exacto sale practicamente gratis. Sustituye a sacar el numero de
    * `res.length` sobre una consulta con `limit`, que devolvia el tope en lugar
    * del total: una empresa con 300 colaboradores mostraba 20.
+   *
+   * Con `group` cuenta sobre todas las subcolecciones que se llamen igual,
+   * esten donde esten. Es como se cuentan cosas repartidas por empresa sin
+   * recorrerlas una a una.
    */
   async contarDocumentos(
     path: string,
-    querys: Models.Firebases.whereQuery[] = []
+    querys: Models.Firebases.whereQuery[] = [],
+    group = false
   ): Promise<number> {
-    const ref = collection(this._firestore, path);
+    const ref = group
+      ? collectionGroup(this._firestore, path)
+      : collection(this._firestore, path);
     const q = querys.length ? query(ref, this.construirFiltro(querys)) : query(ref);
     const snap = await getCountFromServer(q);
     return snap.data().count;

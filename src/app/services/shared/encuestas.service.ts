@@ -21,6 +21,22 @@ export class EncuestasService {
 
   private _firestore = inject(FirestoreService);
 
+  /**
+   * Cuántas respuestas se han recogido con esta encuesta, en todas las
+   * empresas.
+   *
+   * Es lo que decide si la encuesta se puede seguir editando. Se cuenta sobre
+   * el grupo de subcolecciones `encuestas`, que vive repartido bajo cada
+   * empresa, en vez de recorrer las empresas una a una.
+   */
+  async contarRespuestas(encuestaId: string): Promise<number> {
+    return this._firestore.contarDocumentos(
+      'encuestas',
+      [['encuestaId', '==', encuestaId]],
+      true
+    );
+  }
+
   /** Todas las encuestas, la más reciente primero. */
   async listar(): Promise<ModelsEncuestas.Encuesta[]> {
     const snap = await this._firestore.getDocuments<ModelsEncuestas.Encuesta>(COLECCION);
@@ -41,31 +57,31 @@ export class EncuestasService {
   /**
    * Guarda los cambios de una encuesta.
    *
-   * Publicar sube la versión. Las respuestas guardan con qué versión se
-   * contestaron, así que editar una encuesta no reescribe lo ya respondido:
-   * quien lea resultados antiguos sabe a qué preguntas contestaban.
+   * Solo tiene sentido mientras nadie la haya respondido. En cuanto hay
+   * respuestas la encuesta queda congelada y el camino es duplicarla: se
+   * comprueba aquí y no solo en la pantalla, porque un diagnóstico es un
+   * documento que la empresa presenta ante la autoridad y tiene que poder
+   * reproducirse tal como se respondió.
    */
-  async actualizar(
-    id: string,
-    cambios: Partial<ModelsEncuestas.Encuesta>,
-    subirVersion = false
-  ): Promise<void> {
-    const datos: Partial<ModelsEncuestas.Encuesta> = { ...cambios };
-
-    if (subirVersion) {
-      const actual = await this.obtener(id);
-      datos.version = (actual?.version ?? 0) + 1;
+  async actualizar(id: string, cambios: Partial<ModelsEncuestas.Encuesta>): Promise<void> {
+    const respuestas = await this.contarRespuestas(id);
+    if (respuestas > 0) {
+      throw new Error(
+        `Esta encuesta ya tiene ${respuestas} respuestas y no se puede modificar. ` +
+        'Duplícala y trabaja sobre la copia.'
+      );
     }
 
-    await this._firestore.updateDocument(`${COLECCION}/${id}`, datos);
+    await this._firestore.updateDocument(`${COLECCION}/${id}`, cambios);
   }
 
   /**
    * Copia una encuesta como borrador.
    *
-   * Es la forma segura de cambiar una encuesta que ya tiene respuestas: se
-   * trabaja sobre la copia y las empresas siguen usando la original hasta que
-   * la nueva esté lista.
+   * Es el único camino para cambiar una encuesta que ya tiene respuestas: se
+   * trabaja sobre la copia mientras las empresas siguen usando la original,
+   * y las respuestas ya recogidas se quedan con el cuestionario al que
+   * realmente contestaron.
    */
   async duplicar(id: string): Promise<void> {
     const original = await this.obtener(id);
@@ -74,8 +90,8 @@ export class EncuestasService {
     const { id: _id, docCreado, docActualizado, ...resto } = original;
     await this.crear({
       ...resto,
-      nombre: `${original.nombre} (copia)`,
-      version: 1,
+      nombre: `${original.nombre} (v${original.version + 1})`,
+      version: original.version + 1,
       estado: 'borrador',
     });
   }
