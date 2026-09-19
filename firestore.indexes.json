@@ -389,21 +389,6 @@
       "density": "SPARSE_ALL"
     },
     {
-      "collectionGroup": "cuestionarios",
-      "queryScope": "COLLECTION_GROUP",
-      "fields": [
-        {
-          "fieldPath": "encuestaId",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "ASCENDING"
-        }
-      ],
-      "density": "SPARSE_ALL"
-    },
-    {
       "collectionGroup": "documentos",
       "queryScope": "COLLECTION",
       "fields": [
@@ -418,21 +403,6 @@
         {
           "fieldPath": "__name__",
           "order": "DESCENDING"
-        }
-      ],
-      "density": "SPARSE_ALL"
-    },
-    {
-      "collectionGroup": "encuestas",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "periodo",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "ASCENDING"
         }
       ],
       "density": "SPARSE_ALL"
