@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, CUSTOM_ELEMENTS_SCHEMA, signal } from '@angular/core';
+import { Component, effect, inject, CUSTOM_ELEMENTS_SCHEMA, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FirestoreService } from '../../../../../services/shared/firestore.service';
 import { AuthenticacionService } from '../../../../../services/shared/authenticacion.service';
@@ -13,7 +13,7 @@ import * as XLSX from 'xlsx';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './resultados-encuesta.component.html'
 })
-export class ResultadosEncuestaComponent implements OnInit {
+export class ResultadosEncuestaComponent {
 
   private _firestore = inject(FirestoreService);
   private _auth    = inject(AuthenticacionService);
@@ -31,43 +31,47 @@ export class ResultadosEncuestaComponent implements OnInit {
   aBorrar = signal<{ tipo: 'una' | 'todas'; respuesta?: any } | null>(null);
   borrando = signal(false);
 
-  todasLasRespuestas: any[] = [];
   respuestasFiltradas: any[] = [];
-  periodos: number[] = [];
-  periodoSeleccionado: number | null = null;
   cargando = true;
 
+  /**
+   * El periodo activo de la aplicacion, no un selector propio.
+   *
+   * Cada encuesta pertenece al periodo en que se respondio: un diagnostico es
+   * de un ano concreto y mezclar anos daria cifras que no son de nadie. Antes
+   * esta pantalla agrupaba por la fecha del documento y llevaba su propia
+   * botonera, asi que cambiar de periodo en la aplicacion no le afectaba.
+   */
+  readonly periodo = this._auth.periodo;
+
   get total(): number { return this.respuestasFiltradas.length; }
+
+  constructor() {
+    // Dispara la primera carga y vuelve a cargar al cambiar de periodo, que
+    // es lo que antes no ocurria.
+    effect(() => {
+      this.periodo();
+      this.cargar();
+    });
+  }
 
   private get ruta(): string {
     const nit = this._auth.getCurrentUser()?.displayName ?? '';
     return `Encuestas_publicas/${nit}/encuestas`;
   }
 
-  ngOnInit(): void {
-    this.cargar();
-  }
-
   /**
-   * Lectura puntual, no suscripcion. Es una pantalla de consulta: nadie
-   * necesita ver aparecer respuestas en vivo, y mantener abierta una escucha
-   * sobre la coleccion entera se paga con cada nueva respuesta.
+   * Lectura puntual, no suscripcion, y filtrada en el servidor por periodo:
+   * con muestreo las respuestas se cuentan por miles y no tiene sentido
+   * traerse todos los anos para mostrar uno.
    */
   async cargar(): Promise<void> {
     this.cargando = true;
     try {
-      const snap = await this._firestore.getDocuments<any>(this.ruta);
-      this.todasLasRespuestas = snap.docs.map(d => d.data());
-
-      const anios = [...new Set(this.todasLasRespuestas.map(r => this._getAnio(r.docCreado)))]
-        .sort((a, b) => b - a);
-      this.periodos = anios;
-
-      if (this.periodoSeleccionado === null && anios.length > 0) {
-        this.periodoSeleccionado = anios[0];
-      }
-
-      this._filtrar();
+      const snap = await this._firestore.getDocumentsQuery<any>(
+        this.ruta, [['periodo', '==', this.periodo()]]
+      );
+      this.respuestasFiltradas = snap.docs.map(d => d.data());
     } catch (error: unknown) {
       console.error('[ResultadosEncuesta] cargar:', error);
       this._alerta.showError('No se pudieron cargar las respuestas.');
@@ -124,26 +128,6 @@ export class ResultadosEncuestaComponent implements OnInit {
     } finally {
       this.borrando.set(false);
     }
-  }
-
-  seleccionarPeriodo(anio: number): void {
-    this.periodoSeleccionado = anio;
-    this._filtrar();
-  }
-
-  private _filtrar(): void {
-    if (this.periodoSeleccionado === null) {
-      this.respuestasFiltradas = [...this.todasLasRespuestas];
-    } else {
-      this.respuestasFiltradas = this.todasLasRespuestas
-        .filter(r => this._getAnio(r.docCreado) === this.periodoSeleccionado);
-    }
-  }
-
-  private _getAnio(docCreado: any): number {
-    if (!docCreado) return new Date().getFullYear();
-    if (typeof docCreado.toDate === 'function') return (docCreado.toDate() as Date).getFullYear();
-    return new Date(docCreado).getFullYear();
   }
 
   getFecha(docCreado: any): string {
@@ -220,7 +204,7 @@ export class ResultadosEncuestaComponent implements OnInit {
     const ws = XLSX.utils.json_to_sheet(filas);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Respuestas');
-    XLSX.writeFile(wb, `encuesta_${this.periodoSeleccionado ?? 'todos'}.xlsx`);
+    XLSX.writeFile(wb, `encuesta_${this.periodo()}.xlsx`);
   }
 
 }

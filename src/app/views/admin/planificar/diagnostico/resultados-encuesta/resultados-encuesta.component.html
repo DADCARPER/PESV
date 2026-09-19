@@ -4,7 +4,7 @@
   <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
     <div>
       <h2 class="text-lg font-bold text-gray-800">Resultados de encuesta</h2>
-      <p class="text-sm text-gray-400">Respuestas recibidas de colaboradores por periodo</p>
+      <p class="text-sm text-gray-400">Respuestas recibidas de colaboradores en el periodo activo</p>
     </div>
     <div class="flex items-center gap-2">
       <button (click)="exportarExcel()" [disabled]="total === 0"
@@ -26,16 +26,9 @@
   <!-- Selector de periodo + contador -->
   <div class="flex flex-wrap items-center gap-3">
 
-    @if (periodos.length > 0) {
-      @for (anio of periodos; track anio) {
-        <button (click)="seleccionarPeriodo(anio)"
-          [class]="periodoSeleccionado === anio
-            ? 'px-4 py-1.5 rounded-full text-sm font-semibold bg-amber-500 text-white shadow'
-            : 'px-4 py-1.5 rounded-full text-sm font-semibold bg-gray-100 text-gray-600 hover:bg-amber-100'">
-          {{ anio }}
-        </button>
-      }
-    }
+    <span class="inline-flex items-center gap-2 rounded-full bg-amber-500 px-4 py-1.5 text-sm font-semibold text-white shadow">
+      Periodo {{ periodo() }}
+    </span>
 
     <span class="ml-auto inline-flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-800 text-sm font-semibold px-4 py-1.5 rounded-full">
       <iconify-icon icon="hugeicons:checkmark-circle-02" width="16" height="16"></iconify-icon>
@@ -55,7 +48,7 @@
   @if (!cargando && total === 0) {
     <div class="flex flex-col items-center justify-center py-16 gap-3 text-gray-400">
       <iconify-icon icon="hugeicons:file-not-found" width="48" height="48"></iconify-icon>
-      <p class="text-sm">No hay respuestas para este periodo.</p>
+      <p class="text-sm">Todavía no hay respuestas en {{ periodo() }}.</p>
     </div>
   }
 
