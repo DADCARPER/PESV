@@ -1,8 +1,9 @@
-import { Component, OnInit, OnDestroy, inject, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, OnInit, inject, CUSTOM_ELEMENTS_SCHEMA, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FirestoreService } from '../../../../../services/shared/firestore.service';
 import { AuthenticacionService } from '../../../../../services/shared/authenticacion.service';
-import { Subscription } from 'rxjs';
+import { RolUsuarioService } from '../../../../../services/shared/rol-usuario.service';
+import { AlertaService } from '../../../../../services/shared/alerta.service';
 import * as XLSX from 'xlsx';
 
 @Component({
@@ -12,10 +13,23 @@ import * as XLSX from 'xlsx';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './resultados-encuesta.component.html'
 })
-export class ResultadosEncuestaComponent implements OnInit, OnDestroy {
+export class ResultadosEncuestaComponent implements OnInit {
 
   private _firestore = inject(FirestoreService);
   private _auth    = inject(AuthenticacionService);
+  private _rol     = inject(RolUsuarioService);
+  private _alerta  = inject(AlertaService);
+
+  /** Solo el operativo borra; el supervisor revisa. */
+  get puedeBorrar(): boolean { return this._rol.editable(); }
+
+  /**
+   * Que se esta a punto de borrar: una respuesta concreta o todas las del
+   * periodo. Se confirma aparte porque borrar respuestas destruye los datos
+   * del diagnostico y no hay vuelta atras.
+   */
+  aBorrar = signal<{ tipo: 'una' | 'todas'; respuesta?: any } | null>(null);
+  borrando = signal(false);
 
   todasLasRespuestas: any[] = [];
   respuestasFiltradas: any[] = [];
@@ -23,16 +37,27 @@ export class ResultadosEncuestaComponent implements OnInit, OnDestroy {
   periodoSeleccionado: number | null = null;
   cargando = true;
 
-  private _sub?: Subscription;
-
   get total(): number { return this.respuestasFiltradas.length; }
 
-  ngOnInit(): void {
+  private get ruta(): string {
     const nit = this._auth.getCurrentUser()?.displayName ?? '';
-    const path = `Encuestas_publicas/${nit}/encuestas`;
+    return `Encuestas_publicas/${nit}/encuestas`;
+  }
 
-    this._sub = this._firestore.getDocumentsChanges<any>(path).subscribe(snap => {
-      this.todasLasRespuestas = snap;
+  ngOnInit(): void {
+    this.cargar();
+  }
+
+  /**
+   * Lectura puntual, no suscripcion. Es una pantalla de consulta: nadie
+   * necesita ver aparecer respuestas en vivo, y mantener abierta una escucha
+   * sobre la coleccion entera se paga con cada nueva respuesta.
+   */
+  async cargar(): Promise<void> {
+    this.cargando = true;
+    try {
+      const snap = await this._firestore.getDocuments<any>(this.ruta);
+      this.todasLasRespuestas = snap.docs.map(d => d.data());
 
       const anios = [...new Set(this.todasLasRespuestas.map(r => this._getAnio(r.docCreado)))]
         .sort((a, b) => b - a);
@@ -43,8 +68,62 @@ export class ResultadosEncuestaComponent implements OnInit, OnDestroy {
       }
 
       this._filtrar();
+    } catch (error: unknown) {
+      console.error('[ResultadosEncuesta] cargar:', error);
+      this._alerta.showError('No se pudieron cargar las respuestas.');
+    } finally {
       this.cargando = false;
-    });
+    }
+  }
+
+  // ── Borrado ───────────────────────────────────────────────────────────────
+
+  pedirBorrarUna(respuesta: any): void {
+    this.aBorrar.set({ tipo: 'una', respuesta });
+  }
+
+  pedirBorrarTodas(): void {
+    this.aBorrar.set({ tipo: 'todas' });
+  }
+
+  cancelarBorrado(): void {
+    this.aBorrar.set(null);
+  }
+
+  /**
+   * Borra lo confirmado.
+   *
+   * Dejar el periodo sin respuestas devuelve la encuesta a editable en el
+   * gestor del administrador: el candado no es un estado aparte, sale de que
+   * haya o no respuestas contestadas.
+   */
+  async confirmarBorrado(): Promise<void> {
+    const objetivo = this.aBorrar();
+    if (!objetivo || !this.puedeBorrar) return;
+
+    this.borrando.set(true);
+    try {
+      const aEliminar = objetivo.tipo === 'una'
+        ? [objetivo.respuesta]
+        : [...this.respuestasFiltradas];
+
+      for (const respuesta of aEliminar) {
+        await this._firestore.deleteDocument(`${this.ruta}/${respuesta.id}`);
+      }
+
+      this._alerta.showSuccess(aEliminar.length === 1
+        ? 'Respuesta eliminada.'
+        : `${aEliminar.length} respuestas eliminadas.`);
+
+      this.aBorrar.set(null);
+      await this.cargar();
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'No se pudieron eliminar';
+      console.error('[ResultadosEncuesta] borrar:', error);
+      this._alerta.showError(msg);
+    } finally {
+      this.borrando.set(false);
+    }
   }
 
   seleccionarPeriodo(anio: number): void {
@@ -144,7 +223,4 @@ export class ResultadosEncuestaComponent implements OnInit, OnDestroy {
     XLSX.writeFile(wb, `encuesta_${this.periodoSeleccionado ?? 'todos'}.xlsx`);
   }
 
-  ngOnDestroy(): void {
-    this._sub?.unsubscribe();
-  }
 }

@@ -6,11 +6,21 @@
       <h2 class="text-lg font-bold text-gray-800">Resultados de encuesta</h2>
       <p class="text-sm text-gray-400">Respuestas recibidas de colaboradores por periodo</p>
     </div>
-    <button (click)="exportarExcel()" [disabled]="total === 0"
-      class="flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-semibold text-sm px-4 py-2 rounded-lg shadow transition-all duration-150">
-      <iconify-icon icon="hugeicons:file-export" width="18" height="18"></iconify-icon>
-      Exportar Excel
-    </button>
+    <div class="flex items-center gap-2">
+      <button (click)="exportarExcel()" [disabled]="total === 0"
+        class="flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-semibold text-sm px-4 py-2 rounded-lg shadow transition-all duration-150">
+        <iconify-icon icon="hugeicons:file-export" width="18" height="18"></iconify-icon>
+        Exportar Excel
+      </button>
+      @if (puedeBorrar) {
+        <button (click)="pedirBorrarTodas()" [disabled]="total === 0"
+          title="Deja el periodo sin respuestas y devuelve la encuesta a editable"
+          class="flex items-center gap-2 border border-red-300 text-red-600 hover:bg-red-50 disabled:opacity-50 font-semibold text-sm px-4 py-2 rounded-lg transition-all duration-150">
+          <iconify-icon icon="hugeicons:delete-02" width="18" height="18"></iconify-icon>
+          Eliminar respuestas
+        </button>
+      }
+    </div>
   </div>
 
   <!-- Selector de periodo + contador -->
@@ -66,6 +76,9 @@
             <th class="px-4 py-3 text-left">Conduce</th>
             <th class="px-4 py-3 text-left">Licencia</th>
             <th class="px-4 py-3 text-left">Fecha envío</th>
+            @if (puedeBorrar) {
+              <th class="px-4 py-3 text-right">Acciones</th>
+            }
           </tr>
         </thead>
 
@@ -88,6 +101,12 @@
               </td>
               <td class="px-4 py-3 text-gray-600">{{ r.categoriaLicencia || '—' }}</td>
               <td class="px-4 py-3 text-gray-400 whitespace-nowrap">{{ getFecha(r.docCreado) }}</td>
+              @if (puedeBorrar) {
+                <td class="px-4 py-3 text-right">
+                  <button (click)="pedirBorrarUna(r)" title="Eliminar esta respuesta"
+                    class="rounded px-2 py-1 text-red-400 hover:bg-red-50 hover:text-red-700">✕</button>
+                </td>
+              }
             </tr>
           }
         </tbody>
@@ -97,3 +116,45 @@
   }
 
 </div>
+
+<!-- ── Confirmar borrado ──────────────────────────────────────────────────── -->
+@if (aBorrar(); as objetivo) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div class="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
+
+      <h3 class="text-lg font-bold text-gray-900">
+        {{ objetivo.tipo === 'todas'
+            ? '¿Eliminar las ' + total + ' respuestas de este periodo?'
+            : '¿Eliminar la respuesta de ' + (objetivo.respuesta?.nombre || 'este colaborador') + '?' }}
+      </h3>
+
+      <div class="mt-3 space-y-3 text-sm text-gray-600">
+        <p>
+          Esto borra datos del diagnóstico y no se puede deshacer. Las gráficas y el
+          informe dejarán de reflejar lo que hoy muestran.
+        </p>
+        @if (objetivo.tipo === 'todas') {
+          <p class="rounded-lg border border-sky-200 bg-sky-50 p-3 text-sky-800">
+            Al quedarse el periodo sin ninguna respuesta, la encuesta vuelve a ser
+            editable para el administrador. Es la forma de corregirla, pero pierdes
+            lo ya recogido.
+          </p>
+          <p class="font-medium text-gray-700">
+            Si vas a necesitar estos datos, expórtalos a Excel antes de continuar.
+          </p>
+        }
+      </div>
+
+      <div class="mt-6 flex items-center justify-end gap-2">
+        <button type="button" (click)="cancelarBorrado()" [disabled]="borrando()"
+          class="rounded border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 disabled:opacity-50">
+          Cancelar
+        </button>
+        <button type="button" (click)="confirmarBorrado()" [disabled]="borrando()"
+          class="rounded bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50">
+          {{ borrando() ? 'Eliminando...' : 'Eliminar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
