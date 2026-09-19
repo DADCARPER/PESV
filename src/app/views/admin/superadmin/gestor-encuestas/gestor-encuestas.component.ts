@@ -59,6 +59,16 @@ export class GestorEncuestasComponent implements OnInit {
   /** `id` de los módulos desplegados en el editor. */
   desplegados = signal<Set<string>>(new Set());
 
+  /**
+   * Identificadores que ya estaban guardados al abrir la encuesta.
+   *
+   * Son las claves bajo las que hay respuestas recogidas. Cambiar una no
+   * estropea esas respuestas, pero las deja huérfanas: siguen en Firestore con
+   * la clave vieja mientras la pantalla de resultados busca la nueva, así que
+   * se leen como si nadie hubiera contestado. Por eso se bloquean.
+   */
+  private idsGuardados = signal<Set<string>>(new Set());
+
   readonly hayEncuestas = computed(() => this.lista().length > 0);
 
   ngOnInit(): void {
@@ -113,8 +123,71 @@ export class GestorEncuestasComponent implements OnInit {
    */
   abrir(encuesta: ModelsEncuestas.Encuesta) {
     this.edicion.set(structuredClone(encuesta));
+    this.idsGuardados.set(this.recogerIds(encuesta));
     this.desplegados.set(new Set());
     this.aviso.set('');
+  }
+
+  private recogerIds(encuesta: ModelsEncuestas.Encuesta): Set<string> {
+    return new Set(encuesta.modulos.flatMap(m => m.preguntas.map(p => p.id)));
+  }
+
+  /** La pregunta ya se guardó alguna vez, así que puede tener respuestas. */
+  idBloqueado(pregunta: ModelsEncuestas.Pregunta): boolean {
+    return this.idsGuardados().has(pregunta.id);
+  }
+
+  /**
+   * Convierte un enunciado en un identificador legible.
+   *
+   * Sin tildes ni signos y en minúsculas por seguridad: es una clave de
+   * Firestore y acaba escrita en exportaciones y en el mapeo a la ficha de
+   * colaborador, donde los caracteres raros dan problemas.
+   */
+  private aIdentificador(texto: string): string {
+    const limpio = texto
+      .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-zA-Z0-9\s]/g, ' ')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 6);
+
+    if (!limpio.length) return '';
+    return limpio
+      .map((palabra, i) => i === 0
+        ? palabra.toLowerCase()
+        : palabra.charAt(0).toUpperCase() + palabra.slice(1).toLowerCase())
+      .join('');
+  }
+
+  /** Añade un sufijo si el identificador ya lo usa otra pregunta. */
+  private idLibre(base: string, pregunta: ModelsEncuestas.Pregunta): string {
+    const encuesta = this.edicion();
+    if (!encuesta || !base) return base;
+
+    const ocupados = new Set(
+      encuesta.modulos
+        .flatMap(m => m.preguntas)
+        .filter(p => p !== pregunta)
+        .map(p => p.id)
+    );
+
+    if (!ocupados.has(base)) return base;
+    let n = 2;
+    while (ocupados.has(`${base}${n}`)) n++;
+    return `${base}${n}`;
+  }
+
+  /**
+   * Mientras la pregunta sea nueva, su identificador sigue al enunciado. Así
+   * nadie tiene que inventarse una clave, que es una tripa del sistema y no
+   * una decisión de quien redacta la encuesta.
+   */
+  alEscribirEnunciado(pregunta: ModelsEncuestas.Pregunta) {
+    if (this.idBloqueado(pregunta)) return;
+    const base = this.aIdentificador(pregunta.etiqueta);
+    pregunta.id = base ? this.idLibre(base, pregunta) : pregunta.id;
   }
 
   cerrar() {
@@ -175,8 +248,31 @@ export class GestorEncuestasComponent implements OnInit {
     }];
   }
 
+  /**
+   * Pregunta pendiente de confirmar su borrado.
+   *
+   * Solo se pide confirmación para las que ya se guardaron: borrar una de esas
+   * deja sus respuestas en Firestore sin nada que las lea, y no hay forma de
+   * recuperarlas desde la interfaz. Las recién añadidas se quitan sin más.
+   */
+  borradoPendiente = signal<string | null>(null);
+
+  pedirBorrado(modulo: ModelsEncuestas.Modulo, indice: number) {
+    const pregunta = modulo.preguntas[indice];
+    if (this.idBloqueado(pregunta)) {
+      this.borradoPendiente.set(pregunta.id);
+      return;
+    }
+    this.quitarPregunta(modulo, indice);
+  }
+
+  cancelarBorrado() {
+    this.borradoPendiente.set(null);
+  }
+
   quitarPregunta(modulo: ModelsEncuestas.Modulo, indice: number) {
     modulo.preguntas = modulo.preguntas.filter((_, i) => i !== indice);
+    this.borradoPendiente.set(null);
   }
 
   moverPregunta(modulo: ModelsEncuestas.Modulo, indice: number, salto: number) {
@@ -267,7 +363,12 @@ export class GestorEncuestasComponent implements OnInit {
       this.aviso.set(publicar ? 'Encuesta publicada.' : 'Cambios guardados.');
       await this.cargar();
       const refrescada = this.lista().find(e => e.id === id);
-      if (refrescada) this.edicion.set(structuredClone(refrescada));
+      if (refrescada) {
+        this.edicion.set(structuredClone(refrescada));
+        // Lo recién guardado ya puede recibir respuestas: su identificador
+        // queda fijado a partir de ahora.
+        this.idsGuardados.set(this.recogerIds(refrescada));
+      }
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'No se pudo guardar';
       console.error('[GestorEncuestas] guardar:', error);

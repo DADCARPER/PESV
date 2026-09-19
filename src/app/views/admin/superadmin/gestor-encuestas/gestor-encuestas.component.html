@@ -162,15 +162,37 @@
                           title="Subir" class="rounded px-2 py-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700">↑</button>
                         <button type="button" (click)="moverPregunta(modulo, iPregunta, 1)"
                           title="Bajar" class="rounded px-2 py-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700">↓</button>
-                        <button type="button" (click)="quitarPregunta(modulo, iPregunta)"
+                        <button type="button" (click)="pedirBorrado(modulo, iPregunta)"
                           title="Eliminar" class="rounded px-2 py-1 text-red-400 hover:bg-red-50 hover:text-red-700">✕</button>
                       </div>
                     </div>
+
+                    @if (borradoPendiente() === pregunta.id) {
+                      <div class="mb-3 rounded-lg border border-red-200 bg-red-50 p-3">
+                        <p class="text-sm font-semibold text-red-800">¿Eliminar esta pregunta?</p>
+                        <p class="mt-1 text-xs text-red-700">
+                          Ya se guardó alguna vez, así que puede tener respuestas recogidas.
+                          Seguirán en la base de datos, pero nada volverá a leerlas y no
+                          aparecerán en los resultados.
+                        </p>
+                        <div class="mt-2 flex items-center gap-2">
+                          <button type="button" (click)="quitarPregunta(modulo, iPregunta)"
+                            class="rounded bg-red-600 px-3 py-1.5 text-xs font-bold uppercase text-white hover:bg-red-700">
+                            Eliminar
+                          </button>
+                          <button type="button" (click)="cancelarBorrado()"
+                            class="rounded border border-gray-300 px-3 py-1.5 text-xs font-bold uppercase text-gray-700 hover:bg-gray-100">
+                            Cancelar
+                          </button>
+                        </div>
+                      </div>
+                    }
 
                     <div class="grid gap-3 sm:grid-cols-2">
                       <div class="sm:col-span-2">
                         <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Enunciado</label>
                         <input type="text" [(ngModel)]="pregunta.etiqueta"
+                          (ngModelChange)="alEscribirEnunciado(pregunta)"
                           class="w-full rounded border border-gray-300 px-3 py-2 text-sm">
                       </div>
 
@@ -190,11 +212,27 @@
                         </select>
                       </div>
 
+                      <!-- El identificador no se teclea: es la clave con la que
+                           se guarda la respuesta, y cambiarla deja huerfanas
+                           las ya recogidas. Se genera del enunciado mientras la
+                           pregunta es nueva y se fija al guardar. -->
                       <div>
-                        <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Identificador</label>
-                        <input type="text" [(ngModel)]="pregunta.id"
-                          class="w-full rounded border border-gray-300 px-3 py-2 text-sm font-mono">
-                        <p class="mt-1 text-xs text-gray-500">Clave con la que se guarda la respuesta. Cambiarla deja atrás las ya recogidas.</p>
+                        <label class="block text-xs font-bold uppercase text-gray-600 mb-1">
+                          Identificador
+                        </label>
+                        <div class="flex items-center gap-2 rounded border border-gray-200 bg-gray-50 px-3 py-2">
+                          @if (idBloqueado(pregunta)) {
+                            <span class="text-gray-400" title="Fijado">🔒</span>
+                          }
+                          <span class="truncate font-mono text-sm text-gray-700">{{ pregunta.id }}</span>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                          @if (idBloqueado(pregunta)) {
+                            Fijado: ya puede haber respuestas guardadas con esta clave.
+                          } @else {
+                            Se genera del enunciado y queda fijo al guardar.
+                          }
+                        </p>
                       </div>
 
                       <div class="sm:col-span-2 flex flex-wrap items-center gap-6">
