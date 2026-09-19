@@ -194,6 +194,8 @@ export class DiagnosticoComponent implements OnInit {
   salud = signal<Record<string, number> | null>(null);
   conduccion = signal<Record<string, number> | null>(null);
   desplazamientos = signal<Record<string, number> | null>(null);
+  riesgos = signal<Record<string, number> | null>(null);
+  mejora = signal<Record<string, number> | null>(null);
 
   /** Las cifras del tablero: una lectura por cifra, sin descargar listados. */
   async cargarResumen() {
@@ -218,12 +220,22 @@ export class DiagnosticoComponent implements OnInit {
       { pregunta: 'desplazamientosJornada' },
       { pregunta: 'incidentesDesplazamiento' },
     ]));
+
+    this.riesgos.set(await this.indicadores('modulo5', [
+      { pregunta: 'exposicionRiesgos', excluir: ['No', 'No estoy seguro/a'] },
+      { pregunta: 'experienciaRiesgos' },
+    ]));
+
+    this.mejora.set(await this.indicadores('modulo6', [
+      { pregunta: 'participacionAnterior', excluir: ['No', 'No recuerdo'] },
+      { pregunta: 'sugerenciasMejora', noVacio: true },
+    ]));
   }
 
   /** Cuenta los indicadores de un modulo, sin dejar que un fallo suyo cunda. */
   private async indicadores(
     moduloId: string,
-    preguntas: { pregunta: string; excluir?: string[] }[]
+    preguntas: { pregunta: string; excluir?: string[]; noVacio?: boolean }[]
   ): Promise<Record<string, number> | null> {
     try {
       const resumen = await this._encuestaEmpresa.resumenIndicadores(moduloId, preguntas);

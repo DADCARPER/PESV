@@ -74,7 +74,7 @@ export class EncuestaEmpresaService {
    */
   async resumenIndicadores(
     moduloId: string,
-    indicadores: { pregunta: string; excluir?: string[] }[]
+    indicadores: { pregunta: string; excluir?: string[]; noVacio?: boolean }[]
   ): Promise<{ respuestas: number; valores: Record<string, number> } | null> {
     const copia = await this.activa();
     const modulo = copia?.modulos.find(m => m.id === moduloId);
@@ -83,7 +83,19 @@ export class EncuestaEmpresaService {
     const ruta = this.rutaRespuestas(this.nit());
     const periodo = copia.periodo;
 
-    const contar = async ({ pregunta, excluir = ['No'] }: { pregunta: string; excluir?: string[] }) => {
+    const contar = async (
+      { pregunta, excluir = ['No'], noVacio }:
+      { pregunta: string; excluir?: string[]; noVacio?: boolean }
+    ) => {
+      // Una pregunta abierta no tiene opciones que enumerar: lo que
+      // interesa es cuanta gente escribio algo.
+      if (noVacio) {
+        const escritas = await this._firestore.contarDocumentos(
+          ruta, [['periodo', '==', periodo, pregunta, '!=', '']]
+        );
+        return [pregunta, escritas] as const;
+      }
+
       const opciones = (modulo.preguntas.find(p => p.id === pregunta)?.opciones ?? [])
         .map(o => o.valor)
         .filter(v => !excluir.includes(v));
