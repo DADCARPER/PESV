@@ -65,7 +65,7 @@ export class ColaboradoresComponent {
     effect(() => {
       this.periodo();
       this.cargar();
-    });
+    }, { allowSignalWrites: true });
   }
 
   async cargar() {

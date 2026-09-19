@@ -52,7 +52,7 @@ export class ResultadosEncuestaComponent {
     effect(() => {
       this.periodo();
       this.cargar();
-    });
+    }, { allowSignalWrites: true });
   }
 
   private get ruta(): string {
