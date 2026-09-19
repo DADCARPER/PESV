@@ -90,6 +90,7 @@
             {id: 2,  label: 'Servicios'},
             {id: 3,  label: 'Colaboradores'},
             {id: 10, label: 'Salud'},
+            {id: 11, label: 'Conducción'},
             {id: 4,  label: 'Contratistas'},
             {id: 5,  label: 'Vehículos'},
             {id: 6,  label: 'Rutas frecuentes'},
@@ -311,11 +312,11 @@
               @if (salud(); as s) {
                 <div class="flex gap-2 mb-3">
                   <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
-                    <p class="font-medium text-amber-800">{{ s.conLimitacion }}</p>
+                    <p class="font-medium text-amber-800">{{ s['limitacionFisica'] }}</p>
                     <p class="text-sm">CON LIMITACIÓN</p>
                   </div>
                   <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
-                    <p class="font-medium text-amber-800">{{ s.saludRegular }}</p>
+                    <p class="font-medium text-amber-800">{{ s['estadoGeneral'] }}</p>
                     <p class="text-sm">SALUD REGULAR O MALA</p>
                   </div>
                 </div>
@@ -329,6 +330,40 @@
                      activarlo en vez de mostrar ceros. -->
                 <p class="rounded-lg border border-gray-100 bg-gray-50 p-3 text-sm text-gray-500">
                   El módulo de salud no está activo en la encuesta de este periodo.
+                  Actívalo en la pestaña <strong>Encuesta</strong>.
+                </p>
+              }
+            </article>
+
+            <!-- Conducción y transporte -->
+            <article class="w-full md:w-1/3 rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200">
+              <div class="flex items-center gap-3 mb-2">
+                <div class="text-white inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-amber-500">
+                  <iconify-icon icon="hugeicons:steering" width="28" height="28"></iconify-icon>
+                </div>
+                <p class="text-xl font-medium text-gray-900">Conducción y Transporte</p>
+              </div>
+              <p class="text-base text-gray-500 mb-3">Quiénes conducen, con qué licencia y experiencia, y qué siniestros e infracciones registran en el último año.</p>
+
+              @if (conduccion(); as c) {
+                <div class="flex gap-2 mb-3">
+                  <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
+                    <p class="font-medium text-amber-800">{{ c['conduceVehiculos'] }}</p>
+                    <p class="text-sm">CONDUCEN</p>
+                  </div>
+                  <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
+                    <p class="font-medium text-amber-800">{{ c['accidenteTransito'] }}</p>
+                    <p class="text-sm">CON SINIESTROS</p>
+                  </div>
+                </div>
+                <button (click)="toggleTabs(11)" class="w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
+                  <div class="flex items-center justify-center gap-1">
+                    <iconify-icon icon="hugeicons:plus-sign-square" width="16" height="16"></iconify-icon> Ver Detalles
+                  </div>
+                </button>
+              } @else {
+                <p class="rounded-lg border border-gray-100 bg-gray-50 p-3 text-sm text-gray-500">
+                  El módulo de conducción no está activo en la encuesta de este periodo.
                   Actívalo en la pestaña <strong>Encuesta</strong>.
                 </p>
               }
@@ -385,6 +420,11 @@
       <!-- Tab 10: Salud y condición física (módulo 2 de la encuesta) -->
       @if (openTab === 10) {
         <app-respuestas-modulo moduloId="modulo2" nombreModulo="Salud y condición física"></app-respuestas-modulo>
+      }
+
+      <!-- Tab 11: Conducción y transporte (módulo 3 de la encuesta) -->
+      @if (openTab === 11) {
+        <app-respuestas-modulo moduloId="modulo3" nombreModulo="Conducción y transporte"></app-respuestas-modulo>
       }
 
       <!-- Tab 4: Contratistas -->

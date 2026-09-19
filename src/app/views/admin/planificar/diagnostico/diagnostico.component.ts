@@ -185,12 +185,14 @@ export class DiagnosticoComponent implements OnInit {
   }
 
   /**
-   * Cifras del modulo de salud, para su tarjeta del tablero.
+   * Cifras de los modulos de la encuesta, para sus tarjetas del tablero.
    *
    * Van aparte del resumen porque dependen del cuestionario activo: no se
-   * pueden contar sin saber que opciones tiene la pregunta.
+   * pueden contar sin saber que opciones tiene cada pregunta. Un `null` no es
+   * un cero: significa que el modulo no se esta preguntando.
    */
-  salud = signal<{ respuestas: number; conLimitacion: number; saludRegular: number } | null>(null);
+  salud = signal<Record<string, number> | null>(null);
+  conduccion = signal<Record<string, number> | null>(null);
 
   /** Las cifras del tablero: una lectura por cifra, sin descargar listados. */
   async cargarResumen() {
@@ -200,12 +202,29 @@ export class DiagnosticoComponent implements OnInit {
       console.error('[Diagnostico] cargarResumen:', error);
     }
 
-    // Aparte y sin tumbar lo anterior: depende de que haya encuesta activa.
+    // Aparte y sin tumbar lo anterior: dependen de que haya encuesta activa.
+    this.salud.set(await this.indicadores('modulo2', [
+      { pregunta: 'limitacionFisica' },
+      { pregunta: 'estadoGeneral', excluir: ['Excelente', 'Buena'] },
+    ]));
+
+    this.conduccion.set(await this.indicadores('modulo3', [
+      { pregunta: 'conduceVehiculos' },
+      { pregunta: 'accidenteTransito' },
+    ]));
+  }
+
+  /** Cuenta los indicadores de un modulo, sin dejar que un fallo suyo cunda. */
+  private async indicadores(
+    moduloId: string,
+    preguntas: { pregunta: string; excluir?: string[] }[]
+  ): Promise<Record<string, number> | null> {
     try {
-      this.salud.set(await this._encuestaEmpresa.resumenSalud());
+      const resumen = await this._encuestaEmpresa.resumenIndicadores(moduloId, preguntas);
+      return resumen?.valores ?? null;
     } catch (error: unknown) {
-      console.error('[Diagnostico] resumenSalud:', error);
-      this.salud.set(null);
+      console.error(`[Diagnostico] indicadores ${moduloId}:`, error);
+      return null;
     }
   }
 

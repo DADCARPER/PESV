@@ -61,41 +61,51 @@ export class EncuestaEmpresaService {
   }
 
   /**
-   * Cifras de salud para la tarjeta del tablero.
+   * Cifras de un módulo para su tarjeta del tablero.
    *
-   * Cuenta con consultas de agregación, sin descargar respuestas. Las opciones
-   * que valen como "sí" se sacan del cuestionario activo en lugar de estar
-   * escritas aquí: la encuesta es editable y una lista fija se quedaría atrás
-   * en silencio si alguien añade o renombra una opción.
+   * Cada indicador cuenta cuántas respuestas eligieron algo distinto de lo que
+   * se excluye, normalmente `No`. Las opciones que valen se leen del
+   * cuestionario activo en lugar de estar escritas aquí: la encuesta es
+   * editable y una lista fija se quedaría atrás en silencio si alguien añade o
+   * renombra una opción.
    *
-   * Lo único que se da por supuesto es que la opción negativa se llama `No`,
-   * que es la convención de la encuesta de la Resolución.
+   * Devuelve `null` si el módulo no está activo: no es lo mismo que salga cero
+   * a que la pregunta no se haya hecho.
    */
-  async resumenSalud(): Promise<{
-    respuestas: number; conLimitacion: number; saludRegular: number;
-  } | null> {
+  async resumenIndicadores(
+    moduloId: string,
+    indicadores: { pregunta: string; excluir?: string[] }[]
+  ): Promise<{ respuestas: number; valores: Record<string, number> } | null> {
     const copia = await this.activa();
-    const salud = copia?.modulos.find(m => m.id === 'modulo2');
-    if (!copia || !salud || !copia.modulosActivos.includes(salud.id)) return null;
+    const modulo = copia?.modulos.find(m => m.id === moduloId);
+    if (!copia || !modulo || !(modulo.fijo || copia.modulosActivos.includes(moduloId))) return null;
 
-    const periodo = copia.periodo;
     const ruta = this.rutaRespuestas(this.nit());
+    const periodo = copia.periodo;
 
-    const opcionesSi = (id: string) => (salud.preguntas.find(p => p.id === id)?.opciones ?? [])
-      .map(o => o.valor)
-      .filter(v => v !== 'No');
+    const contar = async ({ pregunta, excluir = ['No'] }: { pregunta: string; excluir?: string[] }) => {
+      const opciones = (modulo.preguntas.find(p => p.id === pregunta)?.opciones ?? [])
+        .map(o => o.valor)
+        .filter(v => !excluir.includes(v));
 
-    const contar = (id: string, valores: string[]) => valores.length
-      ? this._firestore.contarDocumentos(ruta, [['periodo', '==', periodo, id, 'in', valores]])
-      : Promise.resolve(0);
+      if (!opciones.length) return [pregunta, 0] as const;
 
-    const [respuestas, conLimitacion, saludRegular] = await Promise.all([
+      // `in` admite hasta treinta valores; ninguna pregunta se acerca.
+      const total = await this._firestore.contarDocumentos(
+        ruta, [['periodo', '==', periodo, pregunta, 'in', opciones.slice(0, 30)]]
+      );
+      return [pregunta, total] as const;
+    };
+
+    const [respuestas, ...conteos] = await Promise.all([
       this._firestore.contarDocumentos(ruta, [['periodo', '==', periodo]]),
-      contar('limitacionFisica', opcionesSi('limitacionFisica')),
-      contar('estadoGeneral', ['Regular', 'Mala']),
+      ...indicadores.map(contar),
     ]);
 
-    return { respuestas, conLimitacion, saludRegular };
+    return {
+      respuestas: respuestas as number,
+      valores: Object.fromEntries(conteos as (readonly [string, number])[]),
+    };
   }
 
   /** Corrige una respuesta ya enviada, por ejemplo una cédula mal tecleada. */
