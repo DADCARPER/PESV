@@ -74,6 +74,23 @@ export class GestorEncuestasComponent implements OnInit {
     return this.usos()[encuesta.id] ?? 0;
   }
 
+  /**
+   * Cuenta en cuantos periodos de empresa se usa cada encuesta, sin dejar que
+   * un fallo suyo estropee la pantalla: si no se puede contar, sencillamente
+   * no se muestra el dato.
+   */
+  private async contarUsos(encuestas: ModelsEncuestas.Encuesta[]) {
+    try {
+      const conteos = await Promise.all(
+        encuestas.map(async (e) => [e.id, await this._encuestas.contarUsos(e.id)] as const)
+      );
+      this.usos.set(Object.fromEntries(conteos));
+    } catch (error: unknown) {
+      console.error('[GestorEncuestas] contarUsos:', error);
+      this.usos.set({});
+    }
+  }
+
   ngOnInit(): void {
     this.cargar();
   }
@@ -96,10 +113,12 @@ export class GestorEncuestasComponent implements OnInit {
 
       // Un conteo por encuesta, en paralelo. Cada uno es una consulta de
       // agregacion: no descarga nada.
-      const conteos = await Promise.all(
-        encuestas.map(async (e) => [e.id, await this._encuestas.contarUsos(e.id)] as const)
-      );
-      this.usos.set(Object.fromEntries(conteos));
+      //
+      // Aparte de la lista y sin tumbarla si falla: es un dato de apoyo, y su
+      // consulta necesita un indice de grupo que tarda minutos en construirse
+      // tras un despliegue. Sin esto, el gestor entero quedaba inutilizable
+      // mientras tanto.
+      this.contarUsos(encuestas);
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'No se pudieron cargar las encuestas';
       console.error('[GestorEncuestas] listar:', error);
