@@ -22,16 +22,15 @@ export class EncuestasService {
   private _firestore = inject(FirestoreService);
 
   /**
-   * Cuántas respuestas se han recogido con esta encuesta, en todas las
-   * empresas.
+   * Cuántas empresas están usando esta encuesta del catálogo.
    *
-   * Es lo que decide si la encuesta se puede seguir editando. Se cuenta sobre
-   * el grupo de subcolecciones `encuestas`, que vive repartido bajo cada
-   * empresa, en vez de recorrer las empresas una a una.
+   * Es informativo, no un candado: cada empresa trabaja sobre su propia copia,
+   * así que editar el catálogo no le toca el cuestionario a nadie. Sirve para
+   * que el administrador sepa el alcance de lo que cambia.
    */
-  async contarRespuestas(encuestaId: string): Promise<number> {
+  async contarUsos(encuestaId: string): Promise<number> {
     return this._firestore.contarDocumentos(
-      'encuestas',
+      'cuestionarios',
       [['encuestaId', '==', encuestaId]],
       true
     );
@@ -55,23 +54,14 @@ export class EncuestasService {
   }
 
   /**
-   * Guarda los cambios de una encuesta.
+   * Guarda los cambios de una encuesta del catálogo.
    *
-   * Solo tiene sentido mientras nadie la haya respondido. En cuanto hay
-   * respuestas la encuesta queda congelada y el camino es duplicarla: se
-   * comprueba aquí y no solo en la pantalla, porque un diagnóstico es un
-   * documento que la empresa presenta ante la autoridad y tiene que poder
-   * reproducirse tal como se respondió.
+   * No hace falta comprobar nada: las empresas trabajan sobre su propia copia,
+   * tomada el día que activaron la encuesta, así que editar aquí no altera
+   * ningún cuestionario ya en uso ni deja respuestas contestando a preguntas
+   * que cambiaron.
    */
   async actualizar(id: string, cambios: Partial<ModelsEncuestas.Encuesta>): Promise<void> {
-    const respuestas = await this.contarRespuestas(id);
-    if (respuestas > 0) {
-      throw new Error(
-        `Esta encuesta ya tiene ${respuestas} respuestas y no se puede modificar. ` +
-        'Duplícala y trabaja sobre la copia.'
-      );
-    }
-
     await this._firestore.updateDocument(`${COLECCION}/${id}`, cambios);
   }
 

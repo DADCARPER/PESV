@@ -389,6 +389,21 @@
       "density": "SPARSE_ALL"
     },
     {
+      "collectionGroup": "cuestionarios",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "encuestaId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "ASCENDING"
+        }
+      ],
+      "density": "SPARSE_ALL"
+    },
+    {
       "collectionGroup": "documentos",
       "queryScope": "COLLECTION",
       "fields": [
@@ -409,10 +424,10 @@
     },
     {
       "collectionGroup": "encuestas",
-      "queryScope": "COLLECTION_GROUP",
+      "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "encuestaId",
+          "fieldPath": "periodo",
           "order": "ASCENDING"
         },
         {

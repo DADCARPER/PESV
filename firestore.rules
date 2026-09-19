@@ -127,12 +127,24 @@ service cloud.firestore {
         allow read: if esDeLaEmpresa(nitempresa);
         allow update, delete: if puedeEditar(nitempresa);
       }
+
+      // La copia del cuestionario de cada periodo. Leerla es abierto porque el
+      // formulario publico se construye con ella y lo rellena gente sin
+      // cuenta; escribirla es activar la encuesta, y eso es del operativo.
+      //
+      // Se llama `cuestionarios` y no `periodos` porque Empresas/{nit}/periodos
+      // ya existe: con el mismo nombre, la consulta de grupo de abajo abriria
+      // al administrador los datos del PESV de todas las empresas.
+      match /cuestionarios/{periodo} {
+        allow read: if true;
+        allow create, update, delete: if puedeEditar(nitempresa);
+      }
     }
 
-    // El gestor cuenta las respuestas de una encuesta en todas las empresas
-    // para saber si todavia se puede editar. Es una consulta de grupo, que se
-    // autoriza aparte de la regla anidada de arriba.
-    match /{camino=**}/encuestas/{respuestaId} {
+    // El gestor cuenta en cuantos periodos de empresa se usa cada encuesta del
+    // catalogo. Es informativo y va por consulta de grupo, que se autoriza
+    // aparte de la regla anidada de arriba.
+    match /{camino=**}/cuestionarios/{periodo} {
       allow read: if esSuperadmin();
     }
   }

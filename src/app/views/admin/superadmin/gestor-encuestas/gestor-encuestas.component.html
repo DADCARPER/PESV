@@ -67,48 +67,35 @@
           class="text-sm font-medium text-gray-500 hover:text-gray-900">
           ‹ Volver a la lista
         </button>
-        @if (edicionCongelada()) {
-          <button type="button" (click)="duplicar(encuesta)" [disabled]="guardando()"
-            class="rounded bg-color1 px-4 py-2 text-xs font-bold uppercase text-white shadow transition-opacity hover:opacity-90 disabled:opacity-50">
-            Duplicar para editar
+        <div class="flex items-center gap-2">
+          <button type="button" (click)="guardar(false)" [disabled]="guardando()"
+            class="rounded border border-gray-300 px-4 py-2 text-xs font-bold uppercase text-gray-700 transition-colors hover:bg-gray-100 disabled:opacity-50">
+            {{ guardando() ? 'Guardando...' : 'Guardar borrador' }}
           </button>
-        } @else {
-          <div class="flex items-center gap-2">
-            <button type="button" (click)="guardar(false)" [disabled]="guardando()"
-              class="rounded border border-gray-300 px-4 py-2 text-xs font-bold uppercase text-gray-700 transition-colors hover:bg-gray-100 disabled:opacity-50">
-              {{ guardando() ? 'Guardando...' : 'Guardar borrador' }}
-            </button>
-            <button type="button" (click)="guardar(true)" [disabled]="guardando()"
-              title="La deja disponible para las empresas"
-              class="rounded bg-color1 px-4 py-2 text-xs font-bold uppercase text-white shadow transition-opacity hover:opacity-90 disabled:opacity-50">
-              Publicar
-            </button>
-          </div>
-        }
+          <button type="button" (click)="guardar(true)" [disabled]="guardando()"
+            title="La deja disponible para las empresas"
+            class="rounded bg-color1 px-4 py-2 text-xs font-bold uppercase text-white shadow transition-opacity hover:opacity-90 disabled:opacity-50">
+            Publicar
+          </button>
+        </div>
       </div>
 
-      @if (edicionCongelada()) {
-        <!-- Congelada: un diagnostico se presenta ante la autoridad y tiene que
-             poder reproducirse tal como se respondio. Cambiar el cuestionario
-             despues dejaria respuestas contestando a preguntas que ya no
-             existen. -->
+      @if (cuantosUsos(encuesta) > 0) {
+        <!-- Informativo, no un candado: cada empresa trabaja sobre su copia. -->
         <div class="mb-6 flex items-start gap-3 rounded-lg border border-sky-200 bg-sky-50 p-4">
-          <i class="fas fa-lock mt-0.5 text-sky-600" aria-hidden="true"></i>
+          <i class="fas fa-circle-info mt-0.5 text-sky-600" aria-hidden="true"></i>
           <div>
             <p class="font-semibold text-sky-900">
-              Esta encuesta ya tiene {{ cuantasRespuestas(encuesta) }} respuestas
+              En uso en {{ cuantosUsos(encuesta) }} periodos de empresa
             </p>
             <p class="mt-1 text-sm text-sky-800">
-              A partir de la primera respuesta el cuestionario queda fijo: si se pudiera
-              cambiar, esas respuestas estarian contestando a preguntas que ya no existen
-              y el diagnostico dejaria de poder reproducirse. Para hacer cambios,
-              duplicala y trabaja sobre la copia.
+              Puedes editarla sin miedo: cada empresa se llevo una copia el dia que la
+              activo y sigue con ella. Lo que cambies aqui solo lo veran quienes la
+              activen a partir de ahora.
             </p>
           </div>
         </div>
       }
-
-      <fieldset [disabled]="edicionCongelada()" class="disabled:opacity-90">
 
       <div class="grid gap-4 sm:grid-cols-2 mb-8">
         <div>
@@ -290,8 +277,6 @@
         + Añadir módulo
       </button>
 
-      </fieldset>
-
     } @else {
 
       <!-- ── Lista ──────────────────────────────────────────────────────── -->
@@ -325,15 +310,11 @@
                   <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700">
                     versión {{ encuesta.version }}
                   </span>
-                  <span class="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold"
-                    [ngClass]="congelada(encuesta) ? 'bg-sky-100 text-sky-800' : 'bg-gray-100 text-gray-700'">
-                    @if (congelada(encuesta)) {
-                      <i class="fas fa-lock" aria-hidden="true"></i>
-                      {{ cuantasRespuestas(encuesta) }} respuestas · fija
-                    } @else {
-                      Sin respuestas · editable
-                    }
-                  </span>
+                  @if (cuantosUsos(encuesta) > 0) {
+                    <span class="inline-flex items-center rounded-full bg-sky-100 px-2 py-1 text-xs font-semibold text-sky-800">
+                      en uso en {{ cuantosUsos(encuesta) }} periodos
+                    </span>
+                  }
                   <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700">
                     {{ encuesta.modulos.length }} módulos · {{ totalPreguntas(encuesta) }} preguntas
                   </span>
@@ -343,7 +324,7 @@
               <div class="flex flex-wrap items-center gap-2">
                 <button type="button" (click)="abrir(encuesta)"
                   class="whitespace-nowrap rounded border border-sky-500 px-3 py-1.5 text-xs font-semibold text-sky-700 transition-colors hover:bg-sky-500 hover:text-white">
-                  {{ congelada(encuesta) ? 'Ver' : 'Editar' }}
+                  Editar
                 </button>
                 <button type="button" (click)="duplicar(encuesta)" [disabled]="guardando()"
                   title="Copia como borrador, para cambiarla sin tocar la que están usando las empresas"

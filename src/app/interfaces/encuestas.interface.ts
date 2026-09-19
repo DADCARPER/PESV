@@ -96,12 +96,43 @@ export namespace ModelsEncuestas {
     docActualizado?: unknown;
   }
 
-  /** Lo que una empresa elige: qué encuesta usa y qué módulos activa. */
-  export interface EncuestaEmpresa {
+  /**
+   * La encuesta que una empresa usa en un periodo, copiada entera.
+   *
+   * No es una referencia al catálogo: es una copia. Un diagnóstico tiene que
+   * poder reproducirse años después, y si apuntara al catálogo dependería de
+   * un documento que el administrador puede seguir editando. Con la copia, la
+   * empresa se lleva el cuestionario tal como estaba el día que lo activó y ya
+   * nadie se lo mueve.
+   *
+   * De paso el congelado pasa a ser suyo: sus respuestas no atan a las demás
+   * empresas, y el catálogo vuelve a ser libremente editable.
+   */
+  export interface EncuestaActiva {
+    /** De qué encuesta del catálogo y de qué versión salió esta copia. */
     encuestaId: string;
+    version: number;
+
+    nombre: string;
+    descripcion: string;
+    /** Copia literal, incluidos los módulos que la empresa no active. */
+    modulos: Modulo[];
+
+    /** Año al que pertenece. Cada periodo tiene su propia copia. */
+    periodo: number;
+    /** `id` de los módulos que la empresa quiere preguntar. Los fijos van siempre. */
+    modulosActivos: string[];
     /** Abierta al público. Mientras esté en falso el enlace no responde. */
     mostrarEncuesta: boolean;
-    /** `id` de los módulos activos. Los fijos van siempre. */
-    modulosActivos: string[];
+
+    fechaActivacion?: string;
+  }
+
+  /** Lo que el formulario público necesita para pintarse. */
+  export interface Pagina {
+    empresa: string;
+    encuesta: EncuestaActiva;
+    /** Solo los módulos que la empresa activó, ya filtrados. */
+    modulos: Modulo[];
   }
 }

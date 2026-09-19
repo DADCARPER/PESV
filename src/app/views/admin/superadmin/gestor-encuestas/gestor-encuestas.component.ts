@@ -62,26 +62,17 @@ export class GestorEncuestasComponent implements OnInit {
   readonly hayEncuestas = computed(() => this.lista().length > 0);
 
   /**
-   * Cuantas respuestas tiene cada encuesta. Es lo que decide si se puede
-   * seguir editando: en cuanto alguien la responde, el cuestionario queda
-   * congelado y el unico camino es duplicarlo.
+   * En cuantas empresas y periodos se esta usando cada encuesta.
+   *
+   * Es informativo, no un candado: cada empresa trabaja sobre su propia copia,
+   * tomada el dia que la activo, asi que editar aqui no le cambia el
+   * cuestionario a nadie. Sirve para saber el alcance de lo que se toca.
    */
-  respuestas = signal<Record<string, number>>({});
+  usos = signal<Record<string, number>>({});
 
-  /** La encuesta ya no se puede tocar porque hay respuestas contestadas. */
-  congelada(encuesta: ModelsEncuestas.Encuesta): boolean {
-    return (this.respuestas()[encuesta.id] ?? 0) > 0;
+  cuantosUsos(encuesta: ModelsEncuestas.Encuesta): number {
+    return this.usos()[encuesta.id] ?? 0;
   }
-
-  cuantasRespuestas(encuesta: ModelsEncuestas.Encuesta): number {
-    return this.respuestas()[encuesta.id] ?? 0;
-  }
-
-  /** La encuesta abierta esta congelada: la pantalla se muestra en solo lectura. */
-  readonly edicionCongelada = computed(() => {
-    const abierta = this.edicion();
-    return !!abierta && this.congelada(abierta);
-  });
 
   ngOnInit(): void {
     this.cargar();
@@ -104,11 +95,11 @@ export class GestorEncuestasComponent implements OnInit {
       this.lista.set(encuestas);
 
       // Un conteo por encuesta, en paralelo. Cada uno es una consulta de
-      // agregacion: no descarga ninguna respuesta.
+      // agregacion: no descarga nada.
       const conteos = await Promise.all(
-        encuestas.map(async (e) => [e.id, await this._encuestas.contarRespuestas(e.id)] as const)
+        encuestas.map(async (e) => [e.id, await this._encuestas.contarUsos(e.id)] as const)
       );
-      this.respuestas.set(Object.fromEntries(conteos));
+      this.usos.set(Object.fromEntries(conteos));
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'No se pudieron cargar las encuestas';
       console.error('[GestorEncuestas] listar:', error);
@@ -195,7 +186,6 @@ export class GestorEncuestasComponent implements OnInit {
    * una decisión de quien redacta la encuesta.
    */
   alEscribirEnunciado(pregunta: ModelsEncuestas.Pregunta) {
-    if (this.edicionCongelada()) return;
     const base = this.aIdentificador(pregunta.etiqueta);
     pregunta.id = base ? this.idLibre(base, pregunta) : pregunta.id;
   }
@@ -331,11 +321,6 @@ export class GestorEncuestasComponent implements OnInit {
   async guardar(publicar = false) {
     const encuesta = this.edicion();
     if (!encuesta) return;
-
-    if (this.edicionCongelada()) {
-      this.error.set('Esta encuesta ya tiene respuestas. Duplícala para poder cambiarla.');
-      return;
-    }
 
     const fallos = this.problemas();
     if (fallos.length) {
