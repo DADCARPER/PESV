@@ -15,6 +15,7 @@ import { VehiculosComponent } from './vehiculos/vehiculos.component';
 import { RutasFrecuentesComponent } from './rutas-frecuentes/rutas-frecuentes.component';
 import { PlanEmergenciasComponent } from './plan-emergencias/plan-emergencias.component';
 import { ResultadosEncuestaComponent } from './resultados-encuesta/resultados-encuesta.component';
+import { RespuestasModuloComponent } from './respuestas-modulo/respuestas-modulo.component';
 
 // Componentes reutilizables
 import { CardStats2Component } from '../../../../components/cards/card-stats2/card-stats2.component';
@@ -26,6 +27,7 @@ import { AuthenticacionService } from '../../../../services/shared/authenticacio
 import { EmpresaService } from '../../../../services/shared/empresa.service';
 import { FirestoreService } from '../../../../services/shared/firestore.service';
 import { AlertaService } from '../../../../services/shared/alerta.service';
+import { EncuestaEmpresaService } from '../../../../services/shared/encuesta-empresa.service';
 import {
   DiagnosticoDatosService, ListaDiagnostico, ResumenDiagnostico, SeccionDiagnostico,
 } from '../../../../services/shared/diagnostico-datos.service';
@@ -53,7 +55,7 @@ const SECCION_POR_PESTANA: Record<number, SeccionDiagnostico> = {
     SedesComponent, ContratistasComponent, ColaboradoresComponent,
     EncuestaParametrosComponent, ServiciosComponent,
     VehiculosComponent, RutasFrecuentesComponent, PlanEmergenciasComponent,
-    ResultadosEncuestaComponent,
+    ResultadosEncuestaComponent, RespuestasModuloComponent,
     CardStats2Component, CardsMedicionBarraProgresoComponent,
     LoadingComponent,
   ],
@@ -69,6 +71,7 @@ export class DiagnosticoComponent implements OnInit {
   private _alerta = inject(AlertaService);
   private _datos = inject(DiagnosticoDatosService);
   private _destroyRef = inject(DestroyRef);
+  private _encuestaEmpresa = inject(EncuestaEmpresaService);
 
   readonly nit = this._empresaSrv.nit;
 
@@ -181,12 +184,28 @@ export class DiagnosticoComponent implements OnInit {
     if (this.diagnosticoBase) await this.cargarResumen();
   }
 
+  /**
+   * Cifras del modulo de salud, para su tarjeta del tablero.
+   *
+   * Van aparte del resumen porque dependen del cuestionario activo: no se
+   * pueden contar sin saber que opciones tiene la pregunta.
+   */
+  salud = signal<{ respuestas: number; conLimitacion: number; saludRegular: number } | null>(null);
+
   /** Las cifras del tablero: una lectura por cifra, sin descargar listados. */
   async cargarResumen() {
     try {
       this.resumen.set(await this._datos.resumen());
     } catch (error: unknown) {
       console.error('[Diagnostico] cargarResumen:', error);
+    }
+
+    // Aparte y sin tumbar lo anterior: depende de que haya encuesta activa.
+    try {
+      this.salud.set(await this._encuestaEmpresa.resumenSalud());
+    } catch (error: unknown) {
+      console.error('[Diagnostico] resumenSalud:', error);
+      this.salud.set(null);
     }
   }
 

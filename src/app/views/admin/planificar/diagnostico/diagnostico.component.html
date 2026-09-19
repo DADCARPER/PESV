@@ -89,6 +89,7 @@
             {id: 1,  label: 'Sedes'},
             {id: 2,  label: 'Servicios'},
             {id: 3,  label: 'Colaboradores'},
+            {id: 10, label: 'Salud'},
             {id: 4,  label: 'Contratistas'},
             {id: 5,  label: 'Vehículos'},
             {id: 6,  label: 'Rutas frecuentes'},
@@ -297,6 +298,42 @@
               </button>
             </article>
 
+            <!-- Salud y condición física -->
+            <article class="w-full md:w-1/3 rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200">
+              <div class="flex items-center gap-3 mb-2">
+                <div class="text-white inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-amber-700">
+                  <iconify-icon icon="hugeicons:heart-check" width="28" height="28"></iconify-icon>
+                </div>
+                <p class="text-xl font-medium text-gray-900">Salud y Condición Física</p>
+              </div>
+              <p class="text-base text-gray-500 mb-3">Estado de salud de quienes conducen o se desplazan: limitaciones, dolencias e incapacidades que inciden en el riesgo vial.</p>
+
+              @if (salud(); as s) {
+                <div class="flex gap-2 mb-3">
+                  <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
+                    <p class="font-medium text-amber-800">{{ s.conLimitacion }}</p>
+                    <p class="text-sm">CON LIMITACIÓN</p>
+                  </div>
+                  <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
+                    <p class="font-medium text-amber-800">{{ s.saludRegular }}</p>
+                    <p class="text-sm">SALUD REGULAR O MALA</p>
+                  </div>
+                </div>
+                <button (click)="toggleTabs(10)" class="w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
+                  <div class="flex items-center justify-center gap-1">
+                    <iconify-icon icon="hugeicons:plus-sign-square" width="16" height="16"></iconify-icon> Ver Detalles
+                  </div>
+                </button>
+              } @else {
+                <!-- Sin el modulo activo no hay nada que contar: se dice donde
+                     activarlo en vez de mostrar ceros. -->
+                <p class="rounded-lg border border-gray-100 bg-gray-50 p-3 text-sm text-gray-500">
+                  El módulo de salud no está activo en la encuesta de este periodo.
+                  Actívalo en la pestaña <strong>Encuesta</strong>.
+                </p>
+              }
+            </article>
+
             <!-- Plan de emergencias -->
             <article class="w-full md:w-1/3 rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200">
               <div class="flex items-center gap-3 mb-2">
@@ -343,6 +380,11 @@
         <!-- Se abastece sola de las respuestas de la encuesta: no recibe datos
              ni se pagina desde aqui. -->
         <app-colaboradores></app-colaboradores>
+      }
+
+      <!-- Tab 10: Salud y condición física (módulo 2 de la encuesta) -->
+      @if (openTab === 10) {
+        <app-respuestas-modulo moduloId="modulo2" nombreModulo="Salud y condición física"></app-respuestas-modulo>
       }
 
       <!-- Tab 4: Contratistas -->

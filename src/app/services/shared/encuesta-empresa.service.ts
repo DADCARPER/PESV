@@ -60,6 +60,44 @@ export class EncuestaEmpresaService {
     return snap.docs.map(d => d.data());
   }
 
+  /**
+   * Cifras de salud para la tarjeta del tablero.
+   *
+   * Cuenta con consultas de agregación, sin descargar respuestas. Las opciones
+   * que valen como "sí" se sacan del cuestionario activo en lugar de estar
+   * escritas aquí: la encuesta es editable y una lista fija se quedaría atrás
+   * en silencio si alguien añade o renombra una opción.
+   *
+   * Lo único que se da por supuesto es que la opción negativa se llama `No`,
+   * que es la convención de la encuesta de la Resolución.
+   */
+  async resumenSalud(): Promise<{
+    respuestas: number; conLimitacion: number; saludRegular: number;
+  } | null> {
+    const copia = await this.activa();
+    const salud = copia?.modulos.find(m => m.id === 'modulo2');
+    if (!copia || !salud || !copia.modulosActivos.includes(salud.id)) return null;
+
+    const periodo = copia.periodo;
+    const ruta = this.rutaRespuestas(this.nit());
+
+    const opcionesSi = (id: string) => (salud.preguntas.find(p => p.id === id)?.opciones ?? [])
+      .map(o => o.valor)
+      .filter(v => v !== 'No');
+
+    const contar = (id: string, valores: string[]) => valores.length
+      ? this._firestore.contarDocumentos(ruta, [['periodo', '==', periodo, id, 'in', valores]])
+      : Promise.resolve(0);
+
+    const [respuestas, conLimitacion, saludRegular] = await Promise.all([
+      this._firestore.contarDocumentos(ruta, [['periodo', '==', periodo]]),
+      contar('limitacionFisica', opcionesSi('limitacionFisica')),
+      contar('estadoGeneral', ['Regular', 'Mala']),
+    ]);
+
+    return { respuestas, conLimitacion, saludRegular };
+  }
+
   /** Corrige una respuesta ya enviada, por ejemplo una cédula mal tecleada. */
   async corregir(id: string, cambios: Record<string, unknown>): Promise<void> {
     await this._firestore.updateDocument(`${this.rutaRespuestas(this.nit())}/${id}`, cambios);

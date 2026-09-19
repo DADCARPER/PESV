@@ -1,0 +1,108 @@
+<div class="bg-white rounded-lg border shadow-sm">
+
+  <div class="p-4 border-b">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <h2 class="text-lg font-medium">{{ titulo() || nombreModulo }}</h2>
+        <p class="text-sm text-gray-500">
+          Lo que respondieron los colaboradores en {{ periodo() }}.
+        </p>
+      </div>
+
+      @if (!noDisponible() && !cargando()) {
+        <span class="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-4 py-1.5 text-sm font-semibold text-amber-800">
+          {{ respuestas().length }} {{ respuestas().length === 1 ? 'respuesta' : 'respuestas' }}
+        </span>
+      }
+    </div>
+  </div>
+
+  <div class="p-4">
+
+    @if (cargando()) {
+      <div class="space-y-3">
+        @for (n of [1,2,3]; track n) {
+          <div class="h-12 animate-pulse rounded bg-gray-100"></div>
+        }
+      </div>
+
+    } @else if (noDisponible()) {
+      <!-- Un modulo que no se activo no se pregunto: no hay respuestas suyas. -->
+      <div class="flex flex-col items-center justify-center gap-3 py-16 text-center">
+        <p class="font-semibold text-gray-800">Este módulo no está activo</p>
+        <p class="max-w-md text-sm text-gray-500">
+          En la pestaña <strong>Encuesta</strong> puedes activarlo para que se pregunte.
+          Solo se puede mientras no haya respuestas recogidas en el periodo.
+        </p>
+      </div>
+
+    } @else if (respuestas().length === 0) {
+      <div class="flex flex-col items-center justify-center gap-3 py-16 text-center">
+        <p class="font-semibold text-gray-800">Nadie ha respondido todavía</p>
+        <p class="max-w-md text-sm text-gray-500">
+          En cuanto alguien complete la encuesta aparecerán aquí sus respuestas.
+        </p>
+      </div>
+
+    } @else {
+
+      <!-- ── Reparto de respuestas ──────────────────────────────────────────
+           En una muestra de cientos, la fila a fila no dice nada: lo que
+           interesa es cuantos contestaron cada cosa.                        -->
+      <div class="mb-6 grid gap-4 md:grid-cols-2">
+        @for (pregunta of resumibles(); track pregunta.id) {
+          <div class="rounded-lg border border-gray-100 p-4">
+            <p class="mb-3 text-sm font-semibold text-gray-800">{{ pregunta.etiqueta }}</p>
+
+            <div class="space-y-2">
+              @for (fila of reparto(pregunta); track fila.etiqueta) {
+                <div>
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="truncate pr-2 text-gray-600">{{ fila.etiqueta }}</span>
+                    <span class="shrink-0 font-semibold text-gray-800">
+                      {{ fila.total }} · {{ fila.porcentaje }}%
+                    </span>
+                  </div>
+                  <div class="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+                    <div class="h-full rounded-full bg-amber-400" [style.width.%]="fila.porcentaje"></div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- ── Detalle ─────────────────────────────────────────────────────── -->
+      <div class="relative mb-4">
+        <input type="search" [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)"
+          placeholder="Buscar en cualquier columna"
+          class="w-full rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+      </div>
+
+      <div class="overflow-x-auto rounded-lg border border-gray-100">
+        <table class="min-w-full text-sm">
+          <thead class="bg-amber-50 text-xs uppercase tracking-wide text-amber-800">
+            <tr>
+              <th class="px-4 py-3 text-left">#</th>
+              @for (columna of todasLasColumnas(); track columna.id) {
+                <th class="whitespace-nowrap px-4 py-3 text-left">{{ columna.etiqueta }}</th>
+              }
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-gray-100 bg-white">
+            @for (r of filtradas(); track r['id']; let i = $index) {
+              <tr class="transition-colors hover:bg-amber-50">
+                <td class="px-4 py-3 text-gray-400">{{ i + 1 }}</td>
+                @for (columna of todasLasColumnas(); track columna.id) {
+                  <td class="whitespace-nowrap px-4 py-3 text-gray-700">{{ mostrar(r, columna) }}</td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
