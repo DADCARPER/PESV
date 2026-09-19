@@ -37,7 +37,8 @@ import { Models } from '../../../../interfaces/models';
 const SECCION_POR_PESTANA: Record<number, SeccionDiagnostico> = {
   1: 'sedes',
   2: 'servicios',
-  3: 'colaboradores',
+  // La pestana 3, Colaboradores, no esta: se abastece de las respuestas de la
+  // encuesta y se carga ella sola.
   4: 'contratistas',
   5: 'vehiculos',
   6: 'rutas',
@@ -114,7 +115,6 @@ export class DiagnosticoComponent implements OnInit {
   readonly listas: Record<SeccionDiagnostico, ListaDiagnostico<any>> = {
     'sedes': this._datos.lista<Models.Diagnostico.Sedes>('sedes'),
     'servicios': this._datos.lista<Models.Diagnostico.Servicio>('servicios'),
-    'colaboradores': this._datos.lista<Models.Diagnostico.Colaboradores>('colaboradores'),
     'contratistas': this._datos.lista<Models.Diagnostico.Contratistas>('contratistas'),
     'vehiculos': this._datos.lista<any>('vehiculos'),
     'rutas': this._datos.lista<any>('rutas'),
@@ -314,7 +314,6 @@ export class DiagnosticoComponent implements OnInit {
 
   get datosSedes() { return this.listas['sedes'].datos(); }
   get datos006diagnosticoServicios() { return this.listas['servicios'].datos(); }
-  get datosColaboradores() { return this.listas['colaboradores'].datos(); }
   get datosContratistas() { return this.listas['contratistas'].datos(); }
   get datosVehiculos() { return this.listas['vehiculos'].datos(); }
   get datosRutas() { return this.listas['rutas'].datos(); }

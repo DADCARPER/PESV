@@ -8,11 +8,13 @@ import { Models } from '../../interfaces/models';
 /**
  * Cada bloque de datos que recoge el diagnóstico. El valor es el sufijo de la
  * subcolección bajo `Empresas/{nit}/periodos/{periodo}/`.
+ *
+ * Los colaboradores no están: dejaron de ser un registro propio y son las
+ * respuestas a la encuesta, que viven en `Encuestas_publicas/{nit}/encuestas`.
  */
 export type SeccionDiagnostico =
   | 'sedes'
   | 'servicios'
-  | 'colaboradores'
   | 'contratistas'
   | 'vehiculos'
   | 'rutas'
@@ -20,7 +22,7 @@ export type SeccionDiagnostico =
 
 /** Todas las secciones, para reconocerlas a partir de una ruta escrita. */
 const SECCIONES: SeccionDiagnostico[] = [
-  'sedes', 'servicios', 'colaboradores', 'contratistas',
+  'sedes', 'servicios', 'contratistas',
   'vehiculos', 'rutas', 'plan-emergencias',
 ];
 
@@ -297,14 +299,14 @@ export class DiagnosticoDatosService {
     ] = await this.enParalelo([
       contar('sedes'),
       contar('servicios'),
-      contar('colaboradores'),
+      this.contarRespuestas(),
       contar('contratistas'),
       contar('vehiculos'),
       contar('rutas'),
       contar('plan-emergencias'),
       this._firestore.sumarCampo(this.ruta('contratistas'), 'conductores', SOLO_ACTIVOS),
-      contar('colaboradores', ['genero', '==', 'Masculino']),
-      contar('colaboradores', ['genero', '==', 'Femenino']),
+      this.contarRespuestas(['genero', '==', 'Masculino']),
+      this.contarRespuestas(['genero', '==', 'Femenino']),
     ]);
 
     return {
@@ -345,6 +347,24 @@ export class DiagnosticoDatosService {
 
     const sufijo = coleccion.slice(PREFIJO.length) as SeccionDiagnostico;
     return SECCIONES.includes(sufijo) ? sufijo : null;
+  }
+
+  /**
+   * Cuenta colaboradores, que son las respuestas a la encuesta del periodo.
+   *
+   * Ya no hay un registro de colaboradores que teclear aparte: para una
+   * empresa de miles de empleados consolidarlo a mano es inviable, y el
+   * diagnostico se hace por muestreo. Quien responde la encuesta es un
+   * colaborador de la lista.
+   */
+  private contarRespuestas(extra: any[] = []): Promise<number> {
+    const nit = this._empresa.nit();
+    if (!nit) return Promise.resolve(0);
+
+    return this._firestore.contarDocumentos(
+      `Encuestas_publicas/${nit}/encuestas`,
+      [['periodo', '==', this._auth.periodo(), ...extra]]
+    );
   }
 
   private rutaPeriodo(): string {

@@ -340,8 +340,9 @@
 
       <!-- Tab 3: Colaboradores -->
       @if (openTab === 3) {
-        <app-colaboradores [datos]="datosColaboradores"></app-colaboradores>
-        <ng-container *ngTemplateOutlet="paginacion; context: { $implicit: listas['colaboradores'], seccion: 'colaboradores', nombre: 'colaboradores' }"></ng-container>
+        <!-- Se abastece sola de las respuestas de la encuesta: no recibe datos
+             ni se pagina desde aqui. -->
+        <app-colaboradores></app-colaboradores>
       }
 
       <!-- Tab 4: Contratistas -->

@@ -45,6 +45,42 @@ export class EncuestaEmpresaService {
     return `Encuestas_publicas/${nit}/encuestas`;
   }
 
+  /**
+   * Las respuestas del periodo.
+   *
+   * Son la Lista de Colaboradores: cada persona que contestó la encuesta es
+   * una ficha. Se filtra por periodo en la consulta, con un solo campo de
+   * igualdad para no necesitar índice compuesto.
+   */
+  async respuestas(periodo = this._auth.periodo()): Promise<Record<string, any>[]> {
+    const snap = await this._firestore.getDocumentsQuery<Record<string, any>>(
+      this.rutaRespuestas(this.nit()),
+      [['periodo', '==', periodo]]
+    );
+    return snap.docs.map(d => d.data());
+  }
+
+  /** Corrige una respuesta ya enviada, por ejemplo una cédula mal tecleada. */
+  async corregir(id: string, cambios: Record<string, unknown>): Promise<void> {
+    await this._firestore.updateDocument(`${this.rutaRespuestas(this.nit())}/${id}`, cambios);
+  }
+
+  async eliminarRespuesta(id: string): Promise<void> {
+    await this._firestore.deleteDocument(`${this.rutaRespuestas(this.nit())}/${id}`);
+  }
+
+  /**
+   * El módulo que identifica a la persona: nombre, documento, cargo, área.
+   *
+   * Es el que la encuesta marca como fijo, y sus preguntas son las columnas de
+   * la Lista de Colaboradores. Se saca del cuestionario del periodo y no de una
+   * lista escrita en el código, para que cambiar la encuesta cambie la tabla.
+   */
+  async moduloPersonal(): Promise<ModelsEncuestas.Modulo | null> {
+    const copia = await this.activa();
+    return copia?.modulos.find(m => m.fijo) ?? null;
+  }
+
   /** La copia activa de esta empresa en este periodo, si la hay. */
   async activa(): Promise<ModelsEncuestas.EncuestaActiva | null> {
     const nit = this.nit();

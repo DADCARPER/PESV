@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { FirestoreService } from '../../../../services/shared/firestore.service';
+import { EncuestaEmpresaService } from '../../../../services/shared/encuesta-empresa.service';
 import { AuthenticacionService } from '../../../../services/shared/authenticacion.service';
 import { EstatusGeneralService } from '../../../../services/shared/estatus-general.service';
 import { Models } from '../../../../interfaces/models';
@@ -30,6 +31,7 @@ const SLUG = '010-competencia-plan-anual-formacion';
 export class CompetenciasPlanAnualFormacionComponent implements OnInit, OnDestroy {
 
   private _firestore = inject(FirestoreService);
+  private _encuestaEmpresa = inject(EncuestaEmpresaService);
   private _authcations = inject(AuthenticacionService);
   private _estatus = inject(EstatusGeneralService);
 
@@ -113,24 +115,26 @@ export class CompetenciasPlanAnualFormacionComponent implements OnInit, OnDestro
     );
   }
 
-  /** Nombres y cargos vienen del Diagnóstico; alimentan el selector de asistentes. */
-  consultarColaboradores() {
-    const periodo = this._authcations.periodo();
-    const path = `Empresas/${this.nit}/periodos/${periodo}/006-diagnostico-colaboradores`;
-    const q: Models.Firebases.whereQuery[] = [['estado', '==', 'Activo']];
-    const extras: Models.Firebases.extrasQuery = { orderParam: 'docCreado', directionSort: 'desc', limit: 300 };
-
-    this.subs.push(
-      this._firestore
-        .getDocumentsQueryChanges<Models.Diagnostico.Colaboradores>(path, q, extras)
-        .subscribe({
-          next: (res) => {
-            this.colaboradores.set(res.map(c => c.nombre).filter(Boolean).sort());
-            this.cargosDiagnostico.set([...new Set(res.map(c => c.cargo).filter(Boolean))]);
-          },
-          error: (error: unknown) => console.error('[Formacion] consultarColaboradores:', error)
-        })
-    );
+  /**
+   * Nombres y cargos vienen del Diagnóstico; alimentan el selector de asistentes.
+   *
+   * Salen de las respuestas a la encuesta, que es lo que ahora forma la Lista de
+   * Colaboradores: el registro aparte desapareció al pasar el diagnóstico a
+   * hacerse por muestreo. Antes esto leía la colección vieja, que ya nadie
+   * llena, y el selector se habría quedado vacío.
+   */
+  async consultarColaboradores() {
+    try {
+      const respuestas = await this._encuestaEmpresa.respuestas();
+      this.colaboradores.set(
+        respuestas.map(c => c['nombre']).filter(Boolean).sort()
+      );
+      this.cargosDiagnostico.set(
+        [...new Set(respuestas.map(c => c['cargo']).filter(Boolean))] as string[]
+      );
+    } catch (error: unknown) {
+      console.error('[Formacion] consultarColaboradores:', error);
+    }
   }
 
   // ── Competencias ──────────────────────────────────────────────────────────

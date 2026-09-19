@@ -1,126 +1,171 @@
 <div class="bg-white rounded-lg border shadow-sm">
+
   <div class="p-4 border-b">
-    <div class="flex items-center justify-between">
-        <div>
-            <h2 class="text-lg font-medium">Lista de Colaboradores</h2>
-            <p class="text-sm text-gray-500">
-              Colaboradores de la organización, incluyendo datos personales y horas laborales.
-            </p>
-        </div>
-        <div class="flex gap-2">
-            <button (click)="modalFormulario.abrirModal('crear')" class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none  mb-1 ease-linear transition-all duration-150" type="button">
-              <div class="flex items-center">
-                  <iconify-icon icon="hugeicons:plus-sign-square" width="18" height="18" class="pr-2 "></iconify-icon> Nuevo
-              </div>
-            </button>
-            <!-- La plantilla se descarga desde el modal de Importar, que la
-                 genera a partir de las columnas que la importacion espera. Un
-                 archivo suelto en assets se queda desfasado en cuanto cambia
-                 un campo y la importacion lo rechaza sin que se entienda. -->
-            <button (click)="modalImportar.abrirModal()" class="text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white active:bg-amber-600 font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none  mb-1 ease-linear transition-all duration-150" type="button">
-                <div class="flex items-center">
-                    <iconify-icon icon="hugeicons:plus-sign-square" width="18" height="18" class="pr-2 "></iconify-icon> Importar
-                </div>
-            </button>
-            <!-- <p class="text-sm text-gray-500">
-                Por cada 1,000,000 de kilómetros recorridos se presentaron XX cantidad de siniestros viales.
-            </p> -->
-            
-        </div>
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <h2 class="text-lg font-medium">Lista de Colaboradores</h2>
+        <p class="text-sm text-gray-500">
+          Las personas que respondieron la encuesta en {{ periodo() }}. Las columnas son
+          las preguntas de información personal del cuestionario activo.
+        </p>
+      </div>
+
+      @if (!sinEncuesta() && !cargando()) {
+        <span class="inline-flex items-center rounded-full bg-amber-50 border border-amber-200 px-4 py-1.5 text-sm font-semibold text-amber-800">
+          {{ respuestas().length }} {{ respuestas().length === 1 ? 'colaborador' : 'colaboradores' }}
+        </span>
+      }
     </div>
   </div>
-    <div class="p-4">
 
-        
-            <!-- Header -->
-            <div class="flex justify-between items-center mb-5 bg-gray-50 p-2 rounded-lg shadow-sm">
-              <div class="flex gap-2">
-                <button 
-                  *ngFor="let filter of filterButtons" 
-                  class="px-4 py-1 rounded-md border transition-all"
-                  [class]="activeFilter === filter.value ? 'bg-amber-600 text-white border-amber-600' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'"
-                  (click)="setFilter(filter.value)">
-                  {{ filter.label }}
-                </button>
-              </div>
-              
-              <div class="relative w-80">
-                <input 
-                  type="text" 
-                  class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Buscar colaborador"
-                  [(ngModel)]="searchText"
-                  (input)="onSearchChange()">
-                <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
-              </div>
-            </div>
-            
-      
-            <!-- Grid -->
-            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-              <ag-grid-angular
-                class="ag-theme-quartz w-full h-[400px]"
-                [rowData]="filteredData"
-                [columnDefs]="columnDefs"
-                [defaultColDef]="defaultColDef"
-                [rowHeight]="60"
-                [headerHeight]="50"
-                [localeText]="{noRowsToShow: 'No hay datos disponibles'}"
-                (gridReady)="onGridReady($event)"
-                (cellClicked)="onCellClicked($event)"
-                [animateRows]="true">
-              </ag-grid-angular>
-            </div>
-            <div class="mt-2 text-sm text-gray-600 text-right">
-                Mostrando {{ filteredData.length }} de {{ datos.length }} registros
-            </div>
-        
+  <div class="p-4">
 
-      <!-- <app-tabla-compartida 
-      [datas]="datos"
-      [headers]="heads"
-      [dataKeys]="['nombre', 'fechaNacimiento', 'genero', 'documento', 'telefono', 'email', 'escolaridad', 'estrato', 'estadoCivil', 'cargo', 'jornada', 'horasLaborales', 'tiempoEmpresa', 'tipoContrato', 'areaDepartamento']"
-      [columnConfig]="columnasConfig"
-      [accion]="true"
-      (editar)="manejarEdicion($event)"
-      (eliminar)="manejarEliminar($event)">
-      ></app-tabla-compartida> -->
-    </div>
+    @if (cargando()) {
+      <div class="space-y-3">
+        @for (n of [1,2,3]; track n) {
+          <div class="h-12 rounded bg-gray-100 animate-pulse"></div>
+        }
+      </div>
+
+    } @else if (sinEncuesta()) {
+      <!-- Sin cuestionario activo no hay columnas que pintar: las columnas son
+           sus preguntas. -->
+      <div class="flex flex-col items-center justify-center gap-3 py-16 text-center">
+        <p class="font-semibold text-gray-800">Todavía no hay encuesta activa</p>
+        <p class="max-w-md text-sm text-gray-500">
+          Los colaboradores entran aquí al responder la encuesta. Actívala en la
+          pestaña <strong>Encuesta</strong>, comparte el enlace y las respuestas
+          aparecerán en esta lista.
+        </p>
+      </div>
+
+    } @else {
+
+      <div class="relative mb-4">
+        <input type="search" [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)"
+          placeholder="Buscar en cualquier columna"
+          class="w-full rounded border border-gray-300 py-2 px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+      </div>
+
+      @if (respuestas().length === 0) {
+        <div class="flex flex-col items-center justify-center gap-3 py-16 text-center">
+          <p class="font-semibold text-gray-800">Nadie ha respondido todavía</p>
+          <p class="max-w-md text-sm text-gray-500">
+            En cuanto alguien complete la encuesta aparecerá en esta lista.
+          </p>
+        </div>
+
+      } @else {
+        <div class="overflow-x-auto rounded-lg border border-gray-100">
+          <table class="min-w-full text-sm">
+            <thead class="bg-amber-50 text-xs uppercase tracking-wide text-amber-800">
+              <tr>
+                <th class="px-4 py-3 text-left">#</th>
+                @for (columna of columnas(); track columna.id) {
+                  <th class="whitespace-nowrap px-4 py-3 text-left">{{ columna.etiqueta }}</th>
+                }
+                @if (editable) {
+                  <th class="px-4 py-3 text-right">Acciones</th>
+                }
+              </tr>
+            </thead>
+
+            <tbody class="divide-y divide-gray-100 bg-white">
+              @for (r of filtradas(); track r['id']; let i = $index) {
+                <tr class="transition-colors hover:bg-amber-50">
+                  <td class="px-4 py-3 text-gray-400">{{ i + 1 }}</td>
+                  @for (columna of columnas(); track columna.id) {
+                    <td class="whitespace-nowrap px-4 py-3 text-gray-700">{{ mostrar(r, columna) }}</td>
+                  }
+                  @if (editable) {
+                    <td class="whitespace-nowrap px-4 py-3 text-right">
+                      <button (click)="abrirEdicion(r)" title="Corregir datos"
+                        class="rounded px-2 py-1 text-xs font-semibold text-amber-600 hover:bg-amber-50">
+                        Corregir
+                      </button>
+                      <button (click)="pedirEliminar(r)" title="Eliminar colaborador"
+                        class="rounded px-2 py-1 text-red-400 hover:bg-red-50 hover:text-red-700">✕</button>
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  </div>
 </div>
 
-<app-form1-colaboradores #modalFormulario></app-form1-colaboradores>
-<app-form3-importar-excell #modalImportar></app-form3-importar-excell>
+<!-- ── Corregir datos ─────────────────────────────────────────────────────── -->
+@if (edicion(); as ficha) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div class="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white p-6 shadow-xl">
 
-<!-- Modal confirmación eliminar -->
-@if (colaboradorAEliminar) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
-      <div class="flex items-center gap-3 mb-4">
-        <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-red-100">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
-            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
-            <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
-          </svg>
-        </div>
-        <h3 class="text-lg font-bold text-gray-800">Eliminar colaborador</h3>
-      </div>
-      <p class="text-sm text-gray-600 mb-1">
-        ¿Estás seguro de que deseas eliminar a <span class="font-semibold text-gray-800">{{ colaboradorAEliminar.nombre }}</span>?
+      <h3 class="text-lg font-bold text-gray-900">Corregir datos del colaborador</h3>
+      <p class="mt-1 text-sm text-gray-500">
+        Solo los datos personales y laborales. Lo que la persona respondió sobre salud,
+        conducción o percepción de riesgo no se modifica desde aquí.
       </p>
-      <p class="text-xs text-gray-400 mb-6">Esta acción cambia el estado del registro a inactivo.</p>
-      <div class="flex gap-3">
-        <button (click)="cancelarEliminar()" type="button"
-          class="flex-1 border border-gray-300 text-gray-600 hover:bg-gray-50 font-semibold text-sm px-4 py-2 rounded-lg transition-all">
+
+      <div class="mt-5 grid gap-4 sm:grid-cols-2">
+        @for (columna of columnas(); track columna.id) {
+          <div [class.sm:col-span-2]="columna.tipo === 'textoLargo'">
+            <label [for]="'ed-' + columna.id" class="mb-1 block text-xs font-bold uppercase text-gray-600">
+              {{ columna.etiqueta }}
+            </label>
+
+            @if (esLista(columna)) {
+              <select [id]="'ed-' + columna.id" [(ngModel)]="ficha[columna.id]"
+                class="w-full rounded border border-gray-300 px-3 py-2 text-sm">
+                <option value="">Sin definir</option>
+                @for (opcion of columna.opciones; track opcion.valor) {
+                  <option [value]="opcion.valor">{{ opcion.etiqueta }}</option>
+                }
+              </select>
+            } @else {
+              <input [id]="'ed-' + columna.id" [type]="tipoCampo(columna)"
+                [(ngModel)]="ficha[columna.id]"
+                class="w-full rounded border border-gray-300 px-3 py-2 text-sm">
+            }
+          </div>
+        }
+      </div>
+
+      <div class="mt-6 flex items-center justify-end gap-2">
+        <button type="button" (click)="cerrarEdicion()" [disabled]="guardando()"
+          class="rounded border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 disabled:opacity-50">
           Cancelar
         </button>
-        <button (click)="confirmarEliminar()" type="button" [disabled]="eliminando"
-          class="flex-1 bg-red-500 hover:bg-red-600 disabled:opacity-60 text-white font-bold text-sm px-4 py-2 rounded-lg shadow transition-all flex items-center justify-center gap-2">
-          @if (eliminando) {
-            <svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-            Eliminando...
-          } @else {
-            Sí, eliminar
-          }
+        <button type="button" (click)="guardarEdicion()" [disabled]="guardando()"
+          class="rounded bg-amber-500 px-5 py-2 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-50">
+          {{ guardando() ? 'Guardando...' : 'Guardar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Confirmar eliminación ──────────────────────────────────────────────── -->
+@if (aEliminar(); as ficha) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div class="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
+      <h3 class="text-lg font-bold text-gray-900">
+        ¿Eliminar a {{ ficha['nombre'] || 'este colaborador' }}?
+      </h3>
+      <p class="mt-2 text-sm text-gray-600">
+        Se borra su respuesta completa a la encuesta, no solo estos datos. Las gráficas
+        del diagnóstico dejarán de contarla y no se puede deshacer.
+      </p>
+
+      <div class="mt-6 flex items-center justify-end gap-2">
+        <button type="button" (click)="cancelarEliminar()" [disabled]="guardando()"
+          class="rounded border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 disabled:opacity-50">
+          Cancelar
+        </button>
+        <button type="button" (click)="confirmarEliminar()" [disabled]="guardando()"
+          class="rounded bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50">
+          {{ guardando() ? 'Eliminando...' : 'Eliminar' }}
         </button>
       </div>
     </div>

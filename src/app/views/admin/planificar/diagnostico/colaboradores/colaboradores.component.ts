@@ -1,181 +1,191 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, viewChild, Input, OnInit, OnChanges, SimpleChanges, inject } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TablaCompartidaComponent } from "../../../../../components/tablas/tabla-compartida/tabla-compartida.component";
-import { Form1ColaboradoresComponent } from './form1-colaboradores/form1-colaboradores.component';
-import { Form2ColaboradoresComponent } from './form2-colaboradores/form2-colaboradores.component';
-import { Form3ImportarExcellComponent } from './form3-importar-excell/form3-importar-excell.component';
-import { Models } from '../../../../../interfaces/models';
 import { FormsModule } from '@angular/forms';
-import { AgGridModule } from 'ag-grid-angular';
-import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
-import { FirestoreService } from '../../../../../services/shared/firestore.service';
-import { AuthenticacionService } from '../../../../../services/shared/authenticacion.service';
-import { AlertaService } from '../../../../../services/shared/alerta.service';
 
+import { EncuestaEmpresaService } from '../../../../../services/shared/encuesta-empresa.service';
+import { AuthenticacionService } from '../../../../../services/shared/authenticacion.service';
+import { RolUsuarioService } from '../../../../../services/shared/rol-usuario.service';
+import { AlertaService } from '../../../../../services/shared/alerta.service';
+import { ModelsEncuestas } from '../../../../../interfaces/encuestas.interface';
+
+/**
+ * Lista de Colaboradores: las personas que respondieron la encuesta.
+ *
+ * No es un registro aparte que haya que teclear. Para una empresa de dos mil
+ * empleados repartidos en varios departamentos, consolidar esa lista a mano es
+ * inviable, y por eso el diagnóstico se hace por muestreo: quien contesta la
+ * encuesta entra aquí.
+ *
+ * Las columnas salen del módulo de información personal del cuestionario que la
+ * empresa activó, no de una lista escrita en el código: si cambia la encuesta,
+ * cambia la tabla.
+ */
 @Component({
   selector: 'app-colaboradores',
   standalone: true,
-  imports: [CommonModule, TablaCompartidaComponent, Form1ColaboradoresComponent, Form2ColaboradoresComponent, Form3ImportarExcellComponent, FormsModule, AgGridModule],
+  imports: [CommonModule, FormsModule],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './colaboradores.component.html',
-  styleUrl: './colaboradores.component.css'
+  styleUrl: './colaboradores.component.css',
 })
-export class ColaboradoresComponent implements OnInit, OnChanges {
+export class ColaboradoresComponent {
 
-  private _firestore = inject(FirestoreService);
-  private _authcations = inject(AuthenticacionService);
+  private _encuesta = inject(EncuestaEmpresaService);
+  private _auth = inject(AuthenticacionService);
+  private _rol = inject(RolUsuarioService);
   private _alerta = inject(AlertaService);
 
-  modalFormulario = viewChild.required<Form1ColaboradoresComponent>('modalFormulario');
-  modalImportar = viewChild.required<Form3ImportarExcellComponent>('modalImportar');
+  readonly periodo = this._auth.periodo;
 
-  private gridApi!: GridApi;
+  /** El supervisor consulta; corregir y eliminar es del operativo. */
+  get editable(): boolean { return this._rol.editable(); }
 
-  searchText = '';
-  activeFilter = 'Todos';
+  cargando = signal(true);
+  guardando = signal(false);
 
-  // ── Confirmación de eliminación ──────────────────────────────────────────
-  colaboradorAEliminar: Models.Diagnostico.Colaboradores | null = null;
-  eliminando = false;
+  /** Las preguntas del módulo personal, que son las columnas de la tabla. */
+  columnas = signal<ModelsEncuestas.Pregunta[]>([]);
 
-  filterButtons = [
-    { label: 'Todos', value: 'Todos' },
-    { label: 'Diurna', value: 'Diurna' },
-    { label: 'Nocturna', value: 'Nocturna' },
-    { label: 'Mixta', value: 'Mixta Día - Noche' }
-  ];
+  respuestas = signal<Record<string, any>[]>([]);
 
-  @Input() datos: any = [];
-  filteredData: any = [];
+  /** Ninguna encuesta activada todavía en este periodo. */
+  sinEncuesta = signal(false);
 
-  columnDefs: ColDef[] = [
-    {
-      headerName: 'Acciones',
-      width: 105,
-      pinned: 'left',
-      sortable: false,
-      resizable: false,
-      cellRenderer: () => `
-        <div class="flex gap-1 h-full items-center justify-center">
-          <button class="btn-editar flex items-center gap-1 px-2 py-1 bg-amber-500 text-white text-xs rounded hover:bg-amber-600 transition-colors">
-            <svg class="pointer-events-none" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            Editar
-          </button>
-          <button class="btn-eliminar flex items-center px-2 py-1 border border-red-300 text-red-500 text-xs rounded hover:bg-red-50 transition-colors">
-            <svg class="pointer-events-none" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-          </button>
-        </div>
-      `
-    },
-    {
-      headerName: 'Colaborador',
-      field: 'nombre',
-      width: 280,
-      cellRenderer: (params: any) => `
-        <div class="grid grid-cols-[auto_1fr] gap-3 items-center h-full">
-          <div class="w-8 h-8 bg-amber-500 text-white rounded-full grid place-items-center text-sm font-semibold flex-shrink-0">
-            ${(params.value ?? '?').split(' ').map((n: string) => n[0] ?? '').join('').substring(0, 2).toUpperCase()}
-          </div>
-          <div>
-            <div class="font-semibold text-gray-900 text-sm leading-tight">${params.value ?? ''}</div>
-            <div class="text-xs text-gray-400 truncate">${params.data.email ?? ''}</div>
-          </div>
-        </div>
-      `
-    },
-    { headerName: 'Documento',      field: 'documento',       width: 120 },
-    { headerName: 'Género',         field: 'genero',          width: 90  },
-    { headerName: 'F. Nacimiento',  field: 'fechaNacimiento', width: 120 },
-    { headerName: 'Escolaridad',    field: 'escolaridad',     width: 110 },
-    { headerName: 'Estado Civil',   field: 'estadoCivil',     width: 110 },
-    { headerName: 'Estrato',        field: 'estrato',         width: 90  },
-    { headerName: 'Jornada',        field: 'jornada',         width: 100 },
-    { headerName: 'Cargo',          field: 'cargo',           width: 160 },
-    { headerName: 'Área',           field: 'areaDepartamento',width: 140 },
-    { headerName: 'Contrato',       field: 'tipoContrato',    width: 120 },
-    { headerName: 'Hrs. lab.',      field: 'horasLaborales',  width: 80, type: 'numericColumn' },
-    { headerName: 'Experiencia',    field: 'tiempoEmpresa',   width: 100, type: 'numericColumn',
-      valueFormatter: (p: any) => `${p.value} años` },
-    { headerName: 'Teléfono',       field: 'telefono',        width: 120 },
-  ];
+  busqueda = signal('');
 
-  defaultColDef: ColDef = { sortable: true, resizable: true };
+  /** La ficha abierta para corregir, como copia para poder cancelar. */
+  edicion = signal<Record<string, any> | null>(null);
 
-  ngOnInit() {
-    this.filteredData = [...this.datos];
+  /** La ficha pendiente de confirmar su eliminación. */
+  aEliminar = signal<Record<string, any> | null>(null);
+
+  constructor() {
+    // Cada periodo tiene su cuestionario y sus respuestas: al cambiar de año
+    // hay que releer las dos cosas.
+    effect(() => {
+      this.periodo();
+      this.cargar();
+    });
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['datos']) {
-      this.filteredData = [...this.datos];
-      this.applyFilters();
+  async cargar() {
+    this.cargando.set(true);
+    this.sinEncuesta.set(false);
+    try {
+      const modulo = await this._encuesta.moduloPersonal();
+
+      if (!modulo) {
+        this.sinEncuesta.set(true);
+        this.columnas.set([]);
+        this.respuestas.set([]);
+        return;
+      }
+
+      this.columnas.set(modulo.preguntas);
+      this.respuestas.set(await this._encuesta.respuestas());
+    } catch (error: unknown) {
+      console.error('[Colaboradores] cargar:', error);
+      this._alerta.showError('No se pudieron cargar los colaboradores.');
+    } finally {
+      this.cargando.set(false);
     }
   }
 
-  onGridReady(params: GridReadyEvent) {
-    this.gridApi = params.api;
+  /** Filtra por cualquiera de las columnas visibles. */
+  filtradas(): Record<string, any>[] {
+    const texto = this.busqueda().trim().toLowerCase();
+    if (!texto) return this.respuestas();
+
+    return this.respuestas().filter(r =>
+      this.columnas().some(c => this.mostrar(r, c).toLowerCase().includes(texto))
+    );
   }
 
-  setFilter(filterValue: string) {
-    this.activeFilter = filterValue;
-    this.applyFilters();
+  /** El valor de una respuesta, listo para pintar. */
+  mostrar(respuesta: Record<string, any>, pregunta: ModelsEncuestas.Pregunta): string {
+    const valor = respuesta[pregunta.id];
+    if (valor === undefined || valor === null || valor === '') return '—';
+    return Array.isArray(valor) ? valor.join(', ') : String(valor);
   }
 
-  onSearchChange() {
-    this.applyFilters();
+  // ── Corregir ──────────────────────────────────────────────────────────────
+
+  abrirEdicion(respuesta: Record<string, any>) {
+    if (!this.editable) return;
+    this.edicion.set({ ...respuesta });
   }
 
-  private applyFilters() {
-    let filtered = [...this.datos];
-    if (this.activeFilter !== 'Todos') {
-      filtered = filtered.filter(item => item.jornada === this.activeFilter);
+  cerrarEdicion() { this.edicion.set(null); }
+
+  /**
+   * Guarda solo los campos del módulo personal.
+   *
+   * Lo demás de la respuesta —salud, conducción, percepción de riesgo— es lo
+   * que la persona contestó y no se toca desde aquí: esto sirve para corregir
+   * una cédula mal tecleada, no para reescribir lo que alguien respondió.
+   */
+  async guardarEdicion() {
+    const ficha = this.edicion();
+    if (!ficha || !this.editable) return;
+
+    this.guardando.set(true);
+    try {
+      const cambios: Record<string, unknown> = {};
+      for (const columna of this.columnas()) cambios[columna.id] = ficha[columna.id] ?? '';
+
+      await this._encuesta.corregir(ficha['id'], cambios);
+      this._alerta.showSuccess('Datos corregidos.');
+      this.edicion.set(null);
+      await this.cargar();
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'No se pudo guardar';
+      console.error('[Colaboradores] guardarEdicion:', error);
+      this._alerta.showError(msg);
+    } finally {
+      this.guardando.set(false);
     }
-    if (this.searchText.trim()) {
-      const search = this.searchText.toLowerCase();
-      filtered = filtered.filter(item =>
-        String(item.nombre ?? '').toLowerCase().includes(search) ||
-        String(item.documento ?? '').toLowerCase().includes(search) ||
-        String(item.email ?? '').toLowerCase().includes(search) ||
-        String(item.cargo ?? '').toLowerCase().includes(search) ||
-        String(item.areaDepartamento ?? '').toLowerCase().includes(search)
-      );
-    }
-    this.filteredData = filtered;
   }
 
-  onCellClicked(event: any) {
-    if (event.colDef.headerName !== 'Acciones') return;
-    const target = event.event?.target as HTMLElement;
-    if (target?.closest('.btn-editar')) {
-      this.modalFormulario().abrirModal('editar', event.data);
-    }
-    if (target?.closest('.btn-eliminar')) {
-      this.colaboradorAEliminar = event.data;
+  /** Las opciones se pintan como desplegable; el resto, como campo de texto. */
+  esLista(pregunta: ModelsEncuestas.Pregunta): boolean {
+    return pregunta.tipo === 'unica' && !!pregunta.opciones?.length;
+  }
+
+  tipoCampo(pregunta: ModelsEncuestas.Pregunta): string {
+    switch (pregunta.tipo) {
+      case 'numero': return 'number';
+      case 'fecha': return 'date';
+      case 'email': return 'email';
+      case 'telefono': return 'tel';
+      default: return 'text';
     }
   }
 
-  cancelarEliminar() {
-    this.colaboradorAEliminar = null;
+  // ── Eliminar ──────────────────────────────────────────────────────────────
+
+  pedirEliminar(respuesta: Record<string, any>) {
+    if (!this.editable) return;
+    this.aEliminar.set(respuesta);
   }
+
+  cancelarEliminar() { this.aEliminar.set(null); }
 
   async confirmarEliminar() {
-    if (!this.colaboradorAEliminar?.id) return;
-    this.eliminando = true;
-    const nit = this._authcations.getCurrentUser().displayName;
-    const periodo = this._authcations.periodo();
+    const ficha = this.aEliminar();
+    if (!ficha || !this.editable) return;
+
+    this.guardando.set(true);
     try {
-      await this._firestore.updateDocument(
-        `Empresas/${nit}/periodos/${periodo}/006-diagnostico-colaboradores/${this.colaboradorAEliminar.id}`,
-        { estado: 'NoActivo' }
-      );
-      this._alerta.showSuccess('Colaborador eliminado exitosamente.');
-      this.colaboradorAEliminar = null;
+      await this._encuesta.eliminarRespuesta(ficha['id']);
+      this._alerta.showSuccess('Colaborador eliminado.');
+      this.aEliminar.set(null);
+      await this.cargar();
     } catch (error: unknown) {
-      const msg = error instanceof Error ? error.message : 'Error al eliminar el colaborador';
+      const msg = error instanceof Error ? error.message : 'No se pudo eliminar';
       console.error('[Colaboradores] eliminar:', error);
       this._alerta.showError(msg);
     } finally {
-      this.eliminando = false;
+      this.guardando.set(false);
     }
   }
 }

@@ -6,7 +6,7 @@ import { ColumnsStrackedNumericoComponent } from '../../../../../components/apex
 import { ColumnsBarHorizontalComponent, CauseData } from '../../../../../components/apexChart/columns-bar-horizontal/columns-bar-horizontal.component';
 import { LineColumnComponent } from '../../../../../components/apexChart/line-column/line-column.component';
 import { AuthenticacionService } from '../../../../../services/shared/authenticacion.service';
-import { DiagnosticoDatosService } from '../../../../../services/shared/diagnostico-datos.service';
+import { EncuestaEmpresaService } from '../../../../../services/shared/encuesta-empresa.service';
 import { Models } from '../../../../../interfaces/models';
 
 @Component({
@@ -19,7 +19,7 @@ import { Models } from '../../../../../interfaces/models';
 export class GestionColaboradoresComponent implements OnInit {
 
   private _auth = inject(AuthenticacionService);
-  private _datos = inject(DiagnosticoDatosService);
+  private _encuesta = inject(EncuestaEmpresaService);
 
   colaboradores: any[] = [];
   cargando = true;
@@ -57,7 +57,9 @@ export class GestionColaboradoresComponent implements OnInit {
     // todavia no hay NIT y la ruta de la consulta saldria mal formada.
     if (!await this._auth.waitForUser()) return;
     try {
-      const datos = await this._datos.todos<any>('colaboradores');
+      // Los colaboradores son las respuestas a la encuesta del periodo: el
+      // registro aparte desaparecio al hacerse el diagnostico por muestreo.
+      const datos = await this._encuesta.respuestas();
       this.colaboradores = datos;
       this._calcular(datos);
     } catch (error: unknown) {
