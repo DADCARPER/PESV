@@ -4,6 +4,7 @@ import { FirestoreService } from '../../../../../services/shared/firestore.servi
 import { AuthenticacionService } from '../../../../../services/shared/authenticacion.service';
 import { RolUsuarioService } from '../../../../../services/shared/rol-usuario.service';
 import { AlertaService } from '../../../../../services/shared/alerta.service';
+import { EncuestaEmpresaService } from '../../../../../services/shared/encuesta-empresa.service';
 import * as XLSX from 'xlsx';
 
 @Component({
@@ -19,6 +20,7 @@ export class ResultadosEncuestaComponent {
   private _auth    = inject(AuthenticacionService);
   private _rol     = inject(RolUsuarioService);
   private _alerta  = inject(AlertaService);
+  private _encuesta = inject(EncuestaEmpresaService);
 
   /** Solo el operativo borra; el supervisor revisa. */
   get puedeBorrar(): boolean { return this._rol.editable(); }
@@ -136,75 +138,45 @@ export class ResultadosEncuestaComponent {
     return d.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' });
   }
 
-  private _arr(val: any): string {
-    if (Array.isArray(val)) return val.join(', ');
-    return val ?? '';
-  }
+  /**
+   * Exporta a Excel con las columnas del cuestionario del periodo.
+   *
+   * Antes llevaba las cuarenta y tantas columnas escritas a mano, con sus
+   * encabezados. Eso dejo de funcionar en cuanto la encuesta paso a ser
+   * editable: una pregunta nueva no aparecia, una renombrada salia con el
+   * titulo viejo, y un identificador reaprovechado ponia a una respuesta el
+   * encabezado de otra. Ahora las columnas son las preguntas.
+   */
+  async exportarExcel(): Promise<void> {
+    try {
+      const copia = await this._encuesta.activa();
+      if (!copia) {
+        this._alerta.showWarning('No hay cuestionario activo en este periodo.');
+        return;
+      }
 
-  exportarExcel(): void {
-    const filas = this.respuestasFiltradas.map(r => ({
-      // ── Módulo 1: Información personal y laboral ──
-      'Nombre':                    r.nombre               ?? '',
-      'Documento':                 r.documento            ?? '',
-      'Fecha Nacimiento':          r.fechaNacimiento      ?? '',
-      'Género':                    r.genero               ?? '',
-      'Teléfono':                  r.telefono             ?? '',
-      'Email':                     r.email                ?? '',
-      'Escolaridad':               r.escolaridad          ?? '',
-      'Estrato':                   r.estrato              ?? '',
-      'Estado Civil':              r.estadoCivil          ?? '',
-      'Cargo':                     r.cargo                ?? '',
-      'Área / Departamento':       r.areaDepartamento     ?? '',
-      'Jornada':                   r.jornada              ?? '',
-      'Horas Laborales':           r.horasLaborales       ?? '',
-      'Tiempo en Empresa (años)':  r.tiempoEmpresa        ?? '',
-      'Tipo Contrato':             r.tipoContrato         ?? '',
-      // ── Módulo 2: Salud y condición física ──
-      'Estado General Salud':      r.estadoGeneral        ?? '',
-      'Limitación Física':         r.limitacionFisica     ?? '',
-      'Incapacidades':             r.incapacidades        ?? '',
-      'Actividad Física':          r.actividadFisica      ?? '',
-      'Dolor / Molestia':          r.dolorMolestia        ?? '',
-      'Discapacidad':              r.discapacidad         ?? '',
-      // ── Módulo 3: Conducción y transporte ──
-      'Conduce Vehículos':         r.conduceVehiculos     ?? '',
-      'Tipo de Vehículos':         this._arr(r.tipoVehiculos),
-      'Licencia de Conducción':    r.licenciaConduccion   ?? '',
-      'Categoría Licencia':        r.categoriaLicencia    ?? '',
-      'Frecuencia Conducción':     r.frecuenciaConduccion ?? '',
-      'Experiencia Conducción':    r.experienciaConduccion?? '',
-      'Uso Cinturón':              r.usoCinturon          ?? '',
-      'Accidente de Tránsito':     r.accidenteTransito    ?? '',
-      'Conocimiento Normas':       r.conocimientoNormas   ?? '',
-      'Capacidad Emergencia':      r.capacidadEmergencia  ?? '',
-      // ── Módulo 4: Desplazamientos laborales ──
-      'Medios de Transporte':      this._arr(r.mediosTransporte),
-      'Tiempo Desplazamiento':     r.tiempoDesplazamiento ?? '',
-      'Estado de Vías':            r.estadoVias           ?? '',
-      'Incidentes Desplazamiento': r.incidentesDesplazamiento ?? '',
-      'Seguridad Desplazamiento':  r.seguridadDesplazamiento  ?? '',
-      // ── Módulo 5: Identificación de riesgos ──
-      'Exposición a Riesgos':      r.exposicionRiesgos    ?? '',
-      'Experiencia con Riesgos':   r.experienciaRiesgos   ?? '',
-      'Situaciones de Riesgo':     this._arr(r.situacionesRiesgo),
-      'Reporte de Riesgo':         r.reporteRiesgo        ?? '',
-      'Conocimiento Reporte':      r.conocimientoReporte  ?? '',
-      'Cultura de Seguridad':      r.culturaSeguridad     ?? '',
-      'Preparación ante Riesgos':  r.preparacionRiesgos   ?? '',
-      // ── Módulo 6: Mejora y participación ──
-      'Aportar Ideas':             r.aportarIdeas         ?? '',
-      'Participación Actividades': r.participacionActividades ?? '',
-      'Acciones de Mejora':        this._arr(r.accionesMejora),
-      'Participación Anterior':    r.participacionAnterior?? '',
-      'Sugerencias de Mejora':     r.sugerenciasMejora    ?? '',
-      // ── Metadatos ──
-      'Fecha Envío':               this.getFecha(r.docCreado)
-    }));
+      const preguntas = copia.modulos
+        .filter(m => m.fijo || copia.modulosActivos.includes(m.id))
+        .flatMap(m => m.preguntas);
 
-    const ws = XLSX.utils.json_to_sheet(filas);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Respuestas');
-    XLSX.writeFile(wb, `encuesta_${this.periodo()}.xlsx`);
+      const filas = this.respuestasFiltradas.map(r => {
+        const fila: Record<string, string> = {};
+        for (const pregunta of preguntas) {
+          const valor = r[pregunta.id];
+          fila[pregunta.etiqueta] = Array.isArray(valor) ? valor.join(', ') : (valor ?? '');
+        }
+        fila['Fecha de envio'] = this.getFecha(r.docCreado);
+        return fila;
+      });
+
+      const hoja = XLSX.utils.json_to_sheet(filas);
+      const libro = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(libro, hoja, 'Respuestas');
+      XLSX.writeFile(libro, `encuesta_${this.periodo()}.xlsx`);
+    } catch (error: unknown) {
+      console.error('[ResultadosEncuesta] exportar:', error);
+      this._alerta.showError('No se pudo generar el archivo.');
+    }
   }
 
 }

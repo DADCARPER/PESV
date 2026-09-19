@@ -354,7 +354,7 @@ export const ENCUESTA_PESV_BASE: Omit<ModelsEncuestas.Encuesta, 'id'> = {
           mapaColaborador: 'estadoPagoInfracciones',
         },
         {
-          id: 'frecuenciaConduccion',
+          id: 'accidenteEnJornada',
           etiqueta: '¿El accidente ha ocurrido durante la jornada laboral?',
           tipo: 'unica',
           obligatoria: false,
@@ -379,7 +379,7 @@ export const ENCUESTA_PESV_BASE: Omit<ModelsEncuestas.Encuesta, 'id'> = {
           condicion: { pregunta: 'conduceVehiculos', valores: ['Sí'] },
         },
         {
-          id: 'usoCinturon',
+          id: 'accidenteUltimoAno',
           etiqueta: '¿Ha tenido accidentes de tránsito en el último año?',
           tipo: 'unica',
           obligatoria: false,

@@ -131,9 +131,9 @@ export namespace ModelDiagnosticos {
         tipoVehiculos: string;
         licenciaConduccion: string;
         categoriaLicencia: string;
-        frecuenciaConduccion: string;
+        accidenteEnJornada: string;
         experienciaConduccion: string;
-        usoCinturon: string;
+        accidenteUltimoAno: string;
         accidenteTransito: string;
         conocimientoNormas: string;
         capacidadEmergencia: string;
