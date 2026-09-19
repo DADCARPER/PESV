@@ -83,34 +83,49 @@ export class EncuestaEmpresaService {
     const ruta = this.rutaRespuestas(this.nit());
     const periodo = copia.periodo;
 
+    const total = await this._firestore.contarDocumentos(ruta, [['periodo', '==', periodo]]);
+
     const contar = async (
       { pregunta, excluir = ['No'], noVacio }:
       { pregunta: string; excluir?: string[]; noVacio?: boolean }
     ) => {
-      // Una pregunta abierta no tiene opciones que enumerar: lo que
-      // interesa es cuanta gente escribio algo.
+      const definicion = modulo.preguntas.find(p => p.id === pregunta);
+
+      // Una pregunta abierta no tiene opciones que enumerar: interesa cuánta
+      // gente escribió algo. Se cuentan las vacías y se restan, en vez de
+      // preguntar por "distinto de vacío": una desigualdad junto al filtro de
+      // periodo exigiría un índice compuesto por cada pregunta abierta, y eso
+      // ataría la configuración de Firestore al contenido de la encuesta, que
+      // es editable. Dos igualdades no necesitan índice.
+      //
+      // Se apoya en que los módulos no se pueden cambiar con respuestas ya
+      // recogidas: todas las del periodo tienen el campo, aunque sea vacío.
       if (noVacio) {
-        const escritas = await this._firestore.contarDocumentos(
-          ruta, [['periodo', '==', periodo, pregunta, '!=', '']]
+        const vacias = await this._firestore.contarDocumentos(
+          ruta, [['periodo', '==', periodo, pregunta, '==', '']]
         );
-        return [pregunta, escritas] as const;
+        return [pregunta, total - vacias] as const;
       }
 
-      const opciones = (modulo.preguntas.find(p => p.id === pregunta)?.opciones ?? [])
+      const opciones = (definicion?.opciones ?? [])
         .map(o => o.valor)
         .filter(v => !excluir.includes(v));
 
       if (!opciones.length) return [pregunta, 0] as const;
 
-      // `in` admite hasta treinta valores; ninguna pregunta se acerca.
-      const total = await this._firestore.contarDocumentos(
-        ruta, [['periodo', '==', periodo, pregunta, 'in', opciones.slice(0, 30)]]
+      // Una pregunta de varias opciones guarda una lista, y ahí `in` compararía
+      // la lista entera: lo que se busca es que contenga alguna de las
+      // opciones. Ambos admiten hasta treinta valores.
+      const operador = definicion?.tipo === 'multiple' ? 'array-contains-any' : 'in';
+
+      const cuantos = await this._firestore.contarDocumentos(
+        ruta, [['periodo', '==', periodo, pregunta, operador, opciones.slice(0, 30)]]
       );
-      return [pregunta, total] as const;
+      return [pregunta, cuantos] as const;
     };
 
     const [respuestas, ...conteos] = await Promise.all([
-      this._firestore.contarDocumentos(ruta, [['periodo', '==', periodo]]),
+      Promise.resolve(total),
       ...indicadores.map(contar),
     ]);
 
