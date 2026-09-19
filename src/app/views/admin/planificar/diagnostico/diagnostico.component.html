@@ -91,6 +91,7 @@
             {id: 3,  label: 'Colaboradores'},
             {id: 10, label: 'Salud'},
             {id: 11, label: 'Conducción'},
+            {id: 12, label: 'Desplazamientos'},
             {id: 4,  label: 'Contratistas'},
             {id: 5,  label: 'Vehículos'},
             {id: 6,  label: 'Rutas frecuentes'},
@@ -369,6 +370,40 @@
               }
             </article>
 
+            <!-- Desplazamientos laborales -->
+            <article class="w-full md:w-1/3 rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200">
+              <div class="flex items-center gap-3 mb-2">
+                <div class="text-white inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-amber-600">
+                  <iconify-icon icon="hugeicons:route-01" width="28" height="28"></iconify-icon>
+                </div>
+                <p class="text-xl font-medium text-gray-900">Desplazamientos Laborales</p>
+              </div>
+              <p class="text-base text-gray-500 mb-3">Cómo llega la gente al trabajo y quién se desplaza durante la jornada: medios, tiempos e incidentes del último año.</p>
+
+              @if (desplazamientos(); as d) {
+                <div class="flex gap-2 mb-3">
+                  <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
+                    <p class="font-medium text-amber-800">{{ d['desplazamientosJornada'] }}</p>
+                    <p class="text-sm">EN JORNADA</p>
+                  </div>
+                  <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
+                    <p class="font-medium text-amber-800">{{ d['incidentesDesplazamiento'] }}</p>
+                    <p class="text-sm">CON INCIDENTES</p>
+                  </div>
+                </div>
+                <button (click)="toggleTabs(12)" class="w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
+                  <div class="flex items-center justify-center gap-1">
+                    <iconify-icon icon="hugeicons:plus-sign-square" width="16" height="16"></iconify-icon> Ver Detalles
+                  </div>
+                </button>
+              } @else {
+                <p class="rounded-lg border border-gray-100 bg-gray-50 p-3 text-sm text-gray-500">
+                  El módulo de desplazamientos no está activo en la encuesta de este periodo.
+                  Actívalo en la pestaña <strong>Encuesta</strong>.
+                </p>
+              }
+            </article>
+
             <!-- Plan de emergencias -->
             <article class="w-full md:w-1/3 rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200">
               <div class="flex items-center gap-3 mb-2">
@@ -425,6 +460,11 @@
       <!-- Tab 11: Conducción y transporte (módulo 3 de la encuesta) -->
       @if (openTab === 11) {
         <app-respuestas-modulo moduloId="modulo3" nombreModulo="Conducción y transporte"></app-respuestas-modulo>
+      }
+
+      <!-- Tab 12: Desplazamientos laborales (módulo 4 de la encuesta) -->
+      @if (openTab === 12) {
+        <app-respuestas-modulo moduloId="modulo4" nombreModulo="Desplazamientos laborales"></app-respuestas-modulo>
       }
 
       <!-- Tab 4: Contratistas -->

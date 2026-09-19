@@ -463,7 +463,7 @@ export const ENCUESTA_PESV_BASE: Omit<ModelsEncuestas.Encuesta, 'id'> = {
           ],
         },
         {
-          id: 'estadoVias',
+          id: 'estadoVehiculo',
           etiqueta: '¿Cuál es el estado general del vehículo en el quese desplaza?',
           tipo: 'unica',
           obligatoria: true,
@@ -488,7 +488,7 @@ export const ENCUESTA_PESV_BASE: Omit<ModelsEncuestas.Encuesta, 'id'> = {
           ],
         },
         {
-          id: 'seguridadDesplazamiento',
+          id: 'propiedadVehiculo',
           etiqueta: 'El vehículo en el cual se desplaza es:',
           tipo: 'unica',
           obligatoria: true,
@@ -499,7 +499,7 @@ export const ENCUESTA_PESV_BASE: Omit<ModelsEncuestas.Encuesta, 'id'> = {
             { valor: 'Alquilado (Tercero)', etiqueta: 'Alquilado (Tercero)' },
             { valor: 'Otro', etiqueta: 'Otro' },
           ],
-          campoOtro: 'seguridadDesplazamientoOtro',
+          campoOtro: 'propiedadVehiculoOtro',
         },
         {
           id: 'desplazamientosJornada',

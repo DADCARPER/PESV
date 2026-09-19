@@ -193,6 +193,7 @@ export class DiagnosticoComponent implements OnInit {
    */
   salud = signal<Record<string, number> | null>(null);
   conduccion = signal<Record<string, number> | null>(null);
+  desplazamientos = signal<Record<string, number> | null>(null);
 
   /** Las cifras del tablero: una lectura por cifra, sin descargar listados. */
   async cargarResumen() {
@@ -211,6 +212,11 @@ export class DiagnosticoComponent implements OnInit {
     this.conduccion.set(await this.indicadores('modulo3', [
       { pregunta: 'conduceVehiculos' },
       { pregunta: 'accidenteTransito' },
+    ]));
+
+    this.desplazamientos.set(await this.indicadores('modulo4', [
+      { pregunta: 'desplazamientosJornada' },
+      { pregunta: 'incidentesDesplazamiento' },
     ]));
   }
 

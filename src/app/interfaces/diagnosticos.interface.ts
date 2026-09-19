@@ -140,9 +140,9 @@ export namespace ModelDiagnosticos {
         //modulo4
         mediosTransporte: string[]; // array de strings (puedes ajustarlo si son objetos)
         tiempoDesplazamiento: string;
-        estadoVias: string;
+        estadoVehiculo: string;
         incidentesDesplazamiento: string;
-        seguridadDesplazamiento: string;
+        propiedadVehiculo: string;
         //modulo5
         exposicionRiesgos: string;
         experienciaRiesgos: string;
