@@ -116,28 +116,28 @@
         <div class="text-lg font-light leading-relaxed text-gray-700">
 
           <!-- Tarjetas resumen -->
-          <div class="flex flex-col md:flex-row gap-2 mb-4">
-            <div class="w-full md:w-1/5">
+          <div class="grid gap-2 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 mb-4">
+            <div>
               <app-card-stats2 [titulo]="'Sedes'" [valor]="'Total: ' + num_sedes"
                 [colorIcono]="'bg-amber-500'" [iconClass]="'factory'"
                 [tabNumber]="1" (tabClick)="toggleTabs($event)"></app-card-stats2>
             </div>
-            <div class="w-full md:w-1/5">
+            <div>
               <app-card-stats2 [titulo]="'Colaboradores'" [valor]="'Total: ' + num_empleados"
                 [colorIcono]="'bg-amber-700'" [iconClass]="'mentoring'"
                 [tabNumber]="3" (tabClick)="toggleTabs($event)"></app-card-stats2>
             </div>
-            <div class="w-full md:w-1/5">
+            <div>
               <app-card-stats2 [titulo]="'Contratistas'" [valor]="'Total: ' + num_contratista"
                 [colorIcono]="'bg-amber-600'" [iconClass]="'conference'"
                 [tabNumber]="4" (tabClick)="toggleTabs($event)"></app-card-stats2>
             </div>
-            <div class="w-full md:w-1/5">
+            <div>
               <app-card-stats2 [titulo]="'Vehículos'" [valor]="'Total: ' + num_vehiculos"
                 [colorIcono]="'bg-amber-800'" [iconClass]="'container-truck'"
                 [tabNumber]="5" (tabClick)="toggleTabs($event)"></app-card-stats2>
             </div>
-            <div class="w-full md:w-1/5">
+            <div>
               <app-card-stats2 [titulo]="'Rutas'" [valor]="'Total: ' + num_rutas"
                 [colorIcono]="'bg-amber-500'" [iconClass]="'road-location-01'"
                 [tabNumber]="6" (tabClick)="toggleTabs($event)"></app-card-stats2>
@@ -154,36 +154,36 @@
           </div> -->
 
           <!-- Módulos del diagnóstico -->
-          <div class="flex flex-col md:flex-row gap-2 mb-2">
+          <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 mb-2">
 
-            <article class="w-full md:w-1/3 rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200">
-              <div class="flex items-center gap-3 mb-2">
-                <div class="text-white inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-amber-800">
-                  <iconify-icon icon="hugeicons:factory" width="28" height="28"></iconify-icon>
+            <article class="flex h-full flex-col rounded-lg border border-gray-100 bg-white p-3 hover:shadow-lg transition-shadow duration-200">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="text-white inline-flex items-center justify-center w-9 h-9 shadow rounded-full bg-amber-800 shrink-0">
+                  <iconify-icon icon="hugeicons:factory" width="20" height="20"></iconify-icon>
                 </div>
                 <a [routerLink]="['/admin/planificar/diagnostico/informacion_organizacion']"
-                  class="text-xl font-medium text-gray-900 hover:text-amber-600 hover:underline cursor-pointer transition-colors">
+                  class="text-sm font-semibold leading-tight text-gray-900 hover:text-amber-600 hover:underline cursor-pointer transition-colors">
                   Información Organización
                 </a>
               </div>
-              <p class="text-base text-gray-500 mb-3">Registro de sedes, servicios y estructura organizacional básica para el diagnóstico de seguridad vial.</p>
+              <p class="text-xs text-gray-500 mb-3 line-clamp-2">Registro de sedes, servicios y estructura organizacional básica para el diagnóstico de seguridad vial.</p>
               <div class="flex gap-2 mb-3">
-                <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
-                  <p class="font-medium text-amber-800">{{ num_sedes }}</p>
-                  <p class="text-sm">SEDES</p>
+                <div class="flex-1 bg-amber-50 p-2 rounded-md border border-amber-100 text-center">
+                  <p class="text-lg font-bold leading-none text-amber-800">{{ num_sedes }}</p>
+                  <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">SEDES</p>
                 </div>
-                <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
-                  <p class="font-medium text-amber-800">{{ num_servicios }}</p>
-                  <p class="text-sm">SERVICIOS</p>
+                <div class="flex-1 bg-amber-50 p-2 rounded-md border border-amber-100 text-center">
+                  <p class="text-lg font-bold leading-none text-amber-800">{{ num_servicios }}</p>
+                  <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">SERVICIOS</p>
                 </div>
               </div>
-              <div class="flex gap-2">
-                <button (click)="toggleTabs(1)" class="flex-1 text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
+              <div class="mt-auto flex gap-2">
+                <button (click)="toggleTabs(1)" class="flex-1 text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-[11px] px-3 py-1.5 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
                   <div class="flex items-center justify-center gap-1">
                     <iconify-icon icon="hugeicons:plus-sign-square" width="16" height="16"></iconify-icon> Ver Sedes
                   </div>
                 </button>
-                <button (click)="toggleTabs(2)" class="flex-1 text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
+                <button (click)="toggleTabs(2)" class="flex-1 text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-[11px] px-3 py-1.5 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
                   <div class="flex items-center justify-center gap-1">
                     <iconify-icon icon="hugeicons:plus-sign-square" width="16" height="16"></iconify-icon> Ver Servicios
                   </div>
@@ -191,86 +191,82 @@
               </div>
             </article>
 
-            <article class="w-full md:w-1/3 rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200">
-              <div class="flex items-center gap-3 mb-2">
-                <div class="text-white inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-amber-500">
-                  <iconify-icon icon="hugeicons:conference" width="28" height="28"></iconify-icon>
+            <article class="flex h-full flex-col rounded-lg border border-gray-100 bg-white p-3 hover:shadow-lg transition-shadow duration-200">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="text-white inline-flex items-center justify-center w-9 h-9 shadow rounded-full bg-amber-500 shrink-0">
+                  <iconify-icon icon="hugeicons:conference" width="20" height="20"></iconify-icon>
                 </div>
                 <a [routerLink]="['/admin/planificar/diagnostico/gestion_contratistas']"
-                  class="text-xl font-medium text-gray-900 hover:text-amber-600 hover:underline cursor-pointer transition-colors">
+                  class="text-sm font-semibold leading-tight text-gray-900 hover:text-amber-600 hover:underline cursor-pointer transition-colors">
                   Gestión de Contratistas
                 </a>
               </div>
-              <p class="text-base text-gray-500 mb-3">Registro completo de terceros que realizan desplazamientos laborales: flotas, afiliados, tercerizados.</p>
+              <p class="text-xs text-gray-500 mb-3 line-clamp-2">Registro completo de terceros que realizan desplazamientos laborales: flotas, afiliados, tercerizados.</p>
               <div class="flex gap-2 mb-3">
-                <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
-                  <p class="font-medium text-amber-800">{{ num_contratista }}</p>
-                  <p class="text-sm">CONTRATISTAS</p>
+                <div class="flex-1 bg-amber-50 p-2 rounded-md border border-amber-100 text-center">
+                  <p class="text-lg font-bold leading-none text-amber-800">{{ num_contratista }}</p>
+                  <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">CONTRATISTAS</p>
                 </div>
-                <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
-                  <p class="font-medium text-amber-800">{{ num_conductores }}</p>
-                  <p class="text-sm">CONDUCTORES</p>
+                <div class="flex-1 bg-amber-50 p-2 rounded-md border border-amber-100 text-center">
+                  <p class="text-lg font-bold leading-none text-amber-800">{{ num_conductores }}</p>
+                  <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">CONDUCTORES</p>
                 </div>
               </div>
-              <button (click)="toggleTabs(4)" class="w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
+              <button (click)="toggleTabs(4)" class="mt-auto w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-[11px] px-3 py-1.5 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
                 <div class="flex items-center justify-center gap-1">
                   <iconify-icon icon="hugeicons:plus-sign-square" width="16" height="16"></iconify-icon> Ver Detalles
                 </div>
               </button>
             </article>
 
-            <article class="w-full md:w-1/3 rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200">
-              <div class="flex items-center gap-3 mb-2">
-                <div class="text-white inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-amber-600">
-                  <iconify-icon icon="hugeicons:mentoring" width="28" height="28"></iconify-icon>
+            <article class="flex h-full flex-col rounded-lg border border-gray-100 bg-white p-3 hover:shadow-lg transition-shadow duration-200">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="text-white inline-flex items-center justify-center w-9 h-9 shadow rounded-full bg-amber-600 shrink-0">
+                  <iconify-icon icon="hugeicons:mentoring" width="20" height="20"></iconify-icon>
                 </div>
                 <a [routerLink]="['/admin/planificar/diagnostico/gestion_colaboradores']"
-                  class="text-xl font-medium text-gray-900 hover:text-amber-600 hover:underline cursor-pointer transition-colors">
+                  class="text-sm font-semibold leading-tight text-gray-900 hover:text-amber-600 hover:underline cursor-pointer transition-colors">
                   Gestión de Colaboradores
                 </a>
               </div>
-              <p class="text-base text-gray-500 mb-3">Información completa del personal directo: datos personales, licencias, capacitaciones, historial de siniestros.</p>
+              <p class="text-xs text-gray-500 mb-3 line-clamp-2">Información completa del personal directo: datos personales, licencias, capacitaciones, historial de siniestros.</p>
               <div class="flex gap-2 mb-3">
-                <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
-                  <p class="font-medium text-amber-800">{{ num_empleados }}</p>
-                  <p class="text-sm">EMPLEADOS</p>
+                <div class="flex-1 bg-amber-50 p-2 rounded-md border border-amber-100 text-center">
+                  <p class="text-lg font-bold leading-none text-amber-800">{{ num_empleados }}</p>
+                  <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">EMPLEADOS</p>
                 </div>
-                <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
-                  <p class="font-medium text-amber-800">{{ num_masculino }} / {{ num_femenino }}</p>
-                  <p class="text-sm">M / F</p>
+                <div class="flex-1 bg-amber-50 p-2 rounded-md border border-amber-100 text-center">
+                  <p class="text-lg font-bold leading-none text-amber-800">{{ num_masculino }} / {{ num_femenino }}</p>
+                  <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">M / F</p>
                 </div>
               </div>
-              <button (click)="toggleTabs(3)" class="w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
+              <button (click)="toggleTabs(3)" class="mt-auto w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-[11px] px-3 py-1.5 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
                 <div class="flex items-center justify-center gap-1">
                   <iconify-icon icon="hugeicons:plus-sign-square" width="16" height="16"></iconify-icon> Ver Detalles
                 </div>
               </button>
             </article>
 
-          </div>
-
-          <!-- Segunda fila de módulos -->
-          <div class="flex flex-col md:flex-row gap-2 mb-2">
 
             <!-- Vehículos -->
-            <article class="w-full md:w-1/3 rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200">
-              <div class="flex items-center gap-3 mb-2">
-                <div class="text-white inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-amber-800">
-                  <iconify-icon icon="hugeicons:container-truck" width="28" height="28"></iconify-icon>
+            <article class="flex h-full flex-col rounded-lg border border-gray-100 bg-white p-3 hover:shadow-lg transition-shadow duration-200">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="text-white inline-flex items-center justify-center w-9 h-9 shadow rounded-full bg-amber-800 shrink-0">
+                  <iconify-icon icon="hugeicons:container-truck" width="20" height="20"></iconify-icon>
                 </div>
                 <a [routerLink]="['/admin/planificar/diagnostico/flota_vehiculos']"
-                  class="text-xl font-medium text-gray-900 hover:text-amber-600 hover:underline cursor-pointer transition-colors">
+                  class="text-sm font-semibold leading-tight text-gray-900 hover:text-amber-600 hover:underline cursor-pointer transition-colors">
                   Flota de Vehículos
                 </a>
               </div>
-              <p class="text-base text-gray-500 mb-3">Registro de vehículos propios, afiliados o asociados con su documentación legal y estado de mantenimiento.</p>
+              <p class="text-xs text-gray-500 mb-3 line-clamp-2">Registro de vehículos propios, afiliados o asociados con su documentación legal y estado de mantenimiento.</p>
               <div class="flex gap-2 mb-3">
-                <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
-                  <p class="font-medium text-amber-800">{{ num_vehiculos }}</p>
-                  <p class="text-sm">VEHÍCULOS</p>
+                <div class="flex-1 bg-amber-50 p-2 rounded-md border border-amber-100 text-center">
+                  <p class="text-lg font-bold leading-none text-amber-800">{{ num_vehiculos }}</p>
+                  <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">VEHÍCULOS</p>
                 </div>
               </div>
-              <button (click)="toggleTabs(5)" class="w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
+              <button (click)="toggleTabs(5)" class="mt-auto w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-[11px] px-3 py-1.5 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
                 <div class="flex items-center justify-center gap-1">
                   <iconify-icon icon="hugeicons:plus-sign-square" width="16" height="16"></iconify-icon> Ver Detalles
                 </div>
@@ -278,24 +274,24 @@
             </article>
 
             <!-- Rutas frecuentes -->
-            <article class="w-full md:w-1/3 rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200">
-              <div class="flex items-center gap-3 mb-2">
-                <div class="text-white inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-amber-500">
-                  <iconify-icon icon="hugeicons:road-location-01" width="28" height="28"></iconify-icon>
+            <article class="flex h-full flex-col rounded-lg border border-gray-100 bg-white p-3 hover:shadow-lg transition-shadow duration-200">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="text-white inline-flex items-center justify-center w-9 h-9 shadow rounded-full bg-amber-500 shrink-0">
+                  <iconify-icon icon="hugeicons:road-location-01" width="20" height="20"></iconify-icon>
                 </div>
                 <a [routerLink]="['/admin/planificar/diagnostico/rutas_frecuentes']"
-                  class="text-xl font-medium text-gray-900 hover:text-amber-600 hover:underline cursor-pointer transition-colors">
+                  class="text-sm font-semibold leading-tight text-gray-900 hover:text-amber-600 hover:underline cursor-pointer transition-colors">
                   Rutas Frecuentes
                 </a>
               </div>
-              <p class="text-base text-gray-500 mb-3">Trayectos habituales realizados por la organización: origen, destino, tipo de vía y frecuencia de uso.</p>
+              <p class="text-xs text-gray-500 mb-3 line-clamp-2">Trayectos habituales realizados por la organización: origen, destino, tipo de vía y frecuencia de uso.</p>
               <div class="flex gap-2 mb-3">
-                <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
-                  <p class="font-medium text-amber-800">{{ num_rutas }}</p>
-                  <p class="text-sm">RUTAS</p>
+                <div class="flex-1 bg-amber-50 p-2 rounded-md border border-amber-100 text-center">
+                  <p class="text-lg font-bold leading-none text-amber-800">{{ num_rutas }}</p>
+                  <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">RUTAS</p>
                 </div>
               </div>
-              <button (click)="toggleTabs(6)" class="w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
+              <button (click)="toggleTabs(6)" class="mt-auto w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-[11px] px-3 py-1.5 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
                 <div class="flex items-center justify-center gap-1">
                   <iconify-icon icon="hugeicons:plus-sign-square" width="16" height="16"></iconify-icon> Ver Detalles
                 </div>
@@ -303,27 +299,27 @@
             </article>
 
             <!-- Salud y condición física -->
-            <article class="w-full md:w-1/3 rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200">
-              <div class="flex items-center gap-3 mb-2">
-                <div class="text-white inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-amber-700">
-                  <iconify-icon icon="hugeicons:heart-check" width="28" height="28"></iconify-icon>
+            <article class="flex h-full flex-col rounded-lg border border-gray-100 bg-white p-3 hover:shadow-lg transition-shadow duration-200">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="text-white inline-flex items-center justify-center w-9 h-9 shadow rounded-full bg-amber-700 shrink-0">
+                  <iconify-icon icon="hugeicons:heart-check" width="20" height="20"></iconify-icon>
                 </div>
-                <p class="text-xl font-medium text-gray-900">Salud y Condición Física</p>
+                <p class="text-sm font-semibold leading-tight text-gray-900">Salud y Condición Física</p>
               </div>
-              <p class="text-base text-gray-500 mb-3">Estado de salud de quienes conducen o se desplazan: limitaciones, dolencias e incapacidades que inciden en el riesgo vial.</p>
+              <p class="text-xs text-gray-500 mb-3 line-clamp-2">Estado de salud de quienes conducen o se desplazan: limitaciones, dolencias e incapacidades que inciden en el riesgo vial.</p>
 
               @if (salud(); as s) {
                 <div class="flex gap-2 mb-3">
-                  <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
-                    <p class="font-medium text-amber-800">{{ s['limitacionFisica'] }}</p>
-                    <p class="text-sm">CON LIMITACIÓN</p>
+                  <div class="flex-1 bg-amber-50 p-2 rounded-md border border-amber-100 text-center">
+                    <p class="text-lg font-bold leading-none text-amber-800">{{ s['limitacionFisica'] }}</p>
+                    <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">CON LIMITACIÓN</p>
                   </div>
-                  <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
-                    <p class="font-medium text-amber-800">{{ s['estadoGeneral'] }}</p>
-                    <p class="text-sm">SALUD REGULAR O MALA</p>
+                  <div class="flex-1 bg-amber-50 p-2 rounded-md border border-amber-100 text-center">
+                    <p class="text-lg font-bold leading-none text-amber-800">{{ s['estadoGeneral'] }}</p>
+                    <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">SALUD REGULAR O MALA</p>
                   </div>
                 </div>
-                <button (click)="toggleTabs(10)" class="w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
+                <button (click)="toggleTabs(10)" class="mt-auto w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-[11px] px-3 py-1.5 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
                   <div class="flex items-center justify-center gap-1">
                     <iconify-icon icon="hugeicons:plus-sign-square" width="16" height="16"></iconify-icon> Ver Detalles
                   </div>
@@ -331,7 +327,7 @@
               } @else {
                 <!-- Sin el modulo activo no hay nada que contar: se dice donde
                      activarlo en vez de mostrar ceros. -->
-                <p class="rounded-lg border border-gray-100 bg-gray-50 p-3 text-sm text-gray-500">
+                <p class="mt-auto rounded-md border border-gray-100 bg-gray-50 p-2 text-xs text-gray-500">
                   El módulo de salud no está activo en la encuesta de este periodo.
                   Actívalo en la pestaña <strong>Encuesta</strong>.
                 </p>
@@ -339,33 +335,33 @@
             </article>
 
             <!-- Conducción y transporte -->
-            <article class="w-full md:w-1/3 rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200">
-              <div class="flex items-center gap-3 mb-2">
-                <div class="text-white inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-amber-500">
-                  <iconify-icon icon="hugeicons:steering" width="28" height="28"></iconify-icon>
+            <article class="flex h-full flex-col rounded-lg border border-gray-100 bg-white p-3 hover:shadow-lg transition-shadow duration-200">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="text-white inline-flex items-center justify-center w-9 h-9 shadow rounded-full bg-amber-500 shrink-0">
+                  <iconify-icon icon="hugeicons:steering" width="20" height="20"></iconify-icon>
                 </div>
-                <p class="text-xl font-medium text-gray-900">Conducción y Transporte</p>
+                <p class="text-sm font-semibold leading-tight text-gray-900">Conducción y Transporte</p>
               </div>
-              <p class="text-base text-gray-500 mb-3">Quiénes conducen, con qué licencia y experiencia, y qué siniestros e infracciones registran en el último año.</p>
+              <p class="text-xs text-gray-500 mb-3 line-clamp-2">Quiénes conducen, con qué licencia y experiencia, y qué siniestros e infracciones registran en el último año.</p>
 
               @if (conduccion(); as c) {
                 <div class="flex gap-2 mb-3">
-                  <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
-                    <p class="font-medium text-amber-800">{{ c['conduceVehiculos'] }}</p>
-                    <p class="text-sm">CONDUCEN</p>
+                  <div class="flex-1 bg-amber-50 p-2 rounded-md border border-amber-100 text-center">
+                    <p class="text-lg font-bold leading-none text-amber-800">{{ c['conduceVehiculos'] }}</p>
+                    <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">CONDUCEN</p>
                   </div>
-                  <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
-                    <p class="font-medium text-amber-800">{{ c['accidenteTransito'] }}</p>
-                    <p class="text-sm">CON SINIESTROS</p>
+                  <div class="flex-1 bg-amber-50 p-2 rounded-md border border-amber-100 text-center">
+                    <p class="text-lg font-bold leading-none text-amber-800">{{ c['accidenteTransito'] }}</p>
+                    <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">CON SINIESTROS</p>
                   </div>
                 </div>
-                <button (click)="toggleTabs(11)" class="w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
+                <button (click)="toggleTabs(11)" class="mt-auto w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-[11px] px-3 py-1.5 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
                   <div class="flex items-center justify-center gap-1">
                     <iconify-icon icon="hugeicons:plus-sign-square" width="16" height="16"></iconify-icon> Ver Detalles
                   </div>
                 </button>
               } @else {
-                <p class="rounded-lg border border-gray-100 bg-gray-50 p-3 text-sm text-gray-500">
+                <p class="mt-auto rounded-md border border-gray-100 bg-gray-50 p-2 text-xs text-gray-500">
                   El módulo de conducción no está activo en la encuesta de este periodo.
                   Actívalo en la pestaña <strong>Encuesta</strong>.
                 </p>
@@ -373,33 +369,33 @@
             </article>
 
             <!-- Desplazamientos laborales -->
-            <article class="w-full md:w-1/3 rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200">
-              <div class="flex items-center gap-3 mb-2">
-                <div class="text-white inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-amber-600">
-                  <iconify-icon icon="hugeicons:route-01" width="28" height="28"></iconify-icon>
+            <article class="flex h-full flex-col rounded-lg border border-gray-100 bg-white p-3 hover:shadow-lg transition-shadow duration-200">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="text-white inline-flex items-center justify-center w-9 h-9 shadow rounded-full bg-amber-600 shrink-0">
+                  <iconify-icon icon="hugeicons:route-01" width="20" height="20"></iconify-icon>
                 </div>
-                <p class="text-xl font-medium text-gray-900">Desplazamientos Laborales</p>
+                <p class="text-sm font-semibold leading-tight text-gray-900">Desplazamientos Laborales</p>
               </div>
-              <p class="text-base text-gray-500 mb-3">Cómo llega la gente al trabajo y quién se desplaza durante la jornada: medios, tiempos e incidentes del último año.</p>
+              <p class="text-xs text-gray-500 mb-3 line-clamp-2">Cómo llega la gente al trabajo y quién se desplaza durante la jornada: medios, tiempos e incidentes del último año.</p>
 
               @if (desplazamientos(); as d) {
                 <div class="flex gap-2 mb-3">
-                  <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
-                    <p class="font-medium text-amber-800">{{ d['desplazamientosJornada'] }}</p>
-                    <p class="text-sm">EN JORNADA</p>
+                  <div class="flex-1 bg-amber-50 p-2 rounded-md border border-amber-100 text-center">
+                    <p class="text-lg font-bold leading-none text-amber-800">{{ d['desplazamientosJornada'] }}</p>
+                    <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">EN JORNADA</p>
                   </div>
-                  <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
-                    <p class="font-medium text-amber-800">{{ d['incidentesDesplazamiento'] }}</p>
-                    <p class="text-sm">CON INCIDENTES</p>
+                  <div class="flex-1 bg-amber-50 p-2 rounded-md border border-amber-100 text-center">
+                    <p class="text-lg font-bold leading-none text-amber-800">{{ d['incidentesDesplazamiento'] }}</p>
+                    <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">CON INCIDENTES</p>
                   </div>
                 </div>
-                <button (click)="toggleTabs(12)" class="w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
+                <button (click)="toggleTabs(12)" class="mt-auto w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-[11px] px-3 py-1.5 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
                   <div class="flex items-center justify-center gap-1">
                     <iconify-icon icon="hugeicons:plus-sign-square" width="16" height="16"></iconify-icon> Ver Detalles
                   </div>
                 </button>
               } @else {
-                <p class="rounded-lg border border-gray-100 bg-gray-50 p-3 text-sm text-gray-500">
+                <p class="mt-auto rounded-md border border-gray-100 bg-gray-50 p-2 text-xs text-gray-500">
                   El módulo de desplazamientos no está activo en la encuesta de este periodo.
                   Actívalo en la pestaña <strong>Encuesta</strong>.
                 </p>
@@ -407,33 +403,33 @@
             </article>
 
             <!-- Identificación de Riesgos -->
-            <article class="w-full md:w-1/3 rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200">
-              <div class="flex items-center gap-3 mb-2">
-                <div class="text-white inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-amber-800">
-                  <iconify-icon icon="hugeicons:alert-circle" width="28" height="28"></iconify-icon>
+            <article class="flex h-full flex-col rounded-lg border border-gray-100 bg-white p-3 hover:shadow-lg transition-shadow duration-200">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="text-white inline-flex items-center justify-center w-9 h-9 shadow rounded-full bg-amber-800 shrink-0">
+                  <iconify-icon icon="hugeicons:alert-circle" width="20" height="20"></iconify-icon>
                 </div>
-                <p class="text-xl font-medium text-gray-900">Identificación de Riesgos</p>
+                <p class="text-sm font-semibold leading-tight text-gray-900">Identificación de Riesgos</p>
               </div>
-              <p class="text-base text-gray-500 mb-3">Qué riesgos percibe y ha vivido la gente, y qué factores señalan como causa: humano, vehículo, vía y entorno.</p>
+              <p class="text-xs text-gray-500 mb-3 line-clamp-2">Qué riesgos percibe y ha vivido la gente, y qué factores señalan como causa: humano, vehículo, vía y entorno.</p>
 
               @if (riesgos(); as r) {
                 <div class="flex gap-2 mb-3">
-                  <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
-                    <p class="font-medium text-amber-800">{{ r['exposicionRiesgos'] }}</p>
-                    <p class="text-sm">SE SIENTEN EXPUESTOS</p>
+                  <div class="flex-1 bg-amber-50 p-2 rounded-md border border-amber-100 text-center">
+                    <p class="text-lg font-bold leading-none text-amber-800">{{ r['exposicionRiesgos'] }}</p>
+                    <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">SE SIENTEN EXPUESTOS</p>
                   </div>
-                  <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
-                    <p class="font-medium text-amber-800">{{ r['experienciaRiesgos'] }}</p>
-                    <p class="text-sm">VIVIERON SITUACIONES</p>
+                  <div class="flex-1 bg-amber-50 p-2 rounded-md border border-amber-100 text-center">
+                    <p class="text-lg font-bold leading-none text-amber-800">{{ r['experienciaRiesgos'] }}</p>
+                    <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">VIVIERON SITUACIONES</p>
                   </div>
                 </div>
-                <button (click)="toggleTabs(13)" class="w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
+                <button (click)="toggleTabs(13)" class="mt-auto w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-[11px] px-3 py-1.5 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
                   <div class="flex items-center justify-center gap-1">
                     <iconify-icon icon="hugeicons:plus-sign-square" width="16" height="16"></iconify-icon> Ver Detalles
                   </div>
                 </button>
               } @else {
-                <p class="rounded-lg border border-gray-100 bg-gray-50 p-3 text-sm text-gray-500">
+                <p class="mt-auto rounded-md border border-gray-100 bg-gray-50 p-2 text-xs text-gray-500">
                   El módulo de riesgos no está activo en la encuesta de este periodo.
                   Actívalo en la pestaña <strong>Encuesta</strong>.
                 </p>
@@ -441,33 +437,33 @@
             </article>
 
             <!-- Mejora y Participación -->
-            <article class="w-full md:w-1/3 rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200">
-              <div class="flex items-center gap-3 mb-2">
-                <div class="text-white inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-amber-500">
-                  <iconify-icon icon="hugeicons:idea-01" width="28" height="28"></iconify-icon>
+            <article class="flex h-full flex-col rounded-lg border border-gray-100 bg-white p-3 hover:shadow-lg transition-shadow duration-200">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="text-white inline-flex items-center justify-center w-9 h-9 shadow rounded-full bg-amber-500 shrink-0">
+                  <iconify-icon icon="hugeicons:idea-01" width="20" height="20"></iconify-icon>
                 </div>
-                <p class="text-xl font-medium text-gray-900">Mejora y Participación</p>
+                <p class="text-sm font-semibold leading-tight text-gray-900">Mejora y Participación</p>
               </div>
-              <p class="text-base text-gray-500 mb-3">Qué formación ha recibido la gente y qué propone para mejorar. Alimenta el plan anual de trabajo y el de formación.</p>
+              <p class="text-xs text-gray-500 mb-3 line-clamp-2">Qué formación ha recibido la gente y qué propone para mejorar. Alimenta el plan anual de trabajo y el de formación.</p>
 
               @if (mejora(); as m) {
                 <div class="flex gap-2 mb-3">
-                  <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
-                    <p class="font-medium text-amber-800">{{ m['participacionAnterior'] }}</p>
-                    <p class="text-sm">YA CAPACITADOS</p>
+                  <div class="flex-1 bg-amber-50 p-2 rounded-md border border-amber-100 text-center">
+                    <p class="text-lg font-bold leading-none text-amber-800">{{ m['participacionAnterior'] }}</p>
+                    <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">YA CAPACITADOS</p>
                   </div>
-                  <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
-                    <p class="font-medium text-amber-800">{{ m['sugerenciasMejora'] }}</p>
-                    <p class="text-sm">CON SUGERENCIAS</p>
+                  <div class="flex-1 bg-amber-50 p-2 rounded-md border border-amber-100 text-center">
+                    <p class="text-lg font-bold leading-none text-amber-800">{{ m['sugerenciasMejora'] }}</p>
+                    <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">CON SUGERENCIAS</p>
                   </div>
                 </div>
-                <button (click)="toggleTabs(14)" class="w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
+                <button (click)="toggleTabs(14)" class="mt-auto w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-[11px] px-3 py-1.5 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
                   <div class="flex items-center justify-center gap-1">
                     <iconify-icon icon="hugeicons:plus-sign-square" width="16" height="16"></iconify-icon> Ver Detalles
                   </div>
                 </button>
               } @else {
-                <p class="rounded-lg border border-gray-100 bg-gray-50 p-3 text-sm text-gray-500">
+                <p class="mt-auto rounded-md border border-gray-100 bg-gray-50 p-2 text-xs text-gray-500">
                   El módulo de mejora no está activo en la encuesta de este periodo.
                   Actívalo en la pestaña <strong>Encuesta</strong>.
                 </p>
@@ -475,24 +471,24 @@
             </article>
 
             <!-- Plan de emergencias -->
-            <article class="w-full md:w-1/3 rounded-lg border border-gray-100 bg-white p-4 hover:shadow-lg transition-shadow duration-200">
-              <div class="flex items-center gap-3 mb-2">
-                <div class="text-white inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-amber-600">
-                  <iconify-icon icon="hugeicons:alert-02" width="28" height="28"></iconify-icon>
+            <article class="flex h-full flex-col rounded-lg border border-gray-100 bg-white p-3 hover:shadow-lg transition-shadow duration-200">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="text-white inline-flex items-center justify-center w-9 h-9 shadow rounded-full bg-amber-600 shrink-0">
+                  <iconify-icon icon="hugeicons:alert-02" width="20" height="20"></iconify-icon>
                 </div>
                 <a [routerLink]="['/admin/planificar/diagnostico/plan_emergencias']"
-                  class="text-xl font-medium text-gray-900 hover:text-amber-600 hover:underline cursor-pointer transition-colors">
+                  class="text-sm font-semibold leading-tight text-gray-900 hover:text-amber-600 hover:underline cursor-pointer transition-colors">
                   Plan de Emergencias
                 </a>
               </div>
-              <p class="text-base text-gray-500 mb-3">Protocolos de atención ante emergencias viales: accidentes, fallas mecánicas, incendios y emergencias médicas.</p>
+              <p class="text-xs text-gray-500 mb-3 line-clamp-2">Protocolos de atención ante emergencias viales: accidentes, fallas mecánicas, incendios y emergencias médicas.</p>
               <div class="flex gap-2 mb-3">
-                <div class="flex-1 bg-amber-50 p-3 rounded-lg border border-amber-100 text-center">
-                  <p class="font-medium text-amber-700">{{ num_planes }}</p>
-                  <p class="text-sm">PLANES</p>
+                <div class="flex-1 bg-amber-50 p-2 rounded-md border border-amber-100 text-center">
+                  <p class="text-lg font-bold leading-none text-amber-700">{{ num_planes }}</p>
+                  <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">PLANES</p>
                 </div>
               </div>
-              <button (click)="toggleTabs(7)" class="w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
+              <button (click)="toggleTabs(7)" class="mt-auto w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-[11px] px-3 py-1.5 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
                 <div class="flex items-center justify-center gap-1">
                   <iconify-icon icon="hugeicons:plus-sign-square" width="16" height="16"></iconify-icon> Ver Detalles
                 </div>
