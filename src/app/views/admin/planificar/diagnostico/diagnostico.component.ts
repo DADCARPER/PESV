@@ -195,6 +195,12 @@ export class DiagnosticoComponent implements OnInit {
   conduccion = signal<Record<string, number> | null>(null);
   desplazamientos = signal<Record<string, number> | null>(null);
   riesgos = signal<Record<string, number> | null>(null);
+
+  /**
+   * Vehiculos sin SOAT vigente. `null` cuando no se pudo calcular: dar cero
+   * ante un fallo diria que toda la flota esta al dia.
+   */
+  sinSoat = signal<number | null>(null);
   mejora = signal<Record<string, number> | null>(null);
 
   /** Las cifras del tablero: una lectura por cifra, sin descargar listados. */
@@ -204,6 +210,8 @@ export class DiagnosticoComponent implements OnInit {
     } catch (error: unknown) {
       console.error('[Diagnostico] cargarResumen:', error);
     }
+
+    this.sinSoat.set(await this._datos.sinSoatVigente(this.num_vehiculos));
 
     // Aparte y sin tumbar lo anterior: dependen de que haya encuesta activa.
     this.salud.set(await this.indicadores('modulo2', [

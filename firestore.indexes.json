@@ -210,6 +210,25 @@
       "density": "SPARSE_ALL"
     },
     {
+      "collectionGroup": "006-diagnostico-vehiculos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "estado",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "vigenciaSoat",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "ASCENDING"
+        }
+      ],
+      "density": "SPARSE_ALL"
+    },
+    {
       "collectionGroup": "007-objetivos-metas",
       "queryScope": "COLLECTION",
       "fields": [

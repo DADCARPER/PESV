@@ -350,6 +350,34 @@ export class DiagnosticoDatosService {
   }
 
   /**
+   * Vehículos de la flota sin SOAT vigente hoy.
+   *
+   * Un SOAT caducado deja al vehículo sin poder circular, así que es un
+   * hallazgo del diagnóstico y no un dato más.
+   *
+   * Se cuentan los que **sí** lo tienen vigente y se restan del total, en
+   * lugar de preguntar por los vencidos: a los que nunca registraron la fecha
+   * no los devuelve ninguna consulta sobre ese campo, y quedarían fuera de la
+   * cuenta justamente ellos, que son los que peor están.
+   *
+   * Devuelve `null` si no se pudo calcular. No es lo mismo que cero: dar cero
+   * ante un fallo diría que toda la flota está al día.
+   */
+  async sinSoatVigente(total: number): Promise<number | null> {
+    try {
+      const hoy = new Date().toISOString().slice(0, 10);
+      const alDia = await this._firestore.contarDocumentos(
+        this.ruta('vehiculos'),
+        [['estado', '==', 'Activo', 'vigenciaSoat', '>=', hoy]]
+      );
+      return Math.max(0, total - alDia);
+    } catch (error: unknown) {
+      console.error('[Diagnostico] sinSoatVigente:', error);
+      return null;
+    }
+  }
+
+  /**
    * Cuenta colaboradores, que son las respuestas a la encuesta del periodo.
    *
    * Ya no hay un registro de colaboradores que teclear aparte: para una
