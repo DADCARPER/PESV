@@ -1,207 +1,146 @@
 <div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
-    <div class="rounded-t bg-blueGray-100  mb-0 px-6 py-6">
-      <div class="text-center flex ">
-        <button
-          [routerLink]="['/admin/planificar/diagnostico']"
-          class="bg-red-600 text-white active:bg-red-700 font-bold uppercase text-xs px-1 py-1  rounded shadow hover:shadow-md outline-none focus:outline-none mr-2 ease-linear transition-all duration-150"
-          type="button"
-        >
-        <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" /></svg>
-        </button>
-        <h6 class="text-blueGray-700 text-xl font-bold">Diagnostico - Informes</h6>
+
+  <div class="rounded-t bg-amber-400 mb-0 px-6 py-6">
+    <div class="flex items-center">
+      <button [routerLink]="['/admin/planificar/diagnostico']" title="Volver al diagnóstico"
+        class="bg-red-600 text-white active:bg-red-700 font-bold uppercase text-xs px-1 py-1 rounded shadow hover:shadow-md outline-none focus:outline-none mr-2 ease-linear transition-all duration-150"
+        type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" />
+        </svg>
+      </button>
+      <h6 class="text-blueGray-700 text-xl font-bold">Informe de Diagnóstico</h6>
+    </div>
+  </div>
+
+  <div class="flex-auto px-4 lg:px-10 py-8">
+
+    @if (cargando()) {
+      <div class="space-y-3">
+        @for (n of [1,2,3]; track n) {
+          <div class="h-24 animate-pulse rounded-xl bg-gray-100"></div>
+        }
       </div>
-    </div>
-    <div class="flex-auto px-4 pb-4">
 
-        <div class="flex-auto px-4 lg:px-10 text-lg font-light leading-relaxed mt-6 mb-2 text-gray-700" >
+    } @else {
 
-            <p class="text-justify pb-3">
-                A continuación, podrás ver los informes generados a partir de los datos ingresados. Estos informes contienen un análisis detallado de la seguridad vial en tu organización, con base en la información proporcionada en el formato Excel que cargaste.
+    @if (datos(); as informe) {
+
+      <!-- ── Metodología ────────────────────────────────────────────────────
+           Un diagnostico por muestreo tiene que declarar su muestra: sin esto
+           los porcentajes de abajo no significan nada.                     -->
+      <div class="mb-6 rounded-xl border border-gray-200 p-5">
+        <p class="text-lg font-bold text-gray-900">{{ informe.nombreEmpresa || 'Sin razón social' }}</p>
+        <p class="text-sm text-gray-500">NIT {{ informe.nitEmpresa }} · Periodo {{ informe.periodo }}</p>
+
+        <div class="mt-4 grid gap-3 sm:grid-cols-4">
+          <div class="rounded-lg bg-gray-50 p-3">
+            <p class="text-xl font-bold text-gray-900">{{ informe.metodologia.poblacion }}</p>
+            <p class="text-xs uppercase tracking-wide text-gray-500">Empleados declarados</p>
+          </div>
+          <div class="rounded-lg bg-gray-50 p-3">
+            <p class="text-xl font-bold text-gray-900">{{ informe.metodologia.muestra }}</p>
+            <p class="text-xs uppercase tracking-wide text-gray-500">Respondieron</p>
+          </div>
+          <div class="rounded-lg bg-gray-50 p-3">
+            <p class="text-xl font-bold text-gray-900">{{ informe.metodologia.cobertura }}%</p>
+            <p class="text-xs uppercase tracking-wide text-gray-500">Cobertura</p>
+          </div>
+          <div class="rounded-lg bg-gray-50 p-3">
+            <p class="truncate text-sm font-semibold text-gray-900" [title]="informe.metodologia.encuesta">
+              {{ informe.metodologia.encuesta }}
             </p>
-            <p class="text-justify pb-3">
-                Cada informe incluye un diagnóstico completo y recomendaciones personalizadas para mejorar los procesos de seguridad vial, así como los elementos clave de tu organización que podrían requerir atención.
-            </p>
-            <p class="text-justify pb-3">
-                Si necesitas realizar alguna modificación, simplemente carga un nuevo archivo y genera un nuevo informe.
-            </p>
+            <p class="text-xs uppercase tracking-wide text-gray-500">Instrumento</p>
+          </div>
         </div>
+      </div>
 
-        <div class="space-y-4">
-            <details data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" class="group [&_summary::-webkit-details-marker]:hidden" >
-              <summary
-                class="flex cursor-pointer items-center justify-between gap-1.5 rounded-lg bg-gray-50 p-4 text-gray-900"
-              >
-                <h2 class="font-medium">Caracterización de la Población</h2>
-          
-                <svg
-                  class="size-5 shrink-0 transition duration-300 group-open:-rotate-180"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </summary>
-              <div id="contentSociodemografico">
-                <app-sociodemografia></app-sociodemografia>
-              </div>
-            </details>
-          
-            <details data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300" class="group [&_summary::-webkit-details-marker]:hidden">
-              <summary
-                class="flex cursor-pointer items-center justify-between gap-1.5 rounded-lg bg-gray-50 p-4 text-gray-900"
-              >
-                <h2 class="font-medium">Conducción y Movilidad</h2>
-          
-                <svg
-                  class="size-5 shrink-0 transition duration-300 group-open:-rotate-180"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </summary>
-              <div id="contentSociodemografico2">
-                <app-movilidad></app-movilidad>
-              </div>
-            </details>
+      <!-- ── Lo que hay que atender ───────────────────────────────────────── -->
+      @if (alertas().length) {
+        <div class="mb-6 rounded-xl border border-red-200 bg-red-50 p-5">
+          <p class="font-semibold text-red-900">Hallazgos que requieren atención</p>
+          <ul class="mt-2 space-y-1 text-sm text-red-800">
+            @for (a of alertas(); track a.cifra.etiqueta) {
+              <li>
+                <strong>{{ a.cifra.valor }}</strong> — {{ a.cifra.etiqueta }}
+                <span class="text-red-600">({{ a.seccion }})</span>
+                @if (a.cifra.nota) { <span class="text-xs">· {{ a.cifra.nota }}</span> }
+              </li>
+            }
+          </ul>
+        </div>
+      }
 
-            <details data-aos="fade-right" data-aos-duration="1000" data-aos-delay="500" class="group [&_summary::-webkit-details-marker]:hidden" >
-                <summary
-                  class="flex cursor-pointer items-center justify-between gap-1.5 rounded-lg bg-gray-50 p-4 text-gray-900"
-                >
-                  <h2 class="font-medium">Factores de Riesgo Viales</h2>
-            
-                  <svg
-                    class="size-5 shrink-0 transition duration-300 group-open:-rotate-180"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </summary>
-                <div id="contentSociodemografico3">
-                  <app-factor-riesgo></app-factor-riesgo>
+      <!-- ── Lo que falta por llenar ──────────────────────────────────────── -->
+      @if (seccionesVacias().length) {
+        <div class="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-5">
+          <p class="font-semibold text-amber-900">Secciones sin datos</p>
+          <p class="mt-1 text-sm text-amber-800">
+            Saldrán vacías en el informe: {{ seccionesVacias().join(', ') }}.
+          </p>
+        </div>
+      }
+
+      <!-- ── Las secciones ────────────────────────────────────────────────── -->
+      <div class="space-y-5">
+        @for (seccion of informe.secciones; track seccion.id) {
+          <div class="rounded-xl border border-gray-200 p-5" [class.opacity-60]="seccion.sinDatos">
+
+            <div class="mb-4 flex items-center justify-between gap-3">
+              <h3 class="text-lg font-semibold text-gray-900">{{ seccion.titulo }}</h3>
+              @if (seccion.sinDatos) {
+                <span class="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-500">Sin datos</span>
+              }
+            </div>
+
+            @if (seccion.cifras.length) {
+              <div class="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                @for (cifra of seccion.cifras; track cifra.etiqueta) {
+                  <div class="rounded-lg border p-3"
+                    [ngClass]="cifra.alerta ? 'border-red-200 bg-red-50' : 'border-gray-100 bg-gray-50'">
+                    <p class="text-xl font-bold" [ngClass]="cifra.alerta ? 'text-red-700' : 'text-gray-900'">
+                      {{ cifra.valor }}
+                    </p>
+                    <p class="text-xs uppercase tracking-wide text-gray-500">{{ cifra.etiqueta }}</p>
+                    @if (cifra.nota) {
+                      <p class="mt-1 text-xs text-gray-400">{{ cifra.nota }}</p>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            @for (reparto of seccion.repartos; track reparto.titulo) {
+              @if (reparto.filas.length) {
+                <div class="mb-4 last:mb-0">
+                  <p class="mb-2 text-sm font-semibold text-gray-700">{{ reparto.titulo }}</p>
+                  <div class="space-y-1.5">
+                    @for (fila of reparto.filas; track fila.etiqueta) {
+                      <div>
+                        <div class="flex items-center justify-between text-xs">
+                          <span class="truncate pr-2 text-gray-600">{{ fila.etiqueta }}</span>
+                          <span class="shrink-0 font-semibold text-gray-800">{{ fila.total }} · {{ fila.porcentaje }}%</span>
+                        </div>
+                        <div class="mt-0.5 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+                          <div class="h-full rounded-full bg-amber-400" [style.width.%]="fila.porcentaje"></div>
+                        </div>
+                      </div>
+                    }
+                  </div>
                 </div>
-            </details>
-        
-            <!-- <details data-aos="fade-right" data-aos-duration="1000" data-aos-delay="700" class="group [&_summary::-webkit-details-marker]:hidden">
-            <summary
-                class="flex cursor-pointer items-center justify-between gap-1.5 rounded-lg bg-gray-50 p-4 text-gray-900"
-            >
-                <h2 class="font-medium">Parque Automotor</h2>
-        
-                <svg
-                class="size-5 shrink-0 transition duration-300 group-open:-rotate-180"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-            </summary>
-        
-            <p class="mt-4 px-4 leading-relaxed text-gray-700">
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ab hic veritatis molestias culpa in,
-                recusandae laboriosam neque aliquid libero nesciunt voluptate dicta quo officiis explicabo
-                consequuntur distinctio corporis earum similique!
-            </p>
-            </details>
+              }
+            }
+          </div>
+        }
+      </div>
 
-            <details  data-aos="fade-right" data-aos-duration="1000" data-aos-delay="900"class="group [&_summary::-webkit-details-marker]:hidden" >
-            <summary
-                class="flex cursor-pointer items-center justify-between gap-1.5 rounded-lg bg-gray-50 p-4 text-gray-900"
-            >
-                <h2 class="font-medium">Rutas Frecuentes</h2>
-        
-                <svg
-                class="size-5 shrink-0 transition duration-300 group-open:-rotate-180"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-            </summary>
-        
-            <p class="mt-4 px-4 leading-relaxed text-gray-700">
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ab hic veritatis molestias culpa in,
-                recusandae laboriosam neque aliquid libero nesciunt voluptate dicta quo officiis explicabo
-                consequuntur distinctio corporis earum similique!
-            </p>
-            </details>
-        
-            <details  data-aos="fade-right" data-aos-duration="1000" data-aos-delay="1100"class="group [&_summary::-webkit-details-marker]:hidden">
-            <summary
-                class="flex cursor-pointer items-center justify-between gap-1.5 rounded-lg bg-gray-50 p-4 text-gray-900"
-            >
-                <h2 class="font-medium">Sedes y Servicios</h2>
-        
-                <svg
-                class="size-5 shrink-0 transition duration-300 group-open:-rotate-180"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-            </summary>
-        
-            <p class="mt-4 px-4 leading-relaxed text-gray-700">
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ab hic veritatis molestias culpa in,
-                recusandae laboriosam neque aliquid libero nesciunt voluptate dicta quo officiis explicabo
-                consequuntur distinctio corporis earum similique!
-            </p>
-            </details> -->
-
-            <details  data-aos="fade-right" data-aos-duration="1000" data-aos-delay="700"class="group [&_summary::-webkit-details-marker]:hidden">
-                <summary
-                    class="flex cursor-pointer items-center justify-between gap-1.5 rounded-lg bg-gray-50 p-4 text-gray-900"
-                >
-                    <h2 class="font-medium">Administrar Informes</h2>
-            
-                    <svg
-                    class="size-5 shrink-0 transition duration-300 group-open:-rotate-180"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    >
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                </summary>
-            
-                <div class="flex-auto px-4 lg:px-10 text-lg font-light leading-relaxed mt-6 mb-2 text-gray-700 text-center" >
-                  <p class=" pb-3">
-                    ya puedes descargar el informe detallado de Caracterización de la Población, Conducción y Movilidad y Factores de Riesgo Viales. En caso de encontrar alguna inconsistencia con el informe, puede repetir el proceso y generar nuevamente el documento.
-                  </p>
-                
-
-                <button (click)="generarPDF()"
-                  class="text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 mt-4 ease-linear transition-all duration-150" type="button">
-                  <i class="fas fa-download mr-1"></i> Informe Caracterización 
-                </button>
-                <button (click)="generarPDF2()"
-                  class="text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 mt-4 ease-linear transition-all duration-150" type="button">
-                  <i class="fas fa-download mr-1"></i> Informe Conducción
-                </button>
-                <button (click)="generarPDF3()"
-                  class="text-amber-500 bg-white border-amber-500 hover:bg-amber-500 hover:text-white border border-solid font-bold uppercase text-sm px-6 py-3 rounded-full outline-none focus:outline-none mr-1 mb-1 mt-4 ease-linear transition-all duration-150" type="button">
-                  <i class="fas fa-download mr-1"></i> Informe Factor Humano
-                </button>
-
-              </div>
-                
-            </details>
-        </div>
-
-    </div>
+      <p class="mt-6 rounded-lg border border-sky-200 bg-sky-50 p-4 text-sm text-sky-800">
+        Esto es lo que el sistema ve hoy. Todavía no se puede emitir: el asistente de
+        emisión y el PDF son los pasos siguientes.
+      </p>
+    }
+    }
+  </div>
 </div>

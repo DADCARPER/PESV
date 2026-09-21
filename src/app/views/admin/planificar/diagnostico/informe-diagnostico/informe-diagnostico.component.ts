@@ -1,265 +1,71 @@
+import { Component, CUSTOM_ELEMENTS_SCHEMA, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ColumnsStrackedIconosComponent } from "../../../../../components/apexChart/columns-stracked-iconos/columns-stracked-iconos.component";
-import { CardProfidComponent } from "../../../../../components/cards/card-profid/card-profid.component";
-import { SociodemografiaComponent } from "../sociodemografia/sociodemografia.component";
-import { MovilidadComponent } from "../movilidad/movilidad.component";
-import { FactorRiesgoComponent } from "../factor-riesgo/factor-riesgo.component";
 
-import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
-import html2canvas from 'html2canvas';
+import { InformeDiagnosticoService } from '../../../../../services/shared/informe-diagnostico.service';
+import { AuthenticacionService } from '../../../../../services/shared/authenticacion.service';
+import { AlertaService } from '../../../../../services/shared/alerta.service';
+import { ModelsInforme } from '../../../../../interfaces/informe.interface';
 
+/**
+ * Informe de diagnóstico: vista previa de las cifras.
+ *
+ * Esta pantalla reemplaza a la anterior, que componía tres subpantallas con
+ * los números escritos a mano y generaba el PDF fotografiando el DOM con
+ * html2canvas. Salía bonito con datos inventados.
+ *
+ * Por ahora solo muestra lo que el sistema ve, que es lo que permite descubrir
+ * qué falta antes de montar el asistente de emisión y el PDF.
+ */
 @Component({
   selector: 'app-informe-diagnostico',
   standalone: true,
-  imports: [CommonModule, RouterLink, ColumnsStrackedIconosComponent, CardProfidComponent, SociodemografiaComponent, MovilidadComponent, FactorRiesgoComponent],
+  imports: [CommonModule, RouterLink],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './informe-diagnostico.component.html',
-  styleUrl: './informe-diagnostico.component.css'
 })
-export class InformeDiagnosticoComponent implements OnInit {
+export class InformeDiagnosticoComponent {
 
+  private _informe = inject(InformeDiagnosticoService);
+  private _auth = inject(AuthenticacionService);
+  private _alerta = inject(AlertaService);
+
+  readonly periodo = this._auth.periodo;
+
+  cargando = signal(true);
+  datos = signal<ModelsInforme.Datos | null>(null);
 
   constructor() {
+    effect(() => {
+      this.periodo();
+      this.cargar();
+    }, { allowSignalWrites: true });
   }
 
-  ngOnInit(): void {
-    // Inicialización de pdfMake
-    pdfMake.vfs = pdfFonts.pdfMake;
-  }
-
-  async generarPDF() {
-    console.log('Iniciando generación de PDF');
-    const content = document.querySelector('#contentSociodemografico');
-    console.log('Elemento encontrado:', content);
-    
-    if (!content) {
-        console.error('No se encontró el elemento #contentSociodemografico');
-        return;
-    }
-
+  async cargar() {
+    this.cargando.set(true);
     try {
-        // Clonamos el contenido para no afectar el diseño visible
-        const clonedContent = content.cloneNode(true);
-
-        // Crear un contenedor temporal fuera de la vista
-        const tempContainer = document.createElement('div');
-        tempContainer.style.position = 'absolute';
-        tempContainer.style.top = '-9999px';  // Ocultarlo fuera de la vista
-        tempContainer.style.left = '-9999px'; // Ocultarlo fuera de la vista
-        tempContainer.style.width = '1440px'; // El tamaño que deseas para la captura
-
-        // Aseguramos que el contenedor temporal tenga la altura del contenido
-        tempContainer.style.height = `${content.scrollHeight}px`; // Ajustar altura dinámica
-
-        tempContainer.appendChild(clonedContent);
-
-        // Lo agregamos al cuerpo del documento para poder capturarlo
-        document.body.appendChild(tempContainer);
-
-        console.log('Iniciando html2canvas');
-        const canvas = await html2canvas(tempContainer, {
-            scale: 2,  // Asegura la captura en alta resolución
-            useCORS: true,
-            logging: true,
-            onclone: function(clonedDoc) {
-                console.log('Documento clonado:', clonedDoc);
-            }
-        });
-
-        console.log('Canvas generado:', canvas);
-
-        // Obtener el tamaño original del canvas
-        const originalWidth = canvas.width;
-        const originalHeight = canvas.height;
-
-        // Definir el tamaño máximo para la página en función de la resolución
-        const scaleFactor = 0.18; // Factor de escala para redimensionar la imagen
-
-        const scaledWidth = originalWidth * scaleFactor;
-        const scaledHeight = originalHeight * scaleFactor;
-
-        const imageData = canvas.toDataURL('image/png');
-        console.log('Image data generado');
-
-        const documentDefinition = {
-            pageMargins: [40, 50, 50, 49],  // Márgenes: Izquierda, Superior, Derecha, Inferior
-            content: [{
-                image: imageData,
-                width: scaledWidth,
-                height: scaledHeight
-            }],
-            defaultStyle: {
-                fontSize: 12
-            }
-        };
-
-        console.log('Creando PDF');
-        pdfMake.createPdf(documentDefinition).open();
-
-        // Limpiar el contenedor temporal después de la captura
-        document.body.removeChild(tempContainer);
-
-    } catch (error) {
-        console.error('Error detallado:', error);
+      this.datos.set(await this._informe.reunir());
+    } catch (error: unknown) {
+      console.error('[InformeDiagnostico] reunir:', error);
+      this._alerta.showError('No se pudieron reunir las cifras del informe.');
+      this.datos.set(null);
+    } finally {
+      this.cargando.set(false);
     }
   }
 
-  async generarPDF2() {
-    console.log('Iniciando generación de PDF');
-    const content = document.querySelector('#contentSociodemografico2');
-    console.log('Elemento encontrado:', content);
-    
-    if (!content) {
-        console.error('No se encontró el elemento #contentSociodemografico2');
-        return;
-    }
-
-    try {
-        // Clonamos el contenido para no afectar el diseño visible
-        const clonedContent = content.cloneNode(true);
-
-        // Crear un contenedor temporal fuera de la vista
-        const tempContainer = document.createElement('div');
-        tempContainer.style.position = 'absolute';
-        tempContainer.style.top = '-9999px';  // Ocultarlo fuera de la vista
-        tempContainer.style.left = '-9999px'; // Ocultarlo fuera de la vista
-        tempContainer.style.width = '1440px'; // El tamaño que deseas para la captura
-
-        // Aseguramos que el contenedor temporal tenga la altura del contenido
-        tempContainer.style.height = `${content.scrollHeight}px`; // Ajustar altura dinámica
-
-        tempContainer.appendChild(clonedContent);
-
-        // Lo agregamos al cuerpo del documento para poder capturarlo
-        document.body.appendChild(tempContainer);
-
-        console.log('Iniciando html2canvas');
-        const canvas = await html2canvas(tempContainer, {
-            scale: 2,  // Asegura la captura en alta resolución
-            useCORS: true,
-            logging: true,
-            onclone: function(clonedDoc) {
-                console.log('Documento clonado:', clonedDoc);
-            }
-        });
-
-        console.log('Canvas generado:', canvas);
-
-        // Obtener el tamaño original del canvas
-        const originalWidth = canvas.width;
-        const originalHeight = canvas.height;
-
-        // Definir el tamaño máximo para la página en función de la resolución
-        const scaleFactor = 0.18; // Factor de escala para redimensionar la imagen
-
-        const scaledWidth = originalWidth * scaleFactor;
-        const scaledHeight = originalHeight * scaleFactor;
-
-        const imageData = canvas.toDataURL('image/png');
-        console.log('Image data generado');
-
-        const documentDefinition = {
-            pageMargins: [40, 50, 50, 49],  // Márgenes: Izquierda, Superior, Derecha, Inferior
-            content: [{
-                image: imageData,
-                width: scaledWidth,
-                height: scaledHeight
-            }],
-            defaultStyle: {
-                fontSize: 12
-            }
-        };
-
-        console.log('Creando PDF');
-        pdfMake.createPdf(documentDefinition).open();
-
-        // Limpiar el contenedor temporal después de la captura
-        document.body.removeChild(tempContainer);
-
-    } catch (error) {
-        console.error('Error detallado:', error);
-    }
+  /** Secciones sin ningún dato: lo que habría que llenar antes de emitir. */
+  seccionesVacias(): string[] {
+    return (this.datos()?.secciones ?? [])
+      .filter(s => s.sinDatos)
+      .map(s => s.titulo);
   }
 
-  async generarPDF3() {
-    console.log('Iniciando generación de PDF');
-    const content = document.querySelector('#contentSociodemografico3');
-    console.log('Elemento encontrado:', content);
-    
-    if (!content) {
-        console.error('No se encontró el elemento #contentSociodemografico3');
-        return;
-    }
-
-    try {
-        // Clonamos el contenido para no afectar el diseño visible
-        const clonedContent = content.cloneNode(true);
-
-        // Crear un contenedor temporal fuera de la vista
-        const tempContainer = document.createElement('div');
-        tempContainer.style.position = 'absolute';
-        tempContainer.style.top = '-9999px';  // Ocultarlo fuera de la vista
-        tempContainer.style.left = '-9999px'; // Ocultarlo fuera de la vista
-        tempContainer.style.width = '1440px'; // El tamaño que deseas para la captura
-
-        // Aseguramos que el contenedor temporal tenga la altura del contenido
-        tempContainer.style.height = `${content.scrollHeight}px`; // Ajustar altura dinámica
-
-        tempContainer.appendChild(clonedContent);
-
-        // Lo agregamos al cuerpo del documento para poder capturarlo
-        document.body.appendChild(tempContainer);
-
-        console.log('Iniciando html2canvas');
-        const canvas = await html2canvas(tempContainer, {
-            scale: 2,  // Asegura la captura en alta resolución
-            useCORS: true,
-            logging: true,
-            onclone: function(clonedDoc) {
-                console.log('Documento clonado:', clonedDoc);
-            }
-        });
-
-        console.log('Canvas generado:', canvas);
-
-        // Obtener el tamaño original del canvas
-        const originalWidth = canvas.width;
-        const originalHeight = canvas.height;
-
-        // Definir el tamaño máximo para la página en función de la resolución
-        const scaleFactor = 0.18; // Factor de escala para redimensionar la imagen
-
-        const scaledWidth = originalWidth * scaleFactor;
-        const scaledHeight = originalHeight * scaleFactor;
-
-        const imageData = canvas.toDataURL('image/png');
-        console.log('Image data generado');
-
-        const documentDefinition = {
-            pageMargins: [40, 50, 50, 49],  // Márgenes: Izquierda, Superior, Derecha, Inferior
-            content: [{
-                image: imageData,
-                width: scaledWidth,
-                height: scaledHeight
-            }],
-            defaultStyle: {
-                fontSize: 12
-            }
-        };
-
-        console.log('Creando PDF');
-        pdfMake.createPdf(documentDefinition).open();
-
-        // Limpiar el contenedor temporal después de la captura
-        document.body.removeChild(tempContainer);
-
-    } catch (error) {
-        console.error('Error detallado:', error);
-    }
+  /** Cifras marcadas como alerta en todo el informe, para verlas juntas. */
+  alertas(): { seccion: string; cifra: ModelsInforme.Cifra }[] {
+    return (this.datos()?.secciones ?? []).flatMap(s =>
+      s.cifras.filter(c => c.alerta).map(cifra => ({ seccion: s.titulo, cifra }))
+    );
   }
-
-
-
 }
