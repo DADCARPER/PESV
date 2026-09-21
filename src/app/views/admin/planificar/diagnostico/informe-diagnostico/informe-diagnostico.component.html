@@ -150,6 +150,34 @@
               </div>
             }
 
+            @for (tabla of seccion.tablas; track tabla.titulo) {
+              @if (tabla.filas.length) {
+                <div class="mb-4">
+                  <p class="mb-2 text-sm font-semibold text-gray-700">{{ tabla.titulo }}</p>
+                  <div class="overflow-x-auto rounded-lg border border-gray-100">
+                    <table class="min-w-full text-sm">
+                      <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+                        <tr>
+                          @for (columna of tabla.columnas; track columna) {
+                            <th class="whitespace-nowrap px-3 py-2 text-left font-semibold">{{ columna }}</th>
+                          }
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-gray-100">
+                        @for (fila of tabla.filas; track $index) {
+                          <tr>
+                            @for (celda of fila; track $index) {
+                              <td class="px-3 py-2 text-gray-700">{{ celda || '—' }}</td>
+                            }
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              }
+            }
+
             @for (reparto of seccion.repartos; track reparto.titulo) {
               @if (reparto.filas.length) {
                 <div class="mb-4 last:mb-0">

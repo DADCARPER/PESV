@@ -45,6 +45,18 @@ export namespace ModelsInforme {
     fotoUrl?: string;
   }
 
+  /**
+   * Un listado del informe.
+   *
+   * Con pocos registros una tabla dice mas que un grafico: se lee cada fila
+   * entera en vez de un reparto que reparte casi nada.
+   */
+  export interface Tabla {
+    titulo: string;
+    columnas: string[];
+    filas: string[][];
+  }
+
   export interface Seccion {
     id: string;
     titulo: string;
@@ -58,6 +70,8 @@ export namespace ModelsInforme {
     identificacion?: { etiqueta: string; valor: string }[];
     /** Solo la sección de organización: una ficha por sede. */
     sedes?: FichaSede[];
+    /** Listados que acompañan a las cifras. */
+    tablas?: Tabla[];
   }
 
   /**

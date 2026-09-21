@@ -123,12 +123,59 @@ export class InformeDiagnosticoService {
         { etiqueta: 'Empleados declarados en sedes', valor: empleadosEnSedes },
         { etiqueta: 'Servicios', valor: servicios.length },
       ],
-      repartos: [
-        this.contar('Sedes por departamento', sedes, s => s.departamento),
-        this.contar('Servicios por categoría', servicios, s => s.categoriaServicio),
-        this.contar('Frecuencia de operación', servicios, s => s.frecuenciaOperacion),
-      ],
+      // Los servicios se leen mejor uno a uno que repartidos en barras: son
+      // pocos, y lo que interesa de cada uno es su perfil completo.
+      tablas: [{
+        titulo: 'Servicios que presta la organización',
+        columnas: ['Servicio', 'Categoría', 'Importancia', 'Frecuencia', 'Cobertura'],
+        filas: servicios.map(s => [
+          s.nombreServicio ?? '',
+          s.categoriaServicio ?? '',
+          this.primeraParte(s.importanciaServicio),
+          this.primeraParte(s.frecuenciaOperacion),
+          this.primeraParte(s.coberturaOperacion),
+        ]),
+      }],
+
+      repartos: [this.controlesDeServicio(servicios)],
     };
+  }
+
+  /**
+   * Qué controles tienen los servicios contratados.
+   *
+   * No se veía en ninguna parte del informe, y es de lo que más mira una
+   * auditoría: un servicio de transporte sin seguimiento ni seguro es una
+   * exposición, no un dato administrativo.
+   */
+  private controlesDeServicio(
+    servicios: Models.Diagnostico.Servicio[]
+  ): ModelsInforme.Reparto {
+    const controles: [string, keyof Models.Diagnostico.Servicio][] = [
+      ['Seguimiento GPS', 'gps'],
+      ['Conductores certificados', 'conductores'],
+      ['Seguro de carga o pasajeros', 'seguro'],
+      ['Mantenimiento incluido', 'mantenimiento'],
+      ['Monitoreo 24/7', 'monitoreo'],
+      ['Soporte 24/7', 'soporte'],
+    ];
+
+    const base = servicios.length || 1;
+    return {
+      titulo: 'Controles de los servicios',
+      filas: controles.map(([etiqueta, campo]) => {
+        const total = servicios.filter(s => s[campo] === true).length;
+        return { etiqueta, total, porcentaje: Math.round((total / base) * 1000) / 10 };
+      }),
+    };
+  }
+
+  /**
+   * Las opciones vienen como "Diario - Todos los dias": en una tabla estrecha
+   * basta la primera parte, y la aclaracion sobra.
+   */
+  private primeraParte(valor: string | undefined): string {
+    return String(valor ?? '').split(' - ')[0];
   }
 
   /**
