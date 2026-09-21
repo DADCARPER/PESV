@@ -108,7 +108,7 @@ export class ContratistasComponent implements OnInit, OnChanges {
         return `
           <div class="text-xs leading-5">
             <div>${textoSeguro(params.data.tipoFlota, '—')}</div>
-            <div class="text-gray-400">🚚 ${textoSeguro(params.data.vehiculos, '0')} · 👤 ${textoSeguro(params.data.conductores, '0')}</div>
+            <div class="text-gray-400">👤 ${textoSeguro(params.data.conductores, '0')} conductores</div>
           </div>
         `;
       }

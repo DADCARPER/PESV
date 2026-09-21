@@ -41,7 +41,6 @@ export class GestionContratistasComponent implements OnInit {
 
   // Stats rápidas
   totalConductores = 0;
-  totalVehiculos = 0;
   conDesplazamientos = 0;
 
   async ngOnInit() {
@@ -82,7 +81,6 @@ export class GestionContratistasComponent implements OnInit {
 
     // Stats
     this.totalConductores = data.reduce((s, c) => s + (Number(c.conductores) || 0), 0);
-    this.totalVehiculos   = data.reduce((s, c) => s + (Number(c.vehiculos)   || 0), 0);
     this.conDesplazamientos = data.filter(c => c.realizaDesplazamientos === 'SI').length;
   }
 

@@ -44,7 +44,6 @@ export class Form1ContratistasComponent {
       // Sección 4 – Flota
       tipoFlota:    [''],
       conductores:  [0, Validators.min(0)],
-      vehiculos:    [0, Validators.min(0)],
       observaciones: [''],
     });
   }
@@ -67,7 +66,7 @@ export class Form1ContratistasComponent {
       tipoVinculacion: '', vinculacionOtro: '', servicioPrestado: '',
       fechaInicioContrato: '', contratoIndefinido: false, fechaFinContrato: '',
       realizaDesplazamientos: '', tipoFlota: '',
-      conductores: 0, vehiculos: 0, observaciones: '',
+      conductores: 0, observaciones: '',
     });
     this.mostrarModal.set(false);
   }

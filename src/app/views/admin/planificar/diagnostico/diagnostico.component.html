@@ -264,8 +264,12 @@
               <p class="text-xs text-gray-500 mb-3 line-clamp-2">Registro de vehículos propios, afiliados o asociados con su documentación legal y estado de mantenimiento.</p>
               <div class="flex gap-2 mb-3">
                 <div class="flex-1 bg-amber-50 p-2 rounded-md border border-amber-100 text-center">
-                  <p class="text-lg font-bold leading-none text-amber-800">{{ num_vehiculos }}</p>
-                  <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">VEHÍCULOS</p>
+                  <p class="text-lg font-bold leading-none text-amber-800">{{ num_vehiculos_propios }}</p>
+                  <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">PROPIOS</p>
+                </div>
+                <div class="flex-1 bg-amber-50 p-2 rounded-md border border-amber-100 text-center">
+                  <p class="text-lg font-bold leading-none text-amber-800">{{ num_vehiculos_terceros }}</p>
+                  <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">DE TERCEROS</p>
                 </div>
                 @if (sinSoat() !== null) {
                   <!-- Un SOAT caducado deja al vehiculo sin poder circular: se

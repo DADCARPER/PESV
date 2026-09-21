@@ -109,10 +109,17 @@ export namespace ModelDiagnosticos {
          */
         realizaDesplazamientos: string;
 
-        // Flota, solo cuando hay desplazamientos
+        // Operacion, solo cuando hay desplazamientos
+        /** Fidelizada u ocasional: con que continuidad opera. */
         tipoFlota?: string;
+        /**
+         * Conductores que pone el contratista.
+         *
+         * Es el unico sitio donde vive este dato: no son colaboradores de la
+         * empresa y no responden la encuesta, asi que sin este campo esa
+         * exposicion desapareceria del diagnostico.
+         */
         conductores: number;
-        vehiculos: number;
         observaciones?: string;
     }
       
@@ -142,8 +149,18 @@ export namespace ModelDiagnosticos {
         kilometrajeActual?: number;
         marca?: string;
         modelo?: string;
-        /** Propio, en arriendo, de un tercero. */
+        /** Propio, afiliado, asociado o puesto al servicio. */
         tipoRelacion?: string;
+        /**
+         * Contratista al que pertenece, cuando no es propio.
+         *
+         * Sustituye al conteo de vehiculos que guardaba el contratista: dos
+         * numeros sobre lo mismo podian discrepar, y un numero no tiene placa,
+         * ni SOAT, ni mantenimiento. Se guarda tambien el nombre para que el
+         * registro siga entendiendose si el contratista se da de baja.
+         */
+        contratistaId?: string;
+        contratistaNombre?: string;
 
         // Documentacion legal
         vigenciaSoat?: string;

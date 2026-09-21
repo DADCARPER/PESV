@@ -2,7 +2,7 @@
   <div class="p-4 border-b flex items-center justify-between">
     <div>
       <h2 class="text-lg font-medium">Flota de Vehículos</h2>
-      <p class="text-sm text-gray-500">Vehículos propios, arrendados o en leasing de la organización.</p>
+      <p class="text-sm text-gray-500">Toda la flota que circula por la empresa: propios, afiliados, asociados y puestos al servicio por contratistas.</p>
     </div>
     <button (click)="modalFormulario.abrirModal('crear')"
       class="text-amber-500 bg-white border border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-xs px-4 py-2 rounded outline-none focus:outline-none mb-1 ease-linear transition-all duration-150">
@@ -23,7 +23,7 @@
       </div>
       <div class="relative w-72">
         <input type="text" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-          placeholder="Buscar por placa, tipo, marca..."
+          placeholder="Buscar por placa, tipo, marca o contratista..."
           [(ngModel)]="searchText" (input)="onSearchChange()">
         <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
       </div>

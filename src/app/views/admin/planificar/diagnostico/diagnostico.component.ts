@@ -370,6 +370,8 @@ export class DiagnosticoComponent implements OnInit {
   get num_empleados() { return this.resumen()?.colaboradores ?? 0; }
   get num_contratista() { return this.resumen()?.contratistas ?? 0; }
   get num_vehiculos() { return this.resumen()?.vehiculos ?? 0; }
+  get num_vehiculos_propios() { return this.resumen()?.vehiculosPropios ?? 0; }
+  get num_vehiculos_terceros() { return this.num_vehiculos - this.num_vehiculos_propios; }
   get num_rutas() { return this.resumen()?.rutas ?? 0; }
   get num_planes() { return this.resumen()?.planEmergencias ?? 0; }
   get num_conductores() { return this.resumen()?.conductores ?? 0; }

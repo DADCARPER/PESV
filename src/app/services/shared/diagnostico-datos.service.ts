@@ -191,6 +191,8 @@ export interface ResumenDiagnostico {
   colaboradores: number;
   contratistas: number;
   vehiculos: number;
+  /** De la flota, cuantos son de la propia empresa. */
+  vehiculosPropios: number;
   rutas: number;
   planEmergencias: number;
   /** Conductores declarados por los contratistas, sumados en el servidor. */
@@ -295,13 +297,14 @@ export class DiagnosticoDatosService {
 
     const [
       sedes, servicios, colaboradores, contratistas, vehiculos, rutas,
-      planEmergencias, conductores, masculino, femenino,
+      vehiculosPropios, planEmergencias, conductores, masculino, femenino,
     ] = await this.enParalelo([
       contar('sedes'),
       contar('servicios'),
       this.contarRespuestas(),
       contar('contratistas'),
       contar('vehiculos'),
+      contar('vehiculos', ['tipoRelacion', '==', 'Propio']),
       contar('rutas'),
       contar('plan-emergencias'),
       this._firestore.sumarCampo(this.ruta('contratistas'), 'conductores', SOLO_ACTIVOS),
@@ -311,7 +314,7 @@ export class DiagnosticoDatosService {
 
     return {
       sedes, servicios, colaboradores, contratistas, vehiculos, rutas,
-      planEmergencias, conductores, masculino, femenino,
+      vehiculosPropios, planEmergencias, conductores, masculino, femenino,
     };
   }
 

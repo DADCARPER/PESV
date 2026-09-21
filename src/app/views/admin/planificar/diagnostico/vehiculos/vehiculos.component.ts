@@ -44,7 +44,8 @@ export class VehiculosComponent implements OnInit, OnChanges {
 
   filterButtons = [
     { label: 'Todos',              value: 'Todos' },
-    { label: 'Propio',             value: 'Propio' },
+    { label: 'Propios',            value: 'Propio' },
+    { label: 'De terceros',        value: 'Terceros' },
     { label: 'Afiliado',           value: 'Afiliado' },
     { label: 'Asociado',           value: 'Asociado' },
     { label: 'Puesto al servicio', value: 'Puesto al servicio' },
@@ -104,7 +105,22 @@ export class VehiculosComponent implements OnInit, OnChanges {
       headerName: 'Kilometraje',  field: 'kilometrajeActual', width: 120, type: 'numericColumn',
       valueFormatter: (p: any) => p.value != null && p.value !== '' ? `${Number(p.value).toLocaleString()} km` : '—'
     },
-    { headerName: 'Relación',     field: 'tipoRelacion',     width: 150 },
+    {
+      headerName: 'Relación', field: 'tipoRelacion', width: 190,
+      cellRenderer: (params: any) => {
+        // Propio y de terceros se distinguen de un vistazo: son dos regimenes
+        // distintos de obligaciones, no dos etiquetas cualesquiera.
+        const propio = params.value === 'Propio';
+        const color = propio ? 'bg-sky-100 text-sky-800' : 'bg-purple-100 text-purple-800';
+        const duenno = propio ? '' : textoSeguro(params.data.contratistaNombre, 'Sin asignar');
+
+        return `
+          <div class="leading-tight">
+            <span class="inline-block rounded px-1.5 text-[11px] font-medium ${color}">${textoSeguro(params.value, '—')}</span>
+            ${duenno ? `<div class="text-xs text-gray-400 truncate">${duenno}</div>` : ''}
+          </div>`;
+      },
+    },
     {
       headerName: 'SOAT',         field: 'vigenciaSoat',     width: 150,
       cellRenderer: (params: any) => this.pintarVigencia(params.value),
@@ -180,7 +196,9 @@ export class VehiculosComponent implements OnInit, OnChanges {
   private applyFilters() {
     let filtered = [...this.datos];
     if (this.activeFilter !== 'Todos') {
-      filtered = filtered.filter(i => i.tipoRelacion === this.activeFilter);
+      filtered = this.activeFilter === 'Terceros'
+        ? filtered.filter(i => i.tipoRelacion !== 'Propio')
+        : filtered.filter(i => i.tipoRelacion === this.activeFilter);
     }
     if (this.searchText.trim()) {
       const s = this.searchText.toLowerCase();
@@ -190,7 +208,8 @@ export class VehiculosComponent implements OnInit, OnChanges {
         String(i.marca        ?? '').toLowerCase().includes(s) ||
         String(i.vin          ?? '').toLowerCase().includes(s) ||
         String(i.numeroMotor  ?? '').toLowerCase().includes(s) ||
-        String(i.tipoRelacion ?? '').toLowerCase().includes(s)
+        String(i.tipoRelacion ?? '').toLowerCase().includes(s) ||
+        String(i.contratistaNombre ?? '').toLowerCase().includes(s)
       );
     }
     this.filteredData = filtered;
