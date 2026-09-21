@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { textoSeguro } from '../../../../../data/texto-seguro';
 import { Component, OnInit, OnChanges, SimpleChanges, CUSTOM_ELEMENTS_SCHEMA, Input, viewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AgGridModule } from 'ag-grid-angular';
@@ -60,8 +61,8 @@ export class PlanEmergenciasComponent implements OnInit, OnChanges {
       headerName: 'Plan', field: 'nombrePlan', width: 260,
       cellRenderer: (params: any) => `
         <div class="flex flex-col justify-center h-full">
-          <div class="font-semibold text-gray-900 text-sm leading-tight">${params.value ?? ''}</div>
-          <div class="text-xs text-gray-400 mt-0.5">${params.data.responsable ?? ''}</div>
+          <div class="font-semibold text-gray-900 text-sm leading-tight">${textoSeguro(params.value)}</div>
+          <div class="text-xs text-gray-400 mt-0.5">${textoSeguro(params.data.responsable)}</div>
         </div>`
     },
     {
@@ -74,12 +75,12 @@ export class PlanEmergenciasComponent implements OnInit, OnChanges {
           'Incendio vehicular':    'bg-orange-100 text-orange-700',
         };
         const cls = colors[params.value] ?? 'bg-gray-100 text-gray-600';
-        return `<span class="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full ${cls}">${params.value ?? '—'}</span>`;
+        return `<span class="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full ${cls}">${textoSeguro(params.value, '—')}</span>`;
       }
     },
     {
       headerName: 'Descripción', field: 'descripcion', width: 260,
-      cellRenderer: (params: any) => `<span class="text-xs text-gray-500">${params.value ?? '—'}</span>`
+      cellRenderer: (params: any) => `<span class="text-xs text-gray-500">${textoSeguro(params.value, '—')}</span>`
     },
     { headerName: 'Tel. emergencia', field: 'telefonoEmergencia', width: 130 },
     { headerName: 'Elaborado',       field: 'fechaElaboracion',   width: 120 },

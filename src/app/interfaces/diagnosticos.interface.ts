@@ -71,19 +71,49 @@ export namespace ModelDiagnosticos {
         telefono: string;
     }
 
+    /**
+     * Contratista del diagnostico, tal como lo guarda su formulario.
+     *
+     * La version anterior de esta interfaz describia una forma que el
+     * formulario dejo de escribir hace tiempo: hablaba de `nombreEmpresa`,
+     * `clasificacion`, `tipoServicio`, `direccion`, `email` y `telefono`,
+     * campos que ya no existen. Solo coincidian tres. Por eso el componente
+     * que la pinta acababa usando `any`: tipar con ella daba error en todas
+     * las columnas.
+     */
     export interface Contratistas {
-        clasificacion: string;
-        conductores: number;
-        direccion: string;
-        docCreado: string;    
-        email: string;
-        estado: string;
         id: string;
-        nitEmpresa: string;
-        nombreEmpresa: string;
-        telefono: string;
-        tipoServicio: string;
+        estado: string;
+        docCreado?: unknown;
+        periodo?: number;
+
+        // Identificacion
+        tipoContratista: string;
+        tipoPersona: string;
+        nombreRazonSocial: string;
+        nitCedula: string;
+
+        // Vinculacion
+        tipoVinculacion: string;
+        /** Texto libre cuando la vinculacion es "Otro". */
+        vinculacionOtro?: string;
+        servicioPrestado: string;
+        fechaInicioContrato: string;
+        contratoIndefinido: boolean;
+        /** Vacia mientras el contrato sea indefinido. */
+        fechaFinContrato?: string;
+
+        /**
+         * Si el contratista se desplaza por la empresa. Es lo que decide si
+         * entra en las obligaciones del PESV, por eso va aparte del resto.
+         */
+        realizaDesplazamientos: string;
+
+        // Flota, solo cuando hay desplazamientos
+        tipoFlota?: string;
+        conductores: number;
         vehiculos: number;
+        observaciones?: string;
     }
       
 

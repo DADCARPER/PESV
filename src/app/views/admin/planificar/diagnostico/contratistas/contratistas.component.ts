@@ -1,18 +1,19 @@
 import { CommonModule } from '@angular/common';
+import { textoSeguro } from '../../../../../data/texto-seguro';
 import { Component, OnInit, OnChanges, SimpleChanges, CUSTOM_ELEMENTS_SCHEMA, Input, viewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AgGridModule } from 'ag-grid-angular';
 import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { Form1ContratistasComponent } from './form1-contratistas/form1-contratistas.component';
-import { Form2ContratistasComponent } from './form2-contratistas/form2-contratistas.component';
-import { AuthenticacionService } from '../../../../../services/shared/authenticacion.service';
 import { FirestoreService } from '../../../../../services/shared/firestore.service';
+import { DiagnosticoDatosService } from '../../../../../services/shared/diagnostico-datos.service';
 import { AlertaService } from '../../../../../services/shared/alerta.service';
+import { Models } from '../../../../../interfaces/models';
 
 @Component({
   selector: 'app-contratistas',
   standalone: true,
-  imports: [CommonModule, FormsModule, AgGridModule, Form1ContratistasComponent, Form2ContratistasComponent],
+  imports: [CommonModule, FormsModule, AgGridModule, Form1ContratistasComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './contratistas.component.html',
   styleUrl: './contratistas.component.css'
@@ -20,18 +21,17 @@ import { AlertaService } from '../../../../../services/shared/alerta.service';
 export class ContratistasComponent implements OnInit, OnChanges {
 
   private _firestore = inject(FirestoreService);
-  private _authcations = inject(AuthenticacionService);
+  private _datos = inject(DiagnosticoDatosService);
   private _alerta = inject(AlertaService);
 
   modalFormulario = viewChild.required<Form1ContratistasComponent>('modalFormulario');
-  modalEliminar   = viewChild.required<Form2ContratistasComponent>('modalEliminar');
 
   private gridApi!: GridApi;
 
   searchText  = '';
   activeFilter = 'Todos';
 
-  contratistaAEliminar: any | null = null;
+  contratistaAEliminar: Models.Diagnostico.Contratistas | null = null;
   eliminando = false;
 
   filterButtons = [
@@ -40,8 +40,8 @@ export class ContratistasComponent implements OnInit, OnChanges {
     { label: 'Sin desplazamientos',      value: 'NO'    },
   ];
 
-  @Input() datos: any[] = [];
-  filteredData: any[] = [];
+  @Input() datos: Models.Diagnostico.Contratistas[] = [];
+  filteredData: Models.Diagnostico.Contratistas[] = [];
 
   columnDefs: ColDef[] = [
     {
@@ -72,8 +72,8 @@ export class ContratistasComponent implements OnInit, OnChanges {
             ${(params.value ?? '?').split(' ').map((n: string) => n[0] ?? '').join('').substring(0, 2).toUpperCase()}
           </div>
           <div>
-            <div class="font-semibold text-gray-900 text-sm leading-tight">${params.value ?? ''}</div>
-            <div class="text-xs text-gray-400">${params.data.nitCedula ?? ''} · ${params.data.tipoPersona ?? ''}</div>
+            <div class="font-semibold text-gray-900 text-sm leading-tight">${textoSeguro(params.value)}</div>
+            <div class="text-xs text-gray-400">${textoSeguro(params.data.nitCedula)} · ${textoSeguro(params.data.tipoPersona)}</div>
           </div>
         </div>
       `
@@ -107,8 +107,8 @@ export class ContratistasComponent implements OnInit, OnChanges {
         if (params.data.realizaDesplazamientos !== 'SI') return `<span class="text-gray-300 text-xs">—</span>`;
         return `
           <div class="text-xs leading-5">
-            <div>${params.data.tipoFlota ?? '—'}</div>
-            <div class="text-gray-400">🚚 ${params.data.vehiculos ?? 0} · 👤 ${params.data.conductores ?? 0}</div>
+            <div>${textoSeguro(params.data.tipoFlota, '—')}</div>
+            <div class="text-gray-400">🚚 ${textoSeguro(params.data.vehiculos, '0')} · 👤 ${textoSeguro(params.data.conductores, '0')}</div>
           </div>
         `;
       }
@@ -174,10 +174,6 @@ export class ContratistasComponent implements OnInit, OnChanges {
     this.modalFormulario().abrirModal(modo, datoaEditar);
   }
 
-  manejarEliminar(contratista: any) {
-    this.modalEliminar().abrirModal(contratista);
-  }
-
   cancelarEliminar() {
     this.contratistaAEliminar = null;
   }
@@ -185,11 +181,10 @@ export class ContratistasComponent implements OnInit, OnChanges {
   async confirmarEliminar() {
     if (!this.contratistaAEliminar?.id) return;
     this.eliminando = true;
-    const nit     = this._authcations.getCurrentUser().displayName;
-    const periodo = this._authcations.periodo();
     try {
+      // La ruta la resuelve el servicio, que ya sabe de empresa y periodo.
       await this._firestore.updateDocument(
-        `Empresas/${nit}/periodos/${periodo}/006-diagnostico-contratistas/${this.contratistaAEliminar.id}`,
+        `${this._datos.ruta('contratistas')}/${this.contratistaAEliminar.id}`,
         { estado: 'NoActivo' }
       );
       this._alerta.showSuccess('Contratista eliminado exitosamente.');

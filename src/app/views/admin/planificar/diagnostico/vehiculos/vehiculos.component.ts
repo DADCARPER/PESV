@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { textoSeguro } from '../../../../../data/texto-seguro';
 import { Component, OnInit, OnChanges, SimpleChanges, CUSTOM_ELEMENTS_SCHEMA, Input, viewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AgGridModule } from 'ag-grid-angular';
@@ -81,8 +82,8 @@ export class VehiculosComponent implements OnInit, OnChanges {
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v3"/><rect x="9" y="11" width="14" height="10" rx="2"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>
             </div>
             <div>
-              <div class="font-bold text-gray-900 text-sm">${params.value ?? ''}</div>
-              <div class="text-xs text-gray-400">${params.data.marca ?? ''} ${params.data.modelo ?? ''} · <span title="Docs legales">${tieneDoc}</span><span title="Operación">${tieneOp}</span></div>
+              <div class="font-bold text-gray-900 text-sm">${textoSeguro(params.value)}</div>
+              <div class="text-xs text-gray-400">${textoSeguro(params.data.marca)} ${textoSeguro(params.data.modelo)} · <span title="Docs legales">${tieneDoc}</span><span title="Operación">${tieneOp}</span></div>
             </div>
           </div>`;
       }
@@ -99,13 +100,13 @@ export class VehiculosComponent implements OnInit, OnChanges {
     {
       headerName: 'SOAT',         field: 'vigenciaSoat',     width: 120,
       cellRenderer: (params: any) => params.value
-        ? `<span class="text-xs">${params.value}</span>`
+        ? `<span class="text-xs">${textoSeguro(params.value)}</span>`
         : `<span class="text-xs text-gray-300">Sin registrar</span>`
     },
     {
       headerName: 'Rev. técnica', field: 'vigenciaRevisionTecnica', width: 120,
       cellRenderer: (params: any) => params.value
-        ? `<span class="text-xs">${params.value}</span>`
+        ? `<span class="text-xs">${textoSeguro(params.value)}</span>`
         : `<span class="text-xs text-gray-300">Sin registrar</span>`
     },
   ];

@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { textoSeguro } from '../../../../../data/texto-seguro';
 import { Component, OnInit, OnChanges, SimpleChanges, CUSTOM_ELEMENTS_SCHEMA, Input, viewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AgGridModule } from 'ag-grid-angular';
@@ -61,8 +62,8 @@ export class RutasFrecuentesComponent implements OnInit, OnChanges {
       headerName: 'Ruta', field: 'nombreRuta', width: 220,
       cellRenderer: (params: any) => `
         <div class="flex flex-col justify-center h-full">
-          <div class="font-semibold text-gray-900 text-sm">${params.value ?? ''}</div>
-          <div class="text-xs text-gray-400">${params.data.origen ?? ''} → ${params.data.destino ?? ''}</div>
+          <div class="font-semibold text-gray-900 text-sm">${textoSeguro(params.value)}</div>
+          <div class="text-xs text-gray-400">${textoSeguro(params.data.origen)} → ${textoSeguro(params.data.destino)}</div>
         </div>`
     },
     { headerName: 'Tipo de vía',  field: 'tipoVia',        width: 120 },
@@ -77,7 +78,7 @@ export class RutasFrecuentesComponent implements OnInit, OnChanges {
     },
     {
       headerName: 'Observaciones', field: 'observaciones', width: 220,
-      cellRenderer: (params: any) => `<span class="text-xs text-gray-500">${params.value ?? '—'}</span>`
+      cellRenderer: (params: any) => `<span class="text-xs text-gray-500">${textoSeguro(params.value, '—')}</span>`
     },
   ];
 
