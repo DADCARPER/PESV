@@ -178,7 +178,17 @@ export class InformeDiagnosticoService {
     // para no contarlo dos veces en la misma seccion.
     const repartos = preguntas
       .filter(p => (p.tipo === 'unica' || p.tipo === 'multiple') && p.id !== 'genero')
-      .map(p => this.repartoDePregunta(p, respuestas));
+      .map(p => {
+        const reparto = this.repartoDePregunta(p, respuestas);
+
+        // La escolaridad es una escala que se lee en orden, asi que va en
+        // columnas y con su propia lectura.
+        if (p.id === 'escolaridad') {
+          reparto.grafica = 'columnas';
+          reparto.texto = this.textoEscolaridad(reparto, respuestas.length);
+        }
+        return reparto;
+      });
 
     const hombres = respuestas.filter(r => r['genero'] === 'Masculino').length;
     const mujeres = respuestas.filter(r => r['genero'] === 'Femenino').length;
@@ -241,6 +251,43 @@ export class InformeDiagnosticoService {
       + `trabajadores directos de ${nombre}. La muestra obtenida fue de ${muestra} personas`
       + `${cobertura}.` + '\n\n'
       + `En la distribución por género se observa ${mayoria} de los ${muestra} encuestados.`;
+  }
+
+  /**
+   * Redacta el reparto por formación académica.
+   *
+   * Enumera lo que hay, de mayor a menor, y agrupa aparte la formación
+   * superior, que es la comparacion que suele interesar. No afirma nada que
+   * los datos no digan: si el nivel superior no esta entre las opciones de la
+   * encuesta, esa frase no aparece.
+   */
+  private textoEscolaridad(reparto: ModelsInforme.Reparto, muestra: number): string {
+    if (!muestra || !reparto.filas.length) return '';
+
+    const frase = (f: { etiqueta: string; total: number; porcentaje: number }) =>
+      `${f.porcentaje}% (${f.total}) ${f.etiqueta.toLowerCase()}`;
+
+    const principales = reparto.filas.slice(0, 4).map(frase);
+    const listado = principales.length > 1
+      ? `${principales.slice(0, -1).join(', ')} y ${principales[principales.length - 1]}`
+      : principales[0];
+
+    let texto = `De las ${muestra} personas encuestadas, la formación académica se `
+      + `reparte así: ${listado}.`;
+
+    // Solo si la encuesta contempla esos niveles: las opciones las edita el
+    // superadministrador y una lista fija se quedaria atras en silencio.
+    const superiores = reparto.filas.filter(f =>
+      /profesional|posgrado|maestr|doctor|especializa/i.test(f.etiqueta)
+    );
+    if (superiores.length) {
+      const total = superiores.reduce((n, f) => n + f.total, 0);
+      const pct = Math.round((total / muestra) * 1000) / 10;
+      texto += ` En conjunto, ${total} personas (${pct}%) cuentan con formación `
+        + `superior o de posgrado.`;
+    }
+
+    return texto;
   }
 
   /** Una sección por cada módulo de la encuesta que la empresa activó. */

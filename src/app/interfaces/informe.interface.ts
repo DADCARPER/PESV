@@ -25,6 +25,16 @@ export namespace ModelsInforme {
   export interface Reparto {
     titulo: string;
     filas: { etiqueta: string; total: number; porcentaje: number }[];
+    /**
+     * Texto propuesto para este reparto concreto, editable como el de la
+     * sección. No todos lo llevan: solo los que merecen una lectura.
+     */
+    texto?: string;
+    /**
+     * Cómo se pinta. Por defecto, barras sencillas embebidas; `columnas` pide
+     * una gráfica de barras verticales, para escalas que se leen en orden.
+     */
+    grafica?: 'columnas';
   }
 
   /**

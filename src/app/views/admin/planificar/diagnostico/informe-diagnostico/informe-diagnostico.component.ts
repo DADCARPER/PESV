@@ -2,6 +2,7 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA, effect, inject, signal } from '@angu
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { BarrasVerticalesComponent } from '../../../../../components/apexChart/barras-verticales/barras-verticales.component';
 
 import { InformeDiagnosticoService } from '../../../../../services/shared/informe-diagnostico.service';
 import { AuthenticacionService } from '../../../../../services/shared/authenticacion.service';
@@ -21,7 +22,7 @@ import { ModelsInforme } from '../../../../../interfaces/informe.interface';
 @Component({
   selector: 'app-informe-diagnostico',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, BarrasVerticalesComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './informe-diagnostico.component.html',
 })
