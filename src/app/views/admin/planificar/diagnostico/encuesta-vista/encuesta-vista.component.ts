@@ -99,7 +99,7 @@ export class EncuestaVistaComponent implements OnInit {
 
       this.encuesta.set(copia.data());
       this.construirFormulario();
-      this.recuperarProgreso();
+      this.detectarBorrador();
     } catch (error: unknown) {
       console.error('[EncuestaVista] cargar:', error);
       this.noEncontrada.set(true);
@@ -187,19 +187,49 @@ export class EncuestaVistaComponent implements OnInit {
    * La encuesta es larga y se contesta desde el móvil. Guardar lo escrito en
    * el propio navegador evita que una llamada entrante borre diez minutos de
    * trabajo.
+   *
+   * No se guarda nada una vez enviada: el formulario sigue cargado en memoria,
+   * y al cerrar la pestaña se volvía a escribir lo ya entregado. Por eso la
+   * encuesta reaparecía rellena al abrir el enlace otra vez.
    */
   guardarProgreso() {
-    if (!this.formulario) return;
+    if (!this.formulario || this.enviada()) return;
     try {
       localStorage.setItem(this.clave(), JSON.stringify({
-        v: this.formulario.value, t: this.openTab,
+        v: this.formulario.value, t: this.openTab, ts: Date.now(),
       }));
     } catch (error: unknown) {
       // Navegación privada o almacenamiento lleno: no vale la pena molestar.
     }
   }
 
-  private recuperarProgreso() {
+  /** Lo guardado a medias que se ofrece recuperar, con cuándo se dejó. */
+  borrador = signal<{ fecha: string } | null>(null);
+
+  /**
+   * Mira si hay algo a medias, pero no lo carga: lo ofrece.
+   *
+   * El enlace se difunde por los canales de la empresa y puede abrirse en un
+   * equipo compartido. Rellenar el formulario solo por haberlo encontrado
+   * guardado le pondría a alguien el nombre y la cédula de otro sin avisar.
+   */
+  private detectarBorrador() {
+    try {
+      const guardado = localStorage.getItem(this.clave());
+      if (!guardado) return;
+
+      const { ts } = JSON.parse(guardado);
+      const fecha = ts
+        ? new Date(ts).toLocaleString('es-CO', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+        : '';
+      this.borrador.set({ fecha });
+    } catch (error: unknown) {
+      console.error('[EncuestaVista] detectarBorrador:', error);
+    }
+  }
+
+  /** Carga lo que había a medias y sigue por donde iba. */
+  continuarBorrador() {
     try {
       const guardado = localStorage.getItem(this.clave());
       if (!guardado) return;
@@ -217,7 +247,23 @@ export class EncuestaVistaComponent implements OnInit {
       }
       this.openTab = Math.min(t ?? 0, this.modulos().length - 1);
     } catch (error: unknown) {
-      console.error('[EncuestaVista] recuperarProgreso:', error);
+      console.error('[EncuestaVista] continuarBorrador:', error);
+    } finally {
+      this.borrador.set(null);
+    }
+  }
+
+  /** Descarta lo guardado y empieza en blanco. */
+  descartarBorrador() {
+    this.olvidarBorrador();
+    this.borrador.set(null);
+  }
+
+  private olvidarBorrador() {
+    try {
+      localStorage.removeItem(this.clave());
+    } catch (error: unknown) {
+      // Nada que hacer si el navegador no deja tocar el almacenamiento.
     }
   }
 
@@ -290,8 +336,11 @@ export class EncuestaVistaComponent implements OnInit {
         `Encuestas_publicas/${this.nitEmpresa}/encuestas`, respuesta
       );
 
-      try { localStorage.removeItem(this.clave()); } catch (error: unknown) { /* da igual */ }
+      // Antes de nada: en cuanto esta enviada, guardarProgreso deja de
+      // escribir, asi que cerrar la pestana ya no resucita lo entregado.
       this.enviada.set(true);
+      this.olvidarBorrador();
+      this.formulario.reset();
     } catch (error: unknown) {
       console.error('[EncuestaVista] enviar:', error);
       this._alerta.showError('No se pudo enviar. Revisa tu conexión e inténtalo de nuevo.');
