@@ -5,7 +5,9 @@ import { FormsModule } from '@angular/forms';
 import { AgGridModule } from 'ag-grid-angular';
 import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { Form1RutasComponent } from './form1-rutas/form1-rutas.component';
-import { AuthenticacionService } from '../../../../../services/shared/authenticacion.service';
+import { DiagnosticoDatosService } from '../../../../../services/shared/diagnostico-datos.service';
+import { Models } from '../../../../../interfaces/models';
+import { kilometrosAlMes } from '../../../../../data/rutas';
 import { FirestoreService } from '../../../../../services/shared/firestore.service';
 import { AlertaService } from '../../../../../services/shared/alerta.service';
 
@@ -20,7 +22,7 @@ import { AlertaService } from '../../../../../services/shared/alerta.service';
 export class RutasFrecuentesComponent implements OnInit, OnChanges {
 
   private _firestore = inject(FirestoreService);
-  private _auth = inject(AuthenticacionService);
+  private _datos = inject(DiagnosticoDatosService);
   private _alerta = inject(AlertaService);
 
   modalFormulario = viewChild.required<Form1RutasComponent>('modalFormulario');
@@ -30,7 +32,7 @@ export class RutasFrecuentesComponent implements OnInit, OnChanges {
   searchText = '';
   activeFilter = 'Todos';
 
-  rutaAEliminar: any | null = null;
+  rutaAEliminar: Models.Diagnostico.Ruta | null = null;
   eliminando = false;
 
   filterButtons = [
@@ -41,7 +43,7 @@ export class RutasFrecuentesComponent implements OnInit, OnChanges {
     { label: 'Mixta',      value: 'Mixta'     },
   ];
 
-  @Input() datos: any[] = [];
+  @Input() datos: Models.Diagnostico.Ruta[] = [];
   filteredData: any[] = [];
 
   columnDefs: ColDef[] = [
@@ -73,8 +75,27 @@ export class RutasFrecuentesComponent implements OnInit, OnChanges {
       valueFormatter: (p: any) => p.value ? `${p.value} km` : '—'
     },
     {
-      headerName: 'Tiempo est.',  field: 'tiempoMinutos',  width: 110, type: 'numericColumn',
-      valueFormatter: (p: any) => p.value ? `${p.value} min` : '—'
+      headerName: 'Tiempo est.',  field: 'tiempoEstimado', width: 150,
+      cellRenderer: (params: any) => `<span class="text-xs text-gray-600">${textoSeguro(params.value, '—')}</span>`
+    },
+    {
+      headerName: 'Km al mes', width: 120, type: 'numericColumn',
+      // Sale de la distancia y la frecuencia: es la base de los indicadores
+      // del PESV, que se expresan por millon de kilometros recorridos.
+      valueGetter: (p: any) => kilometrosAlMes(p.data?.distanciaKm, p.data?.frecuencia),
+      valueFormatter: (p: any) => p.value === null || p.value === undefined
+        ? '—' : `${Number(p.value).toLocaleString()} km`,
+    },
+    {
+      headerName: 'Riesgos', width: 200,
+      valueGetter: (p: any) => (p.data?.factoresRiesgo ?? []).length,
+      cellRenderer: (params: any) => {
+        const factores: string[] = params.data?.factoresRiesgo ?? [];
+        if (!factores.length) return `<span class="text-xs text-gray-300">Sin señalar</span>`;
+        const resto = factores.length > 2 ? ` +${factores.length - 2}` : '';
+        return `<span class="text-xs text-gray-600" title="${textoSeguro(factores.join(', '))}">`
+          + `${textoSeguro(factores.slice(0, 2).join(', '))}${resto}</span>`;
+      },
     },
     {
       headerName: 'Observaciones', field: 'observaciones', width: 220,
@@ -126,11 +147,9 @@ export class RutasFrecuentesComponent implements OnInit, OnChanges {
   async confirmarEliminar() {
     if (!this.rutaAEliminar?.id) return;
     this.eliminando = true;
-    const nit = this._auth.getCurrentUser().displayName;
-    const periodo = this._auth.periodo();
     try {
       await this._firestore.updateDocument(
-        `Empresas/${nit}/periodos/${periodo}/006-diagnostico-rutas/${this.rutaAEliminar.id}`,
+        `${this._datos.ruta('rutas')}/${this.rutaAEliminar.id}`,
         { estado: 'NoActivo' }
       );
       this._alerta.showSuccess('Ruta eliminada exitosamente.');

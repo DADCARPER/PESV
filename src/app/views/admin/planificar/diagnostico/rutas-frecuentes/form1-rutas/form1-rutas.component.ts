@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, signal, inject } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { AuthenticacionService } from '../../../../../../services/shared/authenticacion.service';
 import { FirestoreService } from '../../../../../../services/shared/firestore.service';
 import { AlertaService } from '../../../../../../services/shared/alerta.service';
+import { DiagnosticoDatosService } from '../../../../../../services/shared/diagnostico-datos.service';
+import { FACTORES_RIESGO_RUTA, kilometrosAlMes } from '../../../../../../data/rutas';
 
 @Component({
   selector: 'app-form1-rutas',
@@ -24,6 +26,40 @@ export class Form1RutasComponent {
   modo: 'crear' | 'editar' = 'crear';
   datosEdicion: any = null;
 
+  private _datos = inject(DiagnosticoDatosService);
+
+  readonly gruposRiesgo = FACTORES_RIESGO_RUTA;
+
+  /**
+   * Kilometros al mes que supondria la ruta tal como esta rellena.
+   *
+   * Se muestra mientras se escribe para que se vea el efecto de la
+   * distancia y la frecuencia antes de guardar.
+   */
+  get kmAlMes(): number | null {
+    return kilometrosAlMes(
+      this.rutaForm.get('distanciaKm')?.value,
+      this.rutaForm.get('frecuencia')?.value
+    );
+  }
+
+  get factores(): FormArray {
+    return this.rutaForm.get('factoresRiesgo') as FormArray;
+  }
+
+  marcado(factor: string): boolean {
+    return this.factores.value.includes(factor);
+  }
+
+  alMarcar(factor: string, evento: Event) {
+    if ((evento.target as HTMLInputElement).checked) {
+      this.factores.push(this.fb.control(factor));
+      return;
+    }
+    const i = this.factores.value.indexOf(factor);
+    if (i >= 0) this.factores.removeAt(i);
+  }
+
   constructor(private fb: FormBuilder) {
     this.rutaForm = this.fb.group({
       nombreRuta:       ['', [Validators.required, Validators.maxLength(100)]],
@@ -33,6 +69,7 @@ export class Form1RutasComponent {
       tiempoEstimado:    [''],
       tipoVia:          ['', Validators.required],
       frecuencia:       ['', Validators.required],
+      factoresRiesgo:   this.fb.array([]),
       observaciones:    [''],
     });
   }
@@ -43,13 +80,21 @@ export class Form1RutasComponent {
       distanciaKm: 0, tiempoEstimado: '',
       tipoVia: '', frecuencia: '', observaciones: '',
     });
+    this.factores.clear();
     this.mostrarModal.set(false);
   }
 
   abrirModal(modo: 'crear' | 'editar', datosEditar?: any) {
     this.modo = modo;
     this.datosEdicion = datosEditar ?? null;
-    if (modo === 'editar' && datosEditar) this.rutaForm.patchValue(datosEditar);
+    this.factores.clear();
+    if (modo === 'editar' && datosEditar) {
+      this.rutaForm.patchValue(datosEditar);
+      // patchValue no llena un FormArray: hay que recrear sus controles.
+      for (const factor of datosEditar.factoresRiesgo ?? []) {
+        this.factores.push(this.fb.control(factor));
+      }
+    }
     this.mostrarModal.set(true);
   }
 
@@ -58,9 +103,8 @@ export class Form1RutasComponent {
       this._alerta.showWarning('Por favor, completa el formulario correctamente.');
       return;
     }
-    const nit = this._auth.getCurrentUser().displayName;
     const periodo = this._auth.periodo();
-    const path = `Empresas/${nit}/periodos/${periodo}/006-diagnostico-rutas`;
+    const path = this._datos.ruta('rutas');
     try {
       if (this.modo === 'editar') {
         await this._firestore.updateDocument(`${path}/${this.datosEdicion.id}`, this.rutaForm.value);

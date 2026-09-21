@@ -306,6 +306,15 @@
                   <p class="text-lg font-bold leading-none text-amber-800">{{ num_rutas }}</p>
                   <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">RUTAS</p>
                 </div>
+                <!-- Solo con la pestana abierta: la suma se hace sobre las rutas
+                     cargadas, y el tablero no las descarga por su cuenta. -->
+                @if (listas['rutas'].cargada()) {
+                  <div class="flex-1 bg-amber-50 p-2 rounded-md border border-amber-100 text-center"
+                    [title]="rutasSinEstimar ? rutasSinEstimar + ' rutas sin estimar (ocasionales o sin distancia)' : ''">
+                    <p class="text-lg font-bold leading-none text-amber-800">{{ kmAlMes | number }}</p>
+                    <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">KM AL MES</p>
+                  </div>
+                }
               </div>
               <button (click)="toggleTabs(6)" class="mt-auto w-full text-amber-500 bg-white border border-solid border-amber-500 hover:bg-amber-500 hover:text-white font-bold uppercase text-[11px] px-3 py-1.5 rounded outline-none focus:outline-none ease-linear transition-all duration-150" type="button">
                 <div class="flex items-center justify-center gap-1">

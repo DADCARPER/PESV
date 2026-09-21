@@ -28,6 +28,7 @@ import { EmpresaService } from '../../../../services/shared/empresa.service';
 import { FirestoreService } from '../../../../services/shared/firestore.service';
 import { AlertaService } from '../../../../services/shared/alerta.service';
 import { EncuestaEmpresaService } from '../../../../services/shared/encuesta-empresa.service';
+import { kilometrosAlMes } from '../../../../data/rutas';
 import {
   DiagnosticoDatosService, ListaDiagnostico, ResumenDiagnostico, SeccionDiagnostico,
 } from '../../../../services/shared/diagnostico-datos.service';
@@ -201,6 +202,24 @@ export class DiagnosticoComponent implements OnInit {
    * ante un fallo diria que toda la flota esta al dia.
    */
   sinSoat = signal<number | null>(null);
+
+  /**
+   * Kilometros al mes de las rutas frecuentes.
+   *
+   * Es la base de los indicadores del PESV, que se expresan por millon de
+   * kilometros recorridos. Se calcula sobre las rutas cargadas, asi que hasta
+   * que no se abre la pestana no hay nada que sumar.
+   */
+  get kmAlMes(): number {
+    return this.listas['rutas'].datos()
+      .reduce((total, r) => total + (kilometrosAlMes(r.distanciaKm, r.frecuencia) ?? 0), 0);
+  }
+
+  /** Rutas ocasionales o sin distancia, que no entran en la suma. */
+  get rutasSinEstimar(): number {
+    return this.listas['rutas'].datos()
+      .filter(r => kilometrosAlMes(r.distanciaKm, r.frecuencia) === null).length;
+  }
   mejora = signal<Record<string, number> | null>(null);
 
   /** Las cifras del tablero: una lectura por cifra, sin descargar listados. */

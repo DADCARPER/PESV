@@ -177,6 +177,37 @@ export namespace ModelDiagnosticos {
         observaciones?: string;
     }
 
+    /**
+     * Ruta que la organizacion recorre con regularidad.
+     *
+     * Los kilometros al mes no se guardan: salen de la distancia y la
+     * frecuencia. Pedirlos aparte permitiria que los tres datos se
+     * contradijeran entre si.
+     */
+    export interface Ruta {
+        id: string;
+        estado: string;
+        docCreado?: unknown;
+        periodo?: number;
+
+        nombreRuta: string;
+        origen: string;
+        destino: string;
+        distanciaKm?: number;
+        /** Rango de texto: "Entre 1 a 2 horas". No es un numero de minutos. */
+        tiempoEstimado?: string;
+        tipoVia: string;
+        frecuencia: string;
+
+        /**
+         * Riesgos que presenta la ruta, de la lista compartida con el modulo
+         * de riesgos de la encuesta. Antes esto acababa en observaciones,
+         * donde no se podia contar ni graficar.
+         */
+        factoresRiesgo?: string[];
+        observaciones?: string;
+    }
+
     export interface encuestaParametros{
 
         docCreado: Date;
