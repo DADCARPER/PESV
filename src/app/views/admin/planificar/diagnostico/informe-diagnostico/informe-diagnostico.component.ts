@@ -1,6 +1,7 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 import { InformeDiagnosticoService } from '../../../../../services/shared/informe-diagnostico.service';
 import { AuthenticacionService } from '../../../../../services/shared/authenticacion.service';
@@ -20,7 +21,7 @@ import { ModelsInforme } from '../../../../../interfaces/informe.interface';
 @Component({
   selector: 'app-informe-diagnostico',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './informe-diagnostico.component.html',
 })

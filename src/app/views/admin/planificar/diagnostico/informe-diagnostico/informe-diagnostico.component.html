@@ -104,7 +104,17 @@
                   @if (!dato.largo) {
                     <div class="rounded-lg border border-gray-100 bg-gray-50 p-3">
                       <p class="text-xs uppercase tracking-wide text-gray-500">{{ dato.etiqueta }}</p>
-                      <p class="mt-0.5 font-semibold text-gray-900">{{ dato.valor }}</p>
+
+                      @if (dato.editable) {
+                        <!-- Se propone, no se impone: la empresa puede tener
+                             varios operativos y quien abre esto no tiene por
+                             que ser quien firma. -->
+                        <input type="text" [(ngModel)]="dato.valor" [name]="dato.etiqueta"
+                          placeholder="Sin definir"
+                          class="mt-0.5 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                      } @else {
+                        <p class="mt-0.5 font-semibold text-gray-900">{{ dato.valor }}</p>
+                      }
                     </div>
                   }
                 }

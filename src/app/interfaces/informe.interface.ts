@@ -73,7 +73,18 @@ export namespace ModelsInforme {
      * y como párrafo, porque metidos en una rejilla de tarjetas estiran la
      * fila y descuadran el resto.
      */
-    identificacion?: { etiqueta: string; valor: string; largo?: boolean }[];
+    identificacion?: {
+      etiqueta: string;
+      valor: string;
+      largo?: boolean;
+      /**
+       * El sistema propone un valor pero quien emite puede cambiarlo.
+       *
+       * Es el caso del responsable del informe: la empresa puede tener varios
+       * operativos y el que abre la pantalla no tiene por que ser quien firma.
+       */
+      editable?: boolean;
+    }[];
     /** Solo la sección de organización: una ficha por sede. */
     sedes?: FichaSede[];
     /** Listados que acompañan a las cifras. */

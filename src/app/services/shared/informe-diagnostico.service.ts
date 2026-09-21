@@ -3,6 +3,7 @@ import { DiagnosticoDatosService } from './diagnostico-datos.service';
 import { EncuestaEmpresaService } from './encuesta-empresa.service';
 import { EmpresaService } from './empresa.service';
 import { AuthenticacionService } from './authenticacion.service';
+import { PerfilService } from './perfil.service';
 import { Models } from '../../interfaces/models';
 import { ModelsInforme } from '../../interfaces/informe.interface';
 import { kilometrosAlMes } from '../../data/rutas';
@@ -26,6 +27,7 @@ export class InformeDiagnosticoService {
   private _encuesta = inject(EncuestaEmpresaService);
   private _empresa = inject(EmpresaService);
   private _auth = inject(AuthenticacionService);
+  private _perfil = inject(PerfilService);
 
   /**
    * Levanta todas las cifras del periodo.
@@ -38,6 +40,11 @@ export class InformeDiagnosticoService {
 
     // La actividad economica vive en Empresas/{nit}: hay que tenerla leida.
     await this._empresa.cargar();
+
+    // Quien emite: se propone el de la sesion, pero es editable. La empresa
+    // puede tener varios operativos y quien abre la pantalla no tiene por que
+    // ser quien firma el informe.
+    const responsable = await this.responsablePropuesto();
 
     const [base, sedes, servicios, contratistas, vehiculos, rutas, planes, respuestas, encuesta] =
       await Promise.all([
@@ -70,6 +77,7 @@ export class InformeDiagnosticoService {
           nit: this._empresa.nit(),
           nombre: this._empresa.nombre(),
           actividad: this._empresa.datos()?.actividadEmpresa ?? '',
+          responsable,
         }),
         this.personas(respuestas, encuesta),
         ...this.modulosEncuesta(respuestas, encuesta),
@@ -86,7 +94,7 @@ export class InformeDiagnosticoService {
   private organizacion(
     sedes: Models.Diagnostico.Sedes[],
     servicios: Models.Diagnostico.Servicio[],
-    empresa: { nit: string; nombre: string; actividad: string }
+    empresa: { nit: string; nombre: string; actividad: string; responsable: string }
   ): ModelsInforme.Seccion {
     const departamentos = new Set(sedes.map(s => s.departamento).filter(Boolean));
     const empleadosEnSedes = sedes.reduce((n, s) => n + (Number(s.totalempleados) || 0), 0);
@@ -101,6 +109,7 @@ export class InformeDiagnosticoService {
       identificacion: [
         { etiqueta: 'Razón social', valor: empresa.nombre || 'Sin registrar' },
         { etiqueta: 'NIT', valor: empresa.nit },
+        { etiqueta: 'Responsable del informe', valor: empresa.responsable, editable: true },
         { etiqueta: 'Actividad económica', valor: empresa.actividad || 'Sin registrar', largo: true },
       ],
 
@@ -310,6 +319,19 @@ export class InformeDiagnosticoService {
       ],
       repartos: [this.contar('Planes por escenario', planes, p => p.tipoEmergencia)],
     };
+  }
+
+  /** El nombre de quien tiene la sesión, para proponerlo como responsable. */
+  private async responsablePropuesto(): Promise<string> {
+    try {
+      const perfil = await this._perfil.getPerfilEdit();
+      return (perfil as { nombreCompleto?: string })?.nombreCompleto
+        || this._auth.getCurrentUser()?.email
+        || '';
+    } catch (error: unknown) {
+      console.error('[Informe] responsablePropuesto:', error);
+      return '';
+    }
   }
 
   // ── Ayudantes de recuento ─────────────────────────────────────────────────

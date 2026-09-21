@@ -355,7 +355,13 @@ export class DiagnosticoComponent implements OnInit {
   }
 
   abrirModal() {
-    this.formDiagnostico = { totalColaboradores: 0, descripcionEmpresa: '' };
+    // Arranca con la actividad economica ya registrada en los datos de la
+    // empresa: es lo mismo que se pide aqui, y teclearla dos veces solo
+    // consigue que las dos versiones acaben diciendo cosas distintas.
+    this.formDiagnostico = {
+      totalColaboradores: 0,
+      descripcionEmpresa: this._empresaSrv.datos()?.actividadEmpresa ?? '',
+    };
     this.mostrarModal = true;
   }
 
