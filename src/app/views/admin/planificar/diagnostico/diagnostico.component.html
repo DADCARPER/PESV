@@ -88,18 +88,11 @@
             {id: 0,  label: 'Tablero'},
             {id: 1,  label: 'Sedes'},
             {id: 2,  label: 'Servicios'},
-            {id: 3,  label: 'Colaboradores'},
-            {id: 10, label: 'Salud'},
-            {id: 11, label: 'Conducción'},
-            {id: 12, label: 'Desplazamientos'},
-            {id: 13, label: 'Riesgos'},
-            {id: 14, label: 'Mejora'},
             {id: 4,  label: 'Contratistas'},
             {id: 5,  label: 'Vehículos'},
             {id: 6,  label: 'Rutas frecuentes'},
             {id: 7,  label: 'Plan emergencias'},
-            {id: 8,  label: 'Encuesta'},
-            {id: 9,  label: 'Resultados encuesta'}
+            {id: 8,  label: 'Encuesta'}
           ]; track tab.id) {
             <button (click)="toggleTabs(tab.id)"
               [class]="openTab === tab.id
@@ -549,38 +542,6 @@
         <ng-container *ngTemplateOutlet="paginacion; context: { $implicit: listas['servicios'], seccion: 'servicios', nombre: 'servicios' }"></ng-container>
       }
 
-      <!-- Tab 3: Colaboradores -->
-      @if (openTab === 3) {
-        <!-- Se abastece sola de las respuestas de la encuesta: no recibe datos
-             ni se pagina desde aqui. -->
-        <app-colaboradores></app-colaboradores>
-      }
-
-      <!-- Tab 10: Salud y condición física (módulo 2 de la encuesta) -->
-      @if (openTab === 10) {
-        <app-respuestas-modulo moduloId="modulo2" nombreModulo="Salud y condición física"></app-respuestas-modulo>
-      }
-
-      <!-- Tab 11: Conducción y transporte (módulo 3 de la encuesta) -->
-      @if (openTab === 11) {
-        <app-respuestas-modulo moduloId="modulo3" nombreModulo="Conducción y transporte"></app-respuestas-modulo>
-      }
-
-      <!-- Tab 12: Desplazamientos laborales (módulo 4 de la encuesta) -->
-      @if (openTab === 12) {
-        <app-respuestas-modulo moduloId="modulo4" nombreModulo="Desplazamientos laborales"></app-respuestas-modulo>
-      }
-
-      <!-- Tab 13: Identificación de riesgos (módulo 5 de la encuesta) -->
-      @if (openTab === 13) {
-        <app-respuestas-modulo moduloId="modulo5" nombreModulo="Identificación de riesgos"></app-respuestas-modulo>
-      }
-
-      <!-- Tab 14: Mejora y participación (módulo 6 de la encuesta) -->
-      @if (openTab === 14) {
-        <app-respuestas-modulo moduloId="modulo6" nombreModulo="Mejora y participación"></app-respuestas-modulo>
-      }
-
       <!-- Tab 4: Contratistas -->
       @if (openTab === 4) {
         <app-contratistas [datos]="datosContratistas"></app-contratistas>
@@ -605,14 +566,52 @@
         <ng-container *ngTemplateOutlet="paginacion; context: { $implicit: listas['plan-emergencias'], seccion: 'plan-emergencias', nombre: 'planes' }"></ng-container>
       }
 
-      <!-- Tab 8: Encuesta -->
+      <!-- Tab 8: Encuesta ────────────────────────────────────────────────
+           Agrupa todo lo que sale de la encuesta. Antes eran siete pestanas
+           de arriba mostrando lo mismo, y cada modulo nuevo anadia otra. -->
       @if (openTab === 8) {
-        <app-encuesta-parametros></app-encuesta-parametros>
-      }
 
-      <!-- Tab 9: Resultados encuesta -->
-      @if (openTab === 9) {
-        <app-resultados-encuesta></app-resultados-encuesta>
+        <div class="mb-4 flex flex-wrap gap-2 rounded-lg bg-gray-50 p-2">
+          @for (sub of [
+            {id: 'administrar',   label: 'Administrar'},
+            {id: 'colaboradores', label: 'Colaboradores'}
+          ]; track sub.id) {
+            <button type="button" (click)="subEncuesta = sub.id"
+              class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+              [ngClass]="subEncuesta === sub.id ? 'bg-amber-500 text-white shadow' : 'text-gray-600 hover:bg-amber-100'">
+              {{ sub.label }}
+            </button>
+          }
+
+          <!-- Una por modulo activo, sacada del cuestionario: si la empresa no
+               lo activo no aparece, y un modulo nuevo sale solo. -->
+          @for (modulo of modulosEncuesta(); track modulo.id) {
+            <button type="button" (click)="subEncuesta = modulo.id"
+              class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+              [ngClass]="subEncuesta === modulo.id ? 'bg-amber-500 text-white shadow' : 'text-gray-600 hover:bg-amber-100'">
+              {{ modulo.titulo }}
+            </button>
+          }
+
+          <button type="button" (click)="subEncuesta = 'resultados'"
+            class="ml-auto rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+            [ngClass]="subEncuesta === 'resultados' ? 'bg-amber-500 text-white shadow' : 'text-gray-600 hover:bg-amber-100'">
+            Resultados
+          </button>
+        </div>
+
+        @switch (subEncuesta) {
+          @case ('administrar')   { <app-encuesta-parametros></app-encuesta-parametros> }
+          @case ('colaboradores') { <app-colaboradores></app-colaboradores> }
+          @case ('resultados')    { <app-resultados-encuesta></app-resultados-encuesta> }
+          @default {
+            @for (modulo of modulosEncuesta(); track modulo.id) {
+              @if (subEncuesta === modulo.id) {
+                <app-respuestas-modulo [moduloId]="modulo.id" [nombreModulo]="modulo.titulo"></app-respuestas-modulo>
+              }
+            }
+          }
+        }
       }
 
     }

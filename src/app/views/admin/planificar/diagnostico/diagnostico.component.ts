@@ -37,6 +37,29 @@ import {
 // Interfaces
 import { Models } from '../../../../interfaces/models';
 
+/**
+ * Las secciones de la encuesta viven dentro de una sola pestaña.
+ *
+ * Habia una pestaña por modulo, y siete de las quince de arriba mostraban lo
+ * mismo: respuestas de la encuesta. Eso no escalaba, porque cada modulo nuevo
+ * anadia otra. Se agrupan, y el menu de arriba deja de crecer.
+ *
+ * Este mapa traduce los numeros de pestaña que siguen usando las tarjetas del
+ * tablero a la subseccion que les corresponde.
+ */
+const SUBSECCION_POR_PESTANA: Record<number, string> = {
+  3: 'colaboradores',
+  9: 'resultados',
+  10: 'modulo2',
+  11: 'modulo3',
+  12: 'modulo4',
+  13: 'modulo5',
+  14: 'modulo6',
+};
+
+/** La pestaña que agrupa todo lo de la encuesta. */
+const PESTANA_ENCUESTA = 8;
+
 /** Qué sección alimenta cada pestaña. El tablero (0) no tiene listado propio. */
 const SECCION_POR_PESTANA: Record<number, SeccionDiagnostico> = {
   1: 'sedes',
@@ -106,6 +129,23 @@ export class DiagnosticoComponent implements OnInit {
   // ── Tabs del dashboard ───────────────────────────────────────────────────
   openTab = 0;
 
+  /** Qué se está mirando dentro de la pestaña de Encuesta. */
+  subEncuesta = 'administrar';
+
+  /**
+   * Los módulos que se pueden consultar, sacados del cuestionario activo.
+   *
+   * Se generan solos: si la empresa no activó un módulo, su sección no
+   * aparece, y un módulo nuevo en la encuesta no obliga a tocar el menú.
+   */
+  modulosEncuesta = signal<{ id: string; titulo: string }[]>([]);
+
+  /** Abre la pestaña de Encuesta en la sección que se pida. */
+  abrirEncuesta(sub: string) {
+    this.subEncuesta = sub;
+    this.openTab = PESTANA_ENCUESTA;
+  }
+
   /**
    * Cifras del tablero. Salen de consultas de conteo, no de contar filas
    * descargadas, así que reflejan el total real aunque la lista de la pestaña
@@ -132,6 +172,22 @@ export class DiagnosticoComponent implements OnInit {
     await this.consultarDiagnosticoBase();
     this.cargarParametrosEncuesta();
     if (this.diagnosticoBase) await this.cargarResumen();
+    this.cargarModulosEncuesta();
+  }
+
+  /** Las secciones de la encuesta que esta empresa tiene activas. */
+  private async cargarModulosEncuesta() {
+    try {
+      const copia = await this._encuestaEmpresa.activa();
+      this.modulosEncuesta.set(
+        (copia?.modulos ?? [])
+          .filter(m => !m.fijo && copia!.modulosActivos.includes(m.id))
+          .map(m => ({ id: m.id, titulo: m.titulo }))
+      );
+    } catch (error: unknown) {
+      console.error('[Diagnostico] cargarModulosEncuesta:', error);
+      this.modulosEncuesta.set([]);
+    }
   }
 
   /**
@@ -357,6 +413,14 @@ export class DiagnosticoComponent implements OnInit {
    * cuando se abre, y volver a ella no cuesta nada.
    */
   toggleTabs(tabNumber: number) {
+    // Las tarjetas del tablero siguen apuntando a los numeros de antes: se
+    // traducen a su seccion dentro de Encuesta.
+    const sub = SUBSECCION_POR_PESTANA[tabNumber];
+    if (sub) {
+      this.abrirEncuesta(sub);
+      return;
+    }
+
     this.openTab = tabNumber;
 
     const seccion = SECCION_POR_PESTANA[tabNumber];
