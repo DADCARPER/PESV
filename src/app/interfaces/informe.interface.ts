@@ -31,12 +31,14 @@ export namespace ModelsInforme {
      */
     texto?: string;
     /**
-     * Cómo se pinta. Por defecto, barras sencillas embebidas; `columnas` pide
-     * barras verticales, para escalas que se leen en orden; `tablaPastel`
-     * pone la tabla y un pastel al lado, para pocas categorías donde interesa
-     * tanto el dato exacto como el peso de cada una.
+     * Cómo se pinta. Por defecto, barras sencillas embebidas.
+     *
+     * `columnas` son barras verticales, para escalas que se leen en orden;
+     * `barras` son horizontales, para categorías sueltas con nombres largos;
+     * `tablaPastel` pone la tabla y un pastel al lado, para pocas categorías
+     * donde interesa tanto el dato exacto como el peso de cada una.
      */
-    grafica?: 'columnas' | 'tablaPastel';
+    grafica?: 'columnas' | 'barras' | 'tablaPastel';
   }
 
   /**

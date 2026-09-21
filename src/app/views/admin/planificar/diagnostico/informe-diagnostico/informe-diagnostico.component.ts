@@ -2,7 +2,7 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA, effect, inject, signal } from '@angu
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { BarrasVerticalesComponent } from '../../../../../components/apexChart/barras-verticales/barras-verticales.component';
+import { BarrasInformeComponent } from '../../../../../components/apexChart/barras-informe/barras-informe.component';
 import { PieMonochromeComponent } from '../../../../../components/apexChart/pie-monochrome/pie-monochrome.component';
 
 import { InformeDiagnosticoService } from '../../../../../services/shared/informe-diagnostico.service';
@@ -23,7 +23,7 @@ import { ModelsInforme } from '../../../../../interfaces/informe.interface';
 @Component({
   selector: 'app-informe-diagnostico',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, BarrasVerticalesComponent, PieMonochromeComponent],
+  imports: [CommonModule, RouterLink, FormsModule, BarrasInformeComponent, PieMonochromeComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './informe-diagnostico.component.html',
 })

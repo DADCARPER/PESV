@@ -281,11 +281,15 @@
                         [values]="valoresDe(reparto)"></app-pie-monochrome>
                     </div>
 
-                  } @else if (reparto.grafica === 'columnas') {
+                  } @else if (reparto.grafica === 'columnas' || reparto.grafica === 'barras') {
                     <!-- Centrada y con ancho acotado: a pantalla completa las
                          barras quedan demasiado separadas para compararlas. -->
                     <div class="mx-auto max-w-2xl">
-                      <app-barras-verticales [datos]="reparto.filas"></app-barras-verticales>
+                      <app-barras-informe
+                        [datos]="reparto.filas"
+                        [horizontal]="reparto.grafica === 'barras'"
+                        [altura]="reparto.grafica === 'barras' ? 60 + reparto.filas.length * 42 : 300">
+                      </app-barras-informe>
                     </div>
                   } @else {
                   <div class="space-y-1.5">

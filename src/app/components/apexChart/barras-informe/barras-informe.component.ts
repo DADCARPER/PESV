@@ -6,7 +6,7 @@ import {
 } from 'ng-apexcharts';
 
 /** Una barra: su etiqueta, cuántos y qué parte del total son. */
-export interface BarraVertical {
+export interface BarraInforme {
   etiqueta: string;
   total: number;
   porcentaje: number;
@@ -25,17 +25,18 @@ type Opciones = {
 };
 
 /**
- * Barras verticales para el informe.
+ * Barras del informe, en vertical o en horizontal.
  *
- * Las que ya había en el proyecto pintan en horizontal, que va bien para
- * etiquetas largas pero no para una escala ordenada como la escolaridad, donde
- * se lee de menor a mayor y la vertical lo dice sola.
+ * Las que ya había en el proyecto pintan siempre horizontal y meten la
+ * etiqueta dentro de la barra, que va bien para un tablero pero no para un
+ * informe, donde hace falta ver el número exacto junto a su peso.
  *
- * Muestra el número sobre la barra y el porcentaje en el eje, porque en un
- * informe hacen falta los dos: el dato y su peso.
+ * La orientación no es decorativa: una escala que se lee en orden, como la
+ * escolaridad, se entiende mejor en vertical; una lista de categorías sueltas
+ * con nombres largos, como el estado civil, se lee mejor en horizontal.
  */
 @Component({
-  selector: 'app-barras-verticales',
+  selector: 'app-barras-informe',
   standalone: true,
   imports: [CommonModule, NgApexchartsModule],
   template: `
@@ -54,10 +55,12 @@ type Opciones = {
     }
   `,
 })
-export class BarrasVerticalesComponent implements OnChanges {
+export class BarrasInformeComponent implements OnChanges {
 
-  @Input() datos: BarraVertical[] = [];
+  @Input() datos: BarraInforme[] = [];
   @Input() altura = 300;
+  /** Horizontal cuando las etiquetas son largas o no hay orden natural. */
+  @Input() horizontal = false;
 
   listo = false;
   opciones: Partial<Opciones> = {};
@@ -78,16 +81,31 @@ export class BarrasVerticalesComponent implements OnChanges {
         fontFamily: 'inherit',
       },
       plotOptions: {
-        bar: { distributed: true, columnWidth: '55%', borderRadius: 4 },
+        bar: {
+          distributed: true,
+          horizontal: this.horizontal,
+          columnWidth: '55%',
+          barHeight: '65%',
+          borderRadius: 4,
+        },
       },
       // Distribuido pone una leyenda por barra, que repite el eje.
       legend: { show: false },
       colors: ['#fbbf24', '#f59e0b', '#e8930a', '#d97706', '#b45309', '#92400e'],
       dataLabels: {
         enabled: true,
-        offsetY: -22,
-        style: { colors: ['#374151'], fontSize: '12px', fontWeight: 600 },
-        formatter: (valor: number) => `${valor}`,
+        // En vertical la cifra va encima de la barra; en horizontal, dentro,
+        // que es donde hay sitio.
+        offsetY: this.horizontal ? 0 : -22,
+        style: {
+          colors: [this.horizontal ? '#fff' : '#374151'],
+          fontSize: '12px',
+          fontWeight: 600,
+        },
+        formatter: (valor: number, { dataPointIndex }: any) =>
+          this.horizontal
+            ? `${valor} · ${this.datos[dataPointIndex]?.porcentaje ?? 0}%`
+            : `${valor}`,
       },
       xaxis: {
         categories: this.datos.map(d => d.etiqueta),

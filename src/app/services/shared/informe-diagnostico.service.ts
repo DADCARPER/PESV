@@ -190,6 +190,12 @@ export class InformeDiagnosticoService {
 
         // El estrato son pocas categorias y se quiere el dato exacto junto al
         // peso: tabla a la izquierda y pastel a la derecha.
+        // Categorias sueltas con nombres largos: horizontal.
+        if (p.id === 'estadoCivil') {
+          reparto.grafica = 'barras';
+          reparto.texto = this.textoEstadoCivil(reparto, respuestas.length);
+        }
+
         if (p.id === 'estrato') {
           reparto.grafica = 'tablaPastel';
           reparto.texto = this.textoEstrato(reparto, respuestas.length);
@@ -292,6 +298,41 @@ export class InformeDiagnosticoService {
       const pct = Math.round((total / muestra) * 1000) / 10;
       texto += ` En conjunto, ${total} personas (${pct}%) cuentan con formación `
         + `superior o de posgrado.`;
+    }
+
+    return texto;
+  }
+
+  /**
+   * Redacta el reparto por estado civil.
+   *
+   * Agrupa aparte a quienes conviven en pareja, que es la lectura que suele
+   * interesar, detectandolo por el nombre de la opcion y no por una lista
+   * fija: las opciones las edita el superadministrador.
+   */
+  private textoEstadoCivil(reparto: ModelsInforme.Reparto, muestra: number): string {
+    if (!muestra || !reparto.filas.length) return '';
+
+    const principal = reparto.filas[0];
+    const resto = reparto.filas.slice(1, 4)
+      .map(f => `${f.etiqueta.toLowerCase()} con ${f.total} (${f.porcentaje}%)`);
+
+    let texto = `En la distribución por estado civil predomina la condición de `
+      + `${principal.etiqueta.toLowerCase()}, con ${principal.total} personas `
+      + `(${principal.porcentaje}%) de las ${muestra} encuestadas.`;
+
+    if (resto.length) {
+      const listado = resto.length > 1
+        ? `${resto.slice(0, -1).join(', ')} y ${resto[resto.length - 1]}`
+        : resto[0];
+      texto += ` Le siguen ${listado}.`;
+    }
+
+    const enPareja = reparto.filas.filter(f => /casad|uni[oó]n libre|convivi/i.test(f.etiqueta));
+    if (enPareja.length) {
+      const total = enPareja.reduce((n, f) => n + f.total, 0);
+      const pct = Math.round((total / muestra) * 1000) / 10;
+      texto += ` En conjunto, ${total} personas (${pct}%) conviven en pareja.`;
     }
 
     return texto;
