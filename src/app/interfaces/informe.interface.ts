@@ -32,9 +32,11 @@ export namespace ModelsInforme {
     texto?: string;
     /**
      * Cómo se pinta. Por defecto, barras sencillas embebidas; `columnas` pide
-     * una gráfica de barras verticales, para escalas que se leen en orden.
+     * barras verticales, para escalas que se leen en orden; `tablaPastel`
+     * pone la tabla y un pastel al lado, para pocas categorías donde interesa
+     * tanto el dato exacto como el peso de cada una.
      */
-    grafica?: 'columnas';
+    grafica?: 'columnas' | 'tablaPastel';
   }
 
   /**

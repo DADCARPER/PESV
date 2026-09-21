@@ -246,7 +246,37 @@
                       class="mb-3 w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm leading-relaxed text-gray-800 focus:border-amber-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-amber-400"></textarea>
                   }
 
-                  @if (reparto.grafica === 'columnas') {
+                  @if (reparto.grafica === 'tablaPastel') {
+                    <!-- Pocas categorias: interesa tanto el dato exacto como
+                         el peso de cada una, asi que van juntos. -->
+                    <div class="grid items-center gap-4 md:grid-cols-2">
+                      <div class="overflow-hidden rounded-lg border border-gray-100">
+                        <table class="min-w-full text-sm">
+                          <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+                            <tr>
+                              <th class="px-3 py-2 text-left font-semibold">{{ reparto.titulo }}</th>
+                              <th class="px-3 py-2 text-right font-semibold">Personas</th>
+                              <th class="px-3 py-2 text-right font-semibold">%</th>
+                            </tr>
+                          </thead>
+                          <tbody class="divide-y divide-gray-100">
+                            @for (fila of reparto.filas; track fila.etiqueta) {
+                              <tr>
+                                <td class="px-3 py-2 text-gray-700">{{ fila.etiqueta }}</td>
+                                <td class="px-3 py-2 text-right font-medium text-gray-900">{{ fila.total }}</td>
+                                <td class="px-3 py-2 text-right text-gray-500">{{ fila.porcentaje }}%</td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <app-pie-monochrome
+                        [labels]="etiquetasDe(reparto)"
+                        [values]="valoresDe(reparto)"></app-pie-monochrome>
+                    </div>
+
+                  } @else if (reparto.grafica === 'columnas') {
                     <!-- Centrada y con ancho acotado: a pantalla completa las
                          barras quedan demasiado separadas para compararlas. -->
                     <div class="mx-auto max-w-2xl">

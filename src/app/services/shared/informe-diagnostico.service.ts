@@ -187,6 +187,13 @@ export class InformeDiagnosticoService {
           reparto.grafica = 'columnas';
           reparto.texto = this.textoEscolaridad(reparto, respuestas.length);
         }
+
+        // El estrato son pocas categorias y se quiere el dato exacto junto al
+        // peso: tabla a la izquierda y pastel a la derecha.
+        if (p.id === 'estrato') {
+          reparto.grafica = 'tablaPastel';
+          reparto.texto = this.textoEstrato(reparto, respuestas.length);
+        }
         return reparto;
       });
 
@@ -285,6 +292,58 @@ export class InformeDiagnosticoService {
       const pct = Math.round((total / muestra) * 1000) / 10;
       texto += ` En conjunto, ${total} personas (${pct}%) cuentan con formación `
         + `superior o de posgrado.`;
+    }
+
+    return texto;
+  }
+
+  /**
+   * Redacta el reparto por estrato socioeconómico.
+   *
+   * Abre recordando qué es la estratificación, porque el informe lo lee gente
+   * de fuera de la empresa, y agrupa en los tres tramos con que se suele leer:
+   * uno a tres, cuatro y cinco, y seis.
+   *
+   * El número de estrato se saca de la etiqueta, no de una lista fija: las
+   * opciones las edita el superadministrador y una lista cerrada se quedaría
+   * atrás en cuanto alguien las renombrara.
+   */
+  private textoEstrato(reparto: ModelsInforme.Reparto, muestra: number): string {
+    if (!muestra || !reparto.filas.length) return '';
+
+    const definicion = 'La estratificación socioeconómica es una clasificación en estratos '
+      + 'de los inmuebles residenciales que deben recibir servicios públicos. Permite '
+      + 'asignar subsidios y cobrar contribuciones en esa área.';
+
+    const numero = (etiqueta: string) => {
+      const encontrado = etiqueta.match(/\d+/);
+      return encontrado ? Number(encontrado[0]) : null;
+    };
+
+    const sumar = (desde: number, hasta: number) => reparto.filas
+      .filter(f => {
+        const n = numero(f.etiqueta);
+        return n !== null && n >= desde && n <= hasta;
+      })
+      .reduce((total, f) => total + f.total, 0);
+
+    const pct = (total: number) => Math.round((total / muestra) * 1000) / 10;
+
+    const bajos = sumar(1, 3);
+    const medios = sumar(4, 5);
+    const altos = sumar(6, 6);
+    const sinNumero = muestra - bajos - medios - altos;
+
+    // Sin estratos reconocibles no se fuerza la lectura de tramos.
+    if (!bajos && !medios && !altos) return definicion;
+
+    let texto = definicion + '\n\n'
+      + `Se puede evidenciar que el ${pct(bajos)}% de la muestra `
+      + `se ubica en los estratos uno (1), dos (2) y tres (3), el ${pct(medios)}% en los `
+      + `estratos cuatro (4) y cinco (5), y el ${pct(altos)}% en el estrato seis (6).`;
+
+    if (sinNumero > 0) {
+      texto += ` Las ${sinNumero} respuestas restantes no indican un estrato reconocible.`;
     }
 
     return texto;

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BarrasVerticalesComponent } from '../../../../../components/apexChart/barras-verticales/barras-verticales.component';
+import { PieMonochromeComponent } from '../../../../../components/apexChart/pie-monochrome/pie-monochrome.component';
 
 import { InformeDiagnosticoService } from '../../../../../services/shared/informe-diagnostico.service';
 import { AuthenticacionService } from '../../../../../services/shared/authenticacion.service';
@@ -22,7 +23,7 @@ import { ModelsInforme } from '../../../../../interfaces/informe.interface';
 @Component({
   selector: 'app-informe-diagnostico',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, BarrasVerticalesComponent],
+  imports: [CommonModule, RouterLink, FormsModule, BarrasVerticalesComponent, PieMonochromeComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './informe-diagnostico.component.html',
 })
@@ -55,6 +56,15 @@ export class InformeDiagnosticoComponent {
     } finally {
       this.cargando.set(false);
     }
+  }
+
+  /** Las gráficas del proyecto reciben etiquetas y valores por separado. */
+  etiquetasDe(reparto: ModelsInforme.Reparto): string[] {
+    return reparto.filas.map(f => f.etiqueta);
+  }
+
+  valoresDe(reparto: ModelsInforme.Reparto): number[] {
+    return reparto.filas.map(f => f.total);
   }
 
   /** Secciones sin ningún dato: lo que habría que llenar antes de emitir. */
