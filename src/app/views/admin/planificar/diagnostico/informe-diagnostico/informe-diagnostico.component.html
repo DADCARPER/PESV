@@ -248,8 +248,13 @@
 
                   @if (reparto.grafica === 'tablaPastel') {
                     <!-- Pocas categorias: interesa tanto el dato exacto como
-                         el peso de cada una, asi que van juntos. -->
-                    <div class="grid items-center gap-4 md:grid-cols-2">
+                         el peso de cada una, asi que van juntos.
+
+                         Ocupan la mitad central: un cuarto en blanco a cada
+                         lado, tabla y pastel un cuarto cada uno. A ancho
+                         completo la tabla se estira y deja de leerse junto al
+                         pastel. En pantalla estrecha se apilan a ancho total. -->
+                    <div class="mx-auto grid items-center gap-4 md:w-1/2 md:grid-cols-2">
                       <div class="overflow-hidden rounded-lg border border-gray-100">
                         <table class="min-w-full text-sm">
                           <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
