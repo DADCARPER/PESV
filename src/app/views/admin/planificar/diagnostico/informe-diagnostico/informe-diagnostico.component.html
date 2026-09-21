@@ -95,6 +95,40 @@
               }
             </div>
 
+            <!-- ── El texto del informe ──────────────────────────────────
+                 Lo redacta el sistema con lo que los datos dicen, y lo ajusta
+                 quien emite: la lectura de si una muestra basta o si un
+                 reparto es tipico del sector la pone quien conoce su empresa. -->
+            @if (seccion.texto || !seccion.sinDatos) {
+              @if (seccion.texto) {
+                <div class="mb-4">
+                  <textarea [(ngModel)]="seccion.texto" [name]="'texto-' + seccion.id" rows="5"
+                    class="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm leading-relaxed text-gray-800 focus:border-amber-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-amber-400"></textarea>
+                  <p class="mt-1 text-xs text-gray-400">
+                    Propuesto por el sistema. Ajústalo antes de emitir.
+                  </p>
+                </div>
+              }
+            }
+
+            <!-- ── Cifras destacadas ─────────────────────────────────────── -->
+            @if (seccion.destacados?.length) {
+              <div class="mb-5 flex flex-wrap items-center justify-center gap-10">
+                @for (destacado of seccion.destacados; track destacado.etiqueta) {
+                  <div class="flex items-center gap-3">
+                    <div class="flex h-16 w-16 items-center justify-center rounded-full border-2 border-sky-200 bg-sky-50 text-sky-700">
+                      <iconify-icon [attr.icon]="'hugeicons:' + destacado.icono" width="32" height="32"></iconify-icon>
+                    </div>
+                    <div>
+                      <p class="text-2xl font-bold leading-none text-emerald-700">{{ destacado.valor }}</p>
+                      <p class="text-sm font-medium text-emerald-700">{{ destacado.etiqueta }}</p>
+                      <p class="text-xs text-gray-400">{{ destacado.porcentaje }}%</p>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+
             @if (seccion.identificacion?.length) {
               <!-- Los cortos en rejilla; los largos debajo, a ancho completo.
                    Un texto de varias lineas dentro de una tarjeta estira la

@@ -79,7 +79,11 @@ export class InformeDiagnosticoService {
           actividad: this._empresa.datos()?.actividadEmpresa ?? '',
           responsable,
         }),
-        this.personas(respuestas, encuesta),
+        this.personas(respuestas, encuesta, {
+          nombre: this._empresa.nombre(),
+          poblacion,
+          cobertura: poblacion > 0 ? Math.round((muestra / poblacion) * 1000) / 10 : 0,
+        }),
         ...this.modulosEncuesta(respuestas, encuesta),
         this.flota(vehiculos),
         this.contratistas(contratistas),
@@ -164,24 +168,79 @@ export class InformeDiagnosticoService {
    */
   private personas(
     respuestas: Record<string, any>[],
-    encuesta: any
+    encuesta: any,
+    empresa: { nombre: string; poblacion: number; cobertura: number }
   ): ModelsInforme.Seccion {
     const personal = encuesta?.modulos?.find((m: any) => m.fijo);
     const preguntas: any[] = personal?.preguntas ?? [];
 
-    // Las de opciones son las unicas con un reparto que valga la pena.
+    // El genero va aparte, como cifra destacada, asi que se saca del reparto
+    // para no contarlo dos veces en la misma seccion.
     const repartos = preguntas
-      .filter(p => p.tipo === 'unica' || p.tipo === 'multiple')
+      .filter(p => (p.tipo === 'unica' || p.tipo === 'multiple') && p.id !== 'genero')
       .map(p => this.repartoDePregunta(p, respuestas));
+
+    const hombres = respuestas.filter(r => r['genero'] === 'Masculino').length;
+    const mujeres = respuestas.filter(r => r['genero'] === 'Femenino').length;
+    const base = respuestas.length || 1;
 
     return {
       id: 'personas',
-      titulo: 'Las personas',
-      texto: '',
+      titulo: 'Caracterización de la población',
+      texto: this.textoPoblacion(respuestas.length, hombres, mujeres, empresa),
       sinDatos: !respuestas.length,
-      cifras: [{ etiqueta: 'Colaboradores que respondieron', valor: respuestas.length }],
+      cifras: [],
+      destacados: [
+        {
+          etiqueta: 'Hombres', valor: hombres, icono: 'man',
+          porcentaje: Math.round((hombres / base) * 1000) / 10,
+        },
+        {
+          etiqueta: 'Mujeres', valor: mujeres, icono: 'woman',
+          porcentaje: Math.round((mujeres / base) * 1000) / 10,
+        },
+      ],
       repartos,
     };
+  }
+
+  /**
+   * Redacta la presentación de la muestra.
+   *
+   * Dice lo que los datos dicen y nada más: cuántos respondieron, qué parte de
+   * la población son y cómo se reparten por género. La lectura —si eso es
+   * típico del sector, si la muestra basta— la pone quien emite el informe,
+   * que es quien conoce su empresa.
+   */
+  private textoPoblacion(
+    muestra: number,
+    hombres: number,
+    mujeres: number,
+    empresa: { nombre: string; poblacion: number; cobertura: number }
+  ): string {
+    if (!muestra) return '';
+
+    const nombre = empresa.nombre || 'la organización';
+    const base = muestra || 1;
+    const pctH = Math.round((hombres / base) * 1000) / 10;
+    const pctM = Math.round((mujeres / base) * 1000) / 10;
+
+    // Sin poblacion declarada no se puede dar un porcentaje de cobertura, y
+    // inventarlo seria peor que omitirlo.
+    const cobertura = empresa.poblacion > 0
+      ? `, lo que representa el ${empresa.cobertura}% del total de la población objetivo de ${empresa.poblacion.toLocaleString('es-CO')} colaboradores`
+      : '. No se ha registrado el total de colaboradores de la organización, así que no es posible calcular qué parte de la población representa';
+
+    const mayoria = hombres === mujeres
+      ? 'un reparto equilibrado entre hombres y mujeres'
+      : hombres > mujeres
+        ? `una predominancia masculina con ${hombres} hombres (${pctH}%) frente a ${mujeres} mujeres (${pctM}%)`
+        : `una predominancia femenina con ${mujeres} mujeres (${pctM}%) frente a ${hombres} hombres (${pctH}%)`;
+
+    return `La encuesta de percepción del riesgo vial y movilidad fue diligenciada por los `
+      + `trabajadores directos de ${nombre}. La muestra obtenida fue de ${muestra} personas`
+      + `${cobertura}.` + '\n\n'
+      + `En la distribución por género se observa ${mayoria} de los ${muestra} encuestados.`;
   }
 
   /** Una sección por cada módulo de la encuesta que la empresa activó. */

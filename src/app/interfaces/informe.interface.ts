@@ -57,6 +57,19 @@ export namespace ModelsInforme {
     filas: string[][];
   }
 
+  /**
+   * Una cifra que va suelta y grande, con su icono.
+   *
+   * Para lo que se mira de un vistazo y no admite comparacion en barras: el
+   * reparto por genero de la poblacion encuestada, por ejemplo.
+   */
+  export interface Destacado {
+    etiqueta: string;
+    valor: number;
+    porcentaje: number;
+    icono: string;
+  }
+
   export interface Seccion {
     id: string;
     titulo: string;
@@ -89,6 +102,8 @@ export namespace ModelsInforme {
     sedes?: FichaSede[];
     /** Listados que acompañan a las cifras. */
     tablas?: Tabla[];
+    /** Cifras sueltas y grandes, centradas, con icono. */
+    destacados?: Destacado[];
   }
 
   /**
