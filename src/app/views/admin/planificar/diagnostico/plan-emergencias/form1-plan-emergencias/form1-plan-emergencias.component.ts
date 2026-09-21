@@ -4,6 +4,8 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { AuthenticacionService } from '../../../../../../services/shared/authenticacion.service';
 import { FirestoreService } from '../../../../../../services/shared/firestore.service';
 import { AlertaService } from '../../../../../../services/shared/alerta.service';
+import { DiagnosticoDatosService } from '../../../../../../services/shared/diagnostico-datos.service';
+import { TIPOS_EMERGENCIA, TIPO_EMERGENCIA_OTRO } from '../../../../../../data/emergencias';
 
 @Component({
   selector: 'app-form1-plan-emergencias',
@@ -20,6 +22,13 @@ export class Form1PlanEmergenciasComponent {
 
   mostrarModal = signal<boolean>(false);
   planForm: FormGroup;
+
+  private _datos = inject(DiagnosticoDatosService);
+
+  /** Vienen del archivo compartido para que la cobertura del tablero y
+   *  las opciones del formulario no puedan discrepar. */
+  readonly tipos = TIPOS_EMERGENCIA;
+  readonly tipoOtro = TIPO_EMERGENCIA_OTRO;
 
   modo: 'crear' | 'editar' = 'crear';
   datosEdicion: any = null;
@@ -58,9 +67,8 @@ export class Form1PlanEmergenciasComponent {
       this._alerta.showWarning('Por favor, completa el formulario correctamente.');
       return;
     }
-    const nit = this._auth.getCurrentUser().displayName;
     const periodo = this._auth.periodo();
-    const path = `Empresas/${nit}/periodos/${periodo}/006-diagnostico-plan-emergencias`;
+    const path = this._datos.ruta('plan-emergencias');
     try {
       if (this.modo === 'editar') {
         await this._firestore.updateDocument(`${path}/${this.datosEdicion.id}`, this.planForm.value);

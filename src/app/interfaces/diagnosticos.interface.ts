@@ -208,6 +208,35 @@ export namespace ModelDiagnosticos {
         observaciones?: string;
     }
 
+    /**
+     * Plan de respuesta ante un escenario de emergencia vial.
+     *
+     * Uno por escenario: accidente, falla mecanica, derrame... La cobertura
+     * del diagnostico se mide por cuantos escenarios tienen plan, no por
+     * cuantos planes hay.
+     */
+    export interface PlanEmergencia {
+        id: string;
+        estado: string;
+        docCreado?: unknown;
+        periodo?: number;
+
+        nombrePlan: string;
+        tipoEmergencia: string;
+        descripcion: string;
+        /** Los pasos a seguir: el corazon del plan. */
+        protocoloAccion?: string;
+        responsable?: string;
+        telefonoEmergencia?: string;
+
+        fechaElaboracion?: string;
+        /**
+         * Fecha limite para volver a revisarlo, no la ultima revision hecha.
+         * Un plan con la revision vencida deja de valer en una auditoria.
+         */
+        fechaRevision?: string;
+    }
+
     export interface encuestaParametros{
 
         docCreado: Date;

@@ -5,7 +5,9 @@ import { FormsModule } from '@angular/forms';
 import { AgGridModule } from 'ag-grid-angular';
 import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { Form1PlanEmergenciasComponent } from './form1-plan-emergencias/form1-plan-emergencias.component';
-import { AuthenticacionService } from '../../../../../services/shared/authenticacion.service';
+import { DiagnosticoDatosService } from '../../../../../services/shared/diagnostico-datos.service';
+import { Models } from '../../../../../interfaces/models';
+import { celdaVigencia } from '../../../../../data/vigencias';
 import { FirestoreService } from '../../../../../services/shared/firestore.service';
 import { AlertaService } from '../../../../../services/shared/alerta.service';
 
@@ -20,7 +22,7 @@ import { AlertaService } from '../../../../../services/shared/alerta.service';
 export class PlanEmergenciasComponent implements OnInit, OnChanges {
 
   private _firestore = inject(FirestoreService);
-  private _auth = inject(AuthenticacionService);
+  private _datos = inject(DiagnosticoDatosService);
   private _alerta = inject(AlertaService);
 
   modalFormulario = viewChild.required<Form1PlanEmergenciasComponent>('modalFormulario');
@@ -30,7 +32,7 @@ export class PlanEmergenciasComponent implements OnInit, OnChanges {
   searchText = '';
   activeFilter = 'Todos';
 
-  planAEliminar: any | null = null;
+  planAEliminar: Models.Diagnostico.PlanEmergencia | null = null;
   eliminando = false;
 
   filterButtons = [
@@ -40,7 +42,7 @@ export class PlanEmergenciasComponent implements OnInit, OnChanges {
     { label: 'Emergencia médica',        value: 'Emergencia médica' },
   ];
 
-  @Input() datos: any[] = [];
+  @Input() datos: Models.Diagnostico.PlanEmergencia[] = [];
   filteredData: any[] = [];
 
   columnDefs: ColDef[] = [
@@ -82,9 +84,20 @@ export class PlanEmergenciasComponent implements OnInit, OnChanges {
       headerName: 'Descripción', field: 'descripcion', width: 260,
       cellRenderer: (params: any) => `<span class="text-xs text-gray-500">${textoSeguro(params.value, '—')}</span>`
     },
+    {
+      headerName: 'Protocolo', field: 'protocoloAccion', width: 260,
+      cellRenderer: (params: any) => params.value
+        ? `<span class="text-xs text-gray-600" title="${textoSeguro(params.value)}">${textoSeguro(String(params.value).slice(0, 90))}${String(params.value).length > 90 ? '…' : ''}</span>`
+        : `<span class="text-xs text-red-400">Sin definir</span>`,
+    },
     { headerName: 'Tel. emergencia', field: 'telefonoEmergencia', width: 130 },
     { headerName: 'Elaborado',       field: 'fechaElaboracion',   width: 120 },
-    { headerName: 'Revisión',        field: 'fechaRevision',      width: 120 },
+    {
+      headerName: 'Próxima revisión', field: 'fechaRevision', width: 150,
+      cellRenderer: (params: any) => celdaVigencia(params.value, {
+        vencido: 'Sin revisar hace', porVencer: 'Revisar en', vigente: 'Al día',
+      }),
+    },
   ];
 
   defaultColDef: ColDef = { sortable: true, resizable: true };
@@ -131,11 +144,9 @@ export class PlanEmergenciasComponent implements OnInit, OnChanges {
   async confirmarEliminar() {
     if (!this.planAEliminar?.id) return;
     this.eliminando = true;
-    const nit = this._auth.getCurrentUser().displayName;
-    const periodo = this._auth.periodo();
     try {
       await this._firestore.updateDocument(
-        `Empresas/${nit}/periodos/${periodo}/006-diagnostico-plan-emergencias/${this.planAEliminar.id}`,
+        `${this._datos.ruta('plan-emergencias')}/${this.planAEliminar.id}`,
         { estado: 'NoActivo' }
       );
       this._alerta.showSuccess('Plan eliminado exitosamente.');

@@ -9,11 +9,9 @@ import { Form2VehiculosComponent } from './form2-vehiculos/form2-vehiculos.compo
 import { Form3VehiculosComponent } from './form3-vehiculos/form3-vehiculos.component';
 import { DiagnosticoDatosService } from '../../../../../services/shared/diagnostico-datos.service';
 import { Models } from '../../../../../interfaces/models';
+import { celdaVigencia, estadoVigencia } from '../../../../../data/vigencias';
 import { FirestoreService } from '../../../../../services/shared/firestore.service';
 import { AlertaService } from '../../../../../services/shared/alerta.service';
-
-/** Con cuantos dias de antelacion se avisa de una vigencia proxima. */
-const DIAS_AVISO = 30;
 
 @Component({
   selector: 'app-vehiculos',
@@ -81,7 +79,7 @@ export class VehiculosComponent implements OnInit, OnChanges {
       cellRenderer: (params: any) => {
         // Antes el semaforo solo miraba si el campo estaba relleno, asi que
         // un SOAT caducado en 2023 salia en verde.
-        const doc = this.vigencia(params.data.vigenciaSoat);
+        const doc = estadoVigencia(params.data.vigenciaSoat);
         const tieneDoc = doc.estado === 'vigente' ? '🟢'
           : doc.estado === 'porVencer' ? '🟡' : '🔴';
         const tieneOp  = params.data.promedioKmMes != null && params.data.promedioKmMes !== '' ? '🟢' : '🔴';
@@ -123,59 +121,15 @@ export class VehiculosComponent implements OnInit, OnChanges {
     },
     {
       headerName: 'SOAT',         field: 'vigenciaSoat',     width: 150,
-      cellRenderer: (params: any) => this.pintarVigencia(params.value),
+      cellRenderer: (params: any) => celdaVigencia(params.value),
     },
     {
       headerName: 'Rev. técnica', field: 'vigenciaRevisionTecnica', width: 150,
-      cellRenderer: (params: any) => this.pintarVigencia(params.value),
+      cellRenderer: (params: any) => celdaVigencia(params.value),
     },
   ];
 
 
-  /**
-   * En que situacion esta una vigencia.
-   *
-   * Un SOAT o una revision tecnica caducados dejan al vehiculo sin poder
-   * circular, asi que es un hallazgo del diagnostico y no un dato mas. Se
-   * avisa tambien de lo que esta por vencer, que es cuando todavia se puede
-   * hacer algo.
-   *
-   * Las fechas se guardan como texto AAAA-MM-DD, que se compara tal cual.
-   */
-  vigencia(fecha: string | undefined): { estado: 'sinRegistrar' | 'vencido' | 'porVencer' | 'vigente'; dias: number } {
-    if (!fecha) return { estado: 'sinRegistrar', dias: 0 };
-
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
-    const limite = new Date(fecha + 'T00:00:00');
-    if (isNaN(limite.getTime())) return { estado: 'sinRegistrar', dias: 0 };
-
-    const dias = Math.round((limite.getTime() - hoy.getTime()) / 86400000);
-    if (dias < 0) return { estado: 'vencido', dias };
-    if (dias <= DIAS_AVISO) return { estado: 'porVencer', dias };
-    return { estado: 'vigente', dias };
-  }
-
-  /** La celda de una vigencia: la fecha y en que situacion esta. */
-  private pintarVigencia(fecha: string | undefined): string {
-    const { estado, dias } = this.vigencia(fecha);
-
-    if (estado === 'sinRegistrar') {
-      return `<span class="text-xs text-gray-300">Sin registrar</span>`;
-    }
-
-    const aspecto = {
-      vencido:   ['bg-red-100 text-red-700', `Vencido hace ${Math.abs(dias)} d.`],
-      porVencer: ['bg-amber-100 text-amber-800', `Vence en ${dias} d.`],
-      vigente:   ['bg-green-100 text-green-700', 'Vigente'],
-    }[estado];
-
-    return `
-      <div class="leading-tight">
-        <div class="text-xs text-gray-700">${textoSeguro(fecha)}</div>
-        <span class="inline-block rounded px-1 text-[10px] font-medium ${aspecto[0]}">${aspecto[1]}</span>
-      </div>`;
-  }
 
   defaultColDef: ColDef = { sortable: true, resizable: true };
 

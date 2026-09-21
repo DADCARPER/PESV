@@ -29,6 +29,7 @@ import { FirestoreService } from '../../../../services/shared/firestore.service'
 import { AlertaService } from '../../../../services/shared/alerta.service';
 import { EncuestaEmpresaService } from '../../../../services/shared/encuesta-empresa.service';
 import { kilometrosAlMes } from '../../../../data/rutas';
+import { TIPOS_EMERGENCIA } from '../../../../data/emergencias';
 import {
   DiagnosticoDatosService, ListaDiagnostico, ResumenDiagnostico, SeccionDiagnostico,
 } from '../../../../services/shared/diagnostico-datos.service';
@@ -213,6 +214,30 @@ export class DiagnosticoComponent implements OnInit {
   get kmAlMes(): number {
     return this.listas['rutas'].datos()
       .reduce((total, r) => total + (kilometrosAlMes(r.distanciaKm, r.frecuencia) ?? 0), 0);
+  }
+
+  /**
+   * Escenarios de emergencia que ya tienen plan.
+   *
+   * La cobertura no se mide por cuantos planes hay sino por cuantos
+   * escenarios estan cubiertos: una empresa puede tener tres planes y creer
+   * que va bien mientras le faltan cuatro situaciones por prever.
+   */
+  get escenariosCubiertos(): number {
+    const cubiertos = new Set(
+      this.listas['plan-emergencias'].datos().map(p => p.tipoEmergencia)
+    );
+    return TIPOS_EMERGENCIA.filter(t => cubiertos.has(t)).length;
+  }
+
+  get escenariosTotales(): number { return TIPOS_EMERGENCIA.length; }
+
+  /** Los que faltan, para poder nombrarlos en vez de solo contarlos. */
+  get escenariosPendientes(): string {
+    const cubiertos = new Set(
+      this.listas['plan-emergencias'].datos().map(p => p.tipoEmergencia)
+    );
+    return TIPOS_EMERGENCIA.filter(t => !cubiertos.has(t)).join(', ');
   }
 
   /** Rutas ocasionales o sin distancia, que no entran en la suma. */
