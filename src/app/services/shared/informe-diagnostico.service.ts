@@ -36,6 +36,9 @@ export class InformeDiagnosticoService {
   async reunir(): Promise<ModelsInforme.Datos> {
     const periodo = this._auth.periodo();
 
+    // La actividad economica vive en Empresas/{nit}: hay que tenerla leida.
+    await this._empresa.cargar();
+
     const [base, sedes, servicios, contratistas, vehiculos, rutas, planes, respuestas, encuesta] =
       await Promise.all([
         this._datos.diagnosticoBase(),
@@ -63,7 +66,11 @@ export class InformeDiagnosticoService {
         encuesta: encuesta ? `${encuesta.nombre} (v${encuesta.version})` : 'Sin encuesta activa',
       },
       secciones: [
-        this.organizacion(sedes, servicios),
+        this.organizacion(sedes, servicios, {
+          nit: this._empresa.nit(),
+          nombre: this._empresa.nombre(),
+          actividad: this._empresa.datos()?.actividadEmpresa ?? '',
+        }),
         this.personas(respuestas, encuesta),
         ...this.modulosEncuesta(respuestas, encuesta),
         this.flota(vehiculos),
@@ -78,7 +85,8 @@ export class InformeDiagnosticoService {
 
   private organizacion(
     sedes: Models.Diagnostico.Sedes[],
-    servicios: Models.Diagnostico.Servicio[]
+    servicios: Models.Diagnostico.Servicio[],
+    empresa: { nit: string; nombre: string; actividad: string }
   ): ModelsInforme.Seccion {
     const departamentos = new Set(sedes.map(s => s.departamento).filter(Boolean));
     const empleadosEnSedes = sedes.reduce((n, s) => n + (Number(s.totalempleados) || 0), 0);
@@ -88,6 +96,27 @@ export class InformeDiagnosticoService {
       titulo: 'La organización',
       texto: '',
       sinDatos: !sedes.length && !servicios.length,
+
+      // Quien es la empresa: lo primero que tiene que decir un informe.
+      identificacion: [
+        { etiqueta: 'Razón social', valor: empresa.nombre || 'Sin registrar' },
+        { etiqueta: 'NIT', valor: empresa.nit },
+        { etiqueta: 'Actividad económica', valor: empresa.actividad || 'Sin registrar' },
+      ],
+
+      // Una ficha por sede: el informe necesita nombrarlas y situarlas, no
+      // solo contarlas.
+      sedes: sedes.map(s => ({
+        nombre: s.nombreSede ?? '',
+        tipo: s.tiposede ?? '',
+        direccion: s.direccion ?? '',
+        ciudad: s.ciudad ?? '',
+        departamento: s.departamento ?? '',
+        responsable: s.responsable ?? '',
+        telefono: s.telefono ?? '',
+        empleados: Number(s.totalempleados) || 0,
+        fotoUrl: s.fotoUrl ?? '',
+      })),
       cifras: [
         { etiqueta: 'Sedes', valor: sedes.length },
         { etiqueta: 'Departamentos', valor: departamentos.size },

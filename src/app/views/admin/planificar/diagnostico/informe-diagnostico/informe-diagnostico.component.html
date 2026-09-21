@@ -95,6 +95,17 @@
               }
             </div>
 
+            @if (seccion.identificacion?.length) {
+              <div class="mb-4 grid gap-3 sm:grid-cols-3">
+                @for (dato of seccion.identificacion; track dato.etiqueta) {
+                  <div class="rounded-lg border border-gray-100 bg-gray-50 p-3">
+                    <p class="text-xs uppercase tracking-wide text-gray-500">{{ dato.etiqueta }}</p>
+                    <p class="mt-0.5 font-semibold text-gray-900">{{ dato.valor }}</p>
+                  </div>
+                }
+              </div>
+            }
+
             @if (seccion.cifras.length) {
               <div class="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 @for (cifra of seccion.cifras; track cifra.etiqueta) {
@@ -109,6 +120,33 @@
                     }
                   </div>
                 }
+              </div>
+            }
+
+            @if (seccion.sedes?.length) {
+              <div class="mb-4">
+                <p class="mb-2 text-sm font-semibold text-gray-700">Sedes</p>
+                <div class="grid gap-3 sm:grid-cols-2">
+                  @for (sede of seccion.sedes; track sede.nombre) {
+                    <div class="flex gap-3 rounded-lg border border-gray-100 p-3">
+                      @if (sede.fotoUrl) {
+                        <img [src]="sede.fotoUrl" [alt]="'Fotografía de ' + sede.nombre"
+                          class="h-20 w-28 shrink-0 rounded-md border border-gray-200 object-cover">
+                      } @else {
+                        <div class="flex h-20 w-28 shrink-0 items-center justify-center rounded-md border border-dashed border-gray-200 text-xs text-gray-400">
+                          Sin foto
+                        </div>
+                      }
+                      <div class="min-w-0">
+                        <p class="truncate font-semibold text-gray-900">{{ sede.nombre }}</p>
+                        <p class="text-xs text-gray-500">{{ sede.tipo }}</p>
+                        <p class="mt-1 text-xs text-gray-600">{{ sede.direccion || 'Sin dirección' }}</p>
+                        <p class="text-xs text-gray-500">{{ sede.ciudad }}{{ sede.ciudad && sede.departamento ? ', ' : '' }}{{ sede.departamento }}</p>
+                        <p class="mt-1 text-xs text-gray-400">{{ sede.empleados }} empleados · {{ sede.responsable || 'Sin responsable' }}</p>
+                      </div>
+                    </div>
+                  }
+                </div>
               </div>
             }
 

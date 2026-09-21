@@ -4,6 +4,8 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators} from '@angular
 import { AlertaService } from '../../../../../../services/shared/alerta.service';
 import { FirestoreService } from '../../../../../../services/shared/firestore.service';
 import { AuthenticacionService } from '../../../../../../services/shared/authenticacion.service';
+import { StorageService } from '../../../../../../services/shared/storage.service';
+import { DiagnosticoDatosService } from '../../../../../../services/shared/diagnostico-datos.service';
 import { AlertaInformativoComponent } from "../../../../../../components/alertas/alerta-informativo/alerta-informativo.component";
 
 
@@ -27,6 +29,60 @@ export class Form1SedesComponent {
 
   modo : 'crear' | 'editar';
   datosEdicion: any = null;
+
+  private _storage = inject(StorageService);
+  private _datos = inject(DiagnosticoDatosService);
+
+  /**
+   * Fotografia de la sede.
+   *
+   * Se guarda al vuelo en cuanto se elige, no al enviar el formulario:
+   * subir un archivo tarda, y hacerlo dentro del guardado dejaria al
+   * usuario esperando sin saber por que.
+   */
+  fotoUrl = signal<string>('');
+  fotoRuta = signal<string>('');
+  subiendoFoto = signal(false);
+  progresoFoto = signal(0);
+
+  async alElegirFoto(evento: Event) {
+    const archivo = (evento.target as HTMLInputElement).files?.[0];
+    if (!archivo) return;
+
+    if (!archivo.type.startsWith('image/')) {
+      this._alerta.showWarning('El archivo tiene que ser una imagen.');
+      return;
+    }
+    // Las reglas de Storage rechazan por encima de 20 MB: mejor decirlo
+    // aqui que dejar que falle la subida sin explicacion.
+    if (archivo.size > 20 * 1024 * 1024) {
+      this._alerta.showWarning('La imagen no puede pesar mas de 20 MB.');
+      return;
+    }
+
+    this.subiendoFoto.set(true);
+    this.progresoFoto.set(0);
+    try {
+      // El nombre lleva la hora para no pisar la anterior y para que el
+      // navegador no sirva la vieja desde su cache.
+      const ruta = `${this._datos.ruta('sedes')}/fotos/${Date.now()}_${archivo.name}`;
+      const url = await this._storage.uploadFileProgreso(
+        ruta, archivo, (p) => this.progresoFoto.set(Math.round(p))
+      );
+      this.fotoUrl.set(url);
+      this.fotoRuta.set(ruta);
+    } catch (error: unknown) {
+      console.error('[Form1Sedes] subir foto:', error);
+      this._alerta.showError('No se pudo subir la imagen.');
+    } finally {
+      this.subiendoFoto.set(false);
+    }
+  }
+
+  quitarFoto() {
+    this.fotoUrl.set('');
+    this.fotoRuta.set('');
+  }
 
 
   constructor(private fb: FormBuilder){
@@ -53,17 +109,23 @@ export class Form1SedesComponent {
   // Método para cerrar el modal
   cerrarModal() {
     this.agregarsedeForm.reset();
+    this.quitarFoto();
     this.mostrarModal.set(false);
-    
   }
 
   // Método para abrir el modal
   abrirModal(modo:any, datosEditar?:{}) { // crear o editar
     this.mostrarModal.set(true);
-    this.modo = modo; // cuando se abre el modal se le informa en que modo se va a ejecutar 
+    this.modo = modo; // cuando se abre el modal se le informa en que modo se va a ejecutar
+    this.quitarFoto();
     if (modo === 'editar') {
       this.datosEdicion = datosEditar;
       this.cargarDatos();
+
+      // La foto no va en el formulario, asi que patchValue no la recupera.
+      const previa = datosEditar as { fotoUrl?: string; fotoRuta?: string };
+      this.fotoUrl.set(previa?.fotoUrl ?? '');
+      this.fotoRuta.set(previa?.fotoRuta ?? '');
     }
 
   }
@@ -73,14 +135,16 @@ export class Form1SedesComponent {
     console.log('Todooooooo--->', this.agregarsedeForm.value)
     if (this.agregarsedeForm.valid) {
       //console.log('Formulario inválido', this.agregarsedeForm.value);   
-      const uid = this._authcations.getCurrentUser().uid;
-      const nit = this._authcations.getCurrentUser().displayName;
-
-      const periodo = this._authcations.periodo();
+      const path = this._datos.ruta('sedes');
+      const datos = {
+        ...this.agregarsedeForm.value,
+        fotoUrl: this.fotoUrl(),
+        fotoRuta: this.fotoRuta(),
+      };
 
       if (this.modo === 'editar') {
         try {
-          await this._firestore.updateDocument(`Empresas/${nit}/periodos/${periodo}/006-diagnostico-sedes/${this.datosEdicion.id}`, this.agregarsedeForm.value);
+          await this._firestore.updateDocument(`${path}/${this.datosEdicion.id}`, datos);
           this._alerta.showSuccess('Sede actualizada exitosamente.');
           this.cerrarModal();
         } catch (error: unknown) {
@@ -92,7 +156,7 @@ export class Form1SedesComponent {
 
       if (this.modo === 'crear') {
         try {
-          await this._firestore.createDocument(`Empresas/${nit}/periodos/${periodo}/006-diagnostico-sedes`, this.agregarsedeForm.value);
+          await this._firestore.createDocument(path, datos);
           this._alerta.showSuccess('Sede creada exitosamente.');
           this.cerrarModal();
         } catch (error: unknown) {

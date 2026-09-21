@@ -27,6 +27,24 @@ export namespace ModelsInforme {
     filas: { etiqueta: string; total: number; porcentaje: number }[];
   }
 
+  /**
+   * Una sede tal como sale en el informe.
+   *
+   * Va aparte de las cifras porque no es un numero: el informe necesita
+   * nombrarlas, decir donde estan y, si la hay, ensenar su fotografia.
+   */
+  export interface FichaSede {
+    nombre: string;
+    tipo: string;
+    direccion: string;
+    ciudad: string;
+    departamento: string;
+    responsable: string;
+    telefono: string;
+    empleados: number;
+    fotoUrl?: string;
+  }
+
   export interface Seccion {
     id: string;
     titulo: string;
@@ -36,6 +54,10 @@ export namespace ModelsInforme {
     repartos: Reparto[];
     /** Vacía cuando la sección no tiene datos que mostrar. */
     sinDatos?: boolean;
+    /** Datos de identificación, cuando la sección los lleva. */
+    identificacion?: { etiqueta: string; valor: string }[];
+    /** Solo la sección de organización: una ficha por sede. */
+    sedes?: FichaSede[];
   }
 
   /**

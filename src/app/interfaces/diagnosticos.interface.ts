@@ -14,23 +14,43 @@ export namespace ModelDiagnosticos {
     }
 
 
+    /**
+     * Sede de la organizacion.
+     *
+     * La version anterior de esta interfaz no incluia `direccion`, que el
+     * formulario si guardaba desde hace tiempo: otro desfase silencioso entre
+     * lo que se escribe y lo que se declara.
+     */
     export interface Sedes{
         id?: string;               // Opcional, porque normalmente lo genera Firebase
+        estado : string;
+        docCreado : string;
+        docActualizado?: string;
+
+        nombreSede : string;
+        tiposede: string;
+        direccion?: string;
         ciudad : string;
         departamento : string;
-        docCreado : string;
-        estado : string;
-        nombreSede : string;
+
         telefono : string;
-        docActualizado: string;
-        cargoresponsable: string;
         email: string;
         responsable: string;
-        tiposede: string;
-        totalasignados: number;
-        totalconductores: number;
+        cargoresponsable: string;
+
         totalempleados: number;
+        totalconductores: number;
+        totalasignados: number;
         totaloperacion: number;
+
+        /**
+         * Fotografia de la sede, para el informe.
+         *
+         * Se guarda la URL de descarga y la ruta en Storage: la URL sirve para
+         * pintarla, y la ruta para poder reemplazarla o borrarla despues.
+         */
+        fotoUrl?: string;
+        fotoRuta?: string;
     }
 
     export interface Servicio {
