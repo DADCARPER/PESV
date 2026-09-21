@@ -96,14 +96,28 @@
             </div>
 
             @if (seccion.identificacion?.length) {
-              <div class="mb-4 grid gap-3 sm:grid-cols-3">
+              <!-- Los cortos en rejilla; los largos debajo, a ancho completo.
+                   Un texto de varias lineas dentro de una tarjeta estira la
+                   fila y descuadra las de al lado. -->
+              <div class="mb-3 grid gap-3 sm:grid-cols-3">
                 @for (dato of seccion.identificacion; track dato.etiqueta) {
-                  <div class="rounded-lg border border-gray-100 bg-gray-50 p-3">
-                    <p class="text-xs uppercase tracking-wide text-gray-500">{{ dato.etiqueta }}</p>
-                    <p class="mt-0.5 font-semibold text-gray-900">{{ dato.valor }}</p>
-                  </div>
+                  @if (!dato.largo) {
+                    <div class="rounded-lg border border-gray-100 bg-gray-50 p-3">
+                      <p class="text-xs uppercase tracking-wide text-gray-500">{{ dato.etiqueta }}</p>
+                      <p class="mt-0.5 font-semibold text-gray-900">{{ dato.valor }}</p>
+                    </div>
+                  }
                 }
               </div>
+
+              @for (dato of seccion.identificacion; track dato.etiqueta) {
+                @if (dato.largo) {
+                  <div class="mb-4 rounded-lg border border-gray-100 bg-gray-50 p-3">
+                    <p class="text-xs uppercase tracking-wide text-gray-500">{{ dato.etiqueta }}</p>
+                    <p class="mt-1 whitespace-pre-line text-sm leading-relaxed text-gray-800">{{ dato.valor }}</p>
+                  </div>
+                }
+              }
             }
 
             @if (seccion.cifras.length) {

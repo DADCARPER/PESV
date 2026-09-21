@@ -101,7 +101,7 @@ export class InformeDiagnosticoService {
       identificacion: [
         { etiqueta: 'Razón social', valor: empresa.nombre || 'Sin registrar' },
         { etiqueta: 'NIT', valor: empresa.nit },
-        { etiqueta: 'Actividad económica', valor: empresa.actividad || 'Sin registrar' },
+        { etiqueta: 'Actividad económica', valor: empresa.actividad || 'Sin registrar', largo: true },
       ],
 
       // Una ficha por sede: el informe necesita nombrarlas y situarlas, no
@@ -137,36 +137,7 @@ export class InformeDiagnosticoService {
         ]),
       }],
 
-      repartos: [this.controlesDeServicio(servicios)],
-    };
-  }
-
-  /**
-   * Qué controles tienen los servicios contratados.
-   *
-   * No se veía en ninguna parte del informe, y es de lo que más mira una
-   * auditoría: un servicio de transporte sin seguimiento ni seguro es una
-   * exposición, no un dato administrativo.
-   */
-  private controlesDeServicio(
-    servicios: Models.Diagnostico.Servicio[]
-  ): ModelsInforme.Reparto {
-    const controles: [string, keyof Models.Diagnostico.Servicio][] = [
-      ['Seguimiento GPS', 'gps'],
-      ['Conductores certificados', 'conductores'],
-      ['Seguro de carga o pasajeros', 'seguro'],
-      ['Mantenimiento incluido', 'mantenimiento'],
-      ['Monitoreo 24/7', 'monitoreo'],
-      ['Soporte 24/7', 'soporte'],
-    ];
-
-    const base = servicios.length || 1;
-    return {
-      titulo: 'Controles de los servicios',
-      filas: controles.map(([etiqueta, campo]) => {
-        const total = servicios.filter(s => s[campo] === true).length;
-        return { etiqueta, total, porcentaje: Math.round((total / base) * 1000) / 10 };
-      }),
+      repartos: [],
     };
   }
 

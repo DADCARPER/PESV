@@ -66,8 +66,14 @@ export namespace ModelsInforme {
     repartos: Reparto[];
     /** Vacía cuando la sección no tiene datos que mostrar. */
     sinDatos?: boolean;
-    /** Datos de identificación, cuando la sección los lleva. */
-    identificacion?: { etiqueta: string; valor: string }[];
+    /**
+     * Datos de identificación, cuando la sección los lleva.
+     *
+     * `largo` marca los que traen texto de varias líneas: van a ancho completo
+     * y como párrafo, porque metidos en una rejilla de tarjetas estiran la
+     * fila y descuadran el resto.
+     */
+    identificacion?: { etiqueta: string; valor: string; largo?: boolean }[];
     /** Solo la sección de organización: una ficha por sede. */
     sedes?: FichaSede[];
     /** Listados que acompañan a las cifras. */
