@@ -117,6 +117,49 @@ export namespace ModelDiagnosticos {
     }
       
 
+    /**
+     * Vehiculo de la flota.
+     *
+     * Se llena en tres pasos y los tres escriben en el mismo documento:
+     * identificacion, documentacion legal y datos de operacion. Por eso casi
+     * todo es opcional salvo lo que pide el primero: un vehiculo puede estar
+     * registrado sin que nadie haya cargado todavia su SOAT.
+     *
+     * Las fechas se guardan como texto `AAAA-MM-DD`, que es lo que entrega un
+     * `input type="date"`. Asi se comparan y se ordenan igual de bien.
+     */
+    export interface Vehiculo {
+        id: string;
+        estado: string;
+        docCreado?: unknown;
+
+        // Identificacion
+        tipoVehiculo: string;
+        placa: string;
+        vin?: string;
+        numeroMotor?: string;
+        fechaFabricacion?: string;
+        kilometrajeActual?: number;
+        marca?: string;
+        modelo?: string;
+        /** Propio, en arriendo, de un tercero. */
+        tipoRelacion?: string;
+
+        // Documentacion legal
+        vigenciaSoat?: string;
+        vigenciaRevisionTecnica?: string;
+        entidadAseguradora?: string;
+
+        // Operacion
+        promedioKmMes?: number;
+        tienePlanMantenimiento?: string;
+        frecuenciaMantenimiento?: string;
+        fechaUltimoMantenimiento?: string;
+        tieneSiniestros?: string;
+        numeroSiniestros?: number;
+        observaciones?: string;
+    }
+
     export interface encuestaParametros{
 
         docCreado: Date;
