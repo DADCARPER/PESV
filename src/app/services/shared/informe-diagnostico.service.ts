@@ -97,6 +97,7 @@ export class InformeDiagnosticoService {
         encuesta: encuesta ? `${encuesta.nombre} (v${encuesta.version})` : 'Sin encuesta activa',
       },
       secciones: [
+        this.introduccion(this._empresa.nombre()),
         this.organizacion(sedes, servicios, {
           nit: this._empresa.nit(),
           nombre: this._empresa.nombre(),
@@ -187,6 +188,69 @@ export class InformeDiagnosticoService {
   }
 
   // ── Secciones ─────────────────────────────────────────────────────────────
+
+  /**
+   * La introduccion: por que existe este documento, antes de dar una cifra.
+   *
+   * Es la unica seccion que no sale de los datos de la empresa. Situa el
+   * diagnostico en el problema que viene a atender, que es lo que un lector
+   * externo necesita antes de que le pongan delante repartos por escolaridad.
+   *
+   * El texto se propone entero y se edita como el resto. Va con las fuentes
+   * citadas a proposito: una cifra sin fuente en un documento que se presenta
+   * a una autoridad es una afirmacion que alguien puede pedir que se sustente,
+   * y quien emite tiene que poder actualizarla cuando la fuente cambie.
+   */
+  private introduccion(nombreEmpresa: string): ModelsInforme.Seccion {
+    const empresa = nombreEmpresa || 'la organización';
+
+    return {
+      id: 'introduccion',
+      titulo: 'Introducción',
+      texto: [
+        'La seguridad vial se ha convertido en un problema crítico a nivel mundial, '
+        + 'tanto por sus consecuencias humanas como por su impacto económico y social. '
+        + 'Según el informe sobre la situación mundial de la seguridad vial de la '
+        + 'Organización Mundial de la Salud (2023), cerca de 1,19 millones de personas '
+        + 'mueren cada año en siniestros de tránsito, lo que equivale a una vida perdida '
+        + 'cada dos minutos. Entre 20 y 50 millones de personas más sufren traumatismos '
+        + 'no mortales, muchos de los cuales derivan en discapacidades permanentes.',
+
+        'En la región de las Américas la situación no es menos alarmante: alrededor de '
+        + '110.000 personas fallecen cada año y más de cinco millones resultan heridas '
+        + 'en siniestros viales. Los costos económicos y sociales que se derivan de '
+        + 'ellos representan en promedio el 3% del producto interno bruto de los países, '
+        + 'y en América Latina pueden situarse entre el 2% y el 6%. Los siniestros de '
+        + 'tránsito son hoy la principal causa de muerte entre los niños de 5 a 14 años '
+        + 'de la región, lo que da la medida de la urgencia.',
+
+        'En Colombia, la Resolución 40595 de 2022 del Ministerio de Transporte adoptó la '
+        + 'metodología para el diseño, implementación y verificación de los Planes '
+        + 'Estratégicos de Seguridad Vial, y estableció los pasos que toda organización '
+        + 'obligada debe cumplir. El presente documento corresponde al diagnóstico, que '
+        + 'es el primero de ellos: sin saber dónde está el riesgo no se puede decidir '
+        + 'dónde intervenir.',
+
+        `El objetivo del Plan Estratégico de Seguridad Vial de ${empresa} es reducir de `
+        + 'forma significativa los siniestros de tránsito que afecten a sus '
+        + 'trabajadores, tanto en los desplazamientos que realizan por encargo de la '
+        + 'organización (en misión) como en los trayectos entre su vivienda y su lugar '
+        + 'de trabajo (in itinere). Como resultado directo se espera una disminución de '
+        + 'las personas lesionadas y de las ausencias laborales asociadas, lo que '
+        + 'contribuye al bienestar del personal y a la continuidad de la operación.',
+
+        'Como parte de este diagnóstico se aplicó una encuesta de percepción del riesgo '
+        + `vial a los trabajadores de ${empresa}. Su propósito es conocer cómo perciben `
+        + 'la seguridad vial quienes se exponen a ella todos los días y recoger la '
+        + 'información que permita definir acciones concretas para cada actor vial de la '
+        + 'organización. Los resultados de esa encuesta, junto con el inventario de '
+        + 'sedes, flota, contratistas, rutas y planes de emergencia, componen las '
+        + 'secciones que siguen.',
+      ].join('\n\n'),
+      cifras: [],
+      repartos: [],
+    };
+  }
 
   private organizacion(
     sedes: Models.Diagnostico.Sedes[],

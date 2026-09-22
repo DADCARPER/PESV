@@ -102,7 +102,8 @@
             @if (seccion.texto || !seccion.sinDatos) {
               @if (seccion.texto) {
                 <div class="mb-4">
-                  <textarea [(ngModel)]="seccion.texto" [name]="'texto-' + seccion.id" rows="5"
+                  <textarea [(ngModel)]="seccion.texto" [name]="'texto-' + seccion.id"
+                    [rows]="seccion.id === 'introduccion' ? 16 : 5"
                     class="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm leading-relaxed text-gray-800 focus:border-amber-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-amber-400"></textarea>
                   <p class="mt-1 text-xs text-gray-400">
                     Propuesto por el sistema. Ajústalo antes de emitir.
@@ -588,10 +589,22 @@
 
           @if (seccion.texto) {
             <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">
-              Análisis
+              {{ seccion.id === 'introduccion' ? 'Texto de la introducción' : 'Análisis' }}
             </label>
-            <textarea [(ngModel)]="seccion.texto" [name]="'wiz-texto-' + seccion.id" rows="7"
+            <!-- La introducción son cinco párrafos: con siete filas se edita
+                 a través de una rendija. -->
+            <textarea [(ngModel)]="seccion.texto" [name]="'wiz-texto-' + seccion.id"
+              [rows]="seccion.id === 'introduccion' ? 18 : 7"
               class="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm leading-relaxed text-gray-800 focus:border-amber-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-amber-400"></textarea>
+
+            @if (seccion.id === 'introduccion') {
+              <p class="mt-2 rounded-lg border border-sky-200 bg-sky-50 p-3 text-xs text-sky-800">
+                Este texto es el único del informe que no sale de tus datos. Cita cifras
+                de la Organización Mundial de la Salud y de la Resolución 40595 de 2022:
+                <strong>verifica que sigan siendo las vigentes</strong> antes de emitir, y
+                ajusta el objetivo del plan a lo que tu organización se haya propuesto.
+              </p>
+            }
           }
 
           @if (seccion.recomendaciones) {

@@ -25,6 +25,21 @@ export class InformePdfService {
 
   private static readonly NARANJA = '#f46c2d';
   private static readonly AZUL = '#202e48';
+  private static readonly GRIS = '#e5e7eb';
+
+  /** Ancho útil: la carta menos los dos márgenes laterales. */
+  private static readonly ANCHO = 512;
+
+  /** El filete que separa la cabecera y el pie del cuerpo. */
+  private filete(margen: number[]): any {
+    return {
+      canvas: [{
+        type: 'line', x1: 0, y1: 0, x2: InformePdfService.ANCHO, y2: 0,
+        lineWidth: 0.5, lineColor: InformePdfService.GRIS,
+      }],
+      margin: margen,
+    };
+  }
 
   /** Arma el documento y lo descarga. */
   async descargar(informe: ModelsInforme.Datos & { version?: number }): Promise<void> {
@@ -42,6 +57,9 @@ export class InformePdfService {
     informe: ModelsInforme.Datos & { version?: number; fechaEmision?: string; emitidoPor?: string },
     imagenes: WeakMap<ModelsInforme.Reparto, string>
   ): any {
+    const introduccion = informe.secciones.find(s => s.id === 'introduccion');
+    const resto = informe.secciones.filter(s => s !== introduccion);
+
     return {
       pageSize: 'LETTER',
       pageMargins: [50, 70, 50, 60],
@@ -50,32 +68,47 @@ export class InformePdfService {
         author: informe.nombreEmpresa,
       },
 
+      // La portada va limpia: una cabecera sobre el título del documento
+      // compite con él y no informa de nada que no esté ya debajo.
       header: (pagina: number) => pagina === 1 ? null : ({
         margin: [50, 28, 50, 0],
-        columns: [
-          { text: informe.nombreEmpresa, fontSize: 8, color: '#888' },
+        stack: [
           {
-            text: `Diagnóstico PESV ${informe.periodo}`,
-            fontSize: 8, color: '#888', alignment: 'right',
+            columns: [
+              { text: informe.nombreEmpresa, fontSize: 8, color: '#888' },
+              {
+                text: `Diagnóstico PESV ${informe.periodo}`,
+                fontSize: 8, color: '#888', alignment: 'right',
+              },
+            ],
           },
+          this.filete([0, 5, 0, 0]),
         ],
       }),
 
       footer: (pagina: number, total: number) => ({
-        margin: [50, 10, 50, 0],
-        columns: [
+        margin: [50, 12, 50, 0],
+        stack: [
+          this.filete([0, 0, 0, 5]),
           {
-            text: 'Resolución 40595 de 2022 · Plan Estratégico de Seguridad Vial',
-            fontSize: 7, color: '#aaa',
+            columns: [
+              {
+                text: 'Resolución 40595 de 2022 · Plan Estratégico de Seguridad Vial',
+                fontSize: 7, color: '#aaa',
+              },
+              { text: `${pagina} de ${total}`, fontSize: 7, color: '#aaa', alignment: 'right' },
+            ],
           },
-          { text: `${pagina} de ${total}`, fontSize: 7, color: '#aaa', alignment: 'right' },
         ],
       }),
 
+      // La introducción abre el documento, antes incluso de la metodología:
+      // sitúa al lector en el problema antes de darle la primera cifra.
       content: [
         ...this.portada(informe),
+        ...introduccion ? this.seccion(introduccion, imagenes) : [],
         ...this.metodologia(informe),
-        ...informe.secciones.flatMap(s => this.seccion(s, imagenes)),
+        ...resto.flatMap(s => this.seccion(s, imagenes)),
       ],
 
       styles: {
@@ -171,7 +204,7 @@ export class InformePdfService {
       { text: seccion.titulo.toUpperCase(), style: 'seccion', margin: [0, 0, 0, 4] },
       {
         canvas: [{
-          type: 'line', x1: 0, y1: 0, x2: 512, y2: 0,
+          type: 'line', x1: 0, y1: 0, x2: InformePdfService.ANCHO, y2: 0,
           lineWidth: 1.5, lineColor: InformePdfService.NARANJA,
         }],
         margin: [0, 0, 0, 10],
