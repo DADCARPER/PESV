@@ -2047,11 +2047,29 @@ export class InformeDiagnosticoService {
   /** Una fecha límite en texto plano: cuándo y en qué situación está. */
   private resumenVigencia(fecha?: string): string {
     const { estado, dias } = estadoVigencia(fecha);
-
     if (estado === 'sinRegistrar') return 'Sin registrar';
-    if (estado === 'vencido') return `${fecha} · vencido hace ${Math.abs(dias)} días`;
-    if (estado === 'porVencer') return `${fecha} · vence en ${dias} días`;
-    return `${fecha} · vigente`;
+
+    const cuando = this.fechaLegible(fecha ?? '');
+
+    if (estado === 'vencido') return `${cuando} · vencido hace ${Math.abs(dias)} días`;
+    if (estado === 'porVencer') return `${cuando} · vence en ${dias} días`;
+    return `${cuando} · vigente`;
+  }
+
+  /**
+   * Una fecha guardada como AAAA-MM-DD, escrita como se lee en Colombia.
+   *
+   * Es lo que entrega un `input type="date"` y lo que se guarda, pero no lo
+   * que nadie espera ver en un documento oficial: el formulario muestra
+   * 10/01/2027 y el informe enseñaba 2027-01-10 para la misma fecha.
+   *
+   * Se parte el texto en vez de construir un `Date`: `new Date('2027-01-10')`
+   * se interpreta como UTC y en la zona horaria de Colombia devuelve el día
+   * anterior, que en una fecha de vencimiento no es un detalle.
+   */
+  private fechaLegible(fecha: string): string {
+    const [ano, mes, dia] = fecha.split('-');
+    return ano && mes && dia ? `${dia}/${mes}/${ano}` : fecha;
   }
 
   /** Anos cumplidos desde la fabricacion, o null si no consta. */
