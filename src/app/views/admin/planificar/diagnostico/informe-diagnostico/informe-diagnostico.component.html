@@ -169,12 +169,21 @@
                 @for (cifra of seccion.cifras; track cifra.etiqueta) {
                   <div class="rounded-lg border p-3"
                     [ngClass]="cifra.alerta ? 'border-red-200 bg-red-50' : 'border-gray-100 bg-gray-50'">
-                    <p class="text-xl font-bold" [ngClass]="cifra.alerta ? 'text-red-700' : 'text-gray-900'">
-                      {{ cifra.valor }}
-                    </p>
-                    <p class="text-xs uppercase tracking-wide text-gray-500">{{ cifra.etiqueta }}</p>
+                    <!-- El numero manda y la etiqueta lo acompana en la misma
+                         linea: apilados, la vista lee primero una columna de
+                         cifras sueltas y luego tiene que volver a por el
+                         nombre de cada una. -->
+                    <div class="flex items-baseline gap-2">
+                      <p class="shrink-0 text-xl font-bold leading-none"
+                        [ngClass]="cifra.alerta ? 'text-red-700' : 'text-gray-900'">
+                        {{ cifra.valor }}
+                      </p>
+                      <p class="text-xs uppercase leading-tight tracking-wide text-gray-500">
+                        {{ cifra.etiqueta }}
+                      </p>
+                    </div>
                     @if (cifra.nota) {
-                      <p class="mt-1 text-xs text-gray-400">{{ cifra.nota }}</p>
+                      <p class="mt-1.5 text-xs text-gray-400">{{ cifra.nota }}</p>
                     }
                   </div>
                 }

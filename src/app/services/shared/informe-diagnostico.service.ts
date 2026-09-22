@@ -2655,9 +2655,13 @@ export class InformeDiagnosticoService {
         { etiqueta: 'Planes registrados', valor: planes.length },
         {
           etiqueta: 'Escenarios cubiertos',
-          valor: `${TIPOS_EMERGENCIA.length - pendientes.length} de ${TIPOS_EMERGENCIA.length}`,
+          valor: TIPOS_EMERGENCIA.length - pendientes.length,
           alerta: pendientes.length > 0,
-          nota: pendientes.length ? `Faltan: ${pendientes.join(', ')}` : 'Cobertura completa',
+          // Aqui el total si hace falta para entender la cifra, asi que va en
+          // la nota: "faltan 4" y el numero grande dice 2, que son los seis.
+          nota: pendientes.length
+            ? `Faltan ${pendientes.length}: ${pendientes.join(', ')}`
+            : `Los ${TIPOS_EMERGENCIA.length} escenarios tienen plan`,
         },
         this.cifraCumple('Con protocolo de acción',
           planes.length - sinProtocolo, planes.length, {
@@ -2824,6 +2828,11 @@ export class InformeDiagnosticoService {
    * Ahora todas cuentan en la misma direccion: cuantos cumplen de cuantos
    * hay. Mas es mejor en todas, el rojo aparece siempre que falte alguno, y
    * el detalle de que falta va en la nota.
+   *
+   * El total no se imprime junto al numero. En una rejilla de ocho tarjetas,
+   * ocho veces "de 2" es ruido que tapa lo unico que cambia, y cuando algo
+   * falla la nota ya dice cuantos son: el total se recompone sumando. Cuando
+   * no falla nada, el total sobra.
    */
   private cifraCumple(
     etiqueta: string, cumplen: number, total: number,
@@ -2832,7 +2841,7 @@ export class InformeDiagnosticoService {
     const faltan = total - cumplen;
     return {
       etiqueta,
-      valor: `${cumplen} de ${total}`,
+      valor: cumplen,
       alerta: faltan > 0,
       nota: faltan > 0 ? nota.mal : nota.bien,
     };
