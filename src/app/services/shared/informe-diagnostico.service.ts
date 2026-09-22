@@ -524,6 +524,7 @@ export class InformeDiagnosticoService {
       if (modulo.id === 'modulo3') this.enriquecerConduccion(seccion, modulo, respuestas);
       if (modulo.id === 'modulo4') this.enriquecerDesplazamientos(seccion, respuestas);
       if (modulo.id === 'modulo5') this.enriquecerRiesgos(seccion, respuestas);
+      if (modulo.id === 'modulo6') this.enriquecerMejora(seccion, respuestas);
 
       return seccion;
     });
@@ -818,6 +819,148 @@ export class InformeDiagnosticoService {
   }
 
   /**
+   * Lo que se escribe para decir "no tengo nada que proponer".
+   *
+   * En una pregunta abierta y opcional la mitad de las respuestas son una
+   * negacion corta. Listarlas como propuestas llenaria el anexo de ruido, asi
+   * que se descartan; cualquier cosa mas larga se conserva tal cual se
+   * escribio, sin corregir ni resumir.
+   */
+  private static readonly SIN_PROPUESTA =
+    /^(no|nada|ning[uú]n[ao]?|n\/?a|no aplica|sin comentarios?|ok)[.!]?$/i;
+
+  /**
+   * Da lectura y forma al modulo de mejora y participacion.
+   *
+   * Es el modulo que cierra la encuesta y el unico donde la gente habla con
+   * sus propias palabras. Las propuestas escritas no son un adorno: la
+   * Resolucion pide que el diagnostico recoja la participacion de los
+   * trabajadores, y estas son la prueba de que se recogio.
+   */
+  private enriquecerMejora(
+    seccion: ModelsInforme.Seccion,
+    respuestas: Record<string, any>[]
+  ): void {
+    const muestra = respuestas.length;
+    const buscar = (id: string) => seccion.repartos.find(r => r.id === id);
+
+    const acciones = buscar('accionesMejora');
+    if (acciones) {
+      acciones.titulo = 'Acciones que los trabajadores piden para mejorar la seguridad vial';
+      acciones.grafica = 'barras';
+      acciones.texto = this.textoAcciones(acciones, muestra);
+    }
+
+    const participacion = buscar('participacionAnterior');
+    if (participacion) {
+      participacion.titulo = 'Participación previa en actividades de seguridad vial';
+      participacion.grafica = 'dona';
+      participacion.texto = this.textoParticipacion(participacion, muestra);
+    }
+
+    // Las propuestas van sin nombre. La encuesta es nominal, pero firmar una
+    // critica a las condiciones de trabajo en un documento que circula es la
+    // forma mas rapida de que nadie vuelva a escribir nada.
+    const propuestas = respuestas
+      .map(r => String(r['sugerenciasMejora'] ?? '').trim())
+      .filter(texto => texto && !InformeDiagnosticoService.SIN_PROPUESTA.test(texto));
+
+    if (propuestas.length) {
+      seccion.tablas = [{
+        titulo: `Propuestas recibidas de los trabajadores (${propuestas.length})`,
+        columnas: ['Propuesta'],
+        filas: propuestas.map(texto => [texto]),
+      }];
+    }
+
+    seccion.texto = this.textoMejora(muestra, acciones, participacion, propuestas.length);
+  }
+
+  /** Resume el modulo: que piden, si ya se les formo y cuantos escribieron. */
+  private textoMejora(
+    muestra: number,
+    acciones: ModelsInforme.Reparto | undefined,
+    participacion: ModelsInforme.Reparto | undefined,
+    propuestas: number
+  ): string {
+    if (!muestra) return '';
+
+    const partes = [
+      'Este módulo recoge lo que los propios trabajadores proponen para mejorar la '
+      + 'seguridad vial de la organización. A diferencia del resto del diagnóstico, que '
+      + 'describe la situación, aquí se recoge la agenda: son las medidas que pide quien '
+      + 'se expone al riesgo, y por eso alimentan directamente el plan anual de trabajo.',
+    ];
+
+    const pedida = this.principales(acciones, 1)[0];
+    if (pedida) {
+      partes.push(`La acción más solicitada es ${pedida.etiqueta.toLowerCase()}, señalada `
+        + `por ${pedida.total} personas (${pedida.porcentaje}%).`);
+    }
+
+    const conFormacion = this.sumarQue(participacion, /^s[ií]$/i);
+    if (participacion) {
+      partes.push(`${conFormacion} de las ${muestra} personas encuestadas `
+        + `(${this.pct(conFormacion, muestra)}%) recuerdan haber participado antes en `
+        + `alguna actividad de seguridad vial en la empresa.`);
+    }
+
+    if (propuestas) {
+      partes.push(`Además, ${propuestas} personas escribieron una propuesta concreta. Se `
+        + `transcriben al final de esta sección, sin atribuir, para que la participación `
+        + `quede documentada.`);
+    }
+
+    return partes.join(' ');
+  }
+
+  /** Lo que la gente pide, que es media agenda del plan de trabajo. */
+  private textoAcciones(reparto: ModelsInforme.Reparto, muestra: number): string {
+    const top = this.principales(reparto, 3);
+    if (!top.length) return '';
+
+    const listado = this.enumerar(
+      top.map(f => `${f.etiqueta.toLowerCase()} (${f.total}, ${f.porcentaje}%)`)
+    );
+
+    return `Las acciones más pedidas son ${listado}. Conviene contrastarlas con los `
+      + `factores de riesgo identificados en el módulo anterior: cuando coinciden, la `
+      + `medida tiene respaldo doble y debería encabezar el plan; cuando no, hay una `
+      + `percepción que el diagnóstico no confirma y que también merece explicación. `
+      + `Los porcentajes se calculan sobre las ${muestra} personas encuestadas y suman `
+      + `más de cien porque cada una puede señalar varias acciones.`;
+  }
+
+  /**
+   * La linea base de formacion.
+   *
+   * "No recuerdo" no se suma con los que si participaron: una capacitacion
+   * que no dejo recuerdo no dejo tampoco conducta, y para efectos del plan
+   * cuenta como cobertura no efectiva.
+   */
+  private textoParticipacion(reparto: ModelsInforme.Reparto, muestra: number): string {
+    const si = this.sumarQue(reparto, /^s[ií]$/i);
+    const no = this.sumarQue(reparto, /^no$/i);
+    const noRecuerda = this.sumarQue(reparto, /no recuerdo/i);
+
+    let texto = `${si} personas (${this.pct(si, muestra)}%) recuerdan haber participado en `
+      + `alguna actividad o capacitación sobre seguridad vial en la empresa.`;
+
+    if (no) {
+      texto += ` ${no} (${this.pct(no, muestra)}%) no han participado nunca: son la `
+        + `población objetivo inmediata del plan de formación.`;
+    }
+
+    if (noRecuerda) {
+      texto += ` Otras ${noRecuerda} (${this.pct(noRecuerda, muestra)}%) no lo recuerdan. `
+        + `Una capacitación que no deja recuerdo no deja tampoco conducta, así que para `
+        + `efectos del plan conviene tratarlas como cobertura no efectiva.`;
+    }
+
+    return texto;
+  }
+
+  /**
    * Las cuatro familias de factores que la Resolucion usa para clasificar las
    * causas de un siniestro vial.
    *
@@ -950,9 +1093,9 @@ export class InformeDiagnosticoService {
     reparto.filas.forEach((fila, i) => (fila.etiqueta = cortas[i]));
   }
 
-  /** Las causas mas senaladas de un factor, sin las que niegan el riesgo. */
-  private principales(reparto: ModelsInforme.Reparto, cuantas: number) {
-    return reparto.filas
+  /** Las filas mas senaladas, sin las opciones que niegan que haya algo. */
+  private principales(reparto: ModelsInforme.Reparto | undefined, cuantas: number) {
+    return (reparto?.filas ?? [])
       .filter(f => !this.esAusenciaDeRiesgo(f.etiqueta))
       .slice(0, cuantas);
   }
