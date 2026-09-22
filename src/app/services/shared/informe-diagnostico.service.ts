@@ -1860,6 +1860,13 @@ export class InformeDiagnosticoService {
     const porVencer = enEstado('porVencer');
     const sinRegistrar = enEstado('sinRegistrar');
 
+    const soatVigente = vehiculos.filter(
+      v => estadoVigencia(v.vigenciaSoat).estado === 'vigente'
+    ).length;
+    const revisionVigente = vehiculos.filter(
+      v => estadoVigencia(v.vigenciaRevisionTecnica).estado === 'vigente'
+    ).length;
+
     const sinPlan = vehiculos.filter(
       v => !/^s[ií]$/i.test(v.tienePlanMantenimiento ?? '')
     ).length;
@@ -1884,18 +1891,32 @@ export class InformeDiagnosticoService {
           etiqueta: 'Kilómetros al mes', valor: kmMes.toLocaleString('es-CO'),
           nota: 'Exposición declarada de la flota',
         },
-        this.cifraFaltante('SOAT vencido', soatVencido, total,
-          'No pueden circular legalmente',
-          'Todo el SOAT está vigente'),
-        this.cifraFaltante('Revisión técnica vencida', revisionVencida, total,
-          'No pueden circular legalmente',
-          'Toda la revisión técnica está vigente'),
-        this.cifraFaltante('Por vencer', porVencer, total,
-          `En los próximos ${DIAS_AVISO} días`,
-          'Nada vence este mes'),
-        this.cifraFaltante('Sin plan de mantenimiento', sinPlan, total,
-          'El PESV lo exige para toda la flota',
-          'Toda la flota tiene plan de mantenimiento'),
+        this.cifraCumple('Con SOAT vigente', soatVigente, total, {
+          bien: 'Toda la flota puede circular legalmente',
+          mal: this.pendientes([
+            soatVencido ? `${soatVencido} vencido` : null,
+            total - soatVigente - soatVencido
+              ? `${total - soatVigente - soatVencido} por vencer o sin registrar`
+              : null,
+          ]),
+        }),
+        this.cifraCumple('Con revisión técnica vigente', revisionVigente, total, {
+          bien: 'Toda la flota tiene la revisión al día',
+          mal: this.pendientes([
+            revisionVencida ? `${revisionVencida} vencida` : null,
+            total - revisionVigente - revisionVencida
+              ? `${total - revisionVigente - revisionVencida} por vencer o sin registrar`
+              : null,
+          ]),
+        }),
+        this.cifraCumple('Con plan de mantenimiento', total - sinPlan, total, {
+          bien: 'Toda la flota tiene mantenimiento preventivo',
+          mal: `${sinPlan} sin plan: el PESV lo exige para toda la flota`,
+        }),
+        {
+          etiqueta: 'Siniestros registrados', valor: siniestros, alerta: siniestros > 0,
+          nota: siniestros ? 'Exigen investigación interna' : 'Ninguno reportado',
+        },
       ],
       repartos: [
         this.repartoTipoVehiculo(vehiculos),
@@ -2227,6 +2248,12 @@ export class InformeDiagnosticoService {
     ).length;
     const indefinidos = contratistas.filter(c => c.contratoIndefinido).length;
 
+    // Un contrato indefinido esta en regla: no vence, simplemente sigue.
+    const contratoEnRegla = contratistas.filter(
+      c => c.contratoIndefinido
+        || estadoVigencia(c.fechaFinContrato).estado === 'vigente'
+    ).length;
+
     return {
       id: 'contratistas',
       titulo: 'Contratistas',
@@ -2245,15 +2272,21 @@ export class InformeDiagnosticoService {
           nota: 'No responden la encuesta',
         },
         { etiqueta: 'Vehículos que aportan', valor: aportados },
-        this.cifraFaltante('Contrato vencido', vencido, total,
-          'Sin contrato no hay cláusula que exigir',
-          'Ningún contrato está vencido'),
-        this.cifraFaltante('Contrato por vencer', porVencer, total,
-          `En los próximos ${DIAS_AVISO} días`,
-          'Ningún contrato vence este mes'),
-        this.cifraFaltante('Sin vehículos registrados', sinVehiculos, enAlcance.length,
-          'Se desplazan, pero no consta con qué',
-          'Todos tienen vehículos registrados'),
+        this.cifraCumple('Con contrato vigente', contratoEnRegla, total, {
+          bien: 'Todas las vinculaciones están al día',
+          mal: this.pendientes([
+            vencido ? `${vencido} vencido` : null,
+            porVencer ? `${porVencer} vence este mes` : null,
+            total - contratoEnRegla - vencido - porVencer
+              ? `${total - contratoEnRegla - vencido - porVencer} sin fecha`
+              : null,
+          ]),
+        }),
+        this.cifraCumple('Con vehículos registrados',
+          enAlcance.length - sinVehiculos, enAlcance.length, {
+            bien: 'Se sabe con qué circula cada uno',
+            mal: `${sinVehiculos} se desplazan, pero no consta con qué`,
+          }),
         {
           etiqueta: 'Contratos indefinidos', valor: indefinidos,
           nota: 'Ninguna fecha obliga a revisar sus cláusulas',
@@ -2423,12 +2456,16 @@ export class InformeDiagnosticoService {
           etiqueta: 'Kilómetros al mes', valor: kmMes.toLocaleString('es-CO'),
           nota: 'Base de los indicadores por millón de kilómetros',
         },
-        this.cifraFaltante('Rutas sin estimar', sinEstimar, rutas.length,
-          'Ocasionales o sin distancia registrada',
-          'Todas las rutas tienen distancia y frecuencia'),
-        this.cifraFaltante('Rutas sin riesgos señalados', sinRiesgos, rutas.length,
-          'Ninguna vía está libre de riesgo',
-          'Todas las rutas tienen riesgos identificados'),
+        this.cifraCumple('Con exposición estimada',
+          rutas.length - sinEstimar, rutas.length, {
+            bien: 'Todas tienen distancia y frecuencia',
+            mal: `${sinEstimar} ocasionales o sin distancia registrada`,
+          }),
+        this.cifraCumple('Con riesgos identificados',
+          rutas.length - sinRiesgos, rutas.length, {
+            bien: 'Todas las rutas tienen riesgos señalados',
+            mal: `${sinRiesgos} sin señalar: ninguna vía está libre de riesgo`,
+          }),
       ],
       repartos: [
         this.repartoTipoVia(rutas),
@@ -2605,6 +2642,7 @@ export class InformeDiagnosticoService {
     const vencida = enRevision('vencido');
     const porVencer = enRevision('porVencer');
     const sinFecha = enRevision('sinRegistrar');
+    const alDia = enRevision('vigente');
 
     return {
       id: 'emergencias',
@@ -2621,24 +2659,32 @@ export class InformeDiagnosticoService {
           alerta: pendientes.length > 0,
           nota: pendientes.length ? `Faltan: ${pendientes.join(', ')}` : 'Cobertura completa',
         },
-        this.cifraFaltante('Sin protocolo de acción', sinProtocolo, planes.length,
-          'Un plan sin pasos no se puede seguir',
-          'Todos los planes documentan sus pasos'),
-        this.cifraFaltante('Sin responsable', sinResponsable, planes.length,
-          'Nadie a quien avisar',
-          'Todos los planes tienen responsable'),
-        this.cifraFaltante('Sin teléfono de emergencia', sinTelefono, planes.length,
-          'No se pueden activar por teléfono',
-          'Todos los planes tienen teléfono'),
-        this.cifraFaltante('Revisión vencida', vencida, planes.length,
-          'Dejan de valer en una auditoría',
-          'Ninguna revisión está vencida'),
-        this.cifraFaltante('Revisión por vencer', porVencer, planes.length,
-          `En los próximos ${DIAS_AVISO} días`,
-          'Ninguna revisión vence este mes'),
-        this.cifraFaltante('Sin fecha de revisión', sinFecha, planes.length,
-          'Nada obliga a volver a mirarlos',
-          'Todos tienen fecha de revisión'),
+        this.cifraCumple('Con protocolo de acción',
+          planes.length - sinProtocolo, planes.length, {
+            bien: 'Todos describen los pasos a seguir',
+            mal: `${sinProtocolo} sin pasos: no se pueden seguir`,
+          }),
+        this.cifraCumple('Con responsable', planes.length - sinResponsable, planes.length, {
+          bien: 'Todos tienen a quién avisar',
+          mal: `${sinResponsable} sin responsable asignado`,
+        }),
+        this.cifraCumple('Con teléfono de emergencia',
+          planes.length - sinTelefono, planes.length, {
+            bien: 'Todos se pueden activar por teléfono',
+            mal: `${sinTelefono} sin teléfono de contacto`,
+          }),
+        this.cifraCumple('Con revisión al día', alDia, planes.length, {
+          bien: `Ninguna vence en los próximos ${DIAS_AVISO} días`,
+          mal: this.pendientes([
+            vencida ? `${vencida} vencida` : null,
+            porVencer ? `${porVencer} vence este mes` : null,
+            sinFecha ? `${sinFecha} sin fecha` : null,
+          ]),
+        }),
+        this.cifraCumple('Con documento de soporte', conSoporte, planes.length, {
+          bien: 'Todos tienen el procedimiento firmado',
+          mal: `${planes.length - conSoporte} sin adjuntar (opcional)`,
+        }),
       ],
       repartos: [],
       tablas: [this.tablaCobertura(planes), ...this.tablaPlanes(planes)],
@@ -2766,26 +2812,35 @@ export class InformeDiagnosticoService {
   }
 
   /**
-   * Una cifra de lo que falta.
+   * Una cifra de cumplimiento: cuantos estan en regla, de cuantos hay.
    *
-   * Estas tarjetas cuentan carencias, y una carencia en cero se lee al reves:
-   * "Sin protocolo de accion: 0", puesto al lado de "Planes registrados: 2",
-   * parece decir que no hay ningun protocolo cuando dice justo lo contrario.
+   * Antes estas tarjetas contaban carencias y no habia forma de leerlas.
+   * "Sin protocolo de accion: 0", al lado de "Planes registrados: 2", se
+   * entiende como "no hay ningun protocolo" cuando dice exactamente lo
+   * contrario. Ponerle el total al lado y explicarlo en la nota no basto:
+   * en una tarjeta manda el numero grande, y el numero grande decia cero
+   * justo cuando todo estaba bien.
    *
-   * Se arregla de dos maneras a la vez: el valor lleva el total al lado, que
-   * convierte el numero suelto en una proporcion, y la nota cambia cuando no
-   * hay nada que senalar, para que la tarjeta afirme algo en vez de dejar al
-   * lector deducirlo.
+   * Ahora todas cuentan en la misma direccion: cuantos cumplen de cuantos
+   * hay. Mas es mejor en todas, el rojo aparece siempre que falte alguno, y
+   * el detalle de que falta va en la nota.
    */
-  private cifraFaltante(
-    etiqueta: string, cuantos: number, total: number, aviso: string, todoBien: string
+  private cifraCumple(
+    etiqueta: string, cumplen: number, total: number,
+    nota: { bien: string; mal: string }
   ): ModelsInforme.Cifra {
+    const faltan = total - cumplen;
     return {
       etiqueta,
-      valor: `${cuantos} de ${total}`,
-      alerta: cuantos > 0,
-      nota: cuantos > 0 ? aviso : todoBien,
+      valor: `${cumplen} de ${total}`,
+      alerta: faltan > 0,
+      nota: faltan > 0 ? nota.mal : nota.bien,
     };
+  }
+
+  /** Une los pendientes de una tarjeta: "1 vencido - 2 sin registrar". */
+  private pendientes(partes: (string | null)[]): string {
+    return partes.filter(Boolean).join(' · ');
   }
 
   // ── Ayudantes de recuento ─────────────────────────────────────────────────
