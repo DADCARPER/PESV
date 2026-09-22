@@ -141,10 +141,29 @@ export class InformeDiagnosticoComponent {
     if (indice >= 0 && indice < this.pasos().length) this.paso.set(indice);
   }
 
+  /**
+   * Dónde se declara quién responde por el informe.
+   *
+   * Se busca por el campo y no por la posición de la sección. Estaba mirando
+   * la sección cero, que era La organización hasta que la introducción pasó a
+   * ir delante: desde entonces no encontraba la firma nunca y la emisión no
+   * llegaba a intentarse. Buscar el dato es lo único que no se rompe cuando
+   * el informe cambia de orden.
+   */
+  private ubicacionDelResponsable() {
+    const secciones = this.datos()?.secciones ?? [];
+
+    for (let i = 0; i < secciones.length; i++) {
+      const dato = secciones[i].identificacion?.find(d => d.editable);
+      if (dato) return { indice: i, dato };
+    }
+
+    return null;
+  }
+
   /** Quién firma el informe: el dato que el asistente propone y deja cambiar. */
   responsable(): string {
-    const organizacion = this.datos()?.secciones?.[0];
-    return organizacion?.identificacion?.find(d => d.editable)?.valor ?? '';
+    return this.ubicacionDelResponsable()?.dato.valor ?? '';
   }
 
   // ── Emisión ───────────────────────────────────────────────────────────────
@@ -153,10 +172,15 @@ export class InformeDiagnosticoComponent {
     const datos = this.datos();
     if (!datos || this.emitiendo()) return;
 
-    const firma = this.responsable().trim();
+    const ubicacion = this.ubicacionDelResponsable();
+    const firma = (ubicacion?.dato.valor ?? '').trim();
+
     if (!firma) {
-      this._alerta.showWarning('Indica quién responde por el informe antes de emitirlo.');
-      this.irAlPaso(1);
+      this._alerta.showWarning(
+        'Falta el responsable del informe. Escríbelo en la sección La organización.'
+      );
+      // El paso lleva uno más que la sección, porque el aviso va delante.
+      if (ubicacion) this.irAlPaso(ubicacion.indice + 1);
       return;
     }
 
