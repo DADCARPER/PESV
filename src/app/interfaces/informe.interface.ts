@@ -90,7 +90,14 @@ export namespace ModelsInforme {
   export interface Tabla {
     titulo: string;
     columnas: string[];
-    filas: string[][];
+    /**
+     * Cada fila envuelta en un objeto, y no como `string[][]`.
+     *
+     * Firestore no admite un array cuyos elementos sean arrays, y el informe
+     * emitido guarda sus tablas tal cual. Un nivel de objeto por medio es lo
+     * único que hace falta para que la escritura pase.
+     */
+    filas: { celdas: string[] }[];
   }
 
   /**

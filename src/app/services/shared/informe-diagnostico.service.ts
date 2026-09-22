@@ -136,13 +136,17 @@ export class InformeDiagnosticoService {
 
     const version = previos.reduce((mayor, i) => Math.max(mayor, i.version ?? 0), 0) + 1;
 
-    const informe: Omit<ModelsInforme.Informe, 'id'> = {
+    // El informe se arma de muchos campos opcionales, y Firestore rechaza
+    // `undefined` igual que rechaza un array dentro de otro. La vuelta por
+    // JSON los quita todos de una vez y de paso clona: lo que se guarda deja
+    // de compartir objetos con la pantalla, que sigue viva y editable.
+    const informe = this.sinIndefinidos<Omit<ModelsInforme.Informe, 'id'>>({
       ...datos,
       version,
       vigencia: 'vigente',
       fechaEmision: new Date().toISOString(),
       emitidoPor,
-    };
+    });
 
     const peso = JSON.stringify(informe).length;
     if (peso > InformeDiagnosticoService.LIMITE_DOCUMENTO) {
@@ -158,6 +162,17 @@ export class InformeDiagnosticoService {
     }
 
     return await this._firestore.createDocumentDevolverId(ruta, informe);
+  }
+
+  /**
+   * Copia el objeto sin los campos que no tienen valor.
+   *
+   * Vale porque el informe es datos planos: ni fechas ni funciones, solo
+   * cadenas, números, objetos y arrays. Con cualquier otra cosa dentro esta
+   * vuelta por JSON la destruiría en silencio.
+   */
+  private sinIndefinidos<T>(objeto: T): T {
+    return JSON.parse(JSON.stringify(objeto)) as T;
   }
 
   /** Los informes emitidos del periodo, del más reciente al más antiguo. */
@@ -219,13 +234,13 @@ export class InformeDiagnosticoService {
       tablas: [{
         titulo: 'Servicios que presta la organización',
         columnas: ['Servicio', 'Categoría', 'Importancia', 'Frecuencia', 'Cobertura'],
-        filas: servicios.map(s => [
+        filas: servicios.map(s => ({ celdas: [
           s.nombreServicio ?? '',
           s.categoriaServicio ?? '',
           this.primeraParte(s.importanciaServicio),
           this.primeraParte(s.frecuenciaOperacion),
           this.primeraParte(s.coberturaOperacion),
-        ]),
+        ] })),
       }],
 
       repartos: [],
@@ -1080,7 +1095,7 @@ export class InformeDiagnosticoService {
       seccion.tablas = [{
         titulo: `Propuestas recibidas de los trabajadores (${propuestas.length})`,
         columnas: ['Propuesta'],
-        filas: propuestas.map(texto => [texto]),
+        filas: propuestas.map(texto => ({ celdas: [texto] })),
       }];
     }
 
@@ -2278,13 +2293,13 @@ export class InformeDiagnosticoService {
 
     const filas = vehiculos
       .filter(v => !enRegla(v.vigenciaSoat) || !enRegla(v.vigenciaRevisionTecnica))
-      .map(v => [
+      .map(v => ({ celdas: [
         textoSeguro(v.placa, 'Sin placa'),
         textoSeguro(v.tipoVehiculo, '—'),
         textoSeguro(v.tipoRelacion, '—'),
         this.resumenVigencia(v.vigenciaSoat),
         this.resumenVigencia(v.vigenciaRevisionTecnica),
-      ]);
+      ] }));
 
     if (!filas.length) return null;
 
@@ -2609,14 +2624,14 @@ export class InformeDiagnosticoService {
     return [{
       titulo: `Contratistas que realizan desplazamientos (${enAlcance.length})`,
       columnas: ['Razón social', 'Tipo', 'Servicio', 'Conductores', 'Vehículos', 'Contrato'],
-      filas: enAlcance.map(c => [
+      filas: enAlcance.map(c => ({ celdas: [
         textoSeguro(c.nombreRazonSocial, 'Sin nombre'),
         textoSeguro(c.tipoContratista, '—'),
         textoSeguro(c.servicioPrestado, '—'),
         String(Number(c.conductores) || 0),
         String(vehiculosPorContratista.get(c.id) ?? 0),
         this.vigenciaContrato(c),
-      ]),
+      ] })),
     }];
   }
 
@@ -2836,14 +2851,14 @@ export class InformeDiagnosticoService {
       columnas: ['Ruta', 'Trayecto', 'Tipo de vía', 'Frecuencia', 'Km/mes', 'Riesgos'],
       filas: ordenadas.map(r => {
         const km = kmDe(r);
-        return [
+        return { celdas: [
           textoSeguro(r.nombreRuta, 'Sin nombre'),
           `${textoSeguro(r.origen, '—')} → ${textoSeguro(r.destino, '—')}`,
           textoSeguro(r.tipoVia, '—'),
           textoSeguro(r.frecuencia, '—'),
           km === null ? 'Sin estimar' : km.toLocaleString('es-CO'),
           String((r.factoresRiesgo ?? []).length || '—'),
-        ];
+        ] };
       }),
     }];
   }
@@ -2980,16 +2995,18 @@ export class InformeDiagnosticoService {
   private tablaCobertura(
     planes: Models.Diagnostico.PlanEmergencia[]
   ): ModelsInforme.Tabla {
-    const filas: string[][] = TIPOS_EMERGENCIA.map(escenario => {
+    const filas: { celdas: string[] }[] = TIPOS_EMERGENCIA.map(escenario => {
       const total = planes.filter(p => p.tipoEmergencia === escenario).length;
-      return [escenario, String(total), total ? 'Cubierto' : 'Sin plan'];
+      return { celdas: [escenario, String(total), total ? 'Cubierto' : 'Sin plan'] };
     });
 
     // "Otro" no cuenta para la cobertura, pero si hay planes ahi se ensenan:
     // son trabajo hecho y esconderlo seria injusto con quien lo hizo.
     const otros = planes.filter(p => p.tipoEmergencia === TIPO_EMERGENCIA_OTRO).length;
     if (otros) {
-      filas.push([TIPO_EMERGENCIA_OTRO, String(otros), 'Fuera del recuento de cobertura']);
+      filas.push({
+        celdas: [TIPO_EMERGENCIA_OTRO, String(otros), 'Fuera del recuento de cobertura'],
+      });
     }
 
     return {
@@ -3010,7 +3027,7 @@ export class InformeDiagnosticoService {
       columnas: [
         'Plan', 'Escenario', 'Responsable', 'Teléfono', 'Protocolo', 'Soporte', 'Revisión',
       ],
-      filas: planes.map(p => [
+      filas: planes.map(p => ({ celdas: [
         textoSeguro(p.nombrePlan, 'Sin nombre'),
         textoSeguro(p.tipoEmergencia, '—'),
         textoSeguro(p.responsable, 'Sin asignar'),
@@ -3018,7 +3035,7 @@ export class InformeDiagnosticoService {
         (p.protocoloAccion ?? '').trim() ? 'Documentado' : 'Sin documentar',
         (p.soporteUrl ?? '').trim() ? 'Adjunto' : 'Sin adjuntar',
         this.resumenVigencia(p.fechaRevision),
-      ]),
+      ] })),
     }];
   }
 

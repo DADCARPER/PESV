@@ -367,7 +367,7 @@ export class InformePdfService {
           widths: tabla.columnas.map(() => '*'),
           body: [
             tabla.columnas.map(c => ({ text: c, style: 'cabeceraTabla' })),
-            ...tabla.filas.map(fila => fila.map(celda => celda || '—')),
+            ...tabla.filas.map(fila => fila.celdas.map(celda => celda || '—')),
           ],
         },
         layout: 'lightHorizontalLines',
