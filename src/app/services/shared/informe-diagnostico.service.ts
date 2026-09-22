@@ -190,6 +190,12 @@ export class InformeDiagnosticoService {
 
         // El estrato son pocas categorias y se quiere el dato exacto junto al
         // peso: tabla a la izquierda y pastel a la derecha.
+        // Nueve areas con nombres largos: horizontal, que es donde caben.
+        if (p.id === 'areaDepartamento') {
+          reparto.grafica = 'barras';
+          reparto.texto = this.textoAreas(reparto, respuestas.length);
+        }
+
         // Categorias sueltas con nombres largos: horizontal.
         if (p.id === 'estadoCivil') {
           reparto.grafica = 'barras';
@@ -300,6 +306,37 @@ export class InformeDiagnosticoService {
       const pct = Math.round((total / muestra) * 1000) / 10;
       texto += ` En conjunto, ${total} personas (${pct}%) cuentan con formación `
         + `superior o de posgrado.`;
+    }
+
+    return texto;
+  }
+
+  /**
+   * Redacta el reparto por area o departamento.
+   *
+   * Dice donde esta la gente y cuanto se concentra, que es lo que orienta
+   * donde dirigir la formacion y los controles. No clasifica las areas por
+   * exposicion al riesgo vial: eso depende de como opere cada empresa y lo
+   * sabe quien la conoce, no el sistema.
+   */
+  private textoAreas(reparto: ModelsInforme.Reparto, muestra: number): string {
+    if (!muestra || !reparto.filas.length) return '';
+
+    const principales = reparto.filas.slice(0, 3);
+    const listado = principales
+      .map(f => `${f.etiqueta} con ${f.total} (${f.porcentaje}%)`)
+      .join(', ');
+
+    let texto = `La población encuestada se distribuye en ${reparto.filas.length} `
+      + `${reparto.filas.length === 1 ? 'área' : 'áreas'}. `;
+
+    if (principales.length > 1) {
+      const concentracion = principales.reduce((n, f) => n + f.total, 0);
+      const pct = Math.round((concentracion / muestra) * 1000) / 10;
+      texto += `Las de mayor representación son ${listado}, que en conjunto reúnen `
+        + `${concentracion} personas (${pct}%) de las ${muestra} encuestadas.`;
+    } else {
+      texto += `La de mayor representación es ${listado}.`;
     }
 
     return texto;
