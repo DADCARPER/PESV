@@ -2001,8 +2001,10 @@ export class InformeDiagnosticoService {
     const reparto = this.contar('Plan de mantenimiento preventivo', vehiculos,
       v => this.textoSiNo(v.tienePlanMantenimiento));
     reparto.grafica = 'tabla';
+    reparto.unidad = 'Vehículos';
     reparto.emparejado = this.contar('Frecuencia del mantenimiento', vehiculos,
       v => v.frecuenciaMantenimiento || 'Sin definir');
+    reparto.emparejado.unidad = 'Vehículos';
 
     reparto.titulo = 'Mantenimiento preventivo de la flota';
     reparto.texto = sinPlan
@@ -2282,8 +2284,10 @@ export class InformeDiagnosticoService {
       c => c.tipoVinculacion);
     reparto.titulo = 'Vinculación y continuidad de la operación';
     reparto.grafica = 'tabla';
+    reparto.unidad = 'Contratistas';
     reparto.emparejado = this.contar('Tipo de flota', enAlcance,
       c => c.tipoFlota || 'Sin definir');
+    reparto.emparejado.unidad = 'Contratistas';
 
     const ocasionales = this.sumarQue(reparto.emparejado, /ocasional/i);
     if (ocasionales) {
@@ -2502,6 +2506,7 @@ export class InformeDiagnosticoService {
       titulo: 'Rutas afectadas, por familia de riesgo',
       filas,
       grafica: 'tabla',
+      unidad: 'Rutas',
       texto: 'Las dos familias son las mismas que se preguntan a los trabajadores en el '
         + 'módulo de identificación de riesgos. Aquí las declara quien planifica la ruta; '
         + 'allí las percibe quien la recorre. Donde las dos lecturas no coincidan hay algo '
@@ -2631,48 +2636,38 @@ export class InformeDiagnosticoService {
           nota: 'Nada obliga a volver a mirarlo',
         },
       ],
-      repartos: [this.repartoCobertura(planes, [...pendientes])],
-      tablas: this.tablaPlanes(planes),
+      repartos: [],
+      tablas: [this.tablaCobertura(planes), ...this.tablaPlanes(planes)],
     };
   }
 
   /**
    * La cobertura escenario por escenario, incluidos los que estan a cero.
    *
-   * Un reparto normal solo ensena lo que existe. Aqui lo que interesa es
-   * justo lo contrario: la barra vacia es el hallazgo.
+   * En barras no se leia. Con seis escenarios y uno o ningun plan en cada
+   * uno, todas las barras miden lo mismo o nada, y comparar alturas que no
+   * varian no dice nada. Lo que hay que ver de un vistazo es cuales faltan,
+   * y eso es una columna de estado, no un grafico.
    */
-  private repartoCobertura(
-    planes: Models.Diagnostico.PlanEmergencia[], pendientes: string[]
-  ): ModelsInforme.Reparto {
-    const base = planes.length || 1;
-
-    const filas: ModelsInforme.Reparto['filas'] = TIPOS_EMERGENCIA.map(escenario => {
+  private tablaCobertura(
+    planes: Models.Diagnostico.PlanEmergencia[]
+  ): ModelsInforme.Tabla {
+    const filas: string[][] = TIPOS_EMERGENCIA.map(escenario => {
       const total = planes.filter(p => p.tipoEmergencia === escenario).length;
-      return {
-        etiqueta: escenario, total, porcentaje: Math.round((total / base) * 1000) / 10,
-      };
+      return [escenario, String(total), total ? 'Cubierto' : 'Sin plan'];
     });
 
-    // "Otro" queda fuera de la cobertura, pero si hay planes ahi se ensenan.
+    // "Otro" no cuenta para la cobertura, pero si hay planes ahi se ensenan:
+    // son trabajo hecho y esconderlo seria injusto con quien lo hizo.
     const otros = planes.filter(p => p.tipoEmergencia === TIPO_EMERGENCIA_OTRO).length;
     if (otros) {
-      filas.push({
-        etiqueta: TIPO_EMERGENCIA_OTRO, total: otros,
-        porcentaje: Math.round((otros / base) * 1000) / 10,
-      });
+      filas.push([TIPO_EMERGENCIA_OTRO, String(otros), 'Fuera del recuento de cobertura']);
     }
 
     return {
       titulo: 'Cobertura por escenario de emergencia',
+      columnas: ['Escenario', 'Planes', 'Estado'],
       filas,
-      grafica: 'barras',
-      texto: pendientes.length
-        ? `Las barras a cero son los escenarios que la organización no tiene previstos: `
-          + `${pendientes.join(', ')}. Cada uno de ellos es una acción concreta para el `
-          + `plan de trabajo.`
-        : `Los ${TIPOS_EMERGENCIA.length} escenarios previstos por el diagnóstico tienen `
-          + `al menos un plan asociado.`,
     };
   }
 

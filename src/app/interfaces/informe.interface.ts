@@ -45,6 +45,15 @@ export namespace ModelsInforme {
      */
     grafica?: 'columnas' | 'barras' | 'tabla' | 'tablaPastel' | 'dona';
     /**
+     * Qué cuentan las filas, para la cabecera de la tabla.
+     *
+     * Por defecto son personas, que es de donde sale la mayor parte del
+     * informe. Pero la flota cuenta vehículos, contratistas cuenta empresas y
+     * rutas cuenta rutas: una columna titulada "Personas" sobre un recuento
+     * de camiones dice algo que no es.
+     */
+    unidad?: string;
+    /**
      * Otro reparto que se pinta a su lado, bajo un mismo texto.
      *
      * Para preguntas que son la misma familia y se leen juntas: el tipo de

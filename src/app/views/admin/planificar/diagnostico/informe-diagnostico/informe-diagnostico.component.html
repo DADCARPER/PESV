@@ -259,7 +259,7 @@
                           <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
                             <tr>
                               <th class="px-3 py-2 text-left font-semibold">{{ reparto.titulo }}</th>
-                              <th class="px-3 py-2 text-right font-semibold">Personas</th>
+                              <th class="px-3 py-2 text-right font-semibold">{{ reparto.unidad || 'Personas' }}</th>
                               <th class="px-3 py-2 text-right font-semibold">%</th>
                             </tr>
                           </thead>
@@ -356,7 +356,7 @@
       <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
         <tr>
           <th class="px-3 py-2 text-left font-semibold">{{ reparto.titulo }}</th>
-          <th class="px-3 py-2 text-right font-semibold">Personas</th>
+          <th class="px-3 py-2 text-right font-semibold">{{ reparto.unidad || 'Personas' }}</th>
           <th class="px-3 py-2 text-right font-semibold">%</th>
         </tr>
       </thead>
