@@ -1884,22 +1884,18 @@ export class InformeDiagnosticoService {
           etiqueta: 'Kilómetros al mes', valor: kmMes.toLocaleString('es-CO'),
           nota: 'Exposición declarada de la flota',
         },
-        {
-          etiqueta: 'SOAT vencido', valor: soatVencido, alerta: soatVencido > 0,
-          nota: 'No pueden circular legalmente',
-        },
-        {
-          etiqueta: 'Revisión técnica vencida', valor: revisionVencida,
-          alerta: revisionVencida > 0,
-        },
-        {
-          etiqueta: 'Por vencer', valor: porVencer, alerta: porVencer > 0,
-          nota: `En los próximos ${DIAS_AVISO} días`,
-        },
-        {
-          etiqueta: 'Sin plan de mantenimiento', valor: sinPlan, alerta: sinPlan > 0,
-          nota: 'El PESV lo exige para toda la flota',
-        },
+        this.cifraFaltante('SOAT vencido', soatVencido, total,
+          'No pueden circular legalmente',
+          'Todo el SOAT está vigente'),
+        this.cifraFaltante('Revisión técnica vencida', revisionVencida, total,
+          'No pueden circular legalmente',
+          'Toda la revisión técnica está vigente'),
+        this.cifraFaltante('Por vencer', porVencer, total,
+          `En los próximos ${DIAS_AVISO} días`,
+          'Nada vence este mes'),
+        this.cifraFaltante('Sin plan de mantenimiento', sinPlan, total,
+          'El PESV lo exige para toda la flota',
+          'Toda la flota tiene plan de mantenimiento'),
       ],
       repartos: [
         this.repartoTipoVehiculo(vehiculos),
@@ -2231,18 +2227,15 @@ export class InformeDiagnosticoService {
           nota: 'No responden la encuesta',
         },
         { etiqueta: 'Vehículos que aportan', valor: aportados },
-        {
-          etiqueta: 'Contrato vencido', valor: vencido, alerta: vencido > 0,
-          nota: 'Sin contrato no hay cláusula que exigir',
-        },
-        {
-          etiqueta: 'Contrato por vencer', valor: porVencer, alerta: porVencer > 0,
-          nota: `En los próximos ${DIAS_AVISO} días`,
-        },
-        {
-          etiqueta: 'Sin vehículos registrados', valor: sinVehiculos,
-          alerta: sinVehiculos > 0, nota: 'Se desplazan, pero no consta con qué',
-        },
+        this.cifraFaltante('Contrato vencido', vencido, total,
+          'Sin contrato no hay cláusula que exigir',
+          'Ningún contrato está vencido'),
+        this.cifraFaltante('Contrato por vencer', porVencer, total,
+          `En los próximos ${DIAS_AVISO} días`,
+          'Ningún contrato vence este mes'),
+        this.cifraFaltante('Sin vehículos registrados', sinVehiculos, enAlcance.length,
+          'Se desplazan, pero no consta con qué',
+          'Todos tienen vehículos registrados'),
         {
           etiqueta: 'Contratos indefinidos', valor: indefinidos,
           nota: 'Ninguna fecha obliga a revisar sus cláusulas',
@@ -2412,14 +2405,12 @@ export class InformeDiagnosticoService {
           etiqueta: 'Kilómetros al mes', valor: kmMes.toLocaleString('es-CO'),
           nota: 'Base de los indicadores por millón de kilómetros',
         },
-        {
-          etiqueta: 'Rutas sin estimar', valor: sinEstimar, alerta: sinEstimar > 0,
-          nota: 'Ocasionales o sin distancia registrada',
-        },
-        {
-          etiqueta: 'Rutas sin riesgos señalados', valor: sinRiesgos,
-          alerta: sinRiesgos > 0, nota: 'Ninguna vía está libre de riesgo',
-        },
+        this.cifraFaltante('Rutas sin estimar', sinEstimar, rutas.length,
+          'Ocasionales o sin distancia registrada',
+          'Todas las rutas tienen distancia y frecuencia'),
+        this.cifraFaltante('Rutas sin riesgos señalados', sinRiesgos, rutas.length,
+          'Ninguna vía está libre de riesgo',
+          'Todas las rutas tienen riesgos identificados'),
       ],
       repartos: [
         this.repartoTipoVia(rutas),
@@ -2611,30 +2602,24 @@ export class InformeDiagnosticoService {
           alerta: pendientes.length > 0,
           nota: pendientes.length ? `Faltan: ${pendientes.join(', ')}` : 'Cobertura completa',
         },
-        {
-          etiqueta: 'Sin protocolo de acción', valor: sinProtocolo,
-          alerta: sinProtocolo > 0, nota: 'Un plan sin pasos no se puede seguir',
-        },
-        {
-          etiqueta: 'Sin responsable', valor: sinResponsable, alerta: sinResponsable > 0,
-          nota: 'Nadie a quien avisar',
-        },
-        {
-          etiqueta: 'Sin teléfono de emergencia', valor: sinTelefono,
-          alerta: sinTelefono > 0,
-        },
-        {
-          etiqueta: 'Revisión vencida', valor: vencida, alerta: vencida > 0,
-          nota: 'Deja de valer en una auditoría',
-        },
-        {
-          etiqueta: 'Revisión por vencer', valor: porVencer, alerta: porVencer > 0,
-          nota: `En los próximos ${DIAS_AVISO} días`,
-        },
-        {
-          etiqueta: 'Sin fecha de revisión', valor: sinFecha, alerta: sinFecha > 0,
-          nota: 'Nada obliga a volver a mirarlo',
-        },
+        this.cifraFaltante('Sin protocolo de acción', sinProtocolo, planes.length,
+          'Un plan sin pasos no se puede seguir',
+          'Todos los planes documentan sus pasos'),
+        this.cifraFaltante('Sin responsable', sinResponsable, planes.length,
+          'Nadie a quien avisar',
+          'Todos los planes tienen responsable'),
+        this.cifraFaltante('Sin teléfono de emergencia', sinTelefono, planes.length,
+          'No se pueden activar por teléfono',
+          'Todos los planes tienen teléfono'),
+        this.cifraFaltante('Revisión vencida', vencida, planes.length,
+          'Dejan de valer en una auditoría',
+          'Ninguna revisión está vencida'),
+        this.cifraFaltante('Revisión por vencer', porVencer, planes.length,
+          `En los próximos ${DIAS_AVISO} días`,
+          'Ninguna revisión vence este mes'),
+        this.cifraFaltante('Sin fecha de revisión', sinFecha, planes.length,
+          'Nada obliga a volver a mirarlos',
+          'Todos tienen fecha de revisión'),
       ],
       repartos: [],
       tablas: [this.tablaCobertura(planes), ...this.tablaPlanes(planes)],
@@ -2751,6 +2736,29 @@ export class InformeDiagnosticoService {
       console.error('[Informe] responsablePropuesto:', error);
       return '';
     }
+  }
+
+  /**
+   * Una cifra de lo que falta.
+   *
+   * Estas tarjetas cuentan carencias, y una carencia en cero se lee al reves:
+   * "Sin protocolo de accion: 0", puesto al lado de "Planes registrados: 2",
+   * parece decir que no hay ningun protocolo cuando dice justo lo contrario.
+   *
+   * Se arregla de dos maneras a la vez: el valor lleva el total al lado, que
+   * convierte el numero suelto en una proporcion, y la nota cambia cuando no
+   * hay nada que senalar, para que la tarjeta afirme algo en vez de dejar al
+   * lector deducirlo.
+   */
+  private cifraFaltante(
+    etiqueta: string, cuantos: number, total: number, aviso: string, todoBien: string
+  ): ModelsInforme.Cifra {
+    return {
+      etiqueta,
+      valor: `${cuantos} de ${total}`,
+      alerta: cuantos > 0,
+      nota: cuantos > 0 ? aviso : todoBien,
+    };
   }
 
   // ── Ayudantes de recuento ─────────────────────────────────────────────────
