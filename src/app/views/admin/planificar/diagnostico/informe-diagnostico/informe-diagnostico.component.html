@@ -396,6 +396,7 @@
                   <th class="px-3 py-2 text-left font-semibold">Emitido</th>
                   <th class="px-3 py-2 text-left font-semibold">Responde</th>
                   <th class="px-3 py-2 text-left font-semibold">Estado</th>
+                  <th class="px-3 py-2 text-right font-semibold">Documento</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100">
@@ -411,6 +412,13 @@
                         <span class="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-500">Archivado</span>
                       }
                     </td>
+                    <td class="px-3 py-2 text-right">
+                      <button type="button" (click)="descargar(informe)"
+                        [disabled]="descargando() !== null"
+                        class="rounded border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50">
+                        {{ descargando() === informe.id ? 'Generando...' : 'Descargar PDF' }}
+                      </button>
+                    </td>
                   </tr>
                 }
               </tbody>
@@ -418,7 +426,9 @@
           </div>
           <p class="mt-2 text-xs text-gray-400">
             Solo uno está vigente. Los anteriores quedan consultables, porque un informe
-            ya presentado no se puede hacer desaparecer.
+            ya presentado no se puede hacer desaparecer. El PDF no se almacena: se vuelve
+            a armar desde las cifras congeladas cada vez que se descarga, así que un
+            informe de hace un año sale hoy exactamente igual que el día que se emitió.
           </p>
         </div>
       }

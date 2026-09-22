@@ -7,6 +7,7 @@ import { PieMonochromeComponent } from '../../../../../components/apexChart/pie-
 import { DonutComponent } from '../../../../../components/apexChart/donut/donut.component';
 
 import { InformeDiagnosticoService } from '../../../../../services/shared/informe-diagnostico.service';
+import { InformePdfService } from '../../../../../services/shared/informe-pdf.service';
 import { AuthenticacionService } from '../../../../../services/shared/authenticacion.service';
 import { AlertaService } from '../../../../../services/shared/alerta.service';
 import { ModelsInforme } from '../../../../../interfaces/informe.interface';
@@ -36,6 +37,7 @@ export class InformeDiagnosticoComponent {
   private _informe = inject(InformeDiagnosticoService);
   private _auth = inject(AuthenticacionService);
   private _alerta = inject(AlertaService);
+  private _pdf = inject(InformePdfService);
 
   readonly periodo = this._auth.periodo;
 
@@ -54,6 +56,9 @@ export class InformeDiagnosticoComponent {
   asistente = signal(false);
   paso = signal(0);
   emitiendo = signal(false);
+
+  /** Qué informe se está armando ahora mismo, para no pulsar dos veces. */
+  descargando = signal<string | null>(null);
 
   /**
    * Los pasos del asistente: el aviso, una sección por sección y el cierre.
@@ -161,12 +166,38 @@ export class InformeDiagnosticoComponent {
       await this.cargarHistorial();
       this.asistente.set(false);
       this._alerta.showSuccess('Informe emitido. El anterior queda archivado.');
+
+      // Se descarga solo: lo normal después de emitir es querer el documento,
+      // y obligar a buscarlo en la tabla de abajo es un paso de más.
+      const recien = this.vigente();
+      if (recien) await this.descargar(recien);
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'No se pudo emitir el informe.';
       console.error('[InformeDiagnostico] emitir:', error);
       this._alerta.showError(msg);
     } finally {
       this.emitiendo.set(false);
+    }
+  }
+
+  /**
+   * Arma el PDF de un informe ya emitido.
+   *
+   * Se rehace desde las cifras guardadas y no desde la pantalla: por eso un
+   * informe archivado hace un año se descarga igual que el día que se emitió,
+   * aunque el diagnóstico haya cambiado por completo desde entonces.
+   */
+  async descargar(informe: ModelsInforme.Informe) {
+    if (this.descargando()) return;
+
+    this.descargando.set(informe.id);
+    try {
+      await this._pdf.descargar(informe);
+    } catch (error: unknown) {
+      console.error('[InformeDiagnostico] descargar:', error);
+      this._alerta.showError('No se pudo generar el PDF del informe.');
+    } finally {
+      this.descargando.set(null);
     }
   }
 
