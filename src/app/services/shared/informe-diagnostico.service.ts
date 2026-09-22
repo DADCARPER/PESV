@@ -6,8 +6,8 @@ import { AuthenticacionService } from './authenticacion.service';
 import { PerfilService } from './perfil.service';
 import { Models } from '../../interfaces/models';
 import { ModelsInforme } from '../../interfaces/informe.interface';
-import { kilometrosAlMes } from '../../data/rutas';
-import { TIPOS_EMERGENCIA } from '../../data/emergencias';
+import { FACTORES_RIESGO_RUTA, kilometrosAlMes, VIAJES_AL_MES } from '../../data/rutas';
+import { TIPO_EMERGENCIA_OTRO, TIPOS_EMERGENCIA } from '../../data/emergencias';
 import { DIAS_AVISO, estadoVigencia } from '../../data/vigencias';
 import { textoSeguro } from '../../data/texto-seguro';
 
@@ -2381,48 +2381,222 @@ export class InformeDiagnosticoService {
     return partes.join(' ');
   }
 
+  /**
+   * Da lectura y forma a las rutas frecuentes.
+   *
+   * Una ruta no es un dato administrativo: es el sitio concreto donde ocurre
+   * el riesgo. La Resolucion pide estudiarlas, y estudiarlas empieza por saber
+   * cuales se recorren mas y que tienen. Por eso la seccion ordena por
+   * kilometros al mes y no por nombre.
+   */
   private rutas(rutas: Models.Diagnostico.Ruta[]): ModelsInforme.Seccion {
-    const kmMes = rutas.reduce(
-      (total, r) => total + (kilometrosAlMes(r.distanciaKm, r.frecuencia) ?? 0), 0
-    );
-    const sinEstimar = rutas.filter(
-      r => kilometrosAlMes(r.distanciaKm, r.frecuencia) === null
-    ).length;
+    const kmDe = (r: Models.Diagnostico.Ruta) =>
+      kilometrosAlMes(r.distanciaKm, r.frecuencia);
+
+    const kmMes = rutas.reduce((total, r) => total + (kmDe(r) ?? 0), 0);
+    const sinEstimar = rutas.filter(r => kmDe(r) === null).length;
+    const sinRiesgos = rutas.filter(r => !(r.factoresRiesgo ?? []).length).length;
 
     return {
       id: 'rutas',
       titulo: 'Rutas frecuentes',
-      texto: '',
+      texto: this.textoRutas(rutas.length, kmMes, sinEstimar, sinRiesgos),
       sinDatos: !rutas.length,
       cifras: [
         { etiqueta: 'Rutas registradas', valor: rutas.length },
         {
-          etiqueta: 'Kilómetros al mes', valor: kmMes,
-          nota: sinEstimar
-            ? `${sinEstimar} rutas sin estimar, por ser ocasionales o no tener distancia`
-            : 'Base de los indicadores por millón de kilómetros',
+          etiqueta: 'Kilómetros al mes', valor: kmMes.toLocaleString('es-CO'),
+          nota: 'Base de los indicadores por millón de kilómetros',
+        },
+        {
+          etiqueta: 'Rutas sin estimar', valor: sinEstimar, alerta: sinEstimar > 0,
+          nota: 'Ocasionales o sin distancia registrada',
+        },
+        {
+          etiqueta: 'Rutas sin riesgos señalados', valor: sinRiesgos,
+          alerta: sinRiesgos > 0, nota: 'Ninguna vía está libre de riesgo',
         },
       ],
       repartos: [
-        this.contar('Rutas por tipo de vía', rutas, r => r.tipoVia),
-        this.contar('Rutas por frecuencia', rutas, r => r.frecuencia),
-        this.contarLista('Riesgos señalados en las rutas', rutas, r => r.factoresRiesgo ?? []),
+        this.repartoTipoVia(rutas),
+        this.repartoFrecuencia(rutas),
+        this.repartoRiesgosRuta(rutas),
+        this.repartoFamiliasRiesgo(rutas),
       ],
+      tablas: this.tablaRutas(rutas, kmDe),
     };
   }
 
-  private emergencias(planes: Models.Diagnostico.PlanEmergencia[]): ModelsInforme.Seccion {
+  private repartoTipoVia(rutas: Models.Diagnostico.Ruta[]): ModelsInforme.Reparto {
+    const reparto = this.contar('Rutas por tipo de vía', rutas, r => r.tipoVia);
+    reparto.grafica = 'barras';
+
+    const mayor = reparto.filas[0];
+    if (mayor) {
+      reparto.texto = `La mayoría de las rutas discurren por vía `
+        + `${mayor.etiqueta.toLowerCase()}: ${mayor.total} de ${rutas.length} `
+        + `(${mayor.porcentaje}%). El tipo de vía condiciona el límite de velocidad, la `
+        + `presencia de otros actores viales y qué autoridad hay que involucrar cuando `
+        + `el riesgo está en la infraestructura.`;
+    }
+
+    return reparto;
+  }
+
+  /** La frecuencia, en orden de intensidad y no por tamano. */
+  private repartoFrecuencia(rutas: Models.Diagnostico.Ruta[]): ModelsInforme.Reparto {
+    const reparto = this.contar('Rutas por frecuencia', rutas, r => r.frecuencia);
+    reparto.grafica = 'columnas';
+
+    // De la mas intensa a la mas esporadica. Las ocasionales, que no tienen
+    // periodicidad, cierran la escala.
+    const viajes = (etiqueta: string) => VIAJES_AL_MES[etiqueta] ?? -1;
+    reparto.filas.sort((a, b) => viajes(b.etiqueta) - viajes(a.etiqueta));
+
+    const diarias = this.sumarQue(reparto, /diaria/i);
+    if (diarias) {
+      reparto.texto = `${diarias} rutas se recorren a diario. Son las que concentran la `
+        + `exposición y por las que conviene empezar cualquier estudio de rutas: una vía `
+        + `mala recorrida una vez al mes es un problema; la misma vía recorrida cada día `
+        + `es veintidós.`;
+    }
+
+    return reparto;
+  }
+
+  /**
+   * Los riesgos de las rutas, agrupados como en la encuesta.
+   *
+   * Los factores estan agrupados en via y entorno a proposito: son las mismas
+   * dos familias que se preguntan a los trabajadores, asi que lo que declara
+   * el operativo y lo que percibe quien la recorre se pueden contrastar.
+   */
+  private repartoRiesgosRuta(rutas: Models.Diagnostico.Ruta[]): ModelsInforme.Reparto {
+    const reparto = this.contarLista('Riesgos señalados en las rutas', rutas,
+      r => r.factoresRiesgo ?? []);
+    reparto.grafica = 'barras';
+
+    const top = reparto.filas.slice(0, 3);
+    if (top.length) {
+      reparto.texto = `Los riesgos más señalados son `
+        + `${this.enumerar(top.map(f => `${f.etiqueta.toLowerCase()} (${f.total} rutas)`))}. `
+        + `Son los que deben orientar el estudio de rutas y, cuando dependen de la `
+        + `infraestructura, la gestión ante la autoridad vial.`;
+    }
+
+    return reparto;
+  }
+
+  /** Cuantas rutas toca cada familia de riesgo, que son las de la encuesta. */
+  private repartoFamiliasRiesgo(
+    rutas: Models.Diagnostico.Ruta[]
+  ): ModelsInforme.Reparto {
+    const filas = FACTORES_RIESGO_RUTA.map(grupo => {
+      const total = rutas.filter(
+        r => (r.factoresRiesgo ?? []).some(f => grupo.factores.includes(f))
+      ).length;
+      return { etiqueta: grupo.grupo, total, porcentaje: this.pct(total, rutas.length) };
+    });
+
+    return {
+      titulo: 'Rutas afectadas, por familia de riesgo',
+      filas,
+      grafica: 'tabla',
+      texto: 'Las dos familias son las mismas que se preguntan a los trabajadores en el '
+        + 'módulo de identificación de riesgos. Aquí las declara quien planifica la ruta; '
+        + 'allí las percibe quien la recorre. Donde las dos lecturas no coincidan hay algo '
+        + 'que revisar.',
+    };
+  }
+
+  /**
+   * Las rutas ordenadas por exposicion.
+   *
+   * Es el orden en que hay que atenderlas: la que mas kilometros acumula al
+   * mes es donde una mejora rinde mas, aunque no sea la peor de la lista.
+   */
+  private tablaRutas(
+    rutas: Models.Diagnostico.Ruta[],
+    kmDe: (r: Models.Diagnostico.Ruta) => number | null
+  ): ModelsInforme.Tabla[] {
+    if (!rutas.length) return [];
+
+    const ordenadas = [...rutas].sort((a, b) => (kmDe(b) ?? -1) - (kmDe(a) ?? -1));
+
+    return [{
+      titulo: `Rutas por exposición mensual (${rutas.length})`,
+      columnas: ['Ruta', 'Trayecto', 'Tipo de vía', 'Frecuencia', 'Km/mes', 'Riesgos'],
+      filas: ordenadas.map(r => {
+        const km = kmDe(r);
+        return [
+          textoSeguro(r.nombreRuta, 'Sin nombre'),
+          `${textoSeguro(r.origen, '—')} → ${textoSeguro(r.destino, '—')}`,
+          textoSeguro(r.tipoVia, '—'),
+          textoSeguro(r.frecuencia, '—'),
+          km === null ? 'Sin estimar' : km.toLocaleString('es-CO'),
+          String((r.factoresRiesgo ?? []).length || '—'),
+        ];
+      }),
+    }];
+  }
+
+  private textoRutas(
+    total: number, kmMes: number, sinEstimar: number, sinRiesgos: number
+  ): string {
+    if (!total) return '';
+
+    const partes = [`La organización tiene ${total} rutas frecuentes registradas, que `
+      + `suman unos ${kmMes.toLocaleString('es-CO')} kilómetros al mes. Este recorrido se `
+      + `calcula a partir de la distancia y la frecuencia de cada ruta, y mide la `
+      + `exposición de la operación; no debe confundirse con el kilometraje declarado por `
+      + `los vehículos de la flota, que mide otra cosa.`];
+
+    if (sinEstimar) {
+      partes.push(`${sinEstimar} rutas quedan fuera de ese cálculo, por ser ocasionales o `
+        + `por no tener distancia registrada.`);
+    }
+
+    if (sinRiesgos) {
+      partes.push(`En ${sinRiesgos} rutas no se ha señalado ningún factor de riesgo. `
+        + `Ninguna vía está libre de riesgo, así que lo más probable es que falte `
+        + `completar el registro y no que la ruta sea segura.`);
+    }
+
+    return partes.join(' ');
+  }
+
+  /**
+   * Da lectura y forma a la preparacion ante emergencias.
+   *
+   * Lo que se mide aqui no es cuantos planes hay sino cuantos escenarios
+   * quedan sin cubrir, y si los que hay sirven para algo. Un plan sin pasos,
+   * sin responsable o sin telefono es un titulo: en el momento en que hace
+   * falta, no se puede activar.
+   */
+  private emergencias(
+    planes: Models.Diagnostico.PlanEmergencia[]
+  ): ModelsInforme.Seccion {
     const cubiertos = new Set(planes.map(p => p.tipoEmergencia));
     const pendientes = TIPOS_EMERGENCIA.filter(t => !cubiertos.has(t));
 
-    const sinRevisar = planes.filter(
-      p => estadoVigencia(p.fechaRevision).estado === 'vencido'
+    const sinProtocolo = planes.filter(p => !(p.protocoloAccion ?? '').trim()).length;
+    const sinResponsable = planes.filter(p => !(p.responsable ?? '').trim()).length;
+    const sinTelefono = planes.filter(p => !(p.telefonoEmergencia ?? '').trim()).length;
+
+    const enRevision = (estado: string) => planes.filter(
+      p => estadoVigencia(p.fechaRevision).estado === estado
     ).length;
+
+    const vencida = enRevision('vencido');
+    const porVencer = enRevision('porVencer');
+    const sinFecha = enRevision('sinRegistrar');
 
     return {
       id: 'emergencias',
       titulo: 'Preparación ante emergencias',
-      texto: '',
+      texto: this.textoEmergencias(planes.length, [...pendientes], {
+        sinProtocolo, sinResponsable, sinTelefono, vencida, sinFecha,
+      }),
       sinDatos: !planes.length,
       cifras: [
         { etiqueta: 'Planes registrados', valor: planes.length },
@@ -2430,14 +2604,145 @@ export class InformeDiagnosticoService {
           etiqueta: 'Escenarios cubiertos',
           valor: `${TIPOS_EMERGENCIA.length - pendientes.length} de ${TIPOS_EMERGENCIA.length}`,
           alerta: pendientes.length > 0,
-          nota: pendientes.length ? `Faltan: ${pendientes.join(', ')}` : '',
+          nota: pendientes.length ? `Faltan: ${pendientes.join(', ')}` : 'Cobertura completa',
         },
         {
-          etiqueta: 'Planes con revisión vencida', valor: sinRevisar, alerta: sinRevisar > 0,
+          etiqueta: 'Sin protocolo de acción', valor: sinProtocolo,
+          alerta: sinProtocolo > 0, nota: 'Un plan sin pasos no se puede seguir',
+        },
+        {
+          etiqueta: 'Sin responsable', valor: sinResponsable, alerta: sinResponsable > 0,
+          nota: 'Nadie a quien avisar',
+        },
+        {
+          etiqueta: 'Sin teléfono de emergencia', valor: sinTelefono,
+          alerta: sinTelefono > 0,
+        },
+        {
+          etiqueta: 'Revisión vencida', valor: vencida, alerta: vencida > 0,
+          nota: 'Deja de valer en una auditoría',
+        },
+        {
+          etiqueta: 'Revisión por vencer', valor: porVencer, alerta: porVencer > 0,
+          nota: `En los próximos ${DIAS_AVISO} días`,
+        },
+        {
+          etiqueta: 'Sin fecha de revisión', valor: sinFecha, alerta: sinFecha > 0,
+          nota: 'Nada obliga a volver a mirarlo',
         },
       ],
-      repartos: [this.contar('Planes por escenario', planes, p => p.tipoEmergencia)],
+      repartos: [this.repartoCobertura(planes, [...pendientes])],
+      tablas: this.tablaPlanes(planes),
     };
+  }
+
+  /**
+   * La cobertura escenario por escenario, incluidos los que estan a cero.
+   *
+   * Un reparto normal solo ensena lo que existe. Aqui lo que interesa es
+   * justo lo contrario: la barra vacia es el hallazgo.
+   */
+  private repartoCobertura(
+    planes: Models.Diagnostico.PlanEmergencia[], pendientes: string[]
+  ): ModelsInforme.Reparto {
+    const base = planes.length || 1;
+
+    const filas: ModelsInforme.Reparto['filas'] = TIPOS_EMERGENCIA.map(escenario => {
+      const total = planes.filter(p => p.tipoEmergencia === escenario).length;
+      return {
+        etiqueta: escenario, total, porcentaje: Math.round((total / base) * 1000) / 10,
+      };
+    });
+
+    // "Otro" queda fuera de la cobertura, pero si hay planes ahi se ensenan.
+    const otros = planes.filter(p => p.tipoEmergencia === TIPO_EMERGENCIA_OTRO).length;
+    if (otros) {
+      filas.push({
+        etiqueta: TIPO_EMERGENCIA_OTRO, total: otros,
+        porcentaje: Math.round((otros / base) * 1000) / 10,
+      });
+    }
+
+    return {
+      titulo: 'Cobertura por escenario de emergencia',
+      filas,
+      grafica: 'barras',
+      texto: pendientes.length
+        ? `Las barras a cero son los escenarios que la organización no tiene previstos: `
+          + `${pendientes.join(', ')}. Cada uno de ellos es una acción concreta para el `
+          + `plan de trabajo.`
+        : `Los ${TIPOS_EMERGENCIA.length} escenarios previstos por el diagnóstico tienen `
+          + `al menos un plan asociado.`,
+    };
+  }
+
+  /** Los planes uno por uno, con lo que les falta para poder activarse. */
+  private tablaPlanes(
+    planes: Models.Diagnostico.PlanEmergencia[]
+  ): ModelsInforme.Tabla[] {
+    if (!planes.length) return [];
+
+    return [{
+      titulo: `Planes de emergencia registrados (${planes.length})`,
+      columnas: ['Plan', 'Escenario', 'Responsable', 'Teléfono', 'Protocolo', 'Revisión'],
+      filas: planes.map(p => [
+        textoSeguro(p.nombrePlan, 'Sin nombre'),
+        textoSeguro(p.tipoEmergencia, '—'),
+        textoSeguro(p.responsable, 'Sin asignar'),
+        textoSeguro(p.telefonoEmergencia, 'Sin registrar'),
+        (p.protocoloAccion ?? '').trim() ? 'Documentado' : 'Sin documentar',
+        this.resumenVigencia(p.fechaRevision),
+      ]),
+    }];
+  }
+
+  private textoEmergencias(
+    total: number,
+    pendientes: string[],
+    h: {
+      sinProtocolo: number; sinResponsable: number; sinTelefono: number;
+      vencida: number; sinFecha: number;
+    }
+  ): string {
+    if (!total) {
+      return 'La organización no tiene registrado ningún plan de preparación y respuesta '
+        + 'ante emergencias viales. Es uno de los pasos obligatorios del PESV y, más allá '
+        + 'del requisito, es lo que determina qué ocurre en los minutos siguientes a un '
+        + 'siniestro.';
+    }
+
+    const partes = [`La organización tiene ${total} planes de respuesta registrados.`];
+
+    if (pendientes.length) {
+      partes.push(`Quedan sin cubrir ${pendientes.length} de los `
+        + `${TIPOS_EMERGENCIA.length} escenarios previstos: ${pendientes.join(', ')}.`);
+    } else {
+      partes.push('Los escenarios previstos están todos cubiertos.');
+    }
+
+    // Lo que impide activar un plan pesa mas que cuantos planes hay.
+    const inservibles: string[] = [];
+    if (h.sinProtocolo) inservibles.push(`${h.sinProtocolo} no describen los pasos a seguir`);
+    if (h.sinResponsable) inservibles.push(`${h.sinResponsable} no tienen responsable asignado`);
+    if (h.sinTelefono) inservibles.push(`${h.sinTelefono} no tienen teléfono de emergencia`);
+
+    if (inservibles.length) {
+      partes.push(`De los registrados, ${this.enumerar(inservibles)}. Un plan al que le `
+        + `falta cualquiera de esas tres cosas no se puede activar en el momento en que `
+        + `hace falta, que es el único momento en que sirve.`);
+    }
+
+    if (h.vencida) {
+      partes.push(`${h.vencida} planes tienen la fecha de revisión vencida y dejan de `
+        + `valer en una auditoría.`);
+    }
+
+    if (h.sinFecha) {
+      partes.push(`En ${h.sinFecha} no consta fecha de revisión, de modo que nada obliga `
+        + `a volver a mirarlos.`);
+    }
+
+    return partes.join(' ');
   }
 
   /** El nombre de quien tiene la sesión, para proponerlo como responsable. */
