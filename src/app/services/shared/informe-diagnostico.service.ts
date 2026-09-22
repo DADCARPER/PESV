@@ -8,7 +8,8 @@ import { Models } from '../../interfaces/models';
 import { ModelsInforme } from '../../interfaces/informe.interface';
 import { kilometrosAlMes } from '../../data/rutas';
 import { TIPOS_EMERGENCIA } from '../../data/emergencias';
-import { estadoVigencia } from '../../data/vigencias';
+import { DIAS_AVISO, estadoVigencia } from '../../data/vigencias';
+import { textoSeguro } from '../../data/texto-seguro';
 
 /**
  * Reúne las cifras del informe de diagnóstico.
@@ -526,6 +527,8 @@ export class InformeDiagnosticoService {
       if (modulo.id === 'modulo5') this.enriquecerRiesgos(seccion, respuestas);
       if (modulo.id === 'modulo6') this.enriquecerMejora(seccion, respuestas);
 
+      this.ordenarEscalas(seccion.repartos, modulo);
+
       return seccion;
     });
   }
@@ -815,6 +818,47 @@ export class InformeDiagnosticoService {
     const duracion = buscar('tiempoDuracionDesplazamiento');
     if (duracion) {
       duracion.texto = this.textoDuracionJornada(duracion, enMision.length);
+    }
+  }
+
+  /**
+   * Devuelve las escalas al orden en que la encuesta ofrecio las opciones.
+   *
+   * El reparto generico ordena por frecuencia, que es lo correcto para una
+   * lista de causas: interesa cual pesa mas. Pero en una escala destruye la
+   * informacion. Una escolaridad ordenada de primaria a posgrado ensena la
+   * forma de la plantilla; la misma escolaridad ordenada por tamano de barra
+   * no ensena nada, y unas categorias de licencia en A1, C2, B1, A2 no se
+   * pueden leer.
+   *
+   * La regla es la forma del grafico: si algo se pinta en columnas es porque
+   * se lee de izquierda a derecha, y entonces manda el orden de la encuesta.
+   * Las barras horizontales y las tablas siguen ordenadas por frecuencia.
+   */
+  private ordenarEscalas(repartos: ModelsInforme.Reparto[], modulo: any): void {
+    const opcionesDe = new Map<string, string[]>(
+      ((modulo.preguntas ?? []) as any[])
+        .filter(p => p.opciones?.length)
+        .map(p => [
+          p.id as string,
+          (p.opciones as any[]).map(o => String(o.etiqueta ?? o.valor)),
+        ])
+    );
+
+    for (const reparto of repartos) {
+      if (!reparto.id || reparto.grafica !== 'columnas') continue;
+
+      const orden = opcionesDe.get(reparto.id);
+      if (!orden) continue;
+
+      // Una respuesta que ya no esta entre las opciones (la encuesta cambio
+      // despues de recogerla) se va al final en vez de desaparecer.
+      const posicion = (etiqueta: string) => {
+        const i = orden.indexOf(etiqueta);
+        return i < 0 ? orden.length : i;
+      };
+
+      reparto.filas.sort((a, b) => posicion(a.etiqueta) - posicion(b.etiqueta));
     }
   }
 
@@ -1771,38 +1815,356 @@ export class InformeDiagnosticoService {
       .reduce((n, f) => n + f.total, 0);
   }
 
-  private flota(vehiculos: Models.Diagnostico.Vehiculo[]): ModelsInforme.Seccion {
-    const propios = vehiculos.filter(v => v.tipoRelacion === 'Propio').length;
+  /**
+   * Los tramos de antiguedad con que se lee una flota.
+   *
+   * No es una escala arbitraria: a partir de los diez anos un vehiculo pierde
+   * los sistemas de seguridad que trae uno nuevo, y a partir de los quince la
+   * renovacion deja de ser una mejora y pasa a ser una medida de control del
+   * riesgo que el plan tiene que presupuestar.
+   */
+  private static readonly TRAMOS_ANTIGUEDAD = [
+    { etiqueta: 'Menos de 5 años', hasta: 5 },
+    { etiqueta: 'De 5 a 10 años', hasta: 10 },
+    { etiqueta: 'De 11 a 15 años', hasta: 15 },
+    { etiqueta: 'Más de 15 años', hasta: Infinity },
+  ];
 
-    const sinSoat = vehiculos.filter(
-      v => estadoVigencia(v.vigenciaSoat).estado !== 'vigente'
+  /**
+   * Da lectura y forma a la flota.
+   *
+   * La flota es la parte del diagnostico donde los hallazgos son duros: un
+   * SOAT vencido no es una percepcion ni un porcentaje, es un vehiculo que no
+   * puede circular. Por eso la seccion antepone el estado documental y baja
+   * hasta la placa concreta, en vez de quedarse en repartos.
+   */
+  private flota(vehiculos: Models.Diagnostico.Vehiculo[]): ModelsInforme.Seccion {
+    const total = vehiculos.length;
+    const propios = vehiculos.filter(v => /propio/i.test(v.tipoRelacion ?? '')).length;
+
+    // La exposicion: sin kilometros no hay forma de decir si tres siniestros
+    // son muchos o pocos.
+    const kmMes = vehiculos.reduce((n, v) => n + (Number(v.promedioKmMes) || 0), 0);
+
+    const enEstado = (estado: string) => vehiculos.filter(
+      v => estadoVigencia(v.vigenciaSoat).estado === estado
+        || estadoVigencia(v.vigenciaRevisionTecnica).estado === estado
     ).length;
-    const sinRevision = vehiculos.filter(
-      v => estadoVigencia(v.vigenciaRevisionTecnica).estado !== 'vigente'
+
+    const soatVencido = vehiculos.filter(
+      v => estadoVigencia(v.vigenciaSoat).estado === 'vencido'
     ).length;
+    const revisionVencida = vehiculos.filter(
+      v => estadoVigencia(v.vigenciaRevisionTecnica).estado === 'vencido'
+    ).length;
+    const porVencer = enEstado('porVencer');
+    const sinRegistrar = enEstado('sinRegistrar');
+
+    const sinPlan = vehiculos.filter(
+      v => !/^s[ií]$/i.test(v.tienePlanMantenimiento ?? '')
+    ).length;
+    const siniestros = vehiculos.reduce(
+      (n, v) => n + (Number(v.numeroSiniestros) || 0), 0
+    );
+
+    const documental = this.hallazgosDocumentales(vehiculos);
 
     return {
       id: 'flota',
       titulo: 'La flota',
-      texto: '',
-      sinDatos: !vehiculos.length,
+      texto: this.textoFlota(total, propios, kmMes, {
+        soatVencido, revisionVencida, porVencer, sinRegistrar, sinPlan, siniestros,
+      }),
+      sinDatos: !total,
       cifras: [
-        { etiqueta: 'Vehículos', valor: vehiculos.length },
-        { etiqueta: 'Propios', valor: propios },
-        { etiqueta: 'De terceros', valor: vehiculos.length - propios },
+        { etiqueta: 'Vehículos', valor: total },
+        { etiqueta: 'Propios', valor: propios, nota: 'Responsabilidad directa de la empresa' },
+        { etiqueta: 'De terceros', valor: total - propios, nota: 'Se gestionan por contrato' },
         {
-          etiqueta: 'Sin SOAT vigente', valor: sinSoat, alerta: sinSoat > 0,
+          etiqueta: 'Kilómetros al mes', valor: kmMes.toLocaleString('es-CO'),
+          nota: 'Exposición declarada de la flota',
+        },
+        {
+          etiqueta: 'SOAT vencido', valor: soatVencido, alerta: soatVencido > 0,
           nota: 'No pueden circular legalmente',
         },
         {
-          etiqueta: 'Sin revisión técnica vigente', valor: sinRevision, alerta: sinRevision > 0,
+          etiqueta: 'Revisión técnica vencida', valor: revisionVencida,
+          alerta: revisionVencida > 0,
+        },
+        {
+          etiqueta: 'Por vencer', valor: porVencer, alerta: porVencer > 0,
+          nota: `En los próximos ${DIAS_AVISO} días`,
+        },
+        {
+          etiqueta: 'Sin plan de mantenimiento', valor: sinPlan, alerta: sinPlan > 0,
+          nota: 'El PESV lo exige para toda la flota',
         },
       ],
       repartos: [
-        this.contar('Vehículos por tipo', vehiculos, v => v.tipoVehiculo),
-        this.contar('Vehículos por relación', vehiculos, v => v.tipoRelacion),
+        this.repartoTipoVehiculo(vehiculos),
+        this.repartoRelacion(vehiculos, propios, total),
+        this.repartoAntiguedad(vehiculos),
+        this.repartoMantenimiento(vehiculos, sinPlan, total),
       ],
+      tablas: documental ? [documental] : [],
     };
+  }
+
+  private repartoTipoVehiculo(
+    vehiculos: Models.Diagnostico.Vehiculo[]
+  ): ModelsInforme.Reparto {
+    const reparto = this.contar('Vehículos por tipo', vehiculos, v => v.tipoVehiculo);
+    reparto.grafica = 'barras';
+
+    const mayor = reparto.filas[0];
+    if (mayor) {
+      reparto.texto = `La flota se compone principalmente de `
+        + `${mayor.etiqueta.toLowerCase()}: ${mayor.total} de ${vehiculos.length} `
+        + `vehículos (${mayor.porcentaje}%). El tipo de vehículo determina qué categoría `
+        + `de licencia necesitan sus conductores y qué revisiones exige.`;
+    }
+
+    return reparto;
+  }
+
+  private repartoRelacion(
+    vehiculos: Models.Diagnostico.Vehiculo[], propios: number, total: number
+  ): ModelsInforme.Reparto {
+    const reparto = this.contar('Relación de los vehículos con la empresa', vehiculos,
+      v => v.tipoRelacion);
+    reparto.grafica = 'dona';
+
+    const terceros = total - propios;
+    let texto = `${propios} vehículos (${this.pct(propios, total)}%) son propiedad de la `
+      + `organización: sobre ellos recae de forma directa el mantenimiento, la `
+      + `documentación y la inspección preoperacional.`;
+
+    if (terceros) {
+      const empresas = new Set(
+        vehiculos
+          .filter(v => !/propio/i.test(v.tipoRelacion ?? '') && v.contratistaNombre)
+          .map(v => v.contratistaNombre)
+      );
+
+      texto += ` Los ${terceros} restantes (${this.pct(terceros, total)}%) pertenecen a `
+        + `terceros`;
+      texto += empresas.size
+        ? `, repartidos entre ${empresas.size} contratistas.`
+        : `.`;
+      texto += ` Sobre estos la exigencia no desaparece: se traslada al contrato, y el `
+        + `PESV obliga a verificar que cumplen las mismas condiciones.`;
+    }
+
+    reparto.texto = texto;
+    return reparto;
+  }
+
+  /**
+   * La antiguedad de la flota, por tramos y en orden.
+   *
+   * Se construye a mano porque el reparto generico ordena por frecuencia, y
+   * una escala de antiguedad solo se lee de menor a mayor.
+   */
+  private repartoAntiguedad(
+    vehiculos: Models.Diagnostico.Vehiculo[]
+  ): ModelsInforme.Reparto {
+    const edades = vehiculos.map(v => this.antiguedad(v.fechaFabricacion));
+    const conEdad = edades.filter((e): e is number => e !== null);
+    const base = vehiculos.length || 1;
+
+    const filas = InformeDiagnosticoService.TRAMOS_ANTIGUEDAD.map((tramo, i, tramos) => {
+      const desde = i === 0 ? 0 : tramos[i - 1].hasta;
+      const total = conEdad.filter(e => e >= desde && e < tramo.hasta).length;
+      return { etiqueta: tramo.etiqueta, total, porcentaje: this.pct(total, base) };
+    });
+
+    const sinFecha = vehiculos.length - conEdad.length;
+    if (sinFecha) {
+      filas.push({
+        etiqueta: 'Sin fecha registrada', total: sinFecha,
+        porcentaje: this.pct(sinFecha, base),
+      });
+    }
+
+    return {
+      titulo: 'Antigüedad de la flota',
+      filas,
+      grafica: 'columnas',
+      texto: this.textoAntiguedad(conEdad, sinFecha, vehiculos.length),
+    };
+  }
+
+  private repartoMantenimiento(
+    vehiculos: Models.Diagnostico.Vehiculo[], sinPlan: number, total: number
+  ): ModelsInforme.Reparto {
+    const reparto = this.contar('Plan de mantenimiento preventivo', vehiculos,
+      v => this.textoSiNo(v.tienePlanMantenimiento));
+    reparto.grafica = 'tabla';
+    reparto.emparejado = this.contar('Frecuencia del mantenimiento', vehiculos,
+      v => v.frecuenciaMantenimiento || 'Sin definir');
+
+    reparto.titulo = 'Mantenimiento preventivo de la flota';
+    reparto.texto = sinPlan
+      ? `${sinPlan} de los ${total} vehículos (${this.pct(sinPlan, total)}%) no tienen `
+        + `plan de mantenimiento preventivo registrado. El mantenimiento preventivo es `
+        + `uno de los pasos obligatorios del PESV y su ausencia es un hallazgo de `
+        + `auditoría, no una recomendación.`
+      : `Los ${total} vehículos de la flota cuentan con plan de mantenimiento `
+        + `preventivo registrado.`;
+
+    return reparto;
+  }
+
+  /**
+   * Los vehiculos cuya documentacion no esta en regla, con placa.
+   *
+   * Un porcentaje no se puede llevar al taller. Esta tabla es la que convierte
+   * la seccion en una lista de trabajo.
+   */
+  private hallazgosDocumentales(
+    vehiculos: Models.Diagnostico.Vehiculo[]
+  ): ModelsInforme.Tabla | null {
+    const enRegla = (fecha?: string) => estadoVigencia(fecha).estado === 'vigente';
+
+    const filas = vehiculos
+      .filter(v => !enRegla(v.vigenciaSoat) || !enRegla(v.vigenciaRevisionTecnica))
+      .map(v => [
+        textoSeguro(v.placa, 'Sin placa'),
+        textoSeguro(v.tipoVehiculo, '—'),
+        textoSeguro(v.tipoRelacion, '—'),
+        this.resumenVigencia(v.vigenciaSoat),
+        this.resumenVigencia(v.vigenciaRevisionTecnica),
+      ]);
+
+    if (!filas.length) return null;
+
+    return {
+      titulo: `Vehículos con documentación pendiente (${filas.length})`,
+      columnas: ['Placa', 'Tipo', 'Relación', 'SOAT', 'Revisión técnica'],
+      filas,
+    };
+  }
+
+  /** Una fecha límite en texto plano: cuándo y en qué situación está. */
+  private resumenVigencia(fecha?: string): string {
+    const { estado, dias } = estadoVigencia(fecha);
+
+    if (estado === 'sinRegistrar') return 'Sin registrar';
+    if (estado === 'vencido') return `${fecha} · vencido hace ${Math.abs(dias)} días`;
+    if (estado === 'porVencer') return `${fecha} · vence en ${dias} días`;
+    return `${fecha} · vigente`;
+  }
+
+  /** Anos cumplidos desde la fabricacion, o null si no consta. */
+  private antiguedad(fecha?: string): number | null {
+    if (!fecha) return null;
+
+    // El campo admite tanto un ano suelto como una fecha completa.
+    const ano = /^\d{4}$/.test(fecha.trim())
+      ? Number(fecha.trim())
+      : new Date(fecha).getFullYear();
+
+    if (!ano || isNaN(ano)) return null;
+
+    const edad = new Date().getFullYear() - ano;
+    return edad >= 0 && edad < 100 ? edad : null;
+  }
+
+  /** Normaliza un campo de si/no para que el reparto no invente categorias. */
+  private textoSiNo(valor?: string): string {
+    if (/^s[ií]$/i.test(valor ?? '')) return 'Sí';
+    if (/^no$/i.test(valor ?? '')) return 'No';
+    return 'Sin registrar';
+  }
+
+  /** Resume la flota: tamano, exposicion y lo que no esta en regla. */
+  private textoFlota(
+    total: number,
+    propios: number,
+    kmMes: number,
+    h: {
+      soatVencido: number; revisionVencida: number; porVencer: number;
+      sinRegistrar: number; sinPlan: number; siniestros: number;
+    }
+  ): string {
+    if (!total) return '';
+
+    const partes = [`La organización reporta ${total} vehículos, de los cuales ${propios} `
+      + `son propios y ${total - propios} pertenecen a terceros.`];
+
+    if (kmMes > 0) {
+      partes.push(`En conjunto recorren unos ${kmMes.toLocaleString('es-CO')} kilómetros `
+        + `al mes, que es la exposición sobre la que se mide cualquier indicador de `
+        + `siniestralidad.`);
+    }
+
+    // Lo documental primero: es lo unico de esta seccion que impide circular.
+    const irregulares: string[] = [];
+    if (h.soatVencido) irregulares.push(`${h.soatVencido} con el SOAT vencido`);
+    if (h.revisionVencida) {
+      irregulares.push(`${h.revisionVencida} con la revisión técnico-mecánica vencida`);
+    }
+
+    if (irregulares.length) {
+      partes.push(`Hay ${this.enumerar(irregulares)}. Ninguno de ellos puede circular `
+        + `legalmente, de modo que su regularización no es una acción del plan sino una `
+        + `medida inmediata.`);
+    } else {
+      partes.push('Toda la flota tiene la documentación obligatoria vigente.');
+    }
+
+    if (h.porVencer) {
+      partes.push(`Otros ${h.porVencer} tienen alguna vigencia que caduca en los próximos `
+        + `${DIAS_AVISO} días.`);
+    }
+
+    if (h.sinRegistrar) {
+      partes.push(`En ${h.sinRegistrar} vehículos falta registrar alguna de las dos `
+        + `fechas, así que el diagnóstico no puede confirmar su situación: conviene `
+        + `completarlo antes de emitir el informe.`);
+    }
+
+    if (h.siniestros) {
+      let frase = `La flota acumula ${h.siniestros} siniestros registrados`;
+      if (kmMes > 0) {
+        const tasa = (h.siniestros / (kmMes * 12)) * 1000000;
+        frase += `, equivalentes a ${Math.round(tasa * 10) / 10} por millón de kilómetros `
+          + `recorridos`;
+      }
+      partes.push(`${frase}.`);
+    }
+
+    return partes.join(' ');
+  }
+
+  /** La edad de la flota y lo que implica presupuestar. */
+  private textoAntiguedad(
+    edades: number[], sinFecha: number, total: number
+  ): string {
+    if (!edades.length) {
+      return `No consta la fecha de fabricación de ninguno de los ${total} vehículos, de `
+        + `modo que no puede valorarse la antigüedad de la flota.`;
+    }
+
+    const promedio = Math.round(edades.reduce((n, e) => n + e, 0) / edades.length);
+    const viejos = edades.filter(e => e > 10).length;
+
+    let texto = `La flota tiene una antigüedad promedio de ${promedio} años.`;
+
+    if (viejos) {
+      texto += ` ${viejos} vehículos (${this.pct(viejos, total)}%) superan los diez años: `
+        + `a esa edad han quedado atrás los sistemas de seguridad que trae un vehículo `
+        + `nuevo, y su renovación deja de ser una mejora para convertirse en una medida `
+        + `de control del riesgo que el plan debe presupuestar.`;
+    }
+
+    if (sinFecha) {
+      texto += ` En ${sinFecha} vehículos no consta la fecha de fabricación y quedan `
+        + `fuera de este cálculo.`;
+    }
+
+    return texto;
   }
 
   private contratistas(contratistas: Models.Diagnostico.Contratistas[]): ModelsInforme.Seccion {
