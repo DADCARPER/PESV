@@ -196,6 +196,12 @@ export class InformeDiagnosticoService {
           reparto.texto = this.textoEstadoCivil(reparto, respuestas.length);
         }
 
+        // Tres categorias: el dato exacto basta y un grafico no anade nada.
+        if (p.id === 'jornada') {
+          reparto.grafica = 'tabla';
+          reparto.texto = this.textoJornada(reparto, respuestas.length);
+        }
+
         if (p.id === 'estrato') {
           reparto.grafica = 'tablaPastel';
           reparto.texto = this.textoEstrato(reparto, respuestas.length);
@@ -298,6 +304,35 @@ export class InformeDiagnosticoService {
       const pct = Math.round((total / muestra) * 1000) / 10;
       texto += ` En conjunto, ${total} personas (${pct}%) cuentan con formación `
         + `superior o de posgrado.`;
+    }
+
+    return texto;
+  }
+
+  /**
+   * Redacta el reparto por jornada laboral.
+   *
+   * Destaca quienes trabajan de noche o en jornada mixta: conducir al terminar
+   * un turno nocturno es uno de los factores de riesgo vial que la Resolucion
+   * pide vigilar, asi que esa cifra merece salir dicha y no solo tabulada.
+   */
+  private textoJornada(reparto: ModelsInforme.Reparto, muestra: number): string {
+    if (!muestra || !reparto.filas.length) return '';
+
+    const principal = reparto.filas[0];
+    let texto = `La jornada predominante es la ${principal.etiqueta.toLowerCase()}, `
+      + `con ${principal.total} personas (${principal.porcentaje}%) de las ${muestra} `
+      + `encuestadas.`;
+
+    // Por el nombre de la opcion y no por una lista fija: las edita el
+    // superadministrador.
+    const nocturnas = reparto.filas.filter(f => /noct|noche|mixta/i.test(f.etiqueta));
+    if (nocturnas.length) {
+      const total = nocturnas.reduce((n, f) => n + f.total, 0);
+      const pct = Math.round((total / muestra) * 1000) / 10;
+      texto += ` ${total} personas (${pct}%) trabajan en jornada nocturna o mixta, `
+        + `situación que incrementa la fatiga y con ella el riesgo en los `
+        + `desplazamientos al terminar el turno.`;
     }
 
     return texto;

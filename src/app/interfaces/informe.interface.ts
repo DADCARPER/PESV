@@ -35,10 +35,11 @@ export namespace ModelsInforme {
      *
      * `columnas` son barras verticales, para escalas que se leen en orden;
      * `barras` son horizontales, para categorías sueltas con nombres largos;
-     * `tablaPastel` pone la tabla y un pastel al lado, para pocas categorías
-     * donde interesa tanto el dato exacto como el peso de cada una.
+     * `tabla` es solo el listado, centrado, cuando el dato exacto basta y un
+     * gráfico de tres categorías no añade nada; `tablaPastel` pone las dos
+     * cosas, para cuando además interesa el peso de cada una.
      */
-    grafica?: 'columnas' | 'barras' | 'tablaPastel';
+    grafica?: 'columnas' | 'barras' | 'tabla' | 'tablaPastel';
   }
 
   /**
