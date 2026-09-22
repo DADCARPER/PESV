@@ -68,13 +68,38 @@ export class InformeDiagnosticoComponent {
     return reparto.grafica === 'barras' ? 60 + reparto.filas.length * 42 : 300;
   }
 
-  /** Las gráficas del proyecto reciben etiquetas y valores por separado. */
+  /**
+   * Las gráficas del proyecto reciben etiquetas y valores por separado, y hay
+   * que darles siempre el mismo array.
+   *
+   * Calcularlos en la plantilla devolvía uno nuevo en cada ciclo de detección
+   * de cambios. El gráfico lo veía como un dato distinto, se reconstruía y
+   * repetía su animación sin parar, y con ello la página dejaba de
+   * desplazarse. Se guardan la primera vez y se reutilizan.
+   *
+   * El almacén es débil: cuando el informe se recarga, lo anterior se
+   * descarta solo.
+   */
+  private derivados = new WeakMap<ModelsInforme.Reparto, { etiquetas: string[]; valores: number[] }>();
+
+  private derivadosDe(reparto: ModelsInforme.Reparto) {
+    let guardado = this.derivados.get(reparto);
+    if (!guardado) {
+      guardado = {
+        etiquetas: reparto.filas.map(f => f.etiqueta),
+        valores: reparto.filas.map(f => f.total),
+      };
+      this.derivados.set(reparto, guardado);
+    }
+    return guardado;
+  }
+
   etiquetasDe(reparto: ModelsInforme.Reparto): string[] {
-    return reparto.filas.map(f => f.etiqueta);
+    return this.derivadosDe(reparto).etiquetas;
   }
 
   valoresDe(reparto: ModelsInforme.Reparto): number[] {
-    return reparto.filas.map(f => f.total);
+    return this.derivadosDe(reparto).valores;
   }
 
   /** Secciones sin ningún dato: lo que habría que llenar antes de emitir. */
