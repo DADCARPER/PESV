@@ -522,6 +522,7 @@ export class InformeDiagnosticoService {
       // Los que todavia no la tienen salen con el reparto simple de siempre.
       if (modulo.id === 'modulo2') this.enriquecerSalud(seccion, respuestas.length);
       if (modulo.id === 'modulo3') this.enriquecerConduccion(seccion, modulo, respuestas);
+      if (modulo.id === 'modulo4') this.enriquecerDesplazamientos(seccion, respuestas);
 
       return seccion;
     });
@@ -714,6 +715,311 @@ export class InformeDiagnosticoService {
       emergencias.grafica = 'tabla';
       emergencias.texto = this.textoCapacitacion(emergencias, conductores);
     }
+  }
+
+  /**
+   * Da lectura y forma al modulo de desplazamientos.
+   *
+   * El modulo son en realidad dos cosas que la Resolucion separa y que el
+   * informe tiene que separar tambien: el trayecto entre la casa y el trabajo
+   * (in itinere) y los desplazamientos que se hacen durante la jornada (en
+   * mision). Los segundos ocurren por encargo de la empresa, asi que caen de
+   * lleno dentro del alcance del PESV; los primeros importan como exposicion
+   * al riesgo, pero no son lo mismo.
+   */
+  private enriquecerDesplazamientos(
+    seccion: ModelsInforme.Seccion,
+    respuestas: Record<string, any>[]
+  ): void {
+    const muestra = respuestas.length;
+    const buscar = (id: string) => seccion.repartos.find(r => r.id === id);
+
+    // ── El trayecto casa-trabajo: lo responde toda la muestra ──────────────
+    const medios = buscar('mediosTransporte');
+    if (medios) {
+      medios.titulo = 'Medios de transporte para llegar al trabajo';
+      medios.grafica = 'barras';
+      medios.texto = this.textoMedios(medios, muestra);
+    }
+
+    const tiempo = buscar('tiempoDesplazamiento');
+    if (tiempo) {
+      tiempo.grafica = 'columnas';
+      tiempo.texto = this.textoTiempoTrayecto(tiempo, muestra);
+    }
+
+    // Estado y propiedad hablan del mismo vehiculo: se leen juntos.
+    const estado = buscar('estadoVehiculo');
+    const propiedad = buscar('propiedadVehiculo');
+    if (estado && propiedad) {
+      estado.titulo = 'El vehículo en el que se desplaza: estado y propiedad';
+      estado.grafica = 'tabla';
+      estado.emparejado = propiedad;
+      estado.texto = this.textoVehiculoTrayecto(estado, propiedad, muestra);
+      seccion.repartos.splice(seccion.repartos.indexOf(propiedad), 1);
+    }
+
+    const incidentes = buscar('incidentesDesplazamiento');
+    if (incidentes) {
+      incidentes.grafica = 'barras';
+      incidentes.texto = this.textoIncidentes(incidentes, muestra);
+    }
+
+    // ── Los desplazamientos en jornada: base propia ────────────────────────
+    //
+    // La encuesta no condiciona estas dos preguntas, asi que las ve todo el
+    // mundo; pero solo significan algo para quien se desplaza por trabajo, y
+    // sobre la muestra entera saldrian rebajadas.
+    const enMision = respuestas.filter(
+      r => /^s[ií]$/i.test(String(r['desplazamientosJornada'] ?? '').trim())
+    );
+
+    const realiza = buscar('desplazamientosJornada');
+    if (realiza) {
+      realiza.titulo = 'Desplazamientos u operación de vehículos durante la jornada';
+      realiza.grafica = 'dona';
+      realiza.texto = this.textoEnMision(enMision.length, muestra);
+    }
+
+    seccion.texto = this.textoDesplazamientos(muestra, enMision.length, {
+      incidentes,
+      estado,
+    });
+
+    // Sin nadie que se desplace en jornada no hay base sobre la que recalcular.
+    if (!enMision.length) return;
+
+    for (const id of ['tipoDesplazamientoJornada', 'tiempoDuracionDesplazamiento']) {
+      const reparto = buscar(id);
+      if (!reparto) continue;
+
+      reparto.filas = this.repartoDe(
+        reparto.titulo,
+        enMision.length,
+        enMision.flatMap(r => {
+          const valor = r[id];
+          return Array.isArray(valor) ? valor : [valor];
+        })
+      ).filas;
+      reparto.grafica = 'columnas';
+      reparto.titulo = `${reparto.titulo} (sobre ${enMision.length} personas)`;
+    }
+
+    const mediosJornada = buscar('tipoDesplazamientoJornada');
+    if (mediosJornada) {
+      mediosJornada.texto = this.textoMediosJornada(mediosJornada, enMision.length);
+    }
+
+    const duracion = buscar('tiempoDuracionDesplazamiento');
+    if (duracion) {
+      duracion.texto = this.textoDuracionJornada(duracion, enMision.length);
+    }
+  }
+
+  /** Resume el modulo separando el trayecto de la jornada. */
+  private textoDesplazamientos(
+    muestra: number,
+    enMision: number,
+    r: { incidentes?: ModelsInforme.Reparto; estado?: ModelsInforme.Reparto }
+  ): string {
+    if (!muestra) return '';
+
+    const partes = [
+      'Los desplazamientos se analizan por separado según su naturaleza: el trayecto '
+      + 'entre la vivienda y el lugar de trabajo, y los recorridos que se realizan '
+      + 'durante la jornada por encargo de la empresa. Estos últimos son los que caen '
+      + 'de lleno dentro del alcance del PESV.',
+    ];
+
+    partes.push(`De las ${muestra} personas encuestadas, ${enMision} `
+      + `(${this.pct(enMision, muestra)}%) se desplazan u operan algún vehículo durante `
+      + `la jornada laboral.`);
+
+    const hallazgos: string[] = [];
+
+    const conIncidentes = this.sumarSalvoNo(r.incidentes);
+    if (conIncidentes) {
+      hallazgos.push(`${conIncidentes} (${this.pct(conIncidentes, muestra)}%) tuvieron `
+        + `incidentes o dificultades en su desplazamiento durante el último año`);
+    }
+
+    const vehiculoDeficiente = this.sumarQue(r.estado, /regular|malo/i);
+    if (vehiculoDeficiente) {
+      hallazgos.push(`${vehiculoDeficiente} (${this.pct(vehiculoDeficiente, muestra)}%) se `
+        + `desplazan en un vehículo cuyo estado califican como regular o peor`);
+    }
+
+    if (hallazgos.length) {
+      partes.push(`Sobre el conjunto de la muestra, ${this.enumerar(hallazgos)}.`);
+    }
+
+    return partes.join(' ');
+  }
+
+  /** Los medios del trayecto, con el peso de los actores viales vulnerables. */
+  private textoMedios(reparto: ModelsInforme.Reparto, muestra: number): string {
+    const moto = this.sumarQue(reparto, /moto/i);
+    const vulnerables = moto
+      + this.sumarQue(reparto, /bicicleta/i)
+      + this.sumarQue(reparto, /^a pie$/i);
+
+    if (!vulnerables) return '';
+
+    let texto = `${vulnerables} respuestas (${this.pct(vulnerables, muestra)}% de la `
+      + `muestra) corresponden a medios que exponen directamente a la persona: moto, `
+      + `bicicleta o desplazamiento a pie.`;
+
+    if (moto) {
+      texto += ` La moto, con ${moto} (${this.pct(moto, muestra)}%), es el medio con mayor `
+        + `tasa de siniestralidad en el país y merece atención específica en el plan.`;
+    }
+
+    texto += ' Los porcentajes suman más de cien porque cada persona puede señalar '
+      + 'varios medios.';
+
+    return texto;
+  }
+
+  /** El tiempo del trayecto, leído como exposición al riesgo. */
+  private textoTiempoTrayecto(reparto: ModelsInforme.Reparto, muestra: number): string {
+    const largos = this.sumarQue(reparto, /m[aá]s de \d+ hora/i);
+    const cortos = this.sumarQue(reparto, /menos de 15/i);
+
+    if (!largos) {
+      return `Ninguna persona encuestada emplea más de una hora en llegar al trabajo; `
+        + `${cortos} (${this.pct(cortos, muestra)}%) tardan menos de quince minutos.`;
+    }
+
+    return `${largos} personas (${this.pct(largos, muestra)}%) emplean más de una hora en `
+      + `llegar al trabajo, solo en el trayecto de ida. Un trayecto largo suma fatiga `
+      + `antes de empezar la jornada y la suma otra vez al terminarla.`;
+  }
+
+  /** El vehículo del trayecto: en qué estado va y de quién es. */
+  private textoVehiculoTrayecto(
+    estado: ModelsInforme.Reparto,
+    propiedad: ModelsInforme.Reparto,
+    muestra: number
+  ): string {
+    const deficiente = this.sumarQue(estado, /regular|malo/i);
+    const muyMalo = this.sumarQue(estado, /muy malo/i);
+    const deLaEmpresa = this.sumarQue(propiedad, /empresa/i);
+
+    const partes: string[] = [];
+
+    if (deficiente) {
+      let frase = `${deficiente} personas (${this.pct(deficiente, muestra)}%) califican el `
+        + `estado del vehículo en el que se desplazan como regular o peor`;
+      if (muyMalo) frase += `, y ${muyMalo} de ellas como muy malo`;
+      partes.push(`${frase}.`);
+    } else {
+      partes.push(`Las personas encuestadas califican como bueno el estado del vehículo `
+        + `en el que se desplazan.`);
+    }
+
+    if (deLaEmpresa) {
+      partes.push(`${deLaEmpresa} (${this.pct(deLaEmpresa, muestra)}%) se desplazan en un `
+        + `vehículo proporcionado por la empresa: sobre esos la organización tiene `
+        + `responsabilidad directa de mantenimiento y son los primeros que debe cubrir `
+        + `el plan de inspección.`);
+    }
+
+    return partes.join(' ');
+  }
+
+  /** Los incidentes del trayecto, ordenados por gravedad. */
+  private textoIncidentes(reparto: ModelsInforme.Reparto, muestra: number): string {
+    const total = this.sumarSalvoNo(reparto);
+    if (!total) {
+      return `Ninguna de las ${muestra} personas encuestadas reporta incidentes durante `
+        + `su desplazamiento en el último año.`;
+    }
+
+    let texto = `${total} personas (${this.pct(total, muestra)}%) reportan incidentes o `
+      + `dificultades durante su desplazamiento en el último año.`;
+
+    const graves: string[] = [];
+    const accidentes = this.sumarQue(reparto, /graves|accidente/i);
+    const riesgoPublico = this.sumarQue(reparto, /riesgo p[uú]blico/i);
+
+    if (accidentes) graves.push(`${accidentes} sufrieron accidentes`);
+    if (riesgoPublico) graves.push(`${riesgoPublico} estuvieron expuestas a riesgo público`);
+
+    if (graves.length) {
+      texto += ` De ellas, ${this.enumerar(graves)}. Son los casos que el plan debe atender `
+        + `primero, porque no se resuelven con señalización ni con formación.`;
+    }
+
+    return texto;
+  }
+
+  /** Cuántos se desplazan por trabajo: el dato que delimita el alcance. */
+  private textoEnMision(enMision: number, muestra: number): string {
+    if (!enMision) {
+      return `Ninguna de las ${muestra} personas encuestadas realiza desplazamientos ni `
+        + `opera vehículos durante la jornada laboral.`;
+    }
+
+    return `${enMision} personas (${this.pct(enMision, muestra)}%) realizan desplazamientos `
+      + `u operan algún vehículo durante la jornada laboral. Es la población sobre la que `
+      + `recaen de forma directa las medidas del PESV, y la base de las dos cifras `
+      + `siguientes.`;
+  }
+
+  /** Con qué se mueven quienes se desplazan en jornada. */
+  private textoMediosJornada(reparto: ModelsInforme.Reparto, base: number): string {
+    if (!base) return '';
+
+    const moto = this.sumarQue(reparto, /moto/i);
+    const pesados = this.sumarQue(reparto, /cami[oó]n|bus|maquinaria/i);
+
+    const partes: string[] = [];
+
+    if (moto) {
+      partes.push(`${moto} de las ${base} personas que se desplazan en jornada `
+        + `(${this.pct(moto, base)}%) lo hacen en moto.`);
+    }
+
+    if (pesados) {
+      partes.push(`${pesados} (${this.pct(pesados, base)}%) operan vehículos pesados o `
+        + `maquinaria, que exigen licencia de categoría superior y formación específica.`);
+    }
+
+    if (!partes.length) return '';
+
+    partes.push('Los porcentajes suman más de cien porque cada persona puede señalar '
+      + 'varios medios.');
+
+    return partes.join(' ');
+  }
+
+  /** Cuánto tiempo pasan al volante: media jornada o más es otro perfil. */
+  private textoDuracionJornada(reparto: ModelsInforme.Reparto, base: number): string {
+    if (!base) return '';
+
+    const prolongados = this.sumarQue(reparto, /media jornada|toda la jornada/i);
+    const largos = this.sumarQue(reparto, /m[aá]s de 2 horas/i);
+
+    if (!prolongados && !largos) {
+      return `Los desplazamientos en jornada son de corta duración: ninguno supera las `
+        + `dos horas.`;
+    }
+
+    const partes: string[] = [];
+
+    if (prolongados) {
+      partes.push(`${prolongados} personas (${this.pct(prolongados, base)}%) pasan media `
+        + `jornada o la jornada completa desplazándose. Para efectos del riesgo vial son `
+        + `conductores, aunque su cargo no lo diga, y deberían recibir el mismo `
+        + `tratamiento que el personal de conducción.`);
+    }
+
+    if (largos) {
+      partes.push(`Otras ${largos} (${this.pct(largos, base)}%) superan las dos horas de `
+        + `desplazamiento.`);
+    }
+
+    return partes.join(' ');
   }
 
   /** Resume el modulo de conduccion con lo que mas pesa. */
