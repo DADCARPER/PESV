@@ -506,16 +506,196 @@ export class InformeDiagnosticoService {
     const modulos: any[] = (encuesta?.modulos ?? [])
       .filter((m: any) => !m.fijo && encuesta.modulosActivos.includes(m.id));
 
-    return modulos.map(modulo => ({
-      id: modulo.id,
-      titulo: modulo.titulo,
-      texto: '',
-      sinDatos: !respuestas.length,
-      cifras: [],
-      repartos: (modulo.preguntas ?? [])
-        .filter((p: any) => p.tipo === 'unica' || p.tipo === 'multiple')
-        .map((p: any) => this.repartoDePregunta(p, respuestas)),
-    }));
+    return modulos.map(modulo => {
+      const seccion: ModelsInforme.Seccion = {
+        id: modulo.id,
+        titulo: modulo.titulo,
+        texto: '',
+        sinDatos: !respuestas.length,
+        cifras: [],
+        repartos: (modulo.preguntas ?? [])
+          .filter((p: any) => p.tipo === 'unica' || p.tipo === 'multiple')
+          .map((p: any) => this.repartoDePregunta(p, respuestas)),
+      };
+
+      // Cada modulo tiene su lectura: que cifras importan y como se pintan.
+      // Los que todavia no la tienen salen con el reparto simple de siempre.
+      if (modulo.id === 'modulo2') this.enriquecerSalud(seccion, respuestas.length);
+
+      return seccion;
+    });
+  }
+
+  /**
+   * Da lectura y forma al modulo de salud.
+   *
+   * La salud de quien conduce no es un dato de bienestar: la fatiga, el dolor
+   * y las limitaciones fisicas reducen la capacidad de reaccion, y por eso la
+   * Resolucion la mira dentro del diagnostico vial.
+   */
+  private enriquecerSalud(seccion: ModelsInforme.Seccion, muestra: number): void {
+    const buscar = (id: string) => seccion.repartos.find(r => r.id === id);
+
+    const estado = buscar('estadoGeneral');
+    const limitacion = buscar('limitacionFisica');
+    const discapacidad = buscar('discapacidad');
+    const dolor = buscar('dolorMolestia');
+    const incapacidades = buscar('incapacidades');
+    const actividad = buscar('actividadFisica');
+
+    seccion.texto = this.textoSalud(muestra, { estado, limitacion, dolor });
+
+    // Escala ordenada de excelente a mala: se lee de izquierda a derecha.
+    if (estado) {
+      estado.grafica = 'columnas';
+      estado.texto = this.textoEstadoSalud(estado, muestra);
+    }
+
+    // Dolor: tambien escala, y es el indicador de fatiga mas directo.
+    if (dolor) {
+      dolor.grafica = 'columnas';
+      dolor.texto = this.textoAfirmativas(
+        dolor, muestra,
+        'sienten dolor o molestia durante o despues de la jornada',
+        'La fatiga acumulada reduce la atencion y el tiempo de reaccion al conducir.'
+      );
+    }
+
+    // Limitacion y discapacidad hablan de lo mismo: van juntas.
+    if (limitacion && discapacidad) {
+      limitacion.titulo = 'Limitaciones fisicas y discapacidad';
+      limitacion.grafica = 'tabla';
+      limitacion.emparejado = discapacidad;
+      limitacion.texto = this.textoAfirmativas(
+        limitacion, muestra,
+        'declaran alguna limitacion fisica para realizar su trabajo',
+        'Conviene revisar si esas limitaciones exigen ajustes en las tareas de conduccion.'
+      );
+      seccion.repartos.splice(seccion.repartos.indexOf(discapacidad), 1);
+    }
+
+    if (incapacidades) {
+      incapacidades.grafica = 'barras';
+      incapacidades.texto = this.textoAfirmativas(
+        incapacidades, muestra,
+        'tuvieron incapacidades medicas en los ultimos doce meses',
+        ''
+      );
+    }
+
+    // Factor protector, no de riesgo: interesa el peso de cada respuesta.
+    if (actividad) {
+      actividad.grafica = 'tablaPastel';
+      actividad.texto = this.textoActividadFisica(actividad, muestra);
+    }
+  }
+
+  /** Resume el modulo entero, con las tres cifras que mas pesan. */
+  private textoSalud(
+    muestra: number,
+    r: { estado?: ModelsInforme.Reparto; limitacion?: ModelsInforme.Reparto; dolor?: ModelsInforme.Reparto }
+  ): string {
+    if (!muestra) return '';
+
+    const hallazgos: string[] = [];
+
+    const regular = this.sumarQue(r.estado, /regular|mala|deficiente/i);
+    if (regular) hallazgos.push(`${regular} (${this.pct(regular, muestra)}%) califican su salud como regular o mala`);
+
+    const conLimitacion = this.sumarSalvoNo(r.limitacion);
+    if (conLimitacion) hallazgos.push(`${conLimitacion} (${this.pct(conLimitacion, muestra)}%) declaran alguna limitacion fisica`);
+
+    const conDolor = this.sumarSalvoNo(r.dolor);
+    if (conDolor) hallazgos.push(`${conDolor} (${this.pct(conDolor, muestra)}%) sienten dolor o molestia asociado a la jornada`);
+
+    const base = 'El estado de salud de quienes conducen o se desplazan incide '
+      + 'directamente en el riesgo vial: la fatiga, el dolor y las limitaciones fisicas '
+      + 'reducen la capacidad de reaccion.';
+
+    if (!hallazgos.length) {
+      return `${base} De las ${muestra} personas encuestadas no se reportan condiciones `
+        + `de salud que comprometan la conduccion.`;
+    }
+
+    const listado = hallazgos.length > 1
+      ? `${hallazgos.slice(0, -1).join(', ')} y ${hallazgos[hallazgos.length - 1]}`
+      : hallazgos[0];
+
+    return `${base} De las ${muestra} personas encuestadas, ${listado}.`;
+  }
+
+  /** El estado general, de mejor a peor. */
+  private textoEstadoSalud(reparto: ModelsInforme.Reparto, muestra: number): string {
+    const bueno = this.sumarQue(reparto, /excelente|buena|bueno/i);
+    const regular = this.sumarQue(reparto, /regular|mala|deficiente/i);
+    if (!bueno && !regular) return '';
+
+    return `${bueno} personas (${this.pct(bueno, muestra)}%) califican su estado general `
+      + `de salud como bueno o excelente, frente a ${regular} (${this.pct(regular, muestra)}%) `
+      + `que lo califican como regular o malo.`;
+  }
+
+  /**
+   * Redacta cuantos respondieron algo distinto de "No".
+   *
+   * Sirve para las preguntas donde la primera opcion es la negativa y el resto
+   * son grados de lo mismo: limitacion leve, moderada o severa.
+   */
+  private textoAfirmativas(
+    reparto: ModelsInforme.Reparto, muestra: number, que: string, consecuencia: string
+  ): string {
+    const total = this.sumarSalvoNo(reparto);
+    if (!total) return `Ninguna de las ${muestra} personas encuestadas ${que}.`;
+
+    let texto = `${total} personas (${this.pct(total, muestra)}%) de las ${muestra} `
+      + `encuestadas ${que}.`;
+
+    // El grado mas severo, si la pregunta los distingue.
+    const severas = reparto.filas.filter(f => /severa|intensa|m[aá]s de 15/i.test(f.etiqueta));
+    if (severas.length) {
+      const graves = severas.reduce((n, f) => n + f.total, 0);
+      if (graves) {
+        texto += ` De ellas, ${graves} (${this.pct(graves, muestra)}%) en el grado mas alto.`;
+      }
+    }
+
+    return consecuencia ? `${texto} ${consecuencia}` : texto;
+  }
+
+  /** La actividad fisica como factor protector. */
+  private textoActividadFisica(reparto: ModelsInforme.Reparto, muestra: number): string {
+    const activos = this.sumarSalvoNo(reparto);
+    const sedentarios = muestra - activos;
+
+    return `${activos} personas (${this.pct(activos, muestra)}%) realizan actividad fisica `
+      + `con alguna regularidad, frente a ${sedentarios} (${this.pct(sedentarios, muestra)}%) `
+      + `que no la practican. La condicion fisica ayuda a sostener la atencion en `
+      + `trayectos largos.`;
+  }
+
+  // ── Cuentas de apoyo para los textos ──────────────────────────────────────
+
+  private pct(parte: number, total: number): number {
+    return total > 0 ? Math.round((parte / total) * 1000) / 10 : 0;
+  }
+
+  /** Cuantos respondieron algo que encaja con el patron. */
+  private sumarQue(reparto: ModelsInforme.Reparto | undefined, patron: RegExp): number {
+    return (reparto?.filas ?? [])
+      .filter(f => patron.test(f.etiqueta))
+      .reduce((n, f) => n + f.total, 0);
+  }
+
+  /**
+   * Cuantos respondieron algo distinto de "No".
+   *
+   * Se mira el texto y no la posicion: las opciones las edita el
+   * superadministrador y el orden puede cambiar.
+   */
+  private sumarSalvoNo(reparto: ModelsInforme.Reparto | undefined): number {
+    return (reparto?.filas ?? [])
+      .filter(f => !/^no( aplica)?$/i.test(f.etiqueta.trim()))
+      .reduce((n, f) => n + f.total, 0);
   }
 
   private flota(vehiculos: Models.Diagnostico.Vehiculo[]): ModelsInforme.Seccion {
