@@ -39,7 +39,9 @@ type Opciones = {
   selector: 'app-barras-informe',
   standalone: true,
   imports: [CommonModule, NgApexchartsModule],
+  styles: [':host { display: block; width: 100%; }'],
   template: `
+    <div class="w-full">
     @if (listo) {
       <apx-chart
         [series]="opciones.series!"
@@ -53,6 +55,7 @@ type Opciones = {
         [colors]="opciones.colors!">
       </apx-chart>
     }
+    </div>
   `,
 })
 export class BarrasInformeComponent implements OnChanges {
@@ -76,9 +79,17 @@ export class BarrasInformeComponent implements OnChanges {
       chart: {
         type: 'bar',
         height: this.altura,
+        width: '100%',
         toolbar: { show: false },
         animations: { enabled: false },
         fontFamily: 'inherit',
+
+        // Sin esto la grafica se redibuja cada vez que su contenedor cambia de
+        // tamano, y como al redibujarse vuelve a cambiarlo, se entra en un
+        // bucle: la pagina deja de desplazarse con normalidad porque el
+        // navegador esta recolocando el ancla del scroll sin parar.
+        redrawOnParentResize: false,
+        redrawOnWindowResize: false,
       },
       plotOptions: {
         bar: {

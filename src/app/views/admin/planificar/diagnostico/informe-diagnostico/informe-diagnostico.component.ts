@@ -58,6 +58,16 @@ export class InformeDiagnosticoComponent {
     }
   }
 
+  /**
+   * Alto de la gráfica según lo que tenga que pintar.
+   *
+   * Las horizontales crecen con el número de categorías; las verticales no lo
+   * necesitan porque crecen a lo ancho.
+   */
+  alturaGrafica(reparto: ModelsInforme.Reparto): number {
+    return reparto.grafica === 'barras' ? 60 + reparto.filas.length * 42 : 300;
+  }
+
   /** Las gráficas del proyecto reciben etiquetas y valores por separado. */
   etiquetasDe(reparto: ModelsInforme.Reparto): string[] {
     return reparto.filas.map(f => f.etiqueta);
