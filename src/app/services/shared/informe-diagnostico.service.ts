@@ -196,18 +196,14 @@ export class InformeDiagnosticoService {
           reparto.texto = this.textoEstadoCivil(reparto, respuestas.length);
         }
 
-        // Tres categorias: el dato exacto basta y un grafico no anade nada.
-        if (p.id === 'jornada') {
-          reparto.grafica = 'tabla';
-          reparto.texto = this.textoJornada(reparto, respuestas.length);
-        }
-
         if (p.id === 'estrato') {
           reparto.grafica = 'tablaPastel';
           reparto.texto = this.textoEstrato(reparto, respuestas.length);
         }
         return reparto;
       });
+
+    this.emparejarCondicionesLaborales(repartos, respuestas.length);
 
     const hombres = respuestas.filter(r => r['genero'] === 'Masculino').length;
     const mujeres = respuestas.filter(r => r['genero'] === 'Femenino').length;
@@ -310,32 +306,72 @@ export class InformeDiagnosticoService {
   }
 
   /**
-   * Redacta el reparto por jornada laboral.
+   * Junta el tipo de contrato y la jornada en un solo bloque.
    *
-   * Destaca quienes trabajan de noche o en jornada mixta: conducir al terminar
-   * un turno nocturno es uno de los factores de riesgo vial que la Resolucion
-   * pide vigilar, asi que esa cifra merece salir dicha y no solo tabulada.
+   * Son la misma familia —las condiciones de vinculación— y las dos tablas son
+   * cortas. Juntas se leen de una vez; separadas ocupan el doble de alto
+   * diciendo lo mismo.
+   *
+   * Muta la lista que recibe: saca el contrato de su sitio y lo cuelga de la
+   * jornada.
    */
-  private textoJornada(reparto: ModelsInforme.Reparto, muestra: number): string {
-    if (!muestra || !reparto.filas.length) return '';
+  private emparejarCondicionesLaborales(
+    repartos: ModelsInforme.Reparto[], muestra: number
+  ): void {
+    const jornada = repartos.find(r => r.id === 'jornada');
+    const contrato = repartos.find(r => r.id === 'tipoContrato');
+    if (!jornada || !contrato) return;
 
-    const principal = reparto.filas[0];
-    let texto = `La jornada predominante es la ${principal.etiqueta.toLowerCase()}, `
-      + `con ${principal.total} personas (${principal.porcentaje}%) de las ${muestra} `
-      + `encuestadas.`;
+    jornada.titulo = 'Condiciones de vinculación';
+    jornada.grafica = 'tabla';
+    jornada.emparejado = contrato;
+    jornada.texto = this.textoCondicionesLaborales(jornada, contrato, muestra);
+
+    repartos.splice(repartos.indexOf(contrato), 1);
+  }
+
+  /**
+   * Redacta el tipo de contrato y la jornada juntos.
+   *
+   * Destaca la jornada nocturna o mixta: conducir al terminar un turno de
+   * noche es uno de los factores de riesgo vial que la Resolucion pide
+   * vigilar, asi que esa cifra merece salir dicha y no solo tabulada.
+   */
+  private textoCondicionesLaborales(
+    jornada: ModelsInforme.Reparto,
+    contrato: ModelsInforme.Reparto,
+    muestra: number
+  ): string {
+    if (!muestra) return '';
+
+    const partes: string[] = [];
+
+    const contratoPrincipal = contrato.filas[0];
+    if (contratoPrincipal) {
+      partes.push(`El tipo de vinculación más frecuente es `
+        + `${contratoPrincipal.etiqueta.toLowerCase()}, con ${contratoPrincipal.total} `
+        + `personas (${contratoPrincipal.porcentaje}%) de las ${muestra} encuestadas.`);
+    }
+
+    const jornadaPrincipal = jornada.filas[0];
+    if (jornadaPrincipal) {
+      partes.push(`La jornada predominante es la `
+        + `${jornadaPrincipal.etiqueta.toLowerCase()}, con ${jornadaPrincipal.total} `
+        + `(${jornadaPrincipal.porcentaje}%).`);
+    }
 
     // Por el nombre de la opcion y no por una lista fija: las edita el
     // superadministrador.
-    const nocturnas = reparto.filas.filter(f => /noct|noche|mixta/i.test(f.etiqueta));
+    const nocturnas = jornada.filas.filter(f => /noct|noche|mixta/i.test(f.etiqueta));
     if (nocturnas.length) {
       const total = nocturnas.reduce((n, f) => n + f.total, 0);
       const pct = Math.round((total / muestra) * 1000) / 10;
-      texto += ` ${total} personas (${pct}%) trabajan en jornada nocturna o mixta, `
+      partes.push(`${total} personas (${pct}%) trabajan en jornada nocturna o mixta, `
         + `situación que incrementa la fatiga y con ella el riesgo en los `
-        + `desplazamientos al terminar el turno.`;
+        + `desplazamientos al terminar el turno.`);
     }
 
-    return texto;
+    return partes.join(' ');
   }
 
   /**
@@ -599,7 +635,9 @@ export class InformeDiagnosticoService {
       const valor = r[pregunta.id];
       return Array.isArray(valor) ? valor : [valor];
     });
-    return this.repartoDe(pregunta.etiqueta, respuestas.length, valores);
+    const reparto = this.repartoDe(pregunta.etiqueta, respuestas.length, valores);
+    reparto.id = pregunta.id;
+    return reparto;
   }
 
   /**

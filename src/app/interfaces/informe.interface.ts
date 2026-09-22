@@ -23,6 +23,8 @@ export namespace ModelsInforme {
 
   /** Cómo se reparten las respuestas de una pregunta, listo para graficar. */
   export interface Reparto {
+    /** De qué pregunta sale, cuando viene de la encuesta. */
+    id?: string;
     titulo: string;
     filas: { etiqueta: string; total: number; porcentaje: number }[];
     /**
@@ -40,6 +42,14 @@ export namespace ModelsInforme {
      * cosas, para cuando además interesa el peso de cada una.
      */
     grafica?: 'columnas' | 'barras' | 'tabla' | 'tablaPastel';
+    /**
+     * Otro reparto que se pinta a su lado, bajo un mismo texto.
+     *
+     * Para preguntas que son la misma familia y se leen juntas: el tipo de
+     * contrato y la jornada hablan las dos de las condiciones de vinculación,
+     * y separadas ocupan el doble de alto diciendo lo mismo.
+     */
+    emparejado?: Reparto;
   }
 
   /**

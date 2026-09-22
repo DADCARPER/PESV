@@ -249,27 +249,17 @@
                   @if (reparto.grafica === 'tabla') {
                     <!-- Solo el listado, en la mitad central: con pocas
                          categorias el dato exacto basta y un grafico no anade
-                         nada que no diga ya la tabla. -->
-                    <div class="mx-auto md:w-1/2">
-                      <div class="overflow-hidden rounded-lg border border-gray-100">
-                        <table class="min-w-full text-sm">
-                          <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
-                            <tr>
-                              <th class="px-3 py-2 text-left font-semibold">{{ reparto.titulo }}</th>
-                              <th class="px-3 py-2 text-right font-semibold">Personas</th>
-                              <th class="px-3 py-2 text-right font-semibold">%</th>
-                            </tr>
-                          </thead>
-                          <tbody class="divide-y divide-gray-100">
-                            @for (fila of reparto.filas; track fila.etiqueta) {
-                              <tr>
-                                <td class="px-3 py-2 text-gray-700">{{ fila.etiqueta }}</td>
-                                <td class="px-3 py-2 text-right font-medium text-gray-900">{{ fila.total }}</td>
-                                <td class="px-3 py-2 text-right text-gray-500">{{ fila.porcentaje }}%</td>
-                              </tr>
-                            }
-                          </tbody>
-                        </table>
+                         nada que no diga ya la tabla. Si trae pareja, las dos
+                         comparten ese mismo ancho. -->
+                    <!-- Sola ocupa la mitad; en pareja, dos tercios, para que
+                         cada tabla no baje del tercio de ancho: con etiquetas
+                         como "Prestacion de servicios" al 25% se parten. -->
+                    <div class="mx-auto" [ngClass]="reparto.emparejado ? 'md:w-2/3' : 'md:w-1/2'">
+                      <div class="grid gap-4" [class.md:grid-cols-2]="!!reparto.emparejado">
+                        <ng-container *ngTemplateOutlet="tablaReparto; context: { $implicit: reparto }"></ng-container>
+                        @if (reparto.emparejado) {
+                          <ng-container *ngTemplateOutlet="tablaReparto; context: { $implicit: reparto.emparejado }"></ng-container>
+                        }
                       </div>
                     </div>
 
@@ -348,3 +338,27 @@
     }
   </div>
 </div>
+
+<!-- ── Tabla de un reparto ───────────────────────────────────────────────── -->
+<ng-template #tablaReparto let-reparto>
+  <div class="overflow-hidden rounded-lg border border-gray-100">
+    <table class="min-w-full text-sm">
+      <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+        <tr>
+          <th class="px-3 py-2 text-left font-semibold">{{ reparto.titulo }}</th>
+          <th class="px-3 py-2 text-right font-semibold">Personas</th>
+          <th class="px-3 py-2 text-right font-semibold">%</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        @for (fila of reparto.filas; track fila.etiqueta) {
+          <tr>
+            <td class="px-3 py-2 text-gray-700">{{ fila.etiqueta }}</td>
+            <td class="px-3 py-2 text-right font-medium text-gray-900">{{ fila.total }}</td>
+            <td class="px-3 py-2 text-right text-gray-500">{{ fila.porcentaje }}%</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</ng-template>
