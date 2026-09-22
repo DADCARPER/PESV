@@ -87,7 +87,7 @@ export class InformeDiagnosticoService {
         }),
         ...this.modulosEncuesta(respuestas, encuesta),
         this.flota(vehiculos),
-        this.contratistas(contratistas),
+        this.contratistas(contratistas, vehiculos),
         this.rutas(rutas),
         this.emergencias(planes),
       ],
@@ -2167,28 +2167,218 @@ export class InformeDiagnosticoService {
     return texto;
   }
 
-  private contratistas(contratistas: Models.Diagnostico.Contratistas[]): ModelsInforme.Seccion {
-    const conDesplazamientos = contratistas.filter(c => c.realizaDesplazamientos === 'SI');
-    const conductores = conDesplazamientos.reduce((n, c) => n + (Number(c.conductores) || 0), 0);
+  /**
+   * Da lectura y forma a la seccion de contratistas.
+   *
+   * Es el punto ciego del diagnostico. La encuesta llega a los colaboradores
+   * de la empresa, pero los conductores que pone un contratista no la
+   * responden: no son empleados y nadie les pasa el enlace. Circulan por
+   * cuenta de la organizacion y no aparecen en ninguna de las cifras
+   * anteriores, asi que esta seccion es el unico sitio donde esa exposicion
+   * existe.
+   *
+   * Recibe tambien la flota para cruzar los dos registros: un contratista que
+   * declara desplazamientos pero no tiene ningun vehiculo anotado es un hueco
+   * del diagnostico, no un contratista sin vehiculos.
+   */
+  private contratistas(
+    contratistas: Models.Diagnostico.Contratistas[],
+    vehiculos: Models.Diagnostico.Vehiculo[]
+  ): ModelsInforme.Seccion {
+    const total = contratistas.length;
+    const enAlcance = contratistas.filter(c => /^si$/i.test(c.realizaDesplazamientos ?? ''));
+    const conductores = enAlcance.reduce((n, c) => n + (Number(c.conductores) || 0), 0);
+
+    // Cuantos vehiculos tiene anotado cada contratista en el registro de flota.
+    const vehiculosPorContratista = new Map<string, number>();
+    for (const vehiculo of vehiculos) {
+      if (!vehiculo.contratistaId) continue;
+      vehiculosPorContratista.set(
+        vehiculo.contratistaId,
+        (vehiculosPorContratista.get(vehiculo.contratistaId) ?? 0) + 1
+      );
+    }
+
+    const aportados = [...vehiculosPorContratista.values()].reduce((n, v) => n + v, 0);
+    const sinVehiculos = enAlcance.filter(
+      c => !vehiculosPorContratista.get(c.id)
+    ).length;
+
+    const vencido = contratistas.filter(c => this.contratoVencido(c)).length;
+    const porVencer = contratistas.filter(
+      c => !c.contratoIndefinido
+        && estadoVigencia(c.fechaFinContrato).estado === 'porVencer'
+    ).length;
+    const indefinidos = contratistas.filter(c => c.contratoIndefinido).length;
 
     return {
       id: 'contratistas',
       titulo: 'Contratistas',
-      texto: '',
-      sinDatos: !contratistas.length,
+      texto: this.textoContratistas(total, enAlcance.length, conductores, {
+        aportados, sinVehiculos, vencido, porVencer,
+      }),
+      sinDatos: !total,
       cifras: [
-        { etiqueta: 'Contratistas', valor: contratistas.length },
+        { etiqueta: 'Contratistas', valor: total },
         {
-          etiqueta: 'Con desplazamientos', valor: conDesplazamientos.length,
+          etiqueta: 'Con desplazamientos', valor: enAlcance.length,
           nota: 'Los que entran en las obligaciones del PESV',
         },
-        { etiqueta: 'Conductores que aportan', valor: conductores },
+        {
+          etiqueta: 'Conductores que aportan', valor: conductores,
+          nota: 'No responden la encuesta',
+        },
+        { etiqueta: 'Vehículos que aportan', valor: aportados },
+        {
+          etiqueta: 'Contrato vencido', valor: vencido, alerta: vencido > 0,
+          nota: 'Sin contrato no hay cláusula que exigir',
+        },
+        {
+          etiqueta: 'Contrato por vencer', valor: porVencer, alerta: porVencer > 0,
+          nota: `En los próximos ${DIAS_AVISO} días`,
+        },
+        {
+          etiqueta: 'Sin vehículos registrados', valor: sinVehiculos,
+          alerta: sinVehiculos > 0, nota: 'Se desplazan, pero no consta con qué',
+        },
+        {
+          etiqueta: 'Contratos indefinidos', valor: indefinidos,
+          nota: 'Ninguna fecha obliga a revisar sus cláusulas',
+        },
       ],
       repartos: [
-        this.contar('Por tipo de contratista', contratistas, c => c.tipoContratista),
-        this.contar('Por tipo de vinculación', contratistas, c => c.tipoVinculacion),
+        this.repartoTipoContratista(contratistas),
+        this.repartoVinculacion(contratistas, enAlcance),
       ],
+      tablas: this.tablaContratistas(enAlcance, vehiculosPorContratista),
     };
+  }
+
+  private repartoTipoContratista(
+    contratistas: Models.Diagnostico.Contratistas[]
+  ): ModelsInforme.Reparto {
+    const reparto = this.contar('Contratistas por tipo', contratistas,
+      c => c.tipoContratista);
+    reparto.grafica = 'barras';
+
+    const mayor = reparto.filas[0];
+    if (mayor) {
+      reparto.texto = `El tipo más frecuente es ${mayor.etiqueta.toLowerCase()}, con `
+        + `${mayor.total} de ${contratistas.length} contratistas (${mayor.porcentaje}%). `
+        + `El tipo importa porque determina qué se le puede exigir: a un transportador `
+        + `se le exige su propio PESV, a un proveedor ocasional basta con que cumpla las `
+        + `condiciones del contrato.`;
+    }
+
+    return reparto;
+  }
+
+  /** Como se vincula el contratista y con que continuidad opera. */
+  private repartoVinculacion(
+    contratistas: Models.Diagnostico.Contratistas[],
+    enAlcance: Models.Diagnostico.Contratistas[]
+  ): ModelsInforme.Reparto {
+    const reparto = this.contar('Tipo de vinculación', contratistas,
+      c => c.tipoVinculacion);
+    reparto.titulo = 'Vinculación y continuidad de la operación';
+    reparto.grafica = 'tabla';
+    reparto.emparejado = this.contar('Tipo de flota', enAlcance,
+      c => c.tipoFlota || 'Sin definir');
+
+    const ocasionales = this.sumarQue(reparto.emparejado, /ocasional/i);
+    if (ocasionales) {
+      reparto.texto = `${ocasionales} de los ${enAlcance.length} contratistas que se `
+        + `desplazan operan con flota ocasional. Una flota que cambia de vehículos y de `
+        + `conductores es la más difícil de controlar: la verificación no puede hacerse `
+        + `una vez al firmar, tiene que repetirse en cada servicio.`;
+    } else if (enAlcance.length) {
+      reparto.texto = `Los contratistas que se desplazan operan con flota fidelizada, lo `
+        + `que permite verificar documentación y conductores una vez y mantener el `
+        + `control en el tiempo.`;
+    }
+
+    return reparto;
+  }
+
+  /**
+   * Los contratistas que entran en el alcance, uno por uno.
+   *
+   * Con pocos registros y datos que no se pueden agrupar —una razon social, un
+   * servicio, una fecha de contrato— el listado dice mas que cualquier
+   * reparto.
+   */
+  private tablaContratistas(
+    enAlcance: Models.Diagnostico.Contratistas[],
+    vehiculosPorContratista: Map<string, number>
+  ): ModelsInforme.Tabla[] {
+    if (!enAlcance.length) return [];
+
+    return [{
+      titulo: `Contratistas que realizan desplazamientos (${enAlcance.length})`,
+      columnas: ['Razón social', 'Tipo', 'Servicio', 'Conductores', 'Vehículos', 'Contrato'],
+      filas: enAlcance.map(c => [
+        textoSeguro(c.nombreRazonSocial, 'Sin nombre'),
+        textoSeguro(c.tipoContratista, '—'),
+        textoSeguro(c.servicioPrestado, '—'),
+        String(Number(c.conductores) || 0),
+        String(vehiculosPorContratista.get(c.id) ?? 0),
+        this.vigenciaContrato(c),
+      ]),
+    }];
+  }
+
+  /** En que situacion esta el contrato, incluido el caso indefinido. */
+  private vigenciaContrato(contratista: Models.Diagnostico.Contratistas): string {
+    if (contratista.contratoIndefinido) return 'Indefinido';
+    return this.resumenVigencia(contratista.fechaFinContrato);
+  }
+
+  private contratoVencido(contratista: Models.Diagnostico.Contratistas): boolean {
+    return !contratista.contratoIndefinido
+      && estadoVigencia(contratista.fechaFinContrato).estado === 'vencido';
+  }
+
+  /** Resume la seccion, empezando por lo que la encuesta no ve. */
+  private textoContratistas(
+    total: number,
+    enAlcance: number,
+    conductores: number,
+    h: { aportados: number; sinVehiculos: number; vencido: number; porVencer: number }
+  ): string {
+    if (!total) return '';
+
+    const partes = [`La organización registra ${total} contratistas, de los cuales `
+      + `${enAlcance} realizan desplazamientos por su cuenta y entran por tanto en las `
+      + `obligaciones del PESV.`];
+
+    if (conductores) {
+      partes.push(`Entre todos aportan ${conductores} conductores y ${h.aportados} `
+        + `vehículos. Conviene subrayar que esos conductores no responden la encuesta: no `
+        + `son colaboradores de la empresa y no aparecen en ninguna de las cifras de `
+        + `caracterización, aunque circulen por cuenta de la organización. Esta sección `
+        + `es el único lugar del diagnóstico donde esa exposición queda registrada.`);
+    }
+
+    if (h.vencido) {
+      partes.push(`${h.vencido} contratistas tienen el contrato vencido. Es un hallazgo `
+        + `con consecuencia práctica: las obligaciones de seguridad vial se exigen por `
+        + `contrato, y sin contrato vigente no hay cláusula que hacer cumplir.`);
+    }
+
+    if (h.porVencer) {
+      partes.push(`Otros ${h.porVencer} lo tienen venciendo en los próximos `
+        + `${DIAS_AVISO} días: es el momento de incorporar las cláusulas de seguridad `
+        + `vial a la renovación.`);
+    }
+
+    if (h.sinVehiculos) {
+      partes.push(`En ${h.sinVehiculos} de los contratistas que se desplazan no consta `
+        + `ningún vehículo en el registro de flota. No significa que no los tengan, sino `
+        + `que el diagnóstico no sabe con qué circulan: conviene completarlo antes de `
+        + `emitir el informe.`);
+    }
+
+    return partes.join(' ');
   }
 
   private rutas(rutas: Models.Diagnostico.Ruta[]): ModelsInforme.Seccion {
