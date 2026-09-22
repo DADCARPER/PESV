@@ -523,6 +523,7 @@ export class InformeDiagnosticoService {
       if (modulo.id === 'modulo2') this.enriquecerSalud(seccion, respuestas.length);
       if (modulo.id === 'modulo3') this.enriquecerConduccion(seccion, modulo, respuestas);
       if (modulo.id === 'modulo4') this.enriquecerDesplazamientos(seccion, respuestas);
+      if (modulo.id === 'modulo5') this.enriquecerRiesgos(seccion, respuestas);
 
       return seccion;
     });
@@ -814,6 +815,327 @@ export class InformeDiagnosticoService {
     if (duracion) {
       duracion.texto = this.textoDuracionJornada(duracion, enMision.length);
     }
+  }
+
+  /**
+   * Las cuatro familias de factores que la Resolucion usa para clasificar las
+   * causas de un siniestro vial.
+   *
+   * El orden es el de la norma, no el de la encuesta: humano, vehiculo, via y
+   * entorno. En el informe se reordenan por peso, pero la lista de aqui fija
+   * cuales son y como se nombran.
+   */
+  private static readonly FACTORES = [
+    { id: 'factorHumano', etiqueta: 'Factor humano' },
+    { id: 'factorVehiculo', etiqueta: 'Factor vehículo' },
+    { id: 'factorVia', etiqueta: 'Factor vía' },
+    { id: 'factorEntorno', etiqueta: 'Factor entorno' },
+  ];
+
+  /**
+   * Da lectura y forma al modulo de identificacion de riesgos.
+   *
+   * Es el nucleo del diagnostico. Tiene dos partes: como percibe la gente el
+   * riesgo y si lo reporta, y cuales de los cuatro factores de la Resolucion
+   * senalan como causa. Lo segundo es lo que alimenta el plan de accion, asi
+   * que antes del detalle de cada factor se antepone un resumen que compara
+   * los cuatro y permite priorizar.
+   */
+  private enriquecerRiesgos(
+    seccion: ModelsInforme.Seccion,
+    respuestas: Record<string, any>[]
+  ): void {
+    const muestra = respuestas.length;
+    const buscar = (id: string) => seccion.repartos.find(r => r.id === id);
+
+    // ── Percepcion del riesgo y cultura de reporte ────────────────────────
+    const exposicion = buscar('exposicionRiesgos');
+    if (exposicion) {
+      exposicion.grafica = 'dona';
+      exposicion.texto = this.textoExposicion(exposicion, muestra);
+    }
+
+    // Haber vivido una situacion de riesgo y haberla reportado son la misma
+    // historia contada en dos preguntas: separadas no se ve la brecha.
+    const experiencia = buscar('experienciaRiesgos');
+    const reporte = buscar('reporteRiesgo');
+    if (experiencia && reporte) {
+      experiencia.titulo = 'Situaciones de riesgo vividas y su reporte a la empresa';
+      experiencia.grafica = 'tabla';
+      experiencia.emparejado = reporte;
+      experiencia.texto = this.textoReporte(experiencia, reporte);
+      seccion.repartos.splice(seccion.repartos.indexOf(reporte), 1);
+    }
+
+    // Saber reportar y percibir que hay cultura: las dos miran al sistema.
+    const sabeReportar = buscar('conocimientoReporte');
+    const cultura = buscar('culturaSeguridad');
+    if (sabeReportar && cultura) {
+      sabeReportar.titulo = 'Conocimiento del canal de reporte y cultura de seguridad vial';
+      sabeReportar.grafica = 'tabla';
+      sabeReportar.emparejado = cultura;
+      sabeReportar.texto = this.textoCultura(sabeReportar, cultura, muestra);
+      seccion.repartos.splice(seccion.repartos.indexOf(cultura), 1);
+    }
+
+    // ── Los cuatro factores ───────────────────────────────────────────────
+    const resumen = this.resumenFactores(respuestas, muestra);
+
+    for (const factor of InformeDiagnosticoService.FACTORES) {
+      const reparto = buscar(factor.id);
+      if (!reparto) continue;
+
+      reparto.titulo = `${factor.etiqueta}: causas percibidas`;
+      reparto.grafica = 'barras';
+      this.acortarEtiquetas(reparto);
+      reparto.texto = this.textoFactor(reparto, factor.etiqueta, muestra);
+    }
+
+    // El resumen va justo antes del primer factor, para que se lea como
+    // entrada al detalle y no como una cifra suelta al final.
+    const primero = seccion.repartos.findIndex(
+      r => InformeDiagnosticoService.FACTORES.some(f => f.id === r.id)
+    );
+    if (primero >= 0) seccion.repartos.splice(primero, 0, resumen);
+
+    seccion.texto = this.textoRiesgos(muestra, resumen, { exposicion, experiencia, reporte });
+  }
+
+  /**
+   * Cuantas personas senalan al menos una causa real en cada factor.
+   *
+   * Se cuenta por persona y no por marca: una persona que senala cinco causas
+   * del factor humano sigue siendo una persona que percibe riesgo humano, y
+   * asi las cuatro familias se pueden comparar entre si.
+   */
+  private resumenFactores(
+    respuestas: Record<string, any>[], muestra: number
+  ): ModelsInforme.Reparto {
+    const filas = InformeDiagnosticoService.FACTORES.map(factor => {
+      const total = respuestas.filter(r => {
+        const valor = r[factor.id];
+        const marcas = Array.isArray(valor) ? valor : valor ? [valor] : [];
+        return marcas.some((m: any) => !this.esAusenciaDeRiesgo(String(m)));
+      }).length;
+
+      return { etiqueta: factor.etiqueta, total, porcentaje: this.pct(total, muestra) };
+    }).sort((a, b) => b.total - a.total);
+
+    return {
+      titulo: 'Factores de riesgo percibidos, por categoría',
+      filas,
+      grafica: 'columnas',
+      texto: this.textoResumenFactores(filas, muestra),
+    };
+  }
+
+  /** Las opciones que significan "aqui no veo riesgo". */
+  private esAusenciaDeRiesgo(etiqueta: string): boolean {
+    return /^no aplica$/i.test(etiqueta.trim())
+      || /no percibe ning[uú]n riesgo/i.test(etiqueta);
+  }
+
+  /**
+   * Recorta las etiquetas larguisimas de los factores para el eje del grafico.
+   *
+   * Las opciones de via y entorno traen la definicion dentro del propio texto
+   * ("Mal estado de la carpeta de rodadura (Pavimento): huecos, baches..."),
+   * que en una barra no cabe. Si el recorte hiciera coincidir dos etiquetas se
+   * deja el texto completo, porque perder la distincion seria peor.
+   */
+  private acortarEtiquetas(reparto: ModelsInforme.Reparto): void {
+    const cortas = reparto.filas.map(f => f.etiqueta.split(/[:(]|, por ejemplo/)[0].trim());
+    if (new Set(cortas).size !== cortas.length) return;
+
+    reparto.filas.forEach((fila, i) => (fila.etiqueta = cortas[i]));
+  }
+
+  /** Las causas mas senaladas de un factor, sin las que niegan el riesgo. */
+  private principales(reparto: ModelsInforme.Reparto, cuantas: number) {
+    return reparto.filas
+      .filter(f => !this.esAusenciaDeRiesgo(f.etiqueta))
+      .slice(0, cuantas);
+  }
+
+  /** Resume el modulo: percepcion, brecha de reporte y factor dominante. */
+  private textoRiesgos(
+    muestra: number,
+    resumen: ModelsInforme.Reparto,
+    r: {
+      exposicion?: ModelsInforme.Reparto;
+      experiencia?: ModelsInforme.Reparto;
+      reporte?: ModelsInforme.Reparto;
+    }
+  ): string {
+    if (!muestra) return '';
+
+    const partes = [
+      'La identificación de riesgos recoge lo que perciben quienes se exponen a ellos '
+      + 'todos los días. Sus respuestas se clasifican en los cuatro factores que la '
+      + 'Resolución usa para explicar un siniestro vial —humano, vehículo, vía y '
+      + 'entorno—, y son el insumo directo del plan de acción.',
+    ];
+
+    const expuestos = this.sumarQue(r.exposicion, /^s[ií]$/i);
+    if (expuestos) {
+      partes.push(`${expuestos} de las ${muestra} personas encuestadas `
+        + `(${this.pct(expuestos, muestra)}%) se reconocen expuestas a riesgos viales `
+        + `durante su jornada o su desplazamiento.`);
+    }
+
+    const conExperiencia = this.sumarSalvoNo(r.experiencia);
+    const reportaron = this.sumarQue(r.reporte, /^s[ií]$/i);
+    if (conExperiencia) {
+      partes.push(`${conExperiencia} (${this.pct(conExperiencia, muestra)}%) han vivido o `
+        + `presenciado una situación de riesgo en trayectos laborales, y de ellas `
+        + `${reportaron} la reportaron a la empresa.`);
+    }
+
+    const dominante = resumen.filas[0];
+    if (dominante?.total) {
+      partes.push(`El ${dominante.etiqueta.toLowerCase()} es el que más personas señalan `
+        + `como generador de accidentes: ${dominante.total} (${dominante.porcentaje}%).`);
+    }
+
+    return partes.join(' ');
+  }
+
+  /** La exposicion percibida, con los que no saben si lo estan. */
+  private textoExposicion(reparto: ModelsInforme.Reparto, muestra: number): string {
+    const si = this.sumarQue(reparto, /^s[ií]$/i);
+    const inseguros = this.sumarQue(reparto, /no estoy segur|desconozco/i);
+
+    let texto = `${si} personas (${this.pct(si, muestra)}%) reconocen estar expuestas a `
+      + `riesgos viales durante su jornada laboral o su desplazamiento.`;
+
+    if (inseguros) {
+      texto += ` Otras ${inseguros} (${this.pct(inseguros, muestra)}%) no saben si lo `
+        + `están. No identificar la propia exposición es en sí mismo un riesgo: quien no `
+        + `se sabe expuesto no toma precauciones.`;
+    }
+
+    return texto;
+  }
+
+  /**
+   * La brecha entre vivir una situacion de riesgo y reportarla.
+   *
+   * Es el hallazgo mas accionable del modulo: un subreporte alto significa que
+   * la empresa no se esta enterando de lo que pasa en sus trayectos, y que las
+   * cifras de siniestralidad que maneja estan por debajo de la realidad.
+   */
+  private textoReporte(
+    experiencia: ModelsInforme.Reparto, reporte: ModelsInforme.Reparto
+  ): string {
+    const conExperiencia = this.sumarSalvoNo(experiencia);
+    if (!conExperiencia) {
+      return 'Ninguna de las personas encuestadas declara haber vivido o presenciado '
+        + 'situaciones de riesgo vial en trayectos laborales.';
+    }
+
+    const involucrados = this.sumarQue(experiencia, /involucrado|ambas/i);
+    const reportaron = this.sumarQue(reporte, /^s[ií]$/i);
+    const callaron = conExperiencia - reportaron;
+
+    let texto = `${conExperiencia} personas han vivido o presenciado situaciones de riesgo `
+      + `vial en trayectos laborales`;
+
+    if (involucrados) {
+      texto += `, ${involucrados} de ellas como involucradas directas`;
+    }
+
+    texto += `. De ese total, ${reportaron} `
+      + `(${this.pct(reportaron, conExperiencia)}%) lo reportaron a la empresa.`;
+
+    if (callaron > 0) {
+      texto += ` Las ${callaron} restantes (${this.pct(callaron, conExperiencia)}%) no lo `
+        + `hicieron: es un subreporte que deja a la organización sin noticia de lo que `
+        + `ocurre en sus trayectos y hace que sus cifras de siniestralidad queden por `
+        + `debajo de la realidad.`;
+    }
+
+    return texto;
+  }
+
+  /** Si la gente sabe reportar y si percibe que hay cultura de seguridad. */
+  private textoCultura(
+    sabeReportar: ModelsInforme.Reparto, cultura: ModelsInforme.Reparto, muestra: number
+  ): string {
+    const noSabe = this.sumarQue(sabeReportar, /^no$/i);
+    const clara = this.sumarQue(cultura, /clara y activa/i);
+    const debil = this.sumarQue(cultura, /parcialmente|^no$|desconozco/i);
+
+    const partes: string[] = [];
+
+    if (noSabe) {
+      partes.push(`${noSabe} personas (${this.pct(noSabe, muestra)}%) no saben cómo `
+        + `reportar una condición insegura. Un canal que no se conoce no existe, y `
+        + `explica buena parte del subreporte.`);
+    } else {
+      partes.push(`Las ${muestra} personas encuestadas saben cómo reportar una condición `
+        + `insegura.`);
+    }
+
+    if (debil) {
+      partes.push(`${clara} (${this.pct(clara, muestra)}%) perciben que la empresa promueve `
+        + `la seguridad vial de forma clara y activa, frente a ${debil} `
+        + `(${this.pct(debil, muestra)}%) que la ven parcial, ausente o que directamente la `
+        + `desconocen.`);
+    }
+
+    return partes.join(' ');
+  }
+
+  /** Las causas mas senaladas dentro de un factor. */
+  private textoFactor(
+    reparto: ModelsInforme.Reparto, nombre: string, muestra: number
+  ): string {
+    const top = this.principales(reparto, 3);
+    if (!top.length) {
+      return `Las personas encuestadas no señalan causas asociadas al `
+        + `${nombre.toLowerCase()}.`;
+    }
+
+    const listado = this.enumerar(
+      top.map(f => `${f.etiqueta.toLowerCase()} (${f.total}, ${f.porcentaje}%)`)
+    );
+
+    return `Dentro del ${nombre.toLowerCase()}, las causas más señaladas son ${listado}. `
+      + `Los porcentajes se calculan sobre las ${muestra} personas encuestadas y suman más `
+      + `de cien porque cada una puede señalar varias causas.`;
+  }
+
+  /** Cual de los cuatro factores pesa mas, y que hacer con eso. */
+  private textoResumenFactores(
+    filas: { etiqueta: string; total: number; porcentaje: number }[], muestra: number
+  ): string {
+    const conPeso = filas.filter(f => f.total > 0);
+    if (!conPeso.length) return '';
+
+    const dominante = conPeso[0];
+
+    let texto = `Cada barra cuenta cuántas de las ${muestra} personas encuestadas señalan `
+      + `al menos una causa dentro de ese factor, de modo que las cuatro familias se `
+      + `pueden comparar entre sí. El ${dominante.etiqueta.toLowerCase()} encabeza la `
+      + `percepción con ${dominante.total} menciones (${dominante.porcentaje}%).`;
+
+    // Cada familia se corrige con medidas distintas: decirlo aqui es lo que
+    // convierte el grafico en una prioridad de plan y no en un dato mas.
+    if (/humano/i.test(dominante.etiqueta)) {
+      texto += ' Es el factor que se corrige con formación, políticas de regulación y '
+        + 'control de las conductas al volante.';
+    } else if (/veh[ií]culo/i.test(dominante.etiqueta)) {
+      texto += ' Es el factor que se corrige con el plan de mantenimiento preventivo y '
+        + 'las inspecciones preoperacionales.';
+    } else if (/v[ií]a/i.test(dominante.etiqueta)) {
+      texto += ' Es un factor que en buena parte no depende de la empresa, pero sí la '
+        + 'obliga a estudiar las rutas y a gestionar con las autoridades viales.';
+    } else {
+      texto += ' Es un factor no controlable, que se gestiona planificando los '
+        + 'desplazamientos y definiendo cuándo no se sale a la vía.';
+    }
+
+    return texto;
   }
 
   /** Resume el modulo separando el trayecto de la jornada. */
