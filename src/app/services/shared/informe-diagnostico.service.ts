@@ -521,6 +521,7 @@ export class InformeDiagnosticoService {
       // Cada modulo tiene su lectura: que cifras importan y como se pintan.
       // Los que todavia no la tienen salen con el reparto simple de siempre.
       if (modulo.id === 'modulo2') this.enriquecerSalud(seccion, respuestas.length);
+      if (modulo.id === 'modulo3') this.enriquecerConduccion(seccion, modulo, respuestas);
 
       return seccion;
     });
@@ -556,20 +557,20 @@ export class InformeDiagnosticoService {
       dolor.grafica = 'columnas';
       dolor.texto = this.textoAfirmativas(
         dolor, muestra,
-        'sienten dolor o molestia durante o despues de la jornada',
-        'La fatiga acumulada reduce la atencion y el tiempo de reaccion al conducir.'
+        'sienten dolor o molestia durante o después de la jornada',
+        'La fatiga acumulada reduce la atención y el tiempo de reacción al conducir.'
       );
     }
 
     // Limitacion y discapacidad hablan de lo mismo: van juntas.
     if (limitacion && discapacidad) {
-      limitacion.titulo = 'Limitaciones fisicas y discapacidad';
+      limitacion.titulo = 'Limitaciones físicas y discapacidad';
       limitacion.grafica = 'tabla';
       limitacion.emparejado = discapacidad;
       limitacion.texto = this.textoAfirmativas(
         limitacion, muestra,
-        'declaran alguna limitacion fisica para realizar su trabajo',
-        'Conviene revisar si esas limitaciones exigen ajustes en las tareas de conduccion.'
+        'declaran alguna limitación física para realizar su trabajo',
+        'Conviene revisar si esas limitaciones exigen ajustes en las tareas de conducción.'
       );
       seccion.repartos.splice(seccion.repartos.indexOf(discapacidad), 1);
     }
@@ -578,7 +579,7 @@ export class InformeDiagnosticoService {
       incapacidades.grafica = 'barras';
       incapacidades.texto = this.textoAfirmativas(
         incapacidades, muestra,
-        'tuvieron incapacidades medicas en los ultimos doce meses',
+        'tuvieron incapacidades médicas en los últimos doce meses',
         ''
       );
     }
@@ -588,6 +589,307 @@ export class InformeDiagnosticoService {
       actividad.grafica = 'tablaPastel';
       actividad.texto = this.textoActividadFisica(actividad, muestra);
     }
+  }
+
+  /**
+   * Da lectura y forma al modulo de conduccion.
+   *
+   * Aqui cambia el denominador. Salvo la primera, todas estas preguntas solo
+   * se le hacen a quien conduce, asi que calcular sus porcentajes sobre la
+   * muestra entera los diluye: si de 581 encuestados conducen 200 y la mitad
+   * tiene infracciones, eso es el 50% de los conductores, no el 17% de la
+   * plantilla. Lo segundo, en un informe, es decir algo falso.
+   */
+  private enriquecerConduccion(
+    seccion: ModelsInforme.Seccion,
+    modulo: any,
+    respuestas: Record<string, any>[]
+  ): void {
+    const muestra = respuestas.length;
+    const conductores = respuestas.filter(
+      r => /^s[ií]$/i.test(String(r['conduceVehiculos'] ?? '').trim())
+    );
+
+    const buscar = (id: string) => seccion.repartos.find(r => r.id === id);
+
+    // Sin conductores no hay nada que recalcular: las preguntas
+    // condicionadas quedaron vacias y basta con decirlo.
+    if (!conductores.length) {
+      seccion.texto = this.textoConduccion(muestra, 0, {});
+      return;
+    }
+
+    for (const pregunta of (modulo.preguntas ?? []) as any[]) {
+      if (pregunta.condicion?.pregunta !== 'conduceVehiculos') continue;
+
+      const reparto = buscar(pregunta.id);
+      if (!reparto) continue;
+
+      reparto.filas = this.repartoDePregunta(pregunta, conductores).filas;
+      reparto.titulo = `${pregunta.etiqueta} (sobre ${conductores.length} conductores)`;
+    }
+
+    // El texto se redacta ya con las cifras recalculadas sobre conductores.
+    seccion.texto = this.textoConduccion(muestra, conductores.length, {
+      licencia: buscar('licenciaConduccion'),
+      infracciones: buscar('infraccionesTransito'),
+      accidentes: buscar('accidenteUltimoAno'),
+    });
+
+    this.formaConduccion(seccion, buscar, conductores.length);
+  }
+
+  /** Que forma toma cada pregunta del modulo de conduccion. */
+  private formaConduccion(
+    seccion: ModelsInforme.Seccion,
+    buscar: (id: string) => ModelsInforme.Reparto | undefined,
+    conductores: number
+  ): void {
+    const emparejar = (uno: string, otro: string, titulo: string) => {
+      const a = buscar(uno);
+      const b = buscar(otro);
+      if (!a || !b) return;
+      a.titulo = titulo;
+      a.grafica = 'tabla';
+      a.emparejado = b;
+      seccion.repartos.splice(seccion.repartos.indexOf(b), 1);
+    };
+
+    // Quien conduce y quien no: partes de un todo, y sobre la muestra entera.
+    const conduce = buscar('conduceVehiculos');
+    if (conduce) conduce.grafica = 'dona';
+
+    // Tipos de vehiculo: categorias sueltas con nombres largos.
+    const tipos = buscar('tipoVehiculos');
+    if (tipos) tipos.grafica = 'barras';
+
+    // Ocho categorias cortas y ordenadas de A1 a C3: se leen en fila.
+    const categoria = buscar('categoriaLicencia');
+    if (categoria) categoria.grafica = 'columnas';
+
+    // La experiencia es una escala: se lee en orden.
+    const experiencia = buscar('experienciaConduccion');
+    if (experiencia) {
+      experiencia.grafica = 'columnas';
+      experiencia.texto = this.textoExperiencia(experiencia, conductores);
+    }
+
+    // Tres opciones y lo que importa es el dato exacto: tabla.
+    const licencia = buscar('licenciaConduccion');
+    if (licencia) {
+      licencia.grafica = 'tabla';
+      licencia.texto = this.textoLicencia(licencia, conductores);
+    }
+
+    // La infraccion y su estado hablan de lo mismo: van juntas.
+    emparejar('infraccionesTransito', 'estadoInfraccion', 'Infracciones de tránsito y su estado');
+    const infracciones = buscar('infraccionesTransito');
+    if (infracciones) infracciones.texto = this.textoInfracciones(infracciones, conductores);
+
+    // Haber tenido accidente y si fue en jornada: tambien la misma familia.
+    emparejar('accidenteUltimoAno', 'accidenteEnJornada', 'Accidentes de tránsito en el último año');
+    const accidentes = buscar('accidenteUltimoAno');
+    if (accidentes) {
+      accidentes.texto = this.textoAccidentes(
+        accidentes, accidentes.emparejado, conductores
+      );
+    }
+
+    // La gravedad va aparte: es lo que decide si hubo que investigar.
+    const gravedad = buscar('accidenteTransito');
+    if (gravedad) {
+      gravedad.grafica = 'barras';
+      gravedad.texto = this.textoGravedad(gravedad);
+    }
+
+    // Conocimiento de las normas: partes de un todo.
+    const normas = buscar('conocimientoNormas');
+    if (normas) {
+      normas.grafica = 'dona';
+      normas.texto = this.textoNormas(normas, conductores);
+    }
+
+    const emergencias = buscar('capacidadEmergencia');
+    if (emergencias) {
+      emergencias.grafica = 'tabla';
+      emergencias.texto = this.textoCapacitacion(emergencias, conductores);
+    }
+  }
+
+  /** Resume el modulo de conduccion con lo que mas pesa. */
+  private textoConduccion(
+    muestra: number,
+    conductores: number,
+    r: {
+      licencia?: ModelsInforme.Reparto;
+      infracciones?: ModelsInforme.Reparto;
+      accidentes?: ModelsInforme.Reparto;
+    }
+  ): string {
+    if (!muestra) return '';
+
+    if (!conductores) {
+      return `Ninguna de las ${muestra} personas encuestadas declara conducir vehículo `
+        + `automotor, por lo que las preguntas de este módulo no aplican a la muestra `
+        + `obtenida.`;
+    }
+
+    const partes = [
+      `De las ${muestra} personas encuestadas, ${conductores} `
+      + `(${this.pct(conductores, muestra)}%) declaran conducir vehículo automotor. Las `
+      + `cifras que siguen se calculan sobre ese grupo y no sobre la muestra total, `
+      + `porque son preguntas que solo responde quien conduce.`,
+    ];
+
+    const hallazgos: string[] = [];
+
+    const sinLicencia = this.sumarQue(r.licencia, /^no$/i);
+    if (sinLicencia) {
+      hallazgos.push(`${sinLicencia} (${this.pct(sinLicencia, conductores)}%) conducen sin `
+        + `licencia vigente`);
+    }
+
+    const conInfracciones = this.sumarQue(r.infracciones, /^s[ií]$/i);
+    if (conInfracciones) {
+      hallazgos.push(`${conInfracciones} (${this.pct(conInfracciones, conductores)}%) `
+        + `registran infracciones en el último año`);
+    }
+
+    const conAccidentes = this.sumarQue(r.accidentes, /^s[ií]$/i);
+    if (conAccidentes) {
+      hallazgos.push(`${conAccidentes} (${this.pct(conAccidentes, conductores)}%) estuvieron `
+        + `involucrados en un accidente de tránsito`);
+    }
+
+    if (hallazgos.length) partes.push(`De ellos, ${this.enumerar(hallazgos)}.`);
+
+    return partes.join(' ');
+  }
+
+  private textoLicencia(reparto: ModelsInforme.Reparto, conductores: number): string {
+    const con = this.sumarQue(reparto, /^s[ií]$/i);
+    const sin = this.sumarQue(reparto, /^no$/i);
+
+    let texto = `${con} conductores (${this.pct(con, conductores)}%) cuentan con licencia `
+      + `de conducción vigente.`;
+
+    if (sin) {
+      texto += ` ${sin} (${this.pct(sin, conductores)}%) declaran no tenerla: es un `
+        + `hallazgo que exige atención inmediata, porque conducir sin licencia vigente `
+        + `expone a la persona y compromete a la empresa.`;
+    }
+
+    return texto;
+  }
+
+  private textoExperiencia(reparto: ModelsInforme.Reparto, conductores: number): string {
+    const noveles = this.sumarQue(reparto, /menos de|^1 a 3|1 a 3 a/i);
+    if (!noveles) return '';
+
+    return `${noveles} conductores (${this.pct(noveles, conductores)}%) tienen tres años o `
+      + `menos de experiencia al volante. Es el grupo al que conviene dirigir primero la `
+      + `formación en conducción segura.`;
+  }
+
+  private textoInfracciones(reparto: ModelsInforme.Reparto, conductores: number): string {
+    const con = this.sumarQue(reparto, /^s[ií]$/i);
+    if (!con) {
+      return `Ninguno de los ${conductores} conductores registra infracciones de tránsito `
+        + `en el último año.`;
+    }
+
+    let texto = `${con} conductores (${this.pct(con, conductores)}%) registran infracciones `
+      + `de tránsito en el último año.`;
+
+    const pendientes = this.sumarQue(reparto.emparejado, /no gestionad|acuerdo de pago/i);
+    if (pendientes) {
+      texto += ` De esas infracciones, ${pendientes} siguen sin saldar. Una sanción `
+        + `pendiente puede llegar a suspender la licencia, así que conviene hacerles `
+        + `seguimiento.`;
+    }
+
+    return texto;
+  }
+
+  private textoAccidentes(
+    reparto: ModelsInforme.Reparto,
+    enJornada: ModelsInforme.Reparto | undefined,
+    conductores: number
+  ): string {
+    const con = this.sumarQue(reparto, /^s[ií]$/i);
+    if (!con) {
+      return `Ninguno de los ${conductores} conductores reporta accidentes de tránsito `
+        + `en el último año.`;
+    }
+
+    let texto = `${con} conductores (${this.pct(con, conductores)}%) reportan haber tenido `
+      + `un accidente de tránsito en el último año.`;
+
+    const laborales = this.sumarQue(enJornada, /^s[ií]$/i);
+    if (laborales) {
+      texto += ` ${laborales} de esos accidentes ocurrieron durante la jornada laboral, `
+        + `lo que los sitúa dentro del alcance del PESV y obliga a investigarlos.`;
+    }
+
+    return texto;
+  }
+
+  private textoGravedad(reparto: ModelsInforme.Reparto): string {
+    const lesionados = this.sumarQue(reparto, /lesionad/i);
+    const fallecidos = this.sumarQue(reparto, /fallecid|muert/i);
+    const materiales = this.sumarQue(reparto, /daño|dano|material/i);
+
+    if (!lesionados && !fallecidos && !materiales) return '';
+
+    const partes: string[] = [];
+    if (fallecidos) partes.push(`${fallecidos} con personas fallecidas`);
+    if (lesionados) partes.push(`${lesionados} con personas lesionadas`);
+    if (materiales) partes.push(`${materiales} con daños materiales`);
+
+    let texto = `Entre los accidentes reportados hay ${this.enumerar(partes)}.`;
+
+    if (fallecidos || lesionados) {
+      texto += ` Los que dejaron víctimas son los que exigen investigación interna y `
+        + `medidas correctivas documentadas.`;
+    }
+
+    return texto;
+  }
+
+  private textoNormas(reparto: ModelsInforme.Reparto, conductores: number): string {
+    const completo = this.sumarQue(reparto, /completamente|totalmente/i);
+    const brecha = conductores - completo;
+
+    if (brecha <= 0) {
+      return `Los ${conductores} conductores declaran conocer y aplicar las normas de `
+        + `tránsito vigentes.`;
+    }
+
+    return `${completo} conductores (${this.pct(completo, conductores)}%) declaran conocer `
+      + `y aplicar completamente las normas de tránsito. Los ${brecha} restantes `
+      + `(${this.pct(brecha, conductores)}%) las conocen solo en parte o no las conocen, `
+      + `y son quienes marcan la necesidad de formación.`;
+  }
+
+  private textoCapacitacion(reparto: ModelsInforme.Reparto, conductores: number): string {
+    const si = this.sumarQue(reparto, /^s[ií]$/i);
+    const no = conductores - si;
+
+    if (si >= conductores) {
+      return `Los ${conductores} conductores han participado en capacitación sobre `
+        + `atención de emergencias viales.`;
+    }
+
+    return `${si} conductores (${this.pct(si, conductores)}%) han participado en alguna `
+      + `capacitación sobre atención de emergencias viales; ${no} `
+      + `(${this.pct(no, conductores)}%) no lo han hecho. La capacitación de quienes `
+      + `conducen es una de las medidas que exige la Resolución.`;
+  }
+
+  /** Une una lista en prosa: "a, b y c". */
+  private enumerar(partes: string[]): string {
+    if (partes.length <= 1) return partes[0] ?? '';
+    return `${partes.slice(0, -1).join(', ')} y ${partes[partes.length - 1]}`;
   }
 
   /** Resume el modulo entero, con las tres cifras que mas pesan. */
@@ -603,18 +905,18 @@ export class InformeDiagnosticoService {
     if (regular) hallazgos.push(`${regular} (${this.pct(regular, muestra)}%) califican su salud como regular o mala`);
 
     const conLimitacion = this.sumarSalvoNo(r.limitacion);
-    if (conLimitacion) hallazgos.push(`${conLimitacion} (${this.pct(conLimitacion, muestra)}%) declaran alguna limitacion fisica`);
+    if (conLimitacion) hallazgos.push(`${conLimitacion} (${this.pct(conLimitacion, muestra)}%) declaran alguna limitación física`);
 
     const conDolor = this.sumarSalvoNo(r.dolor);
     if (conDolor) hallazgos.push(`${conDolor} (${this.pct(conDolor, muestra)}%) sienten dolor o molestia asociado a la jornada`);
 
     const base = 'El estado de salud de quienes conducen o se desplazan incide '
-      + 'directamente en el riesgo vial: la fatiga, el dolor y las limitaciones fisicas '
-      + 'reducen la capacidad de reaccion.';
+      + 'directamente en el riesgo vial: la fatiga, el dolor y las limitaciones físicas '
+      + 'reducen la capacidad de reacción.';
 
     if (!hallazgos.length) {
       return `${base} De las ${muestra} personas encuestadas no se reportan condiciones `
-        + `de salud que comprometan la conduccion.`;
+        + `de salud que comprometan la conducción.`;
     }
 
     const listado = hallazgos.length > 1
@@ -667,9 +969,9 @@ export class InformeDiagnosticoService {
     const activos = this.sumarSalvoNo(reparto);
     const sedentarios = muestra - activos;
 
-    return `${activos} personas (${this.pct(activos, muestra)}%) realizan actividad fisica `
+    return `${activos} personas (${this.pct(activos, muestra)}%) realizan actividad física `
       + `con alguna regularidad, frente a ${sedentarios} (${this.pct(sedentarios, muestra)}%) `
-      + `que no la practican. La condicion fisica ayuda a sostener la atencion en `
+      + `que no la practican. La condición física ayuda a sostener la atención en `
       + `trayectos largos.`;
   }
 
