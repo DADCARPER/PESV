@@ -255,6 +255,18 @@ export namespace ModelDiagnosticos {
          * Un plan con la revision vencida deja de valer en una auditoria.
          */
         fechaRevision?: string;
+
+        /**
+         * Documento de respaldo: el procedimiento firmado, en PDF o imagen.
+         *
+         * Va aparte de `protocoloAccion` y no lo sustituye. Los pasos escritos
+         * son los que el informe puede imprimir, y un auditor no acepta "existe
+         * un archivo" como evidencia de contenido. El soporte prueba que el
+         * procedimiento esta formalizado; el texto prueba que dice algo.
+         */
+        soporteUrl?: string;
+        soporteRuta?: string;
+        soporteNombre?: string;
     }
 
     export interface encuestaParametros{

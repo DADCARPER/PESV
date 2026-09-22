@@ -2576,6 +2576,7 @@ export class InformeDiagnosticoService {
     const pendientes = TIPOS_EMERGENCIA.filter(t => !cubiertos.has(t));
 
     const sinProtocolo = planes.filter(p => !(p.protocoloAccion ?? '').trim()).length;
+    const conSoporte = planes.filter(p => (p.soporteUrl ?? '').trim()).length;
     const sinResponsable = planes.filter(p => !(p.responsable ?? '').trim()).length;
     const sinTelefono = planes.filter(p => !(p.telefonoEmergencia ?? '').trim()).length;
 
@@ -2591,7 +2592,7 @@ export class InformeDiagnosticoService {
       id: 'emergencias',
       titulo: 'Preparación ante emergencias',
       texto: this.textoEmergencias(planes.length, [...pendientes], {
-        sinProtocolo, sinResponsable, sinTelefono, vencida, sinFecha,
+        sinProtocolo, sinResponsable, sinTelefono, vencida, sinFecha, conSoporte,
       }),
       sinDatos: !planes.length,
       cifras: [
@@ -2664,13 +2665,16 @@ export class InformeDiagnosticoService {
 
     return [{
       titulo: `Planes de emergencia registrados (${planes.length})`,
-      columnas: ['Plan', 'Escenario', 'Responsable', 'Teléfono', 'Protocolo', 'Revisión'],
+      columnas: [
+        'Plan', 'Escenario', 'Responsable', 'Teléfono', 'Protocolo', 'Soporte', 'Revisión',
+      ],
       filas: planes.map(p => [
         textoSeguro(p.nombrePlan, 'Sin nombre'),
         textoSeguro(p.tipoEmergencia, '—'),
         textoSeguro(p.responsable, 'Sin asignar'),
         textoSeguro(p.telefonoEmergencia, 'Sin registrar'),
         (p.protocoloAccion ?? '').trim() ? 'Documentado' : 'Sin documentar',
+        (p.soporteUrl ?? '').trim() ? 'Adjunto' : 'Sin adjuntar',
         this.resumenVigencia(p.fechaRevision),
       ]),
     }];
@@ -2681,7 +2685,7 @@ export class InformeDiagnosticoService {
     pendientes: string[],
     h: {
       sinProtocolo: number; sinResponsable: number; sinTelefono: number;
-      vencida: number; sinFecha: number;
+      vencida: number; sinFecha: number; conSoporte: number;
     }
   ): string {
     if (!total) {
@@ -2720,6 +2724,11 @@ export class InformeDiagnosticoService {
     if (h.sinFecha) {
       partes.push(`En ${h.sinFecha} no consta fecha de revisión, de modo que nada obliga `
         + `a volver a mirarlos.`);
+    }
+
+    if (h.conSoporte) {
+      partes.push(`${h.conSoporte} de los planes tienen adjunto el procedimiento firmado `
+        + `como documento de soporte.`);
     }
 
     return partes.join(' ');

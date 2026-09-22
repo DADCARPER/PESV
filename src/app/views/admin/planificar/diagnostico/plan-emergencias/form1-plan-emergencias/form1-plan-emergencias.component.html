@@ -59,6 +59,47 @@
               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 resize-none"></textarea>
           </div>
 
+          <!-- El soporte va pegado a los pasos, no en otra seccion: son el
+               mismo procedimiento, uno escrito para poder imprimirlo en el
+               informe y otro firmado para poder ensenarlo en una auditoria. -->
+          <div class="space-y-1 col-span-2 lg:col-span-4">
+            <label class="block text-sm font-medium text-gray-700">
+              Documento de soporte <span class="text-gray-400 font-normal">(opcional)</span>
+            </label>
+
+            @if (soporteUrl()) {
+              <div class="flex items-center gap-3 rounded-md border border-gray-200 p-3">
+                <a [href]="soporteUrl()" target="_blank" rel="noopener"
+                  class="min-w-0 flex-1 truncate text-sm text-blue-600 hover:underline">
+                  {{ soporteNombre() || 'Ver documento' }}
+                </a>
+                <button type="button" (click)="quitarSoporte()"
+                  class="shrink-0 rounded border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50">
+                  Quitar
+                </button>
+              </div>
+
+            } @else if (subiendoSoporte()) {
+              <div class="rounded-md border border-gray-200 p-3">
+                <p class="text-sm text-gray-600">Subiendo... {{ progresoSoporte() }}%</p>
+                <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+                  <div class="h-full rounded-full bg-amber-400 transition-all"
+                    [style.width.%]="progresoSoporte()"></div>
+                </div>
+              </div>
+
+            } @else {
+              <input type="file" (change)="alElegirSoporte($event)"
+                accept=".pdf,.doc,.docx,image/*"
+                class="w-full text-sm text-gray-600 file:mr-3 file:rounded file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-gray-700 hover:file:bg-gray-200">
+            }
+
+            <span class="text-xs text-gray-500">
+              El procedimiento firmado, en PDF o imagen. No sustituye a los pasos escritos
+              arriba: el informe imprime el texto, y el archivo queda como respaldo.
+            </span>
+          </div>
+
           <div class="space-y-1 col-span-2">
             <label class="block text-sm font-medium text-gray-700">Responsable</label>
             <input type="text" formControlName="responsable" placeholder="Nombre del responsable del plan"
