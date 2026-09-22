@@ -111,6 +111,18 @@ export namespace ModelsInforme {
     titulo: string;
     /** Lo que el sistema propone decir. El líder lo edita antes de emitir. */
     texto: string;
+    /**
+     * Qué hacer con lo que la sección encontró, una acción por línea.
+     *
+     * Sale de los hallazgos y no de una plantilla: una recomendación que
+     * aparece cuando no hay nada que recomendar es ruido, y el lector aprende
+     * a saltársela. Cuando la sección está en regla, va vacía.
+     *
+     * El sistema propone; quien emite decide. Es el campo que más se va a
+     * editar del informe, porque una acción depende del presupuesto y del
+     * calendario de la empresa, y eso el diagnóstico no lo sabe.
+     */
+    recomendaciones?: string;
     cifras: Cifra[];
     repartos: Reparto[];
     /** Vacía cuando la sección no tiene datos que mostrar. */

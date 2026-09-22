@@ -220,6 +220,17 @@ export class InformeDiagnosticoService {
       id: 'personas',
       titulo: 'Caracterización de la población',
       texto: this.textoPoblacion(respuestas.length, hombres, mujeres, empresa),
+      // La mitad de la plantilla no es un umbral estadistico, es un criterio
+      // practico: por debajo de ahi, atribuir al conjunto lo que dice la
+      // muestra empieza a ser dificil de sostener ante quien pregunte.
+      recomendaciones: this.recomendar([
+        empresa.cobertura < 50 && `Ampliar la difusión de la encuesta: la muestra cubre `
+          + `el ${empresa.cobertura}% de la plantilla, y con esa cobertura cuesta `
+          + `sostener que lo que dice la muestra vale para toda la organización.`,
+        respuestas.length > 0 && `Verificar que todas las sedes y áreas estén `
+          + `representadas en la muestra antes de emitir: una cobertura alta que deja `
+          + `fuera una sede entera esconde justo lo que había que ver.`,
+      ]),
       sinDatos: !respuestas.length,
       cifras: [],
       destacados: [
@@ -595,6 +606,26 @@ export class InformeDiagnosticoService {
       actividad.grafica = 'tablaPastel';
       actividad.texto = this.textoActividadFisica(actividad, muestra);
     }
+
+    const conDolor = this.sumarSalvoNo(dolor);
+    const conLimitacion = this.sumarSalvoNo(limitacion);
+    const saludRegular = this.sumarQue(estado, /regular|mala|deficiente/i);
+    const sedentarios = muestra - this.sumarSalvoNo(actividad);
+
+    seccion.recomendaciones = this.recomendar([
+      conDolor > 0 && `Valorar con la ARL los ${conDolor} casos de dolor o molestia `
+        + `asociados a la jornada: la fatiga acumulada reduce el tiempo de reacción al `
+        + `volante y es una causa de siniestro que no aparece en los partes.`,
+      conLimitacion > 0 && `Revisar si las limitaciones físicas declaradas por `
+        + `${conLimitacion} personas exigen ajustes en sus tareas de conducción o `
+        + `desplazamiento.`,
+      saludRegular > 0 && `Incluir a las ${saludRegular} personas que califican su salud `
+        + `como regular o mala en el seguimiento de exámenes médicos ocupacionales, con `
+        + `énfasis en quienes conducen.`,
+      sedentarios > 0 && `Vincular las pausas activas y los programas de bienestar al `
+        + `PESV y no solo a salud ocupacional: la condición física sostiene la atención `
+        + `en trayectos largos.`,
+    ]);
   }
 
   /**
@@ -720,6 +751,38 @@ export class InformeDiagnosticoService {
       emergencias.grafica = 'tabla';
       emergencias.texto = this.textoCapacitacion(emergencias, conductores);
     }
+
+    const sinLicencia = this.sumarQue(licencia, /^no$/i);
+    const conInfracciones = this.sumarQue(infracciones, /^s[ií]$/i);
+    const pendientes = this.sumarQue(infracciones?.emparejado, /no gestionad|acuerdo de pago/i);
+    const enJornada = this.sumarQue(accidentes?.emparejado, /^s[ií]$/i);
+    const graves = this.sumarQue(gravedad, /lesionad|fallecid|muert/i);
+    const brechaNormas = normas ? conductores - this.sumarQue(normas, /completamente|totalmente/i) : 0;
+    const sinCapacitar = emergencias ? conductores - this.sumarQue(emergencias, /^s[ií]$/i) : 0;
+    const noveles = this.sumarQue(experiencia, /menos de|1 a 3/i);
+
+    seccion.recomendaciones = this.recomendar([
+      sinLicencia > 0 && `Suspender de tareas de conducción a los ${sinLicencia} `
+        + `conductores sin licencia vigente hasta que la regularicen. No es una acción `
+        + `del plan: es una medida inmediata.`,
+      pendientes > 0 && `Hacer seguimiento a las ${pendientes} infracciones sin saldar. `
+        + `Una sanción pendiente puede terminar en suspensión de la licencia y dejar a `
+        + `la operación sin conductor.`,
+      conInfracciones > 0 && `Establecer la verificación periódica del historial de `
+        + `comparendos (RUNT) como control permanente, no como revisión anual.`,
+      enJornada > 0 && `Investigar los ${enJornada} accidentes ocurridos durante la `
+        + `jornada laboral y documentar las medidas correctivas: caen dentro del alcance `
+        + `del PESV.`,
+      graves > 0 && `Priorizar el análisis de los siniestros con víctimas, que exigen `
+        + `investigación formal y lección aprendida documentada.`,
+      brechaNormas > 0 && `Programar formación en normas de tránsito para los `
+        + `${brechaNormas} conductores que declaran conocerlas solo en parte o no `
+        + `conocerlas.`,
+      sinCapacitar > 0 && `Capacitar en atención de emergencias viales a los `
+        + `${sinCapacitar} conductores que no han participado en ninguna.`,
+      noveles > 0 && `Dirigir primero la formación en conducción segura a los `
+        + `${noveles} conductores con tres años o menos de experiencia.`,
+    ]);
   }
 
   /**
@@ -819,6 +882,33 @@ export class InformeDiagnosticoService {
     if (duracion) {
       duracion.texto = this.textoDuracionJornada(duracion, enMision.length);
     }
+
+    const vehiculoDeficiente = this.sumarQue(estado, /regular|malo/i);
+    const deLaEmpresa = this.sumarQue(propiedad, /empresa/i);
+    const incidentesGraves = this.sumarQue(incidentes, /graves|accidente|riesgo p[uú]blico/i);
+    const motos = this.sumarQue(medios, /moto/i);
+    const trayectosLargos = this.sumarQue(tiempo, /m[aá]s de \d+ hora/i);
+    const jornadaCompleta = this.sumarQue(duracion, /media jornada|toda la jornada/i);
+
+    seccion.recomendaciones = this.recomendar([
+      vehiculoDeficiente > 0 && `Verificar el estado de los vehículos en que se desplazan `
+        + `${vehiculoDeficiente} personas, que lo califican como regular o peor.`,
+      deLaEmpresa > 0 && `Incluir en el plan de inspección preoperacional los vehículos `
+        + `que la empresa proporciona para el desplazamiento de ${deLaEmpresa} personas: `
+        + `sobre esos la responsabilidad de mantenimiento es directa.`,
+      incidentesGraves > 0 && `Analizar los ${incidentesGraves} incidentes graves o de `
+        + `riesgo público reportados en los desplazamientos. No se resuelven con `
+        + `señalización ni con formación, y requieren decisiones de ruta y de horario.`,
+      motos > 0 && `Dirigir campañas específicas a quienes se desplazan en moto: es el `
+        + `medio con mayor siniestralidad del país y lo usan ${motos} personas.`,
+      jornadaCompleta > 0 && `Tratar como personal de conducción a las `
+        + `${jornadaCompleta} personas que pasan media jornada o más desplazándose, `
+        + `aunque su cargo diga otra cosa: mismos exámenes, misma formación, mismos `
+        + `controles.`,
+      trayectosLargos > 0 && `Considerar medidas de jornada o de transporte para las `
+        + `${trayectosLargos} personas que emplean más de una hora solo en el trayecto `
+        + `de ida.`,
+    ]);
   }
 
   /**
@@ -918,6 +1008,26 @@ export class InformeDiagnosticoService {
     }
 
     seccion.texto = this.textoMejora(muestra, acciones, participacion, propuestas.length);
+
+    const pedidas = this.principales(acciones, 3);
+    const sinFormacion = participacion
+      ? muestra - this.sumarQue(participacion, /^s[ií]$/i)
+      : 0;
+
+    seccion.recomendaciones = this.recomendar([
+      pedidas.length > 0 && `Llevar al plan anual de trabajo las acciones más pedidas `
+        + `por los trabajadores: `
+        + `${this.enumerar(pedidas.map(f => f.etiqueta.toLowerCase()))}.`,
+      sinFormacion > 0 && `Programar formación en seguridad vial para las `
+        + `${sinFormacion} personas que no han participado en ninguna actividad o no la `
+        + `recuerdan. Una capacitación que no deja recuerdo no deja tampoco conducta.`,
+      propuestas.length > 0 && `Dar respuesta a las ${propuestas.length} propuestas `
+        + `recibidas, aunque sea para descartarlas. Una consulta sin devolución no se `
+        + `repite: el año siguiente nadie escribe.`,
+      pedidas.length > 0 && `Contrastar lo que se pide con los factores de riesgo del `
+        + `módulo anterior: donde coincidan, la medida tiene respaldo doble y debería `
+        + `encabezar el plan.`,
+    ]);
   }
 
   /** Resume el modulo: que piden, si ya se les formo y cuantos escribieron. */
@@ -1086,6 +1196,30 @@ export class InformeDiagnosticoService {
     if (primero >= 0) seccion.repartos.splice(primero, 0, resumen);
 
     seccion.texto = this.textoRiesgos(muestra, resumen, { exposicion, experiencia, reporte });
+
+    const conExperiencia = this.sumarSalvoNo(experiencia);
+    const callaron = conExperiencia - this.sumarQue(reporte, /^s[ií]$/i);
+    const noSabeReportar = this.sumarQue(sabeReportar, /^no$/i);
+    const inseguros = this.sumarQue(exposicion, /no estoy segur|desconozco/i);
+    const culturaDebil = this.sumarQue(cultura, /parcialmente|^no$|desconozco/i);
+    const dominante = resumen.filas[0];
+
+    seccion.recomendaciones = this.recomendar([
+      callaron > 0 && `Revisar por qué ${callaron} personas vivieron una situación de `
+        + `riesgo y no la reportaron. Ese subreporte deja a la organización sin noticia `
+        + `de lo que ocurre en sus trayectos y hace que sus cifras queden por debajo de `
+        + `la realidad.`,
+      noSabeReportar > 0 && `Divulgar el canal de reporte de condiciones inseguras entre `
+        + `las ${noSabeReportar} personas que declaran no saber cómo usarlo. Un canal `
+        + `que no se conoce no existe.`,
+      inseguros > 0 && `Sensibilizar a las ${inseguros} personas que no saben si están `
+        + `expuestas a riesgo vial: quien no se sabe expuesto no toma precauciones.`,
+      culturaDebil > 0 && `Hacer visible el PESV ante las ${culturaDebil} personas que `
+        + `perciben la cultura de seguridad vial como parcial, ausente o desconocida.`,
+      !!dominante?.total && `Concentrar el plan de acción en el `
+        + `${dominante.etiqueta.toLowerCase()}, que es el que más personas señalan `
+        + `(${dominante.total}), sin descuidar las otras tres familias.`,
+    ]);
   }
 
   /**
@@ -1918,6 +2052,25 @@ export class InformeDiagnosticoService {
           nota: siniestros ? 'Exigen investigación interna' : 'Ninguno reportado',
         },
       ],
+      recomendaciones: this.recomendar([
+        soatVencido > 0 && `Regularizar de inmediato el SOAT de ${soatVencido} `
+          + `vehículo(s): mientras esté vencido no pueden circular legalmente y la `
+          + `responsabilidad ante un siniestro recae sobre la organización.`,
+        revisionVencida > 0 && `Programar la revisión técnico-mecánica de `
+          + `${revisionVencida} vehículo(s) con la vigencia cumplida.`,
+        porVencer > 0 && `Renovar antes de ${DIAS_AVISO} días las vigencias de `
+          + `${porVencer} vehículo(s), sin esperar a que caduquen.`,
+        sinRegistrar > 0 && `Completar en el registro las fechas de SOAT o revisión `
+          + `técnica de ${sinRegistrar} vehículo(s): sin ellas el diagnóstico no puede `
+          + `afirmar que estén en regla.`,
+        sinPlan > 0 && `Elaborar el plan de mantenimiento preventivo de ${sinPlan} `
+          + `vehículo(s). Es uno de los pasos obligatorios del PESV y su ausencia es `
+          + `hallazgo de auditoría.`,
+        siniestros > 0 && `Investigar internamente los ${siniestros} siniestros `
+          + `registrados y documentar las medidas correctivas que se derivaron.`,
+        !kmMes && `Registrar el kilometraje mensual de la flota: sin él no puede `
+          + `calcularse ningún indicador por millón de kilómetros.`,
+      ]),
       repartos: [
         this.repartoTipoVehiculo(vehiculos),
         this.repartoRelacion(vehiculos, propios, total),
@@ -2292,6 +2445,21 @@ export class InformeDiagnosticoService {
           nota: 'Ninguna fecha obliga a revisar sus cláusulas',
         },
       ],
+      recomendaciones: this.recomendar([
+        vencido > 0 && `Renovar el contrato de ${vencido} contratista(s): las `
+          + `obligaciones de seguridad vial se exigen por contrato, y sin contrato `
+          + `vigente no hay cláusula que hacer cumplir.`,
+        porVencer > 0 && `Aprovechar la renovación de ${porVencer} contrato(s) que `
+          + `vencen este mes para incorporar o actualizar las cláusulas del PESV.`,
+        sinVehiculos > 0 && `Registrar los vehículos de ${sinVehiculos} contratista(s) `
+          + `que declaran desplazamientos: hoy el diagnóstico no sabe con qué circulan.`,
+        conductores > 0 && `Extender a los ${conductores} conductores de contratistas `
+          + `las medidas de formación y verificación documental que se apliquen al `
+          + `personal propio: no responden la encuesta, pero circulan por cuenta de la `
+          + `organización.`,
+        indefinidos > 0 && `Fijar una revisión periódica de los ${indefinidos} contratos `
+          + `indefinidos: al no vencer, nada obliga a revisar sus cláusulas.`,
+      ]),
       repartos: [
         this.repartoTipoContratista(contratistas),
         this.repartoVinculacion(contratistas, enAlcance),
@@ -2467,6 +2635,18 @@ export class InformeDiagnosticoService {
             mal: `${sinRiesgos} sin señalar: ninguna vía está libre de riesgo`,
           }),
       ],
+      recomendaciones: this.recomendar([
+        sinRiesgos > 0 && `Completar la identificación de riesgos en ${sinRiesgos} `
+          + `ruta(s): ninguna vía está libre de riesgo, de modo que lo más probable es `
+          + `que falte el registro y no que la ruta sea segura.`,
+        sinEstimar > 0 && `Registrar la distancia de ${sinEstimar} ruta(s) para poder `
+          + `estimar su exposición mensual.`,
+        rutas.length > 0 && `Iniciar el estudio de rutas por las de mayor exposición `
+          + `mensual, que encabezan la tabla: una mejora rinde más donde más se circula.`,
+        rutas.length > 0 && `Contrastar los riesgos declarados aquí con el factor vía y `
+          + `el factor entorno de la encuesta; donde las dos lecturas no coincidan, `
+          + `verificar en terreno.`,
+      ]),
       repartos: [
         this.repartoTipoVia(rutas),
         this.repartoFrecuencia(rutas),
@@ -2690,6 +2870,23 @@ export class InformeDiagnosticoService {
           mal: `${planes.length - conSoporte} sin adjuntar (opcional)`,
         }),
       ],
+      recomendaciones: this.recomendar([
+        pendientes.length > 0 && `Elaborar los ${pendientes.length} planes que faltan `
+          + `para cubrir todos los escenarios previstos: ${pendientes.join(', ')}.`,
+        sinProtocolo > 0 && `Documentar los pasos a seguir de ${sinProtocolo} plan(es). `
+          + `Un plan que declara su objetivo pero no describe una conducta no se puede `
+          + `seguir en el momento en que hace falta.`,
+        sinResponsable > 0 && `Asignar responsable a ${sinResponsable} plan(es).`,
+        sinTelefono > 0 && `Registrar el teléfono de emergencia de ${sinTelefono} `
+          + `plan(es): sin él, el plan no se puede activar.`,
+        vencida > 0 && `Actualizar ${vencida} plan(es) con la fecha de revisión `
+          + `cumplida, que en una auditoría dejan de valer.`,
+        sinFecha > 0 && `Fijar fecha de próxima revisión en ${sinFecha} plan(es): sin `
+          + `ella nada obliga a volver a mirarlos.`,
+        planes.length > 0 && `Divulgar los planes entre quienes conducen y dejar `
+          + `constancia de la socialización: un plan que el conductor no conoce no `
+          + `cambia lo que ocurre en la vía.`,
+      ]),
       repartos: [],
       tablas: [this.tablaCobertura(planes), ...this.tablaPlanes(planes)],
     };
@@ -2845,6 +3042,21 @@ export class InformeDiagnosticoService {
       alerta: faltan > 0,
       nota: faltan > 0 ? nota.mal : nota.bien,
     };
+  }
+
+  /**
+   * Arma las recomendaciones de una seccion a partir de sus hallazgos.
+   *
+   * Cada linea viene condicionada: si la condicion no se cumple, la linea no
+   * aparece. Una seccion en regla se queda sin recomendaciones, que es lo
+   * correcto: recomendar algo cuando no hay nada que arreglar entrena al
+   * lector a saltarse el bloque entero.
+   *
+   * Van numeradas porque asi entran directas en el plan anual de trabajo.
+   */
+  private recomendar(lineas: (string | false | null | undefined)[]): string {
+    const vivas = lineas.filter((l): l is string => typeof l === 'string' && !!l);
+    return vivas.map((linea, i) => `${i + 1}. ${linea}`).join('\n');
   }
 
   /** Une los pendientes de una tarjeta: "1 vencido - 2 sin registrar". */

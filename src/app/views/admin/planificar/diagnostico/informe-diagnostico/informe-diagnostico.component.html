@@ -318,6 +318,24 @@
               }
             }
 
+            <!-- ── Recomendaciones ───────────────────────────────────
+                 Van al cierre de la seccion, despues de lo que la sustenta:
+                 primero lo que se encontro y luego que hacer con ello. -->
+            @if (seccion.recomendaciones) {
+              <div class="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-amber-800">
+                  Recomendaciones
+                </p>
+                <textarea [(ngModel)]="seccion.recomendaciones"
+                  [name]="'recomendaciones-' + seccion.id" rows="5"
+                  class="w-full rounded-lg border border-amber-200 bg-white px-4 py-3 text-sm leading-relaxed text-gray-800 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400"></textarea>
+                <p class="mt-1 text-xs text-amber-700">
+                  Propuestas por el sistema a partir de los hallazgos. Ajústalas al
+                  presupuesto y al calendario de la empresa antes de emitir.
+                </p>
+              </div>
+            }
+
             @for (tabla of seccion.tablas; track tabla.titulo) {
               @if (tabla.filas.length) {
                 <div class="mb-4">
