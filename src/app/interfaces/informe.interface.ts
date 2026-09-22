@@ -39,9 +39,11 @@ export namespace ModelsInforme {
      * `barras` son horizontales, para categorías sueltas con nombres largos;
      * `tabla` es solo el listado, centrado, cuando el dato exacto basta y un
      * gráfico de tres categorías no añade nada; `tablaPastel` pone las dos
-     * cosas, para cuando además interesa el peso de cada una.
+     * cosas, para cuando además interesa el peso de cada una; `dona` es un
+     * anillo, para repartos de pocas categorías que se leen como partes de un
+     * todo.
      */
-    grafica?: 'columnas' | 'barras' | 'tabla' | 'tablaPastel';
+    grafica?: 'columnas' | 'barras' | 'tabla' | 'tablaPastel' | 'dona';
     /**
      * Otro reparto que se pinta a su lado, bajo un mismo texto.
      *

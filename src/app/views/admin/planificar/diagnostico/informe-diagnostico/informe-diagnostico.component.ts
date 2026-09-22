@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BarrasInformeComponent } from '../../../../../components/apexChart/barras-informe/barras-informe.component';
 import { PieMonochromeComponent } from '../../../../../components/apexChart/pie-monochrome/pie-monochrome.component';
+import { DonutComponent } from '../../../../../components/apexChart/donut/donut.component';
 
 import { InformeDiagnosticoService } from '../../../../../services/shared/informe-diagnostico.service';
 import { AuthenticacionService } from '../../../../../services/shared/authenticacion.service';
@@ -23,7 +24,7 @@ import { ModelsInforme } from '../../../../../interfaces/informe.interface';
 @Component({
   selector: 'app-informe-diagnostico',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, BarrasInformeComponent, PieMonochromeComponent],
+  imports: [CommonModule, RouterLink, FormsModule, BarrasInformeComponent, PieMonochromeComponent, DonutComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './informe-diagnostico.component.html',
 })

@@ -263,6 +263,16 @@
                       </div>
                     </div>
 
+                  } @else if (reparto.grafica === 'dona') {
+                    <!-- Centrada y acotada: a ancho completo el anillo crece
+                         tanto que las etiquetas quedan sueltas por los bordes. -->
+                    <div class="mx-auto md:w-1/2">
+                      <app-donut
+                        [labels]="etiquetasDe(reparto)"
+                        [series]="valoresDe(reparto)"
+                        [muestraBorde]="false"></app-donut>
+                    </div>
+
                   } @else if (reparto.grafica === 'tablaPastel') {
                     <!-- Pocas categorias: interesa tanto el dato exacto como
                          el peso de cada una, asi que van juntos.

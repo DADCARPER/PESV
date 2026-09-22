@@ -545,9 +545,9 @@ export class InformeDiagnosticoService {
 
     seccion.texto = this.textoSalud(muestra, { estado, limitacion, dolor });
 
-    // Escala ordenada de excelente a mala: se lee de izquierda a derecha.
+    // Cuatro categorias que son partes de un todo: se lee mejor en anillo.
     if (estado) {
-      estado.grafica = 'columnas';
+      estado.grafica = 'dona';
       estado.texto = this.textoEstadoSalud(estado, muestra);
     }
 
