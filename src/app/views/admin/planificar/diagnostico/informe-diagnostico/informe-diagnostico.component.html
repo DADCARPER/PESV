@@ -367,14 +367,273 @@
         }
       </div>
 
-      <p class="mt-6 rounded-lg border border-sky-200 bg-sky-50 p-4 text-sm text-sky-800">
-        Esto es lo que el sistema ve hoy. Todavía no se puede emitir: el asistente de
-        emisión y el PDF son los pasos siguientes.
-      </p>
+      <!-- ── Emitir ──────────────────────────────────────────────────────
+           La vista previa de arriba es un borrador vivo: se recalcula cada vez
+           que se entra. Emitir congela una copia para poder presentarla. -->
+      <div class="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-5">
+        <h3 class="text-base font-semibold text-amber-900">Emitir el informe</h3>
+        <p class="mt-1 max-w-3xl text-sm text-amber-800">
+          Lo de arriba es un borrador: se vuelve a calcular cada vez que abres esta
+          pantalla y cambia según cambie el diagnóstico. Al emitir se guarda una copia
+          de estas cifras, que ya no cambia, y es la que se descarga y se presenta.
+          El diagnóstico sigue abierto: lo que queda quieto es el informe.
+        </p>
+        <button type="button" (click)="abrirAsistente()"
+          class="mt-4 rounded bg-amber-500 px-6 py-3 text-sm font-bold uppercase text-white shadow transition-all duration-150 hover:shadow-lg focus:outline-none active:bg-amber-600">
+          Revisar y emitir
+        </button>
+      </div>
+
+      <!-- ── Historial ───────────────────────────────────────────────────── -->
+      @if (historial().length) {
+        <div class="mt-6">
+          <h3 class="mb-3 text-base font-semibold text-gray-900">Informes emitidos</h3>
+          <div class="overflow-x-auto rounded-lg border border-gray-100">
+            <table class="min-w-full text-sm">
+              <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+                <tr>
+                  <th class="px-3 py-2 text-left font-semibold">Versión</th>
+                  <th class="px-3 py-2 text-left font-semibold">Emitido</th>
+                  <th class="px-3 py-2 text-left font-semibold">Responde</th>
+                  <th class="px-3 py-2 text-left font-semibold">Estado</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                @for (informe of historial(); track informe.id) {
+                  <tr [class.bg-emerald-50]="informe.vigencia === 'vigente'">
+                    <td class="px-3 py-2 font-medium text-gray-900">v{{ informe.version }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ fechaDe(informe) }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ informe.emitidoPor || '—' }}</td>
+                    <td class="px-3 py-2">
+                      @if (informe.vigencia === 'vigente') {
+                        <span class="rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-700">Vigente</span>
+                      } @else {
+                        <span class="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-500">Archivado</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <p class="mt-2 text-xs text-gray-400">
+            Solo uno está vigente. Los anteriores quedan consultables, porque un informe
+            ya presentado no se puede hacer desaparecer.
+          </p>
+        </div>
+      }
     }
     }
   </div>
 </div>
+
+<!-- ── Asistente de emisión ────────────────────────────────────────────────
+     Un paso por sección, y no varias juntas: el punto del asistente es que
+     quien emite pase por delante de cada cosa que el sistema escribió. -->
+@if (asistente()) {
+  <div (click)="cerrarAsistente()" class="fixed inset-0 z-40 bg-black opacity-25"></div>
+
+  <div class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden outline-none focus:outline-none">
+    <div (click)="$event.stopPropagation()" class="relative mx-auto my-6 w-full max-w-4xl rounded-lg bg-white shadow-lg">
+
+      <div class="flex items-center justify-between rounded-t border-b p-5">
+        <h3 class="text-xl font-semibold text-gray-900">
+          @if (esAviso()) { Antes de emitir }
+          @else if (esCierre()) { Todo listo }
+          @else { {{ seccionDelPaso()?.titulo }} }
+        </h3>
+        <span class="text-xs uppercase tracking-wide text-gray-400">
+          Paso {{ paso() + 1 }} de {{ pasos().length }}
+        </span>
+      </div>
+
+      <!-- Barra de avance -->
+      <div class="h-1 w-full bg-gray-100">
+        <div class="h-full bg-amber-400 transition-all"
+          [style.width.%]="((paso() + 1) / pasos().length) * 100"></div>
+      </div>
+
+      <div class="max-h-[65vh] overflow-y-auto p-6">
+
+        @if (esAviso()) {
+          <p class="text-sm leading-relaxed text-gray-700">
+            Vas a congelar el informe del periodo <strong>{{ periodo() }}</strong>.
+          </p>
+          <ul class="mt-4 space-y-2 text-sm text-gray-700">
+            <li class="flex gap-2">
+              <span class="text-amber-500">•</span>
+              Se guarda una copia de las cifras tal como están hoy. Esa copia ya no
+              cambia, aunque el diagnóstico siga creciendo.
+            </li>
+            <li class="flex gap-2">
+              <span class="text-amber-500">•</span>
+              <strong>El diagnóstico no se cierra.</strong> Puedes seguir cargando sedes,
+              vehículos o respuestas de la encuesta. Lo que queda quieto es el informe.
+            </li>
+            <li class="flex gap-2">
+              <span class="text-amber-500">•</span>
+              Si ya había un informe vigente, pasa a archivado. No se borra: queda
+              consultable, porque un informe ya presentado no se puede hacer desaparecer.
+            </li>
+            <li class="flex gap-2">
+              <span class="text-amber-500">•</span>
+              En los pasos siguientes verás lo que el sistema escribió en cada sección y
+              podrás cambiarlo. Lo que dejes ahí es lo que sale en el PDF.
+            </li>
+          </ul>
+
+          @if (seccionesVacias().length) {
+            <div class="mt-5 rounded-lg border border-red-200 bg-red-50 p-4">
+              <p class="text-sm font-semibold text-red-800">Hay secciones sin datos</p>
+              <p class="mt-1 text-sm text-red-700">
+                {{ seccionesVacias().join(', ') }}. Puedes emitir igual, pero el informe
+                saldrá con esas secciones vacías y eso se nota.
+              </p>
+            </div>
+          }
+
+        } @else if (esCierre()) {
+          <p class="text-sm leading-relaxed text-gray-700">
+            El informe se guardará con las cifras y los textos que acabas de revisar.
+          </p>
+
+          <dl class="mt-4 grid gap-3 sm:grid-cols-2">
+            <div class="rounded-lg border border-gray-100 bg-gray-50 p-3">
+              <dt class="text-xs uppercase tracking-wide text-gray-500">Empresa</dt>
+              <dd class="text-sm font-medium text-gray-900">{{ datos()?.nombreEmpresa }}</dd>
+            </div>
+            <div class="rounded-lg border border-gray-100 bg-gray-50 p-3">
+              <dt class="text-xs uppercase tracking-wide text-gray-500">Periodo</dt>
+              <dd class="text-sm font-medium text-gray-900">{{ datos()?.periodo }}</dd>
+            </div>
+            <div class="rounded-lg border border-gray-100 bg-gray-50 p-3">
+              <dt class="text-xs uppercase tracking-wide text-gray-500">Muestra</dt>
+              <dd class="text-sm font-medium text-gray-900">
+                {{ datos()?.metodologia?.muestra }} de {{ datos()?.metodologia?.poblacion }}
+                ({{ datos()?.metodologia?.cobertura }}%)
+              </dd>
+            </div>
+            <div class="rounded-lg border border-gray-100 bg-gray-50 p-3">
+              <dt class="text-xs uppercase tracking-wide text-gray-500">Responde</dt>
+              <dd class="text-sm font-medium text-gray-900">{{ responsable() || '—' }}</dd>
+            </div>
+          </dl>
+
+          @if (vigente()) {
+            <p class="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+              La versión v{{ vigente()?.version }}, emitida el {{ fechaDe(vigente()!) }},
+              pasará a archivada.
+            </p>
+          }
+
+        } @else {
+          @if (seccionDelPaso(); as seccion) {
+
+          @if (seccion.sinDatos) {
+            <p class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-gray-600">
+              Esta sección no tiene datos cargados. Saldrá vacía en el informe.
+            </p>
+          }
+
+          <!-- Los datos de identificación que el sistema propone y se pueden
+               cambiar: el responsable no tiene por qué ser quien abre esto. -->
+          @if (seccion.identificacion?.length) {
+            <div class="mb-5 grid gap-3 sm:grid-cols-2">
+              @for (dato of seccion.identificacion; track dato.etiqueta) {
+                @if (dato.editable) {
+                  <div class="sm:col-span-2">
+                    <label class="mb-1 block text-xs uppercase tracking-wide text-gray-500">
+                      {{ dato.etiqueta }}
+                    </label>
+                    <input type="text" [(ngModel)]="dato.valor"
+                      [name]="'ident-' + seccion.id + '-' + dato.etiqueta"
+                      class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400">
+                  </div>
+                } @else {
+                  <div class="rounded-lg border border-gray-100 bg-gray-50 p-3"
+                    [class.sm:col-span-2]="dato.largo">
+                    <p class="text-xs uppercase tracking-wide text-gray-500">{{ dato.etiqueta }}</p>
+                    <p class="mt-1 whitespace-pre-line text-sm text-gray-800">{{ dato.valor }}</p>
+                  </div>
+                }
+              }
+            </div>
+          }
+
+          <!-- Las cifras van de solo lectura: son el dato, no la redacción. -->
+          @if (seccion.cifras.length) {
+            <div class="mb-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              @for (cifra of seccion.cifras; track cifra.etiqueta) {
+                <div class="rounded border p-2"
+                  [ngClass]="cifra.alerta ? 'border-red-200 bg-red-50' : 'border-gray-100 bg-gray-50'">
+                  <div class="flex items-baseline gap-2">
+                    <span class="shrink-0 text-base font-bold"
+                      [ngClass]="cifra.alerta ? 'text-red-700' : 'text-gray-900'">{{ cifra.valor }}</span>
+                    <span class="text-[11px] uppercase leading-tight tracking-wide text-gray-500">{{ cifra.etiqueta }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          @if (seccion.texto) {
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Análisis
+            </label>
+            <textarea [(ngModel)]="seccion.texto" [name]="'wiz-texto-' + seccion.id" rows="7"
+              class="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm leading-relaxed text-gray-800 focus:border-amber-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-amber-400"></textarea>
+          }
+
+          @if (seccion.recomendaciones) {
+            <label class="mb-1 mt-4 block text-xs font-semibold uppercase tracking-wide text-amber-800">
+              Recomendaciones
+            </label>
+            <textarea [(ngModel)]="seccion.recomendaciones"
+              [name]="'wiz-reco-' + seccion.id" rows="7"
+              class="w-full rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-relaxed text-gray-800 focus:border-amber-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-amber-400"></textarea>
+          }
+
+          @if (!seccion.texto && !seccion.recomendaciones) {
+            <p class="text-sm text-gray-500">
+              El sistema no propuso texto para esta sección. Sus cifras y tablas saldrán
+              igual en el informe.
+            </p>
+          }
+          }
+        }
+      </div>
+
+      <div class="flex items-center justify-between gap-2 border-t p-5">
+        <button type="button" (click)="cerrarAsistente()"
+          class="px-4 py-2 text-sm font-bold uppercase text-red-500 transition-all duration-150 ease-linear focus:outline-none">
+          Cancelar
+        </button>
+
+        <div class="flex items-center gap-2">
+          @if (paso() > 0) {
+            <button type="button" (click)="anterior()"
+              class="rounded border border-gray-300 px-5 py-2 text-sm font-bold uppercase text-gray-600 hover:bg-gray-50 focus:outline-none">
+              Atrás
+            </button>
+          }
+
+          @if (esCierre()) {
+            <button type="button" (click)="emitir()" [disabled]="emitiendo()"
+              class="rounded bg-emerald-500 px-6 py-3 text-sm font-bold uppercase text-white shadow transition-all duration-150 hover:shadow-lg focus:outline-none active:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-60">
+              {{ emitiendo() ? 'Emitiendo...' : 'Emitir informe' }}
+            </button>
+          } @else {
+            <button type="button" (click)="siguiente()"
+              class="rounded bg-amber-500 px-6 py-3 text-sm font-bold uppercase text-white shadow transition-all duration-150 hover:shadow-lg focus:outline-none active:bg-amber-600">
+              Siguiente
+            </button>
+          }
+        </div>
+      </div>
+
+    </div>
+  </div>
+}
 
 <!-- ── Tabla de un reparto ───────────────────────────────────────────────── -->
 <ng-template #tablaReparto let-reparto>

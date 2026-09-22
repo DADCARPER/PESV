@@ -186,8 +186,15 @@ export namespace ModelsInforme {
     id: string;
     /** Sube con cada emisión del periodo. */
     version: number;
-    /** Solo uno está vigente; los demás quedan consultables. */
-    estado: 'vigente' | 'historico' | string;
+    /**
+     * Solo uno está vigente; los demás quedan consultables.
+     *
+     * No se llama `estado` porque ese nombre ya está tomado: el CRUD del
+     * proyecto lo usa para el borrado lógico y escribe "Activo" en cada
+     * documento que crea. Dos significados en un mismo campo acaban siempre
+     * con uno de los dos pisando al otro.
+     */
+    vigencia: 'vigente' | 'historico' | string;
     fechaEmision: string;
     /** Quién lo emitió, para que el documento tenga responsable. */
     emitidoPor: string;

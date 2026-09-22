@@ -1,4 +1,4 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, effect, inject, signal } from '@angular/core';
+import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -12,14 +12,17 @@ import { AlertaService } from '../../../../../services/shared/alerta.service';
 import { ModelsInforme } from '../../../../../interfaces/informe.interface';
 
 /**
- * Informe de diagnóstico: vista previa de las cifras.
+ * Informe de diagnóstico: vista previa, asistente de emisión e historial.
  *
  * Esta pantalla reemplaza a la anterior, que componía tres subpantallas con
  * los números escritos a mano y generaba el PDF fotografiando el DOM con
  * html2canvas. Salía bonito con datos inventados.
  *
- * Por ahora solo muestra lo que el sistema ve, que es lo que permite descubrir
- * qué falta antes de montar el asistente de emisión y el PDF.
+ * La vista previa es un borrador vivo: se recalcula con cada visita y refleja
+ * el diagnóstico tal como está hoy. Emitir es lo contrario: congela una copia
+ * de las cifras para poder presentarla y para poder reproducirla dentro de un
+ * año. El diagnóstico sigue abierto después de emitir; lo que queda quieto es
+ * el informe.
  */
 @Component({
   selector: 'app-informe-diagnostico',
@@ -39,6 +42,42 @@ export class InformeDiagnosticoComponent {
   cargando = signal(true);
   datos = signal<ModelsInforme.Datos | null>(null);
 
+  // ── Historial ─────────────────────────────────────────────────────────────
+
+  historial = signal<ModelsInforme.Informe[]>([]);
+
+  vigente = computed(() => this.historial().find(i => i.vigencia === 'vigente') ?? null);
+  archivados = computed(() => this.historial().filter(i => i.vigencia !== 'vigente'));
+
+  // ── Asistente ─────────────────────────────────────────────────────────────
+
+  asistente = signal(false);
+  paso = signal(0);
+  emitiendo = signal(false);
+
+  /**
+   * Los pasos del asistente: el aviso, una sección por sección y el cierre.
+   *
+   * No se agrupan varias secciones en un paso aunque salgan muchos. El punto
+   * del asistente es que quien emite pase por delante de cada cosa que el
+   * sistema escribió y decida si la deja; juntar cuatro secciones en una
+   * pantalla es la forma de que se pulse Siguiente sin leer.
+   */
+  pasos = computed(() => {
+    const secciones = this.datos()?.secciones ?? [];
+    return ['aviso', ...secciones.map(s => s.id), 'cierre'];
+  });
+
+  /** La sección del paso actual, o null en el aviso y en el cierre. */
+  seccionDelPaso = computed<ModelsInforme.Seccion | null>(() => {
+    const indice = this.paso() - 1;
+    const secciones = this.datos()?.secciones ?? [];
+    return indice >= 0 && indice < secciones.length ? secciones[indice] : null;
+  });
+
+  esAviso = computed(() => this.paso() === 0);
+  esCierre = computed(() => this.paso() === this.pasos().length - 1);
+
   constructor() {
     effect(() => {
       this.periodo();
@@ -49,7 +88,11 @@ export class InformeDiagnosticoComponent {
   async cargar() {
     this.cargando.set(true);
     try {
-      this.datos.set(await this._informe.reunir());
+      const [datos] = await Promise.all([
+        this._informe.reunir(),
+        this.cargarHistorial(),
+      ]);
+      this.datos.set(datos);
     } catch (error: unknown) {
       console.error('[InformeDiagnostico] reunir:', error);
       this._alerta.showError('No se pudieron reunir las cifras del informe.');
@@ -57,6 +100,82 @@ export class InformeDiagnosticoComponent {
     } finally {
       this.cargando.set(false);
     }
+  }
+
+  private async cargarHistorial() {
+    try {
+      this.historial.set(await this._informe.historial());
+    } catch (error: unknown) {
+      console.error('[InformeDiagnostico] historial:', error);
+      this.historial.set([]);
+    }
+  }
+
+  // ── Recorrido del asistente ───────────────────────────────────────────────
+
+  abrirAsistente() {
+    if (!this.datos()) return;
+    this.paso.set(0);
+    this.asistente.set(true);
+  }
+
+  cerrarAsistente() {
+    this.asistente.set(false);
+  }
+
+  siguiente() {
+    if (!this.esCierre()) this.paso.update(p => p + 1);
+  }
+
+  anterior() {
+    if (this.paso() > 0) this.paso.update(p => p - 1);
+  }
+
+  /** Salta directo a un paso, para revisar algo sin recorrerlo todo otra vez. */
+  irAlPaso(indice: number) {
+    if (indice >= 0 && indice < this.pasos().length) this.paso.set(indice);
+  }
+
+  /** Quién firma el informe: el dato que el asistente propone y deja cambiar. */
+  responsable(): string {
+    const organizacion = this.datos()?.secciones?.[0];
+    return organizacion?.identificacion?.find(d => d.editable)?.valor ?? '';
+  }
+
+  // ── Emisión ───────────────────────────────────────────────────────────────
+
+  async emitir() {
+    const datos = this.datos();
+    if (!datos || this.emitiendo()) return;
+
+    const firma = this.responsable().trim();
+    if (!firma) {
+      this._alerta.showWarning('Indica quién responde por el informe antes de emitirlo.');
+      this.irAlPaso(1);
+      return;
+    }
+
+    this.emitiendo.set(true);
+    try {
+      await this._informe.emitir(datos, firma);
+      await this.cargarHistorial();
+      this.asistente.set(false);
+      this._alerta.showSuccess('Informe emitido. El anterior queda archivado.');
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'No se pudo emitir el informe.';
+      console.error('[InformeDiagnostico] emitir:', error);
+      this._alerta.showError(msg);
+    } finally {
+      this.emitiendo.set(false);
+    }
+  }
+
+  /** La fecha de emisión, legible. */
+  fechaDe(informe: ModelsInforme.Informe): string {
+    const fecha = new Date(informe.fechaEmision);
+    return isNaN(fecha.getTime())
+      ? '—'
+      : fecha.toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' });
   }
 
   /**

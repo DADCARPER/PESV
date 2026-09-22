@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { DiagnosticoDatosService } from './diagnostico-datos.service';
+import { FirestoreService } from './firestore.service';
 import { EncuestaEmpresaService } from './encuesta-empresa.service';
 import { EmpresaService } from './empresa.service';
 import { AuthenticacionService } from './authenticacion.service';
@@ -29,6 +30,28 @@ export class InformeDiagnosticoService {
   private _empresa = inject(EmpresaService);
   private _auth = inject(AuthenticacionService);
   private _perfil = inject(PerfilService);
+  private _firestore = inject(FirestoreService);
+
+  /**
+   * Donde viven los informes emitidos.
+   *
+   * Cuelgan del periodo, como el resto del diagnostico: un informe pertenece
+   * a un ano y al cambiar de periodo no tiene sentido verlo mezclado con los
+   * del ano siguiente.
+   */
+  private rutaInformes(periodo = this._auth.periodo()): string {
+    return `Empresas/${this._empresa.nit()}/periodos/${periodo}/informes`;
+  }
+
+  /**
+   * Un documento de Firestore no puede pasar de un mega.
+   *
+   * El informe guarda sus cifras enteras, y la tabla de propuestas escritas a
+   * mano crece con cada respuesta de la encuesta. Se comprueba antes de
+   * escribir para poder explicar que pasa, en vez de dejar que la escritura
+   * falle con un error que no dice donde esta el problema.
+   */
+  private static readonly LIMITE_DOCUMENTO = 900_000;
 
   /**
    * Levanta todas las cifras del periodo.
@@ -92,6 +115,60 @@ export class InformeDiagnosticoService {
         this.emergencias(planes),
       ],
     };
+  }
+
+  /**
+   * Congela el informe y lo deja como vigente.
+   *
+   * Lo que se guarda son las cifras ya calculadas, no una referencia a las
+   * colecciones: el diagnostico sigue abierto y sus datos van a seguir
+   * cambiando, y un informe que cambia solo no sirve para presentarlo. Dentro
+   * de un ano este documento tiene que poder reproducir exactamente lo que se
+   * presento hoy.
+   *
+   * El anterior no se borra: pasa a historico. Se archiva antes de crear el
+   * nuevo, de modo que si algo falla a mitad quede ninguno vigente y no dos,
+   * que es el unico estado del que no se puede salir mirando la pantalla.
+   */
+  async emitir(datos: ModelsInforme.Datos, emitidoPor: string): Promise<string> {
+    const ruta = this.rutaInformes(datos.periodo);
+    const previos = await this.historial(datos.periodo);
+
+    const version = previos.reduce((mayor, i) => Math.max(mayor, i.version ?? 0), 0) + 1;
+
+    const informe: Omit<ModelsInforme.Informe, 'id'> = {
+      ...datos,
+      version,
+      vigencia: 'vigente',
+      fechaEmision: new Date().toISOString(),
+      emitidoPor,
+    };
+
+    const peso = JSON.stringify(informe).length;
+    if (peso > InformeDiagnosticoService.LIMITE_DOCUMENTO) {
+      throw new Error(
+        'El informe no cabe en un documento de Firestore. Suele deberse a la tabla de '
+        + 'propuestas escritas por los trabajadores: recórtala en el asistente y vuelve '
+        + 'a intentarlo.'
+      );
+    }
+
+    for (const previo of previos.filter(i => i.vigencia === 'vigente')) {
+      await this._firestore.updateDocument(`${ruta}/${previo.id}`, { vigencia: 'historico' });
+    }
+
+    return await this._firestore.createDocumentDevolverId(ruta, informe);
+  }
+
+  /** Los informes emitidos del periodo, del más reciente al más antiguo. */
+  async historial(periodo = this._auth.periodo()): Promise<ModelsInforme.Informe[]> {
+    const snapshot = await this._firestore.getDocuments<ModelsInforme.Informe>(
+      this.rutaInformes(periodo)
+    );
+
+    return snapshot.docs
+      .map(d => d.data())
+      .sort((a, b) => (b.version ?? 0) - (a.version ?? 0));
   }
 
   // ── Secciones ─────────────────────────────────────────────────────────────
