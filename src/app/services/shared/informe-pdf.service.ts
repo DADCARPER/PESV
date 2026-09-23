@@ -96,11 +96,12 @@ export class InformePdfService {
   }
 
   /** Arma el documento y lo descarga. */
-  async descargar(
-    informe: ModelsInforme.Datos & { version?: number },
-  ): Promise<void> {
-    const imagenes = await this._graficas.imagenes(informe.secciones);
-    const documento = this.documento(informe, imagenes);
+  async descargar(informe: ModelsInforme.Datos & { version?: number }): Promise<void> {
+    const [imagenes, fotos] = await Promise.all([
+      this._graficas.imagenes(informe.secciones),
+      this.fotosDeSedes(informe.secciones),
+    ]);
+    const documento = this.documento(informe, imagenes, fotos);
 
     const nombre =
       `Informe-diagnostico-PESV-${informe.periodo}` +
@@ -117,6 +118,7 @@ export class InformePdfService {
       emitidoPor?: string;
     },
     imagenes: WeakMap<ModelsInforme.Reparto, string>,
+    fotos: Map<string, string>,
   ): any {
     const introduccion = informe.secciones.find((s) => s.id === 'introduccion');
     const resto = informe.secciones.filter((s) => s !== introduccion);
@@ -178,9 +180,9 @@ export class InformePdfService {
       // sitúa al lector en el problema antes de darle la primera cifra.
       content: [
         ...this.portada(informe),
-        ...(introduccion ? this.seccion(introduccion, imagenes) : []),
+        ...(introduccion ? this.seccion(introduccion, imagenes, fotos) : []),
         ...this.metodologia(informe),
-        ...resto.flatMap((s) => this.seccion(s, imagenes)),
+        ...resto.flatMap((s) => this.seccion(s, imagenes, fotos)),
       ],
 
       styles: {
@@ -332,6 +334,7 @@ export class InformePdfService {
   private seccion(
     seccion: ModelsInforme.Seccion,
     imagenes: WeakMap<ModelsInforme.Reparto, string>,
+    fotos: Map<string, string>,
   ): any[] {
     const bloques: any[] = [
       {
@@ -385,7 +388,7 @@ export class InformePdfService {
     }
 
     if (seccion.sedes?.length) {
-      bloques.push(this.tablaSedes(seccion.sedes));
+      bloques.push(...this.tarjetasSedes(seccion.sedes, fotos));
     }
 
     for (const reparto of seccion.repartos) {
@@ -544,30 +547,161 @@ export class InformePdfService {
     };
   }
 
-  private tablaSedes(sedes: ModelsInforme.FichaSede[]): any {
+  /**
+   * Las sedes, una tarjeta cada una y con su fotografia.
+   *
+   * Estaban en una tabla, que desaprovecha lo mejor que tiene esta seccion:
+   * si alguien se tomo el trabajo de subir la foto de cada sede, un informe
+   * que las reduce a una fila de texto le esta tirando ese trabajo. Ademas,
+   * una foto dice de un vistazo si la sede es una oficina o un patio de
+   * maniobras, que es informacion de riesgo vial y no decoracion.
+   */
+  private tarjetasSedes(
+    sedes: ModelsInforme.FichaSede[], fotos: Map<string, string>
+  ): any[] {
+    const aire = InformePdfService.AIRE;
+    const bloques: any[] = [];
+
+    // De dos en dos, como las cifras: con la foto al lado del texto, una
+    // tarjeta por fila desperdicia media pagina y tres no dejan sitio a nada.
+    for (let i = 0; i < sedes.length; i += 2) {
+      const grupo = sedes.slice(i, i + 2);
+      const ultima = i + 2 >= sedes.length;
+
+      bloques.push({
+        table: {
+          widths: ['*', aire, '*'],
+          body: [[
+            this.tarjetaSede(grupo[0], fotos),
+            { text: '' },
+            grupo[1] ? this.tarjetaSede(grupo[1], fotos) : { text: '' },
+          ]],
+        },
+        layout: 'noBorders',
+        margin: [0, 0, 0, ultima ? 14 : aire],
+      });
+    }
+
+    return bloques;
+  }
+
+  private tarjetaSede(sede: ModelsInforme.FichaSede, fotos: Map<string, string>): any {
+    const foto = sede.fotoUrl ? fotos.get(sede.fotoUrl) : undefined;
+
+    const contacto = [sede.responsable, sede.telefono].filter(Boolean).join(' · ');
+    const lugar = [sede.ciudad, sede.departamento].filter(Boolean).join(', ');
+
     return {
-      style: 'celda',
-      table: {
-        headerRows: 1,
-        widths: ['*', 'auto', '*', 'auto', 'auto'],
-        body: [
-          ['SEDE', 'TIPO', 'DIRECCIÓN', 'CIUDAD', 'EMPLEADOS'].map((t, i) => ({
-            text: t,
-            style: 'cabeceraTabla',
-            alignment: i === 4 ? 'right' : 'left',
-          })),
-          ...sedes.map((s) => [
-            s.nombre || '—',
-            s.tipo || '—',
-            s.direccion || '—',
-            s.ciudad || '—',
-            { text: String(s.empleados ?? 0), style: 'valorTabla' },
-          ]),
-        ],
-      },
-      layout: this.layoutTabla(),
-      margin: [0, 0, 0, 14],
+      columns: [
+        foto
+          ? {
+              width: 92,
+              // `fit` y no un ancho y un alto: con los dos, una foto vertical
+              // sale estirada, y la sede parece otra.
+              image: foto,
+              fit: [92, 66],
+              margin: [0, 0, 8, 0],
+            }
+          : {
+              width: 92,
+              text: 'Sin fotografía',
+              fontSize: 7,
+              color: '#98a2b3',
+              alignment: 'center',
+              margin: [0, 26, 8, 26],
+            },
+        {
+          width: '*',
+          stack: [
+            { text: sede.nombre || 'Sin nombre', fontSize: 10, bold: true, color: InformePdfService.AZUL },
+            sede.tipo ? { text: sede.tipo, fontSize: 7, color: '#98a2b3', margin: [0, 1, 0, 0] } : {},
+            sede.direccion ? { text: sede.direccion, fontSize: 8, color: '#555', margin: [0, 4, 0, 0] } : {},
+            lugar ? { text: lugar, fontSize: 8, color: '#555' } : {},
+            contacto ? { text: contacto, fontSize: 7, color: '#888', margin: [0, 3, 0, 0] } : {},
+            {
+              text: `${sede.empleados ?? 0} empleados`,
+              fontSize: 8, bold: true, color: '#1f2937', margin: [0, 3, 0, 0],
+            },
+          ],
+        },
+      ],
+      fillColor: '#f9fafb',
+      margin: [8, 8, 8, 8],
     };
+  }
+
+  /**
+   * Descarga las fotografias de las sedes y las deja listas para incrustar.
+   *
+   * pdfMake solo acepta imagenes embebidas: una URL no le sirve, aunque el
+   * navegador la pinte sin problema en un `img`. Y como el original viene de
+   * una camara de telefono y puede pesar varios megas, se reescala antes: sin
+   * eso, cuatro sedes convierten el informe en un archivo que no se puede
+   * enviar por correo.
+   *
+   * Si una foto no se puede traer, la tarjeta sale sin ella. Es lo unico
+   * sensato: nadie quiere que el informe entero falle por una imagen.
+   */
+  private async fotosDeSedes(secciones: ModelsInforme.Seccion[]): Promise<Map<string, string>> {
+    const urls = new Set(
+      secciones
+        .flatMap(s => s.sedes ?? [])
+        .map(s => s.fotoUrl)
+        .filter((u): u is string => !!u)
+    );
+
+    const fotos = new Map<string, string>();
+
+    for (const url of urls) {
+      try {
+        fotos.set(url, await this.comoImagenEmbebida(url));
+      } catch (error: unknown) {
+        // Lo normal cuando falla es que el bucket de Storage no tenga
+        // configurado CORS: el navegador pinta la imagen pero no deja leerla.
+        console.error('[InformePdf] foto de sede:', url, error);
+      }
+    }
+
+    return fotos;
+  }
+
+  /** Ancho maximo al que se reescala una fotografia antes de incrustarla. */
+  private static readonly ANCHO_FOTO = 300;
+
+  private async comoImagenEmbebida(url: string): Promise<string> {
+    const respuesta = await fetch(url);
+    if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
+
+    const blob = await respuesta.blob();
+    const local = URL.createObjectURL(blob);
+
+    try {
+      const imagen = await this.cargarImagen(local);
+
+      const escala = Math.min(1, InformePdfService.ANCHO_FOTO / imagen.width);
+      const lienzo = document.createElement('canvas');
+      lienzo.width = Math.round(imagen.width * escala);
+      lienzo.height = Math.round(imagen.height * escala);
+
+      const pincel = lienzo.getContext('2d');
+      if (!pincel) throw new Error('El navegador no dio contexto de dibujo.');
+      pincel.drawImage(imagen, 0, 0, lienzo.width, lienzo.height);
+
+      // JPEG y no PNG: una fotografia en PNG pesa varias veces mas y aqui no
+      // hay transparencia que conservar.
+      return lienzo.toDataURL('image/jpeg', 0.75);
+    } finally {
+      URL.revokeObjectURL(local);
+    }
+  }
+
+  private cargarImagen(src: string): Promise<HTMLImageElement> {
+    return new Promise((resolver, rechazar) => {
+      const imagen = new Image();
+      imagen.onload = () => resolver(imagen);
+      imagen.onerror = () => rechazar(new Error('No se pudo leer la imagen.'));
+      imagen.src = src;
+    });
   }
 
   private reparto(
