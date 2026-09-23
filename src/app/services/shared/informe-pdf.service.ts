@@ -214,7 +214,9 @@ export class InformePdfService {
 
     return {
       pageSize: 'LETTER',
-      pageMargins: [50, 70, 50, 60],
+      // [izquierda, arriba, derecha, abajo]. El de arriba es mayor porque ahí
+      // va la cabecera; el de abajo, lo justo para el pie y su filete.
+      pageMargins: [50, 70, 50, 52],
       info: {
         title: `Informe de diagnóstico PESV ${informe.periodo}`,
         author: informe.nombreEmpresa,

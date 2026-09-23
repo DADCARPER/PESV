@@ -65,15 +65,33 @@ export class InformeRellenosService {
     };
   }
 
-  /** Cómo se pinta una imagen de relleno, pegada al pie del área de texto. */
+  /**
+   * Cuánto baja la imagen por debajo del área de texto.
+   *
+   * Una imagen que va de borde a borde y se corta dos centímetros antes del
+   * final de la hoja no parece a sangre, parece mal medida. Con esto llega
+   * hasta justo encima del filete del pie, y lo único que queda en blanco es
+   * la banda de la paginación, que sí tiene que estar.
+   */
+  private static readonly SANGRADO = 12;
+
+  /** Cómo se pinta una imagen de relleno, al pie de la página. */
   bloque(relleno: Relleno, hueco: number): any {
     return {
       image: relleno.datos,
       width: InformeRellenosService.ANCHO_HOJA,
-      // El margen negativo saca la imagen del área de texto para que llegue a
-      // los dos bordes de la hoja; el superior la empuja hasta abajo, que es
-      // donde el hueco se nota y donde una imagen cierra la página.
-      margin: [-50, Math.max(0, hueco - relleno.alto - AIRE_RELLENO), -50, 0],
+      margin: [
+        // Los laterales negativos la sacan del área de texto para que llegue
+        // a los dos bordes de la hoja.
+        -50,
+        // El superior la empuja hasta abajo del todo: el hueco se nota al pie
+        // de la página, y es ahí donde una imagen la cierra.
+        Math.max(0, hueco - relleno.alto),
+        -50,
+        // El inferior la deja bajar por debajo del área de texto. Como el
+        // alto que consume es menor que el hueco medido, sigue cabiendo.
+        -InformeRellenosService.SANGRADO,
+      ],
     };
   }
 
