@@ -3,6 +3,7 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { ModelsInforme } from '../../interfaces/informe.interface';
 import { InformeGraficasService } from './informe-graficas.service';
+import { recortarImagen } from '../../data/imagenes';
 
 (pdfMake as any).vfs = (pdfFonts as any).vfs ?? (pdfFonts as any).pdfMake?.vfs;
 
@@ -118,7 +119,7 @@ export class InformePdfService {
       emitidoPor?: string;
     },
     imagenes: WeakMap<ModelsInforme.Reparto, string>,
-    fotos: Map<string, string>,
+    fotos: Map<ModelsInforme.FichaSede, string>,
   ): any {
     const introduccion = informe.secciones.find((s) => s.id === 'introduccion');
     const resto = informe.secciones.filter((s) => s !== introduccion);
@@ -334,7 +335,7 @@ export class InformePdfService {
   private seccion(
     seccion: ModelsInforme.Seccion,
     imagenes: WeakMap<ModelsInforme.Reparto, string>,
-    fotos: Map<string, string>,
+    fotos: Map<ModelsInforme.FichaSede, string>,
   ): any[] {
     const bloques: any[] = [
       {
@@ -557,7 +558,8 @@ export class InformePdfService {
    * maniobras, que es informacion de riesgo vial y no decoracion.
    */
   private tarjetasSedes(
-    sedes: ModelsInforme.FichaSede[], fotos: Map<string, string>
+    sedes: ModelsInforme.FichaSede[],
+    fotos: Map<ModelsInforme.FichaSede, string>,
   ): any[] {
     const aire = InformePdfService.AIRE;
     const bloques: any[] = [];
@@ -585,34 +587,36 @@ export class InformePdfService {
     return bloques;
   }
 
-  private tarjetaSede(sede: ModelsInforme.FichaSede, fotos: Map<string, string>): any {
-    // La miniatura viaja con el registro y no hay que ir a buscarla. Solo se
-    // descarga de Storage cuando no la hay, que es el caso de las sedes
-    // cargadas antes de que existiera.
-    const foto = sede.fotoMiniatura
-      || (sede.fotoUrl ? fotos.get(sede.fotoUrl) : undefined);
+  private tarjetaSede(
+    sede: ModelsInforme.FichaSede,
+    fotos: Map<ModelsInforme.FichaSede, string>,
+  ): any {
+    const foto = fotos.get(sede);
 
     const contacto = [sede.responsable, sede.telefono].filter(Boolean).join(' · ');
     const lugar = [sede.ciudad, sede.departamento].filter(Boolean).join(', ');
 
     return {
+      // El hueco entre la foto y el texto va aquí y no como margen de la
+      // columna: pdfMake no aplica el margen de una columna que lleva imagen,
+      // y el texto acababa pegado al borde derecho de la foto.
+      columnGap: 10,
       columns: [
         foto
           ? {
-              width: 92,
-              // `fit` y no un ancho y un alto: con los dos, una foto vertical
-              // sale estirada, y la sede parece otra.
+              width: 96,
+              // Ya viene recortada a tres por dos, así que el recuadro le
+              // queda exacto y todas las tarjetas salen a la misma altura.
               image: foto,
-              fit: [92, 66],
-              margin: [0, 0, 8, 0],
+              fit: [96, 64],
             }
           : {
-              width: 92,
+              width: 96,
               text: 'Sin fotografía',
               fontSize: 7,
               color: '#98a2b3',
               alignment: 'center',
-              margin: [0, 26, 8, 26],
+              margin: [0, 26, 0, 26],
             },
         {
           width: '*',
@@ -646,25 +650,29 @@ export class InformePdfService {
    * Si una foto no se puede traer, la tarjeta sale sin ella. Es lo unico
    * sensato: nadie quiere que el informe entero falle por una imagen.
    */
-  private async fotosDeSedes(secciones: ModelsInforme.Seccion[]): Promise<Map<string, string>> {
-    const urls = new Set(
-      secciones
-        .flatMap(s => s.sedes ?? [])
-        // Las que ya traen miniatura no hace falta ir a buscarlas.
-        .filter(s => !s.fotoMiniatura)
-        .map(s => s.fotoUrl)
-        .filter((u): u is string => !!u)
-    );
+  private async fotosDeSedes(
+    secciones: ModelsInforme.Seccion[],
+  ): Promise<Map<ModelsInforme.FichaSede, string>> {
+    const sedes = secciones.flatMap((s) => s.sedes ?? []);
+    const fotos = new Map<ModelsInforme.FichaSede, string>();
 
-    const fotos = new Map<string, string>();
+    for (const sede of sedes) {
+      if (!sede.fotoMiniatura && !sede.fotoUrl) continue;
 
-    for (const url of urls) {
       try {
-        fotos.set(url, await this.comoImagenEmbebida(url));
+        // La miniatura viaja con el registro y no hay que ir a buscarla. Solo
+        // se descarga de Storage cuando no la hay, que es el caso de las
+        // sedes cargadas antes de que la miniatura existiera.
+        const origen =
+          sede.fotoMiniatura || (await this.comoImagenEmbebida(sede.fotoUrl!));
+
+        // Se recorta aquí y no al subirla, para que cambiar la proporción del
+        // informe no obligue a volver a cargar todas las fotografías.
+        fotos.set(sede, await recortarImagen(origen));
       } catch (error: unknown) {
-        // Lo normal cuando falla es que el bucket de Storage no tenga
-        // configurado CORS: el navegador pinta la imagen pero no deja leerla.
-        console.error('[InformePdf] foto de sede:', url, error);
+        // Una foto que falla deja su tarjeta sin imagen y nada más: nadie
+        // quiere perder el informe entero por una fotografía.
+        console.error('[InformePdf] foto de sede:', sede.nombre, error);
       }
     }
 

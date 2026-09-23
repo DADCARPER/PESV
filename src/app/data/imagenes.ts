@@ -20,6 +20,16 @@ export const ANCHO_FOTO = 1600;
  */
 export const ANCHO_MINIATURA = 240;
 
+/**
+ * El recuadro en que el informe enseña cada sede, en píxeles.
+ *
+ * Tres por dos, y al doble del tamaño con que se imprime para que no se vea
+ * pixelado ni en papel. Todas las fotografías pasan por aquí, venga la
+ * original apaisada, vertical o cuadrada: lo que importa es que las tarjetas
+ * queden a la misma altura.
+ */
+export const RECUADRO_INFORME = { ancho: 192, alto: 128 };
+
 /** Compromiso entre peso y artefactos de compresión, para fotografías. */
 const CALIDAD = 0.82;
 const CALIDAD_MINIATURA = 0.62;
@@ -65,6 +75,46 @@ export async function comprimirComoTexto(
   calidad = CALIDAD_MINIATURA,
 ): Promise<string> {
   const lienzo = await dibujarReducida(archivo, anchoMaximo);
+  return lienzo.toDataURL('image/jpeg', calidad);
+}
+
+/**
+ * Recorta una imagen para que llene un recuadro fijo.
+ *
+ * Encajarla entera dentro del recuadro —lo que hace `fit` en pdfMake— deja
+ * cada tarjeta con un alto distinto según la foto sea apaisada o vertical, y
+ * la fila entera se descuadra. Aquí se escala hasta cubrir el recuadro y se
+ * recorta lo que sobra, centrado: se pierde algo de los bordes, pero todas
+ * las sedes se ven igual y ninguna sale deformada.
+ */
+export async function recortarImagen(
+  origen: string,
+  ancho = RECUADRO_INFORME.ancho,
+  alto = RECUADRO_INFORME.alto,
+  calidad = CALIDAD_MINIATURA,
+): Promise<string> {
+  const imagen = await cargar(origen);
+
+  const lienzo = document.createElement('canvas');
+  lienzo.width = ancho;
+  lienzo.height = alto;
+
+  const pincel = lienzo.getContext('2d');
+  if (!pincel) throw new Error('El navegador no dio contexto de dibujo.');
+
+  // El mayor de los dos factores es el que garantiza que no quede hueco.
+  const escala = Math.max(ancho / imagen.width, alto / imagen.height);
+  const anchoFinal = imagen.width * escala;
+  const altoFinal = imagen.height * escala;
+
+  pincel.drawImage(
+    imagen,
+    (ancho - anchoFinal) / 2,
+    (alto - altoFinal) / 2,
+    anchoFinal,
+    altoFinal,
+  );
+
   return lienzo.toDataURL('image/jpeg', calidad);
 }
 
