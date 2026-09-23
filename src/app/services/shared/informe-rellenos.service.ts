@@ -93,15 +93,33 @@ export class InformeRellenosService {
       }
     }
 
+    if (!cargadas.length && RELLENOS.length) {
+      console.warn(
+        '[InformeRellenos] no se pudo cargar ninguna imagen de relleno. El informe '
+        + `saldrá con sus espacios en blanco. Revisa que existan en ${CARPETA_RELLENOS}.`,
+      );
+    }
+
     this.catalogo = cargadas;
     return cargadas;
   }
 
   private async cargarUna(nombre: string): Promise<Relleno> {
-    const respuesta = await fetch(`${CARPETA_RELLENOS}${nombre}`);
+    // Se resuelve contra la raíz de la aplicación y no contra la ruta en la
+    // que esté el navegador. Una dirección relativa desde
+    // /admin/planificar/diagnostico busca la imagen ahí dentro, y el servidor
+    // de una aplicación de una sola página responde a eso con el index.html
+    // en lugar de con un 404: la petición sale bien, el archivo no es una
+    // imagen, y no hay forma de entender por qué falla.
+    const direccion = new URL(`${CARPETA_RELLENOS}${nombre}`, document.baseURI).href;
+
+    const respuesta = await fetch(direccion);
     if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
 
     const blob = await respuesta.blob();
+    if (!blob.type.startsWith('image/')) {
+      throw new Error(`No es una imagen, sino ${blob.type || 'algo sin tipo'}.`);
+    }
     const datos = await this.comoTexto(blob);
     const medida = await this.medir(datos);
 

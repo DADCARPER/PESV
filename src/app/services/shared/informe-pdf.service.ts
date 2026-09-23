@@ -142,7 +142,9 @@ export class InformePdfService {
    * contenido, y lo que queda por debajo es el hueco.
    */
   private finDeSeccion(id: string): any {
-    return { text: '', id: `fin-${id}`, pageBreak: 'after' };
+    // Un texto vacío puede no llegar a producir bloque, y sin bloque no hay
+    // posición que leer. Un espacio a un punto sí lo produce y no se ve.
+    return { text: ' ', fontSize: 1, id: `fin-${id}`, pageBreak: 'after' };
   }
 
   /**
@@ -193,6 +195,7 @@ export class InformePdfService {
       return new Map();
     }
 
+    console.debug('[InformePdf] huecos medidos:', Object.fromEntries(huecos));
     return huecos;
   }
 
