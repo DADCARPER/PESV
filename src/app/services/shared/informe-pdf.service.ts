@@ -27,8 +27,56 @@ export class InformePdfService {
   private static readonly AZUL = '#202e48';
   private static readonly GRIS = '#e5e7eb';
 
+  /** El gris muy claro de las filas pares. Marca sin llamar la atención. */
+  private static readonly CEBRA = '#f4f7fa';
+  /** El borde de las celdas: más claro que el texto, o compite con él. */
+  private static readonly BORDE = '#d9e2ec';
+
   /** Ancho útil: la carta menos los dos márgenes laterales. */
   private static readonly ANCHO = 512;
+
+  /**
+   * El trazado de las tablas del informe, uno para todas.
+   *
+   * Un documento con dos estilos de tabla se lee como dos documentos pegados.
+   * Va aquí en vez de repetido en cada método para que cambiarlo sea cambiarlo
+   * en un sitio.
+   *
+   * Las filas alternan un gris muy claro. No es adorno: en una tabla de quince
+   * filas y seis columnas, el ojo pierde el renglón al ir de la primera
+   * columna a la última, y la banda lo sostiene.
+   */
+  private layoutTabla(conCabecera = true): any {
+    return {
+      fillColor: (fila: number) => {
+        if (conCabecera && fila === 0) return InformePdfService.AZUL;
+        const indice = conCabecera ? fila - 1 : fila;
+        return indice % 2 === 1 ? InformePdfService.CEBRA : null;
+      },
+      hLineColor: () => InformePdfService.BORDE,
+      vLineColor: () => InformePdfService.BORDE,
+      // El primer y el último trazo, algo más marcados: cierran la tabla.
+      hLineWidth: (i: number, nodo: any) =>
+        i === 0 || i === nodo.table.body.length ? 0.8 : 0.5,
+      vLineWidth: () => 0.5,
+      paddingLeft: () => 10,
+      paddingRight: () => 10,
+      paddingTop: (fila: number) => (conCabecera && fila === 0 ? 9 : 8),
+      paddingBottom: (fila: number) => (conCabecera && fila === 0 ? 9 : 8),
+    };
+  }
+
+  /** Una aclaración del informe, con su etiqueta destacada. */
+  private nota(texto: string): any {
+    return {
+      text: [
+        { text: 'Nota: ', bold: true, color: InformePdfService.AZUL },
+        texto,
+      ],
+      style: 'nota',
+      margin: [0, 2, 0, 4],
+    };
+  }
 
   /** El filete que separa la cabecera y el pie del cuerpo. */
   private filete(margen: number[]): any {
@@ -116,9 +164,13 @@ export class InformePdfService {
         seccion: { fontSize: 15, bold: true, color: InformePdfService.AZUL },
         subtitulo: { fontSize: 10, bold: true, color: '#444' },
         parrafo: { fontSize: 10, lineHeight: 1.35, alignment: 'justify' },
-        nota: { fontSize: 8, color: '#888' },
+        nota: { fontSize: 8.5, color: '#667085', lineHeight: 1.25 },
         celda: { fontSize: 9 },
-        cabeceraTabla: { fontSize: 9, bold: true, color: '#fff', fillColor: InformePdfService.AZUL },
+        // El relleno de la cabecera lo pone el trazado, no el estilo: con las
+        // dos cosas a la vez, la celda y la fila pintan cada una por su lado.
+        cabeceraTabla: { fontSize: 9, bold: true, color: '#fff', characterSpacing: 0.4 },
+        /** Un número se lee alineado a la derecha: las unidades quedan juntas. */
+        valorTabla: { alignment: 'right', bold: true, color: '#1f2937' },
       },
       defaultStyle: { fontSize: 10 },
     };
@@ -170,28 +222,31 @@ export class InformePdfService {
     const m = informe.metodologia;
 
     return [
-      { text: 'Metodología', style: 'seccion', margin: [0, 0, 0, 8] },
+      { text: 'Metodología', style: 'seccion', margin: [0, 0, 0, 10] },
       {
         style: 'celda',
         table: {
-          widths: ['*', 'auto'],
+          widths: ['*', 130],
+          headerRows: 1,
           body: [
-            [{ text: 'Concepto', style: 'cabeceraTabla' }, { text: 'Valor', style: 'cabeceraTabla', alignment: 'right' }],
-            ['Personas vinculadas a la organización', { text: String(m.poblacion), alignment: 'right' }],
-            ['Respuestas obtenidas en la encuesta', { text: String(m.muestra), alignment: 'right' }],
-            ['Cobertura de la muestra', { text: `${m.cobertura}%`, alignment: 'right' }],
-            ['Instrumento aplicado', { text: m.encuesta, alignment: 'right' }],
+            [
+              { text: 'CONCEPTO', style: 'cabeceraTabla' },
+              { text: 'VALOR', style: 'cabeceraTabla', alignment: 'right' },
+            ],
+            ['Personas vinculadas a la organización', { text: String(m.poblacion), style: 'valorTabla' }],
+            ['Respuestas obtenidas en la encuesta', { text: String(m.muestra), style: 'valorTabla' }],
+            ['Cobertura de la muestra', { text: `${m.cobertura}%`, style: 'valorTabla' }],
+            ['Instrumento aplicado', { text: m.encuesta, style: 'valorTabla' }],
           ],
         },
-        layout: 'lightHorizontalLines',
-        margin: [0, 0, 0, 10],
+        layout: this.layoutTabla(),
+        margin: [0, 0, 0, 14],
       },
-      {
-        text: 'Las cifras de este informe corresponden al estado del diagnóstico en la '
-          + 'fecha de emisión. El diagnóstico continúa abierto: las variaciones '
-          + 'posteriores se recogen en una nueva versión del informe.',
-        style: 'nota', margin: [0, 0, 0, 4],
-      },
+      this.nota(
+        'Las cifras de este informe corresponden al estado del diagnóstico en la fecha '
+        + 'de emisión. El diagnóstico continúa abierto: las variaciones posteriores se '
+        + 'recogen en una nueva versión del informe.'
+      ),
       { text: '', pageBreak: 'after' },
     ];
   }
@@ -266,7 +321,8 @@ export class InformePdfService {
           { text: d.valor || '—' },
         ]),
       },
-      layout: 'lightHorizontalLines',
+      // Sin cabecera: son pares de dato y valor, no una tabla de registros.
+      layout: this.layoutTabla(false),
       margin: [0, 0, 0, 12],
     };
   }
@@ -325,16 +381,16 @@ export class InformePdfService {
         headerRows: 1,
         widths: ['*', 'auto', '*', 'auto', 'auto'],
         body: [
-          ['Sede', 'Tipo', 'Dirección', 'Ciudad', 'Empleados'].map(
+          ['SEDE', 'TIPO', 'DIRECCIÓN', 'CIUDAD', 'EMPLEADOS'].map(
             (t, i) => ({ text: t, style: 'cabeceraTabla', alignment: i === 4 ? 'right' : 'left' })
           ),
           ...sedes.map(s => [
             s.nombre || '—', s.tipo || '—', s.direccion || '—',
-            s.ciudad || '—', { text: String(s.empleados ?? 0), alignment: 'right' },
+            s.ciudad || '—', { text: String(s.empleados ?? 0), style: 'valorTabla' },
           ]),
         ],
       },
-      layout: 'lightHorizontalLines',
+      layout: this.layoutTabla(),
       margin: [0, 0, 0, 14],
     };
   }
@@ -372,18 +428,22 @@ export class InformePdfService {
         widths: ['*', 'auto', 'auto'],
         body: [
           [
-            { text: reparto.titulo, style: 'cabeceraTabla' },
-            { text: reparto.unidad || 'Personas', style: 'cabeceraTabla', alignment: 'right' },
+            { text: reparto.titulo.toUpperCase(), style: 'cabeceraTabla' },
+            {
+              text: (reparto.unidad || 'Personas').toUpperCase(),
+              style: 'cabeceraTabla', alignment: 'right',
+            },
             { text: '%', style: 'cabeceraTabla', alignment: 'right' },
           ],
           ...reparto.filas.map(f => [
             f.etiqueta,
-            { text: String(f.total), alignment: 'right' },
-            { text: `${f.porcentaje}%`, alignment: 'right', color: '#777' },
+            { text: String(f.total), style: 'valorTabla' },
+            // El porcentaje acompaña al recuento, no compite con él.
+            { text: `${f.porcentaje}%`, alignment: 'right', color: '#667085' },
           ]),
         ],
       },
-      layout: 'lightHorizontalLines',
+      layout: this.layoutTabla(),
       margin: [0, 0, 0, 12],
     };
   }
@@ -399,11 +459,11 @@ export class InformePdfService {
           headerRows: 1,
           widths: tabla.columnas.map(() => '*'),
           body: [
-            tabla.columnas.map(c => ({ text: c, style: 'cabeceraTabla' })),
+            tabla.columnas.map(c => ({ text: c.toUpperCase(), style: 'cabeceraTabla' })),
             ...tabla.filas.map(fila => fila.celdas.map(celda => celda || '—')),
           ],
         },
-        layout: 'lightHorizontalLines',
+        layout: this.layoutTabla(),
         margin: [0, 0, 0, 12],
       },
     ];
