@@ -175,14 +175,17 @@ export class InformePdfService {
     };
 
     try {
-      await new Promise<void>((resolver, rechazar) => {
-        pdfMake.createPdf(medido as any).getBlob(
-          () => resolver(),
-          // Algunas versiones no pasan callback de error: el catch de fuera
-          // recoge lo que se escape por ahí.
-          undefined as any,
-        );
-      });
+      // `getBlob` devuelve una promesa; no admite callback. Pasarle uno lo
+      // dejaba esperando para siempre, que es lo que colgaba la descarga sin
+      // decir nada: la maquetación terminaba, pero nadie se enteraba.
+      //
+      // El plazo está por lo mismo. Esta pasada solo sirve para decorar, así
+      // que si tarda de más se abandona: vale mil veces más un informe con
+      // espacios en blanco que un botón que se queda girando.
+      await this.conPlazo(
+        pdfMake.createPdf(medido as any).getBlob(),
+        InformePdfService.PLAZO_MEDICION,
+      );
     } catch (error: unknown) {
       // Sin medidas no hay rellenos, y ya está: el informe sale como salía
       // antes, con sus espacios en blanco.
@@ -773,8 +776,29 @@ export class InformePdfService {
     return fotos;
   }
 
-  /** Ancho maximo al que se reescala una fotografia antes de incrustarla. */
-  private static readonly ANCHO_FOTO = 300;
+  /** Lo que se espera a la pasada de medición antes de darla por perdida. */
+  private static readonly PLAZO_MEDICION = 25_000;
+
+  /** Una promesa con fecha límite. */
+  private conPlazo<T>(promesa: Promise<T>, milisegundos: number): Promise<T> {
+    return Promise.race([
+      promesa,
+      new Promise<T>((_, rechazar) =>
+        setTimeout(
+          () => rechazar(new Error('La medición de huecos tardó demasiado.')),
+          milisegundos,
+        ),
+      ),
+    ]);
+  }
+
+  /**
+   * Ancho al que se reescala una fotografía traída de Storage.
+   *
+   * Solo se usa con las sedes cargadas antes de que existiera la miniatura.
+   * Va al mismo tamaño que ella para que esas no se vean peor que las demás.
+   */
+  private static readonly ANCHO_FOTO = 460;
 
   private async comoImagenEmbebida(url: string): Promise<string> {
     const respuesta = await fetch(url);
