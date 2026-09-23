@@ -14,25 +14,39 @@ export const ANCHO_FOTO = 1600;
 /**
  * Ancho de la miniatura que viaja dentro del documento.
  *
- * El informe la pinta a 92 puntos, que en pantalla son unos 123 píxeles. El
- * doble basta para que no se vea pixelada ni impresa, y a ese tamaño la
- * imagen cabe en el propio registro en vez de tener que ir a buscarla.
+ * Tiene que dar de comer al recorte del informe sin que este tenga que
+ * ampliar nada: ampliar una imagen no añade detalle, solo lo inventa. De ahí
+ * que sea algo mayor que el recuadro final.
+ *
+ * Estuvo en 240 y se veía mal. A ese tamaño, una foto que se imprime a 96
+ * puntos sale a 144 puntos por pulgada, que es la mitad de lo que necesita el
+ * papel.
  */
-export const ANCHO_MINIATURA = 240;
+export const ANCHO_MINIATURA = 460;
 
 /**
  * El recuadro en que el informe enseña cada sede, en píxeles.
  *
- * Tres por dos, y al doble del tamaño con que se imprime para que no se vea
- * pixelado ni en papel. Todas las fotografías pasan por aquí, venga la
- * original apaisada, vertical o cuadrada: lo que importa es que las tarjetas
- * queden a la misma altura.
+ * Tres por dos. El informe lo imprime a 96 por 64 puntos, así que 384 de
+ * ancho dan unos 288 puntos por pulgada: suficiente para papel, donde por
+ * debajo de 200 la fotografía se ve blanda.
+ *
+ * Todas las fotografías pasan por aquí, venga la original apaisada, vertical
+ * o cuadrada: lo que importa es que las tarjetas queden a la misma altura.
  */
-export const RECUADRO_INFORME = { ancho: 192, alto: 128 };
+export const RECUADRO_INFORME = { ancho: 384, alto: 256 };
 
-/** Compromiso entre peso y artefactos de compresión, para fotografías. */
+/**
+ * Compromiso entre peso y artefactos de compresión, para fotografías.
+ *
+ * La miniatura y el recorte se aplican uno detrás de otro, y cada paso vuelve
+ * a comprimir lo que ya venía comprimido. Con los dos al 62% el resultado era
+ * un cuadriculado visible: en una cadena de dos pasos, la calidad de cada uno
+ * no se suma, se multiplica.
+ */
 const CALIDAD = 0.82;
-const CALIDAD_MINIATURA = 0.62;
+const CALIDAD_MINIATURA = 0.78;
+const CALIDAD_RECORTE = 0.85;
 
 /**
  * Reduce una imagen y la devuelve lista para subir.
@@ -91,7 +105,7 @@ export async function recortarImagen(
   origen: string,
   ancho = RECUADRO_INFORME.ancho,
   alto = RECUADRO_INFORME.alto,
-  calidad = CALIDAD_MINIATURA,
+  calidad = CALIDAD_RECORTE,
 ): Promise<string> {
   const imagen = await cargar(origen);
 
