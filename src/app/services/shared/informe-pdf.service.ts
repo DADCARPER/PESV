@@ -4,6 +4,7 @@ import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { ModelsInforme } from '../../interfaces/informe.interface';
 import { InformeGraficasService } from './informe-graficas.service';
 import { recortarImagen } from '../../data/imagenes';
+import { InformeRellenosService } from './informe-rellenos.service';
 
 (pdfMake as any).vfs = (pdfFonts as any).vfs ?? (pdfFonts as any).pdfMake?.vfs;
 
@@ -22,6 +23,7 @@ import { recortarImagen } from '../../data/imagenes';
 @Injectable({ providedIn: 'root' })
 export class InformePdfService {
   private _graficas = inject(InformeGraficasService);
+  private _rellenos = inject(InformeRellenosService);
 
   private static readonly NARANJA = '#f46c2d';
   private static readonly AZUL = '#202e48';
@@ -98,11 +100,30 @@ export class InformePdfService {
 
   /** Arma el documento y lo descarga. */
   async descargar(informe: ModelsInforme.Datos & { version?: number }): Promise<void> {
-    const [imagenes, fotos] = await Promise.all([
+    const [imagenes, fotos, repartir] = await Promise.all([
       this._graficas.imagenes(informe.secciones),
       this.fotosDeSedes(informe.secciones),
+      this._rellenos.repartidor(),
     ]);
-    const documento = this.documento(informe, imagenes, fotos);
+
+    // Primera pasada: se maqueta para saber dónde acaba cada sección y cuánto
+    // sobra en su última página. El documento que sale se descarta; lo que
+    // interesaba eran las medidas.
+    const huecos = await this.medirHuecos(this.documento(informe, imagenes, fotos));
+
+    // Segunda pasada: la de verdad, ya con las imágenes en los huecos.
+    //
+    // Las medidas de la primera siguen valiendo porque cada sección termina en
+    // un salto de página forzado: el hueco está siempre al pie de la hoja, de
+    // modo que una imagen que cabe en él no empuja nada, solo ocupa un sitio
+    // que estaba vacío.
+    const rellenos = new Map<string, any>();
+    for (const [seccion, hueco] of huecos) {
+      const imagen = repartir(hueco);
+      if (imagen) rellenos.set(seccion, this._rellenos.bloque(imagen, hueco));
+    }
+
+    const documento = this.documento(informe, imagenes, fotos, rellenos);
 
     const nombre =
       `Informe-diagnostico-PESV-${informe.periodo}` +
@@ -110,6 +131,66 @@ export class InformePdfService {
       '.pdf';
 
     pdfMake.createPdf(documento as any).download(nombre);
+  }
+
+  /**
+   * El bloque invisible que cierra cada sección y provoca el salto.
+   *
+   * Es lo que permite medir. pdfMake no dice cuánto espacio sobra en una
+   * página, pero sí en qué posición coloca cada bloque: si el último de la
+   * sección no ocupa nada, su posición *es* el punto donde terminó el
+   * contenido, y lo que queda por debajo es el hueco.
+   */
+  private finDeSeccion(id: string): any {
+    return { text: '', id: `fin-${id}`, pageBreak: 'after' };
+  }
+
+  /**
+   * Maqueta el documento solo para anotar el hueco que deja cada sección.
+   *
+   * `pageBreakBefore` se ejecuta durante el reparto en páginas y recibe la
+   * posición de cada bloque. Se usa aquí para leer, no para decidir: devuelve
+   * siempre false y no altera ningún corte.
+   *
+   * El hueco sale de `verticalRatio`, que es la fracción de página ya
+   * ocupada, y no de la posición absoluta: así no hay que suponer si esa
+   * posición incluye el margen superior o no.
+   */
+  private async medirHuecos(documento: any): Promise<Map<string, number>> {
+    const huecos = new Map<string, number>();
+
+    const medido = {
+      ...documento,
+      pageBreakBefore: (nodo: any) => {
+        const id: string = nodo?.id ?? '';
+        const posicion = nodo?.startPosition;
+
+        if (id.startsWith('fin-') && posicion) {
+          const sobra = posicion.pageInnerHeight * (1 - posicion.verticalRatio);
+          huecos.set(id.slice(4), sobra);
+        }
+
+        return false;
+      },
+    };
+
+    try {
+      await new Promise<void>((resolver, rechazar) => {
+        pdfMake.createPdf(medido as any).getBlob(
+          () => resolver(),
+          // Algunas versiones no pasan callback de error: el catch de fuera
+          // recoge lo que se escape por ahí.
+          undefined as any,
+        );
+      });
+    } catch (error: unknown) {
+      // Sin medidas no hay rellenos, y ya está: el informe sale como salía
+      // antes, con sus espacios en blanco.
+      console.error('[InformePdf] medición de huecos:', error);
+      return new Map();
+    }
+
+    return huecos;
   }
 
   private documento(
@@ -120,6 +201,7 @@ export class InformePdfService {
     },
     imagenes: WeakMap<ModelsInforme.Reparto, string>,
     fotos: Map<ModelsInforme.FichaSede, string>,
+    rellenos: Map<string, any> = new Map(),
   ): any {
     const introduccion = informe.secciones.find((s) => s.id === 'introduccion');
     const resto = informe.secciones.filter((s) => s !== introduccion);
@@ -181,9 +263,11 @@ export class InformePdfService {
       // sitúa al lector en el problema antes de darle la primera cifra.
       content: [
         ...this.portada(informe),
-        ...(introduccion ? this.seccion(introduccion, imagenes, fotos) : []),
-        ...this.metodologia(informe),
-        ...resto.flatMap((s) => this.seccion(s, imagenes, fotos)),
+        ...(introduccion
+          ? this.seccion(introduccion, imagenes, fotos, rellenos)
+          : []),
+        ...this.metodologia(informe, rellenos),
+        ...resto.flatMap((s) => this.seccion(s, imagenes, fotos, rellenos)),
       ],
 
       styles: {
@@ -279,7 +363,7 @@ export class InformePdfService {
             margin: [0, 2, 0, 0],
           }
         : {},
-      { text: '', pageBreak: 'after' },
+      this.finDeSeccion('portada'),
     ];
   }
 
@@ -290,7 +374,10 @@ export class InformePdfService {
    * empleados" es defendible, y "200 colaboradores" a secas parece un censo
    * mal hecho.
    */
-  private metodologia(informe: ModelsInforme.Datos): any[] {
+  private metodologia(
+    informe: ModelsInforme.Datos,
+    rellenos: Map<string, any> = new Map(),
+  ): any[] {
     const m = informe.metodologia;
 
     return [
@@ -328,7 +415,7 @@ export class InformePdfService {
           'de emisión. El diagnóstico continúa abierto: las variaciones posteriores se ' +
           'recogen en una nueva versión del informe.',
       ),
-      { text: '', pageBreak: 'after' },
+      ...this.cierre('metodologia', rellenos),
     ];
   }
 
@@ -336,6 +423,7 @@ export class InformePdfService {
     seccion: ModelsInforme.Seccion,
     imagenes: WeakMap<ModelsInforme.Reparto, string>,
     fotos: Map<ModelsInforme.FichaSede, string>,
+    rellenos: Map<string, any>,
   ): any[] {
     const bloques: any[] = [
       {
@@ -365,7 +453,7 @@ export class InformePdfService {
         style: 'nota',
         margin: [0, 0, 0, 12],
       });
-      return [...bloques, { text: '', pageBreak: 'after' }];
+      return [...bloques, ...this.cierre(seccion.id, rellenos)];
     }
 
     if (seccion.identificacion?.length) {
@@ -406,7 +494,13 @@ export class InformePdfService {
 
     // Cada sección empieza en su página: un informe que se presenta se hojea
     // por secciones, y una que arranca a media página se pasa por alto.
-    return [...bloques, { text: '', pageBreak: 'after' }];
+    return [...bloques, ...this.cierre(seccion.id, rellenos)];
+  }
+
+  /** El relleno, si lo hay, y la marca que cierra la sección. */
+  private cierre(id: string, rellenos: Map<string, any>): any[] {
+    const relleno = rellenos.get(id);
+    return relleno ? [relleno, this.finDeSeccion(id)] : [this.finDeSeccion(id)];
   }
 
   private tablaIdentificacion(
