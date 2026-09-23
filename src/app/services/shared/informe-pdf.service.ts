@@ -20,7 +20,6 @@ import { InformeGraficasService } from './informe-graficas.service';
  */
 @Injectable({ providedIn: 'root' })
 export class InformePdfService {
-
   private _graficas = inject(InformeGraficasService);
 
   private static readonly NARANJA = '#f46c2d';
@@ -81,32 +80,46 @@ export class InformePdfService {
   /** El filete que separa la cabecera y el pie del cuerpo. */
   private filete(margen: number[]): any {
     return {
-      canvas: [{
-        type: 'line', x1: 0, y1: 0, x2: InformePdfService.ANCHO, y2: 0,
-        lineWidth: 0.5, lineColor: InformePdfService.GRIS,
-      }],
+      canvas: [
+        {
+          type: 'line',
+          x1: 0,
+          y1: 0,
+          x2: InformePdfService.ANCHO,
+          y2: 0,
+          lineWidth: 0.5,
+          lineColor: InformePdfService.GRIS,
+        },
+      ],
       margin: margen,
     };
   }
 
   /** Arma el documento y lo descarga. */
-  async descargar(informe: ModelsInforme.Datos & { version?: number }): Promise<void> {
+  async descargar(
+    informe: ModelsInforme.Datos & { version?: number },
+  ): Promise<void> {
     const imagenes = await this._graficas.imagenes(informe.secciones);
     const documento = this.documento(informe, imagenes);
 
-    const nombre = `Informe-diagnostico-PESV-${informe.periodo}`
-      + (informe.version ? `-v${informe.version}` : '')
-      + '.pdf';
+    const nombre =
+      `Informe-diagnostico-PESV-${informe.periodo}` +
+      (informe.version ? `-v${informe.version}` : '') +
+      '.pdf';
 
     pdfMake.createPdf(documento as any).download(nombre);
   }
 
   private documento(
-    informe: ModelsInforme.Datos & { version?: number; fechaEmision?: string; emitidoPor?: string },
-    imagenes: WeakMap<ModelsInforme.Reparto, string>
+    informe: ModelsInforme.Datos & {
+      version?: number;
+      fechaEmision?: string;
+      emitidoPor?: string;
+    },
+    imagenes: WeakMap<ModelsInforme.Reparto, string>,
   ): any {
-    const introduccion = informe.secciones.find(s => s.id === 'introduccion');
-    const resto = informe.secciones.filter(s => s !== introduccion);
+    const introduccion = informe.secciones.find((s) => s.id === 'introduccion');
+    const resto = informe.secciones.filter((s) => s !== introduccion);
 
     return {
       pageSize: 'LETTER',
@@ -118,21 +131,26 @@ export class InformePdfService {
 
       // La portada va limpia: una cabecera sobre el título del documento
       // compite con él y no informa de nada que no esté ya debajo.
-      header: (pagina: number) => pagina === 1 ? null : ({
-        margin: [50, 28, 50, 0],
-        stack: [
-          {
-            columns: [
-              { text: informe.nombreEmpresa, fontSize: 8, color: '#888' },
-              {
-                text: `Diagnóstico PESV ${informe.periodo}`,
-                fontSize: 8, color: '#888', alignment: 'right',
-              },
-            ],
-          },
-          this.filete([0, 5, 0, 0]),
-        ],
-      }),
+      header: (pagina: number) =>
+        pagina === 1
+          ? null
+          : {
+              margin: [50, 28, 50, 0],
+              stack: [
+                {
+                  columns: [
+                    { text: informe.nombreEmpresa, fontSize: 8, color: '#888' },
+                    {
+                      text: `Diagnóstico PESV ${informe.periodo}`,
+                      fontSize: 8,
+                      color: '#888',
+                      alignment: 'right',
+                    },
+                  ],
+                },
+                this.filete([0, 5, 0, 0]),
+              ],
+            },
 
       footer: (pagina: number, total: number) => ({
         margin: [50, 12, 50, 0],
@@ -142,9 +160,15 @@ export class InformePdfService {
             columns: [
               {
                 text: 'Resolución 40595 de 2022 · Plan Estratégico de Seguridad Vial',
-                fontSize: 7, color: '#aaa',
+                fontSize: 7,
+                color: '#aaa',
               },
-              { text: `${pagina} de ${total}`, fontSize: 7, color: '#aaa', alignment: 'right' },
+              {
+                text: `${pagina} de ${total}`,
+                fontSize: 7,
+                color: '#aaa',
+                alignment: 'right',
+              },
             ],
           },
         ],
@@ -154,9 +178,9 @@ export class InformePdfService {
       // sitúa al lector en el problema antes de darle la primera cifra.
       content: [
         ...this.portada(informe),
-        ...introduccion ? this.seccion(introduccion, imagenes) : [],
+        ...(introduccion ? this.seccion(introduccion, imagenes) : []),
         ...this.metodologia(informe),
-        ...resto.flatMap(s => this.seccion(s, imagenes)),
+        ...resto.flatMap((s) => this.seccion(s, imagenes)),
       ],
 
       styles: {
@@ -168,7 +192,12 @@ export class InformePdfService {
         celda: { fontSize: 9 },
         // El relleno de la cabecera lo pone el trazado, no el estilo: con las
         // dos cosas a la vez, la celda y la fila pintan cada una por su lado.
-        cabeceraTabla: { fontSize: 9, bold: true, color: '#fff', characterSpacing: 0.4 },
+        cabeceraTabla: {
+          fontSize: 9,
+          bold: true,
+          color: '#fff',
+          characterSpacing: 0.4,
+        },
         /** Un número se lee alineado a la derecha: las unidades quedan juntas. */
         valorTabla: { alignment: 'right', bold: true, color: '#1f2937' },
       },
@@ -176,36 +205,76 @@ export class InformePdfService {
     };
   }
 
-  private portada(informe: ModelsInforme.Datos & { fechaEmision?: string; emitidoPor?: string; version?: number }): any[] {
-    const emitido = informe.fechaEmision ? new Date(informe.fechaEmision) : new Date();
+  private portada(
+    informe: ModelsInforme.Datos & {
+      fechaEmision?: string;
+      emitidoPor?: string;
+      version?: number;
+    },
+  ): any[] {
+    const emitido = informe.fechaEmision
+      ? new Date(informe.fechaEmision)
+      : new Date();
 
     return [
       { text: '\n\n\n' },
       { text: 'INFORME DE DIAGNÓSTICO', style: 'titulo', alignment: 'center' },
       {
         text: 'Plan Estratégico de Seguridad Vial',
-        fontSize: 13, color: InformePdfService.NARANJA, alignment: 'center', margin: [0, 6, 0, 0],
+        fontSize: 13,
+        color: InformePdfService.NARANJA,
+        alignment: 'center',
+        margin: [0, 6, 0, 0],
       },
       {
-        canvas: [{
-          type: 'line', x1: 140, y1: 0, x2: 372, y2: 0,
-          lineWidth: 2, lineColor: InformePdfService.NARANJA,
-        }],
+        canvas: [
+          {
+            type: 'line',
+            x1: 140,
+            y1: 0,
+            x2: 372,
+            y2: 0,
+            lineWidth: 2,
+            lineColor: InformePdfService.NARANJA,
+          },
+        ],
         margin: [0, 18, 0, 18],
       },
-      { text: informe.nombreEmpresa, fontSize: 16, bold: true, alignment: 'center' },
-      { text: `NIT ${informe.nitEmpresa}`, fontSize: 10, color: '#666', alignment: 'center', margin: [0, 4, 0, 0] },
+      {
+        text: informe.nombreEmpresa,
+        fontSize: 16,
+        bold: true,
+        alignment: 'center',
+      },
+      {
+        text: `NIT ${informe.nitEmpresa}`,
+        fontSize: 10,
+        color: '#666',
+        alignment: 'center',
+        margin: [0, 4, 0, 0],
+      },
       {
         text: `Periodo ${informe.periodo}`,
-        fontSize: 12, color: InformePdfService.AZUL, alignment: 'center', margin: [0, 24, 0, 0],
+        fontSize: 12,
+        color: InformePdfService.AZUL,
+        alignment: 'center',
+        margin: [0, 24, 0, 0],
       },
       {
-        text: `Emitido el ${emitido.toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' })}`
-          + (informe.version ? `  ·  Versión ${informe.version}` : ''),
-        style: 'nota', alignment: 'center', margin: [0, 8, 0, 0],
+        text:
+          `Emitido el ${emitido.toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' })}` +
+          (informe.version ? `  ·  Versión ${informe.version}` : ''),
+        style: 'nota',
+        alignment: 'center',
+        margin: [0, 8, 0, 0],
       },
       informe.emitidoPor
-        ? { text: `Responde: ${informe.emitidoPor}`, style: 'nota', alignment: 'center', margin: [0, 2, 0, 0] }
+        ? {
+            text: `Responde: ${informe.emitidoPor}`,
+            style: 'nota',
+            alignment: 'center',
+            margin: [0, 2, 0, 0],
+          }
         : {},
       { text: '', pageBreak: 'after' },
     ];
@@ -226,16 +295,25 @@ export class InformePdfService {
       {
         style: 'celda',
         table: {
-          widths: ['*', 130],
+          widths: ['*', 180],
           headerRows: 1,
           body: [
             [
               { text: 'CONCEPTO', style: 'cabeceraTabla' },
               { text: 'VALOR', style: 'cabeceraTabla', alignment: 'right' },
             ],
-            ['Personas vinculadas a la organización', { text: String(m.poblacion), style: 'valorTabla' }],
-            ['Respuestas obtenidas en la encuesta', { text: String(m.muestra), style: 'valorTabla' }],
-            ['Cobertura de la muestra', { text: `${m.cobertura}%`, style: 'valorTabla' }],
+            [
+              'Personas vinculadas a la organización',
+              { text: String(m.poblacion), style: 'valorTabla' },
+            ],
+            [
+              'Respuestas obtenidas en la encuesta',
+              { text: String(m.muestra), style: 'valorTabla' },
+            ],
+            [
+              'Cobertura de la muestra',
+              { text: `${m.cobertura}%`, style: 'valorTabla' },
+            ],
             ['Instrumento aplicado', { text: m.encuesta, style: 'valorTabla' }],
           ],
         },
@@ -243,9 +321,9 @@ export class InformePdfService {
         margin: [0, 0, 0, 14],
       },
       this.nota(
-        'Las cifras de este informe corresponden al estado del diagnóstico en la fecha '
-        + 'de emisión. El diagnóstico continúa abierto: las variaciones posteriores se '
-        + 'recogen en una nueva versión del informe.'
+        'Las cifras de este informe corresponden al estado del diagnóstico en la fecha ' +
+          'de emisión. El diagnóstico continúa abierto: las variaciones posteriores se ' +
+          'recogen en una nueva versión del informe.',
       ),
       { text: '', pageBreak: 'after' },
     ];
@@ -253,15 +331,26 @@ export class InformePdfService {
 
   private seccion(
     seccion: ModelsInforme.Seccion,
-    imagenes: WeakMap<ModelsInforme.Reparto, string>
+    imagenes: WeakMap<ModelsInforme.Reparto, string>,
   ): any[] {
     const bloques: any[] = [
-      { text: seccion.titulo.toUpperCase(), style: 'seccion', margin: [0, 0, 0, 4] },
       {
-        canvas: [{
-          type: 'line', x1: 0, y1: 0, x2: InformePdfService.ANCHO, y2: 0,
-          lineWidth: 1.5, lineColor: InformePdfService.NARANJA,
-        }],
+        text: seccion.titulo.toUpperCase(),
+        style: 'seccion',
+        margin: [0, 0, 0, 4],
+      },
+      {
+        canvas: [
+          {
+            type: 'line',
+            x1: 0,
+            y1: 0,
+            x2: InformePdfService.ANCHO,
+            y2: 0,
+            lineWidth: 1.5,
+            lineColor: InformePdfService.NARANJA,
+          },
+        ],
         margin: [0, 0, 0, 10],
       },
     ];
@@ -269,7 +358,8 @@ export class InformePdfService {
     if (seccion.sinDatos) {
       bloques.push({
         text: 'No se registraron datos para esta sección en el periodo.',
-        style: 'nota', margin: [0, 0, 0, 12],
+        style: 'nota',
+        margin: [0, 0, 0, 12],
       });
       return [...bloques, { text: '', pageBreak: 'after' }];
     }
@@ -279,7 +369,11 @@ export class InformePdfService {
     }
 
     if (seccion.texto) {
-      bloques.push({ text: seccion.texto, style: 'parrafo', margin: [0, 0, 0, 12] });
+      bloques.push({
+        text: seccion.texto,
+        style: 'parrafo',
+        margin: [0, 0, 0, 12],
+      });
     }
 
     if (seccion.destacados?.length) {
@@ -287,7 +381,7 @@ export class InformePdfService {
     }
 
     if (seccion.cifras.length) {
-      bloques.push(this.tablaCifras(seccion.cifras));
+      bloques.push(...this.tablaCifras(seccion.cifras));
     }
 
     if (seccion.sedes?.length) {
@@ -311,12 +405,14 @@ export class InformePdfService {
     return [...bloques, { text: '', pageBreak: 'after' }];
   }
 
-  private tablaIdentificacion(datos: NonNullable<ModelsInforme.Seccion['identificacion']>): any {
+  private tablaIdentificacion(
+    datos: NonNullable<ModelsInforme.Seccion['identificacion']>,
+  ): any {
     return {
       style: 'celda',
       table: {
         widths: ['auto', '*'],
-        body: datos.map(d => [
+        body: datos.map((d) => [
           { text: d.etiqueta, bold: true, color: '#555' },
           { text: d.valor || '—' },
         ]),
@@ -333,9 +429,14 @@ export class InformePdfService {
       table: {
         widths: destacados.map(() => '*'),
         body: [
-          destacados.map(d => ({
+          destacados.map((d) => ({
             text: [
-              { text: `${d.valor}\n`, fontSize: 20, bold: true, color: InformePdfService.NARANJA },
+              {
+                text: `${d.valor}\n`,
+                fontSize: 20,
+                bold: true,
+                color: InformePdfService.NARANJA,
+              },
               { text: `${d.etiqueta}\n`, fontSize: 9, color: '#555' },
               { text: `${d.porcentaje}%`, fontSize: 9, color: '#888' },
             ],
@@ -348,29 +449,98 @@ export class InformePdfService {
     };
   }
 
-  /** Las cifras, de tres en tres: más por fila y dejan de leerse. */
-  private tablaCifras(cifras: ModelsInforme.Cifra[]): any {
-    const filas: any[] = [];
+  /**
+   * Cuantas tarjetas de cifras caben en una fila.
+   *
+   * Dos y no tres. Con el numero al lado del texto cada tarjeta necesita
+   * ancho, y a tres por fila una etiqueta como "Con revision tecnica vigente"
+   * se parte en tres lineas y la cifra deja de leerse de un vistazo.
+   */
+  private static readonly CIFRAS_POR_FILA = 2;
 
-    for (let i = 0; i < cifras.length; i += 3) {
-      filas.push(cifras.slice(i, i + 3).map(c => ({
-        stack: [
-          { text: String(c.valor), fontSize: 15, bold: true, color: c.alerta ? '#b91c1c' : InformePdfService.AZUL },
-          { text: c.etiqueta, fontSize: 8, color: '#555', margin: [0, 2, 0, 0] },
-          c.nota ? { text: c.nota, fontSize: 7, color: '#888', margin: [0, 1, 0, 0] } : {},
-        ],
-        fillColor: c.alerta ? '#fef2f2' : '#f9fafb',
-        margin: [6, 6, 6, 6],
-      })));
+  /** El aire entre tarjetas, en puntos. */
+  private static readonly AIRE = 10;
 
-      // pdfMake exige que todas las filas tengan las mismas celdas.
-      while (filas[filas.length - 1].length < 3) filas[filas.length - 1].push({ text: '' });
+  /**
+   * Las tarjetas de cifras, en filas separadas por aire.
+   *
+   * pdfMake no tiene noción de hueco entre celdas: lo unico que hay es
+   * intercalar columnas vacias y estrechas entre las que llevan contenido.
+   * Por eso la fila se arma alternando tarjeta y separador en vez de mapear
+   * el grupo directamente.
+   *
+   * Cada fila es su propia tabla, y no una tabla con filas separadoras,
+   * porque asi el hueco vertical es el margen de la tabla y no una fila
+   * fantasma que hay que dimensionar a ojo.
+   */
+  private tablaCifras(cifras: ModelsInforme.Cifra[]): any[] {
+    const porFila = InformePdfService.CIFRAS_POR_FILA;
+    const aire = InformePdfService.AIRE;
+    const bloques: any[] = [];
+
+    for (let i = 0; i < cifras.length; i += porFila) {
+      const grupo = cifras.slice(i, i + porFila);
+      const celdas: any[] = [];
+      const anchos: any[] = [];
+
+      for (let j = 0; j < porFila; j++) {
+        if (j > 0) {
+          celdas.push({ text: '' });
+          anchos.push(aire);
+        }
+        // La ultima fila puede venir corta: pdfMake exige que todas las filas
+        // declaren las mismas celdas, y una vacia ocupa el hueco sin pintarse.
+        celdas.push(grupo[j] ? this.tarjetaCifra(grupo[j]) : { text: '' });
+        anchos.push('*');
+      }
+
+      const ultima = i + porFila >= cifras.length;
+
+      bloques.push({
+        table: { widths: anchos, body: [celdas] },
+        layout: 'noBorders',
+        margin: [0, 0, 0, ultima ? 14 : aire],
+      });
     }
 
+    return bloques;
+  }
+
+  /**
+   * Una tarjeta: el numero a la izquierda y lo que significa a la derecha.
+   *
+   * pdfMake alinea las columnas por arriba y no sabe centrar en vertical, asi
+   * que el equilibrio se apana con un desplazamiento calculado sobre cuantas
+   * lineas tiene cada lado: el numero ocupa una linea de 15 puntos y el texto
+   * una o dos de ocho y siete. Con una nota larga que se parta en dos lineas
+   * el centrado se desajusta un poco, y no hay forma de saberlo de antemano.
+   */
+  private tarjetaCifra(cifra: ModelsInforme.Cifra): any {
+    const conNota = !!cifra.nota;
+
     return {
-      table: { widths: ['*', '*', '*'], body: filas },
-      layout: 'noBorders',
-      margin: [0, 0, 0, 14],
+      columns: [
+        {
+          width: 'auto',
+          text: String(cifra.valor),
+          fontSize: 15,
+          bold: true,
+          color: cifra.alerta ? '#b91c1c' : InformePdfService.AZUL,
+          margin: [0, conNota ? 3 : 0, 8, 0],
+        },
+        {
+          width: '*',
+          margin: [0, conNota ? 0 : 4, 0, 0],
+          stack: [
+            { text: cifra.etiqueta, fontSize: 8, color: '#555' },
+            cifra.nota
+              ? { text: cifra.nota, fontSize: 7, color: '#888', margin: [0, 1, 0, 0] }
+              : {},
+          ],
+        },
+      ],
+      fillColor: cifra.alerta ? '#fef2f2' : '#f9fafb',
+      margin: [8, 7, 8, 7],
     };
   }
 
@@ -381,12 +551,17 @@ export class InformePdfService {
         headerRows: 1,
         widths: ['*', 'auto', '*', 'auto', 'auto'],
         body: [
-          ['SEDE', 'TIPO', 'DIRECCIÓN', 'CIUDAD', 'EMPLEADOS'].map(
-            (t, i) => ({ text: t, style: 'cabeceraTabla', alignment: i === 4 ? 'right' : 'left' })
-          ),
-          ...sedes.map(s => [
-            s.nombre || '—', s.tipo || '—', s.direccion || '—',
-            s.ciudad || '—', { text: String(s.empleados ?? 0), style: 'valorTabla' },
+          ['SEDE', 'TIPO', 'DIRECCIÓN', 'CIUDAD', 'EMPLEADOS'].map((t, i) => ({
+            text: t,
+            style: 'cabeceraTabla',
+            alignment: i === 4 ? 'right' : 'left',
+          })),
+          ...sedes.map((s) => [
+            s.nombre || '—',
+            s.tipo || '—',
+            s.direccion || '—',
+            s.ciudad || '—',
+            { text: String(s.empleados ?? 0), style: 'valorTabla' },
           ]),
         ],
       },
@@ -397,7 +572,7 @@ export class InformePdfService {
 
   private reparto(
     reparto: ModelsInforme.Reparto,
-    imagenes: WeakMap<ModelsInforme.Reparto, string>
+    imagenes: WeakMap<ModelsInforme.Reparto, string>,
   ): any[] {
     if (!reparto.filas.length) return [];
 
@@ -406,15 +581,25 @@ export class InformePdfService {
     ];
 
     if (reparto.texto) {
-      bloques.push({ text: reparto.texto, style: 'parrafo', margin: [0, 0, 0, 8] });
+      bloques.push({
+        text: reparto.texto,
+        style: 'parrafo',
+        margin: [0, 0, 0, 8],
+      });
     }
 
     const imagen = imagenes.get(reparto);
     if (imagen) {
-      bloques.push({ image: imagen, width: 460, alignment: 'center', margin: [0, 0, 0, 10] });
+      bloques.push({
+        image: imagen,
+        width: 460,
+        alignment: 'center',
+        margin: [0, 0, 0, 10],
+      });
     } else {
       bloques.push(this.tablaReparto(reparto));
-      if (reparto.emparejado) bloques.push(this.tablaReparto(reparto.emparejado));
+      if (reparto.emparejado)
+        bloques.push(this.tablaReparto(reparto.emparejado));
     }
 
     return bloques;
@@ -431,11 +616,12 @@ export class InformePdfService {
             { text: reparto.titulo.toUpperCase(), style: 'cabeceraTabla' },
             {
               text: (reparto.unidad || 'Personas').toUpperCase(),
-              style: 'cabeceraTabla', alignment: 'right',
+              style: 'cabeceraTabla',
+              alignment: 'right',
             },
             { text: '%', style: 'cabeceraTabla', alignment: 'right' },
           ],
-          ...reparto.filas.map(f => [
+          ...reparto.filas.map((f) => [
             f.etiqueta,
             { text: String(f.total), style: 'valorTabla' },
             // El porcentaje acompaña al recuento, no compite con él.
@@ -459,8 +645,13 @@ export class InformePdfService {
           headerRows: 1,
           widths: tabla.columnas.map(() => '*'),
           body: [
-            tabla.columnas.map(c => ({ text: c.toUpperCase(), style: 'cabeceraTabla' })),
-            ...tabla.filas.map(fila => fila.celdas.map(celda => celda || '—')),
+            tabla.columnas.map((c) => ({
+              text: c.toUpperCase(),
+              style: 'cabeceraTabla',
+            })),
+            ...tabla.filas.map((fila) =>
+              fila.celdas.map((celda) => celda || '—'),
+            ),
           ],
         },
         layout: this.layoutTabla(),
@@ -473,14 +664,24 @@ export class InformePdfService {
     return {
       table: {
         widths: ['*'],
-        body: [[{
-          stack: [
-            { text: 'RECOMENDACIONES', fontSize: 9, bold: true, color: '#92400e', margin: [0, 0, 0, 6] },
-            { text: texto, fontSize: 10, lineHeight: 1.35 },
+        body: [
+          [
+            {
+              stack: [
+                {
+                  text: 'RECOMENDACIONES',
+                  fontSize: 9,
+                  bold: true,
+                  color: '#92400e',
+                  margin: [0, 0, 0, 6],
+                },
+                { text: texto, fontSize: 10, lineHeight: 1.35 },
+              ],
+              fillColor: '#fffbeb',
+              margin: [10, 10, 10, 10],
+            },
           ],
-          fillColor: '#fffbeb',
-          margin: [10, 10, 10, 10],
-        }]],
+        ],
       },
       layout: 'noBorders',
       margin: [0, 8, 0, 0],
