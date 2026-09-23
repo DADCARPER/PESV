@@ -286,6 +286,7 @@ export class InformeDiagnosticoService {
         telefono: s.telefono ?? '',
         empleados: Number(s.totalempleados) || 0,
         fotoUrl: s.fotoUrl ?? '',
+        fotoMiniatura: s.fotoMiniatura ?? '',
       })),
       cifras: [
         { etiqueta: 'Sedes', valor: sedes.length },

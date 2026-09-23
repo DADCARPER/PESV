@@ -5,6 +5,7 @@ import { AlertaService } from '../../../../../../services/shared/alerta.service'
 import { FirestoreService } from '../../../../../../services/shared/firestore.service';
 import { AuthenticacionService } from '../../../../../../services/shared/authenticacion.service';
 import { StorageService } from '../../../../../../services/shared/storage.service';
+import { ANCHO_FOTO, comprimirComoTexto, comprimirImagen } from '../../../../../../data/imagenes';
 import { DiagnosticoDatosService } from '../../../../../../services/shared/diagnostico-datos.service';
 import { AlertaInformativoComponent } from "../../../../../../components/alertas/alerta-informativo/alerta-informativo.component";
 
@@ -42,6 +43,8 @@ export class Form1SedesComponent {
    */
   fotoUrl = signal<string>('');
   fotoRuta = signal<string>('');
+  /** Copia diminuta que se guarda con la sede y es la que imprime el informe. */
+  fotoMiniatura = signal<string>('');
   subiendoFoto = signal(false);
   progresoFoto = signal(0);
 
@@ -63,14 +66,25 @@ export class Form1SedesComponent {
     this.subiendoFoto.set(true);
     this.progresoFoto.set(0);
     try {
+      // Se reduce antes de subir. Una foto de telefono trae cuatro mil
+      // pixeles de ancho y se muestra en un recuadro de ciento doce: subirla
+      // entera es pagar almacenamiento y tiempo de subida, muchas veces desde
+      // datos moviles y en una sede, por pixeles que nadie va a ver.
+      const reducida = await comprimirImagen(archivo, ANCHO_FOTO);
+
       // El nombre lleva la hora para no pisar la anterior y para que el
-      // navegador no sirva la vieja desde su cache.
-      const ruta = `${this._datos.ruta('sedes')}/fotos/${Date.now()}_${archivo.name}`;
+      // navegador no sirva la vieja desde su cache. La extension pasa a jpg
+      // porque eso es lo que sale de la compresion, diga lo que diga el
+      // archivo original.
+      const nombre = archivo.name.replace(/\.[^.]+$/, '') + '.jpg';
+      const ruta = `${this._datos.ruta('sedes')}/fotos/${Date.now()}_${nombre}`;
       const url = await this._storage.uploadFileProgreso(
-        ruta, archivo, (p) => this.progresoFoto.set(Math.round(p))
+        ruta, reducida, (p) => this.progresoFoto.set(Math.round(p))
       );
+
       this.fotoUrl.set(url);
       this.fotoRuta.set(ruta);
+      this.fotoMiniatura.set(await comprimirComoTexto(archivo));
     } catch (error: unknown) {
       console.error('[Form1Sedes] subir foto:', error);
       this._alerta.showError('No se pudo subir la imagen.');
@@ -82,6 +96,7 @@ export class Form1SedesComponent {
   quitarFoto() {
     this.fotoUrl.set('');
     this.fotoRuta.set('');
+    this.fotoMiniatura.set('');
   }
 
 
@@ -123,9 +138,12 @@ export class Form1SedesComponent {
       this.cargarDatos();
 
       // La foto no va en el formulario, asi que patchValue no la recupera.
-      const previa = datosEditar as { fotoUrl?: string; fotoRuta?: string };
+      const previa = datosEditar as {
+        fotoUrl?: string; fotoRuta?: string; fotoMiniatura?: string;
+      };
       this.fotoUrl.set(previa?.fotoUrl ?? '');
       this.fotoRuta.set(previa?.fotoRuta ?? '');
+      this.fotoMiniatura.set(previa?.fotoMiniatura ?? '');
     }
 
   }
@@ -140,6 +158,7 @@ export class Form1SedesComponent {
         ...this.agregarsedeForm.value,
         fotoUrl: this.fotoUrl(),
         fotoRuta: this.fotoRuta(),
+        fotoMiniatura: this.fotoMiniatura(),
       };
 
       if (this.modo === 'editar') {

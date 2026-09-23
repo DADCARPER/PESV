@@ -79,6 +79,8 @@ export namespace ModelsInforme {
     telefono: string;
     empleados: number;
     fotoUrl?: string;
+    /** La miniatura embebida, que es la que se imprime. */
+    fotoMiniatura?: string;
   }
 
   /**

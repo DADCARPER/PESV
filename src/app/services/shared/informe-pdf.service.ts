@@ -586,7 +586,11 @@ export class InformePdfService {
   }
 
   private tarjetaSede(sede: ModelsInforme.FichaSede, fotos: Map<string, string>): any {
-    const foto = sede.fotoUrl ? fotos.get(sede.fotoUrl) : undefined;
+    // La miniatura viaja con el registro y no hay que ir a buscarla. Solo se
+    // descarga de Storage cuando no la hay, que es el caso de las sedes
+    // cargadas antes de que existiera.
+    const foto = sede.fotoMiniatura
+      || (sede.fotoUrl ? fotos.get(sede.fotoUrl) : undefined);
 
     const contacto = [sede.responsable, sede.telefono].filter(Boolean).join(' · ');
     const lugar = [sede.ciudad, sede.departamento].filter(Boolean).join(', ');
@@ -646,6 +650,8 @@ export class InformePdfService {
     const urls = new Set(
       secciones
         .flatMap(s => s.sedes ?? [])
+        // Las que ya traen miniatura no hace falta ir a buscarlas.
+        .filter(s => !s.fotoMiniatura)
         .map(s => s.fotoUrl)
         .filter((u): u is string => !!u)
     );

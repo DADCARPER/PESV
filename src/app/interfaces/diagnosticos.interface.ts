@@ -51,6 +51,18 @@ export namespace ModelDiagnosticos {
          */
         fotoUrl?: string;
         fotoRuta?: string;
+        /**
+         * La misma fotografia, diminuta y guardada dentro del registro.
+         *
+         * Existe para el informe. pdfMake solo admite imagenes embebidas, y
+         * traerlas de Storage con `fetch` exige que el bucket tenga CORS
+         * configurado: el navegador las pinta en un `img` pero no deja
+         * leerlas. Guardar una miniatura aqui quita esa dependencia entera.
+         *
+         * Ademas congela lo que se vio: un informe archivado sigue enseniando
+         * la foto que tenia el dia que se emitio, aunque despues se cambie.
+         */
+        fotoMiniatura?: string;
     }
 
     export interface Servicio {
