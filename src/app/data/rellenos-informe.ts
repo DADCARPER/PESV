@@ -42,6 +42,23 @@ export const RELLENOS: string[] = [
 ];
 
 /**
+ * La imagen que va de fondo en la portada.
+ *
+ * Cubre la hoja entera, márgenes incluidos, y el título va encima. Si no
+ * existe, la portada sale en blanco como hasta ahora.
+ */
+export const PORTADA = 'portada.jpg';
+
+/**
+ * A qué tamaño se recorta la portada, en píxeles.
+ *
+ * Es la proporción exacta de la hoja carta, 8,5 por 11 pulgadas, a unos 200
+ * puntos por pulgada. Se recorta en vez de estirarse: una portada deformada
+ * se nota desde el otro lado de la sala.
+ */
+export const TAMANO_PORTADA = { ancho: 1700, alto: 2200 };
+
+/**
  * Por debajo de este hueco no se rellena nada.
  *
  * Una tira aplastada al pie de la página no parece un diseño, parece que algo

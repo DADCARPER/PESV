@@ -43,3 +43,16 @@ Diseños decorativos, abstractos o ilustrados. Nada que pueda leerse como
 evidencia de una actividad concreta: una fotografía de una capacitación real
 al pie de la sección de formación puede entenderse como que documenta esa
 sesión, y no documenta nada.
+
+## La portada
+
+`portada.jpg` cubre la primera hoja entera, de borde a borde y por detrás del
+título. Si el archivo no está, la portada sale en blanco como siempre.
+
+Exporta a **1700 × 2200 píxeles** (8,5 × 11 pulgadas a 200 ppp). Si la
+proporción no es exacta, el sistema la recorta centrada en vez de estirarla.
+
+**Deja libre la franja central**, más o menos entre el 30% y el 65% de la
+altura: ahí van el título, el nombre de la empresa y el periodo. El texto es
+azul oscuro y naranja, así que esa zona tiene que ser clara. Si el diseño es
+oscuro, dilo y se cambia el texto a blanco.

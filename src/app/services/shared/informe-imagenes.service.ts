@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
+import { recortarImagen } from '../../data/imagenes';
 import {
   AIRE_RELLENO,
   CARPETA_RELLENOS,
   HUECO_MINIMO,
+  PORTADA,
   RELLENOS,
+  TAMANO_PORTADA,
 } from '../../data/rellenos-informe';
 
 /** Una imagen de relleno, ya cargada y con su medida real. */
@@ -16,19 +19,47 @@ interface Relleno {
 }
 
 /**
- * Elige la imagen que mejor llena el hueco al pie de cada sección.
+ * Las imágenes decorativas del informe: la portada y los rellenos.
  *
- * Las imágenes se cargan una sola vez y se quedan en memoria: son fijas,
- * pesan poco y se sirven desde la propia aplicación, así que volver a pedirlas
- * en cada descarga sería trabajo para nada.
+ * Se cargan una sola vez y se quedan en memoria: son fijas, van dentro de la
+ * propia aplicación y volver a pedirlas en cada descarga sería trabajo para
+ * nada.
  */
 @Injectable({ providedIn: 'root' })
-export class InformeRellenosService {
+export class InformeImagenesService {
 
   /** Ancho de la hoja carta. Las imágenes van de borde a borde, sin márgenes. */
   private static readonly ANCHO_HOJA = 612;
 
   private catalogo: Relleno[] | null = null;
+  private fondoPortada: string | null | undefined;
+
+  /**
+   * La imagen que va de fondo en la portada, o null si no la hay.
+   *
+   * Se recorta a la proporción exacta de la hoja antes de usarla. Si la
+   * original no la tiene, forzarla a ocupar la página entera la deformaría, y
+   * una portada estirada se nota desde el otro lado de la sala.
+   */
+  async portada(): Promise<string | null> {
+    if (this.fondoPortada !== undefined) return this.fondoPortada;
+
+    try {
+      const original = await this.comoTextoDesde(PORTADA);
+      this.fondoPortada = await recortarImagen(
+        original,
+        TAMANO_PORTADA.ancho,
+        TAMANO_PORTADA.alto,
+        0.85,
+      );
+    } catch (error: unknown) {
+      // Sin portada el informe sale con la de siempre, en blanco.
+      console.warn('[InformeImagenes] no se pudo cargar la portada:', error);
+      this.fondoPortada = null;
+    }
+
+    return this.fondoPortada;
+  }
 
   /**
    * Devuelve un repartidor de imágenes para un documento concreto.
@@ -79,7 +110,7 @@ export class InformeRellenosService {
   bloque(relleno: Relleno, hueco: number): any {
     return {
       image: relleno.datos,
-      width: InformeRellenosService.ANCHO_HOJA,
+      width: InformeImagenesService.ANCHO_HOJA,
       margin: [
         // Los laterales negativos la sacan del área de texto para que llegue
         // a los dos bordes de la hoja.
@@ -90,7 +121,7 @@ export class InformeRellenosService {
         -50,
         // El inferior la deja bajar por debajo del área de texto. Como el
         // alto que consume es menor que el hueco medido, sigue cabiendo.
-        -InformeRellenosService.SANGRADO,
+        -InformeImagenesService.SANGRADO,
       ],
     };
   }
@@ -123,6 +154,20 @@ export class InformeRellenosService {
   }
 
   private async cargarUna(nombre: string): Promise<Relleno> {
+    const datos = await this.comoTextoDesde(nombre);
+    const medida = await this.medir(datos);
+
+    return {
+      nombre,
+      datos,
+      // Lo que importa no son los píxeles sino la proporción: la imagen se
+      // pinta siempre a lo ancho de la hoja, y el alto sale de ahí.
+      alto: (medida.alto / medida.ancho) * InformeImagenesService.ANCHO_HOJA,
+    };
+  }
+
+  /** Trae un archivo de la carpeta y lo devuelve listo para incrustar. */
+  private async comoTextoDesde(nombre: string): Promise<string> {
     // Se resuelve contra la raíz de la aplicación y no contra la ruta en la
     // que esté el navegador. Una dirección relativa desde
     // /admin/planificar/diagnostico busca la imagen ahí dentro, y el servidor
@@ -138,16 +183,8 @@ export class InformeRellenosService {
     if (!blob.type.startsWith('image/')) {
       throw new Error(`No es una imagen, sino ${blob.type || 'algo sin tipo'}.`);
     }
-    const datos = await this.comoTexto(blob);
-    const medida = await this.medir(datos);
 
-    return {
-      nombre,
-      datos,
-      // Lo que importa no son los píxeles sino la proporción: la imagen se
-      // pinta siempre a lo ancho de la hoja, y el alto sale de ahí.
-      alto: (medida.alto / medida.ancho) * InformeRellenosService.ANCHO_HOJA,
-    };
+    return await this.comoTexto(blob);
   }
 
   private comoTexto(blob: Blob): Promise<string> {

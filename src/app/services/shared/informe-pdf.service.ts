@@ -4,7 +4,7 @@ import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { ModelsInforme } from '../../interfaces/informe.interface';
 import { InformeGraficasService } from './informe-graficas.service';
 import { recortarImagen } from '../../data/imagenes';
-import { InformeRellenosService } from './informe-rellenos.service';
+import { InformeImagenesService } from './informe-imagenes.service';
 
 (pdfMake as any).vfs = (pdfFonts as any).vfs ?? (pdfFonts as any).pdfMake?.vfs;
 
@@ -23,7 +23,7 @@ import { InformeRellenosService } from './informe-rellenos.service';
 @Injectable({ providedIn: 'root' })
 export class InformePdfService {
   private _graficas = inject(InformeGraficasService);
-  private _rellenos = inject(InformeRellenosService);
+  private _imagenes = inject(InformeImagenesService);
 
   private static readonly NARANJA = '#f46c2d';
   private static readonly AZUL = '#202e48';
@@ -100,16 +100,19 @@ export class InformePdfService {
 
   /** Arma el documento y lo descarga. */
   async descargar(informe: ModelsInforme.Datos & { version?: number }): Promise<void> {
-    const [imagenes, fotos, repartir] = await Promise.all([
+    const [imagenes, fotos, repartir, portada] = await Promise.all([
       this._graficas.imagenes(informe.secciones),
       this.fotosDeSedes(informe.secciones),
-      this._rellenos.repartidor(),
+      this._imagenes.repartidor(),
+      this._imagenes.portada(),
     ]);
 
     // Primera pasada: se maqueta para saber dónde acaba cada sección y cuánto
     // sobra en su última página. El documento que sale se descarta; lo que
     // interesaba eran las medidas.
-    const huecos = await this.medirHuecos(this.documento(informe, imagenes, fotos));
+    const huecos = await this.medirHuecos(
+      this.documento(informe, imagenes, fotos, new Map(), portada),
+    );
 
     // Segunda pasada: la de verdad, ya con las imágenes en los huecos.
     //
@@ -120,10 +123,10 @@ export class InformePdfService {
     const rellenos = new Map<string, any>();
     for (const [seccion, hueco] of huecos) {
       const imagen = repartir(hueco);
-      if (imagen) rellenos.set(seccion, this._rellenos.bloque(imagen, hueco));
+      if (imagen) rellenos.set(seccion, this._imagenes.bloque(imagen, hueco));
     }
 
-    const documento = this.documento(informe, imagenes, fotos, rellenos);
+    const documento = this.documento(informe, imagenes, fotos, rellenos, portada);
 
     const nombre =
       `Informe-diagnostico-PESV-${informe.periodo}` +
@@ -208,11 +211,20 @@ export class InformePdfService {
     imagenes: WeakMap<ModelsInforme.Reparto, string>,
     fotos: Map<ModelsInforme.FichaSede, string>,
     rellenos: Map<string, any> = new Map(),
+    portada: string | null = null,
   ): any {
     const introduccion = informe.secciones.find((s) => s.id === 'introduccion');
     const resto = informe.secciones.filter((s) => s !== introduccion);
 
     return {
+      // El fondo se dibuja debajo de todo y cubre la hoja entera, márgenes
+      // incluidos: es lo que permite una portada a sangre con el título
+      // encima. Solo en la primera, claro.
+      background: (pagina: number, hoja: { width: number; height: number }) =>
+        pagina === 1 && portada
+          ? { image: portada, width: hoja.width, height: hoja.height }
+          : null,
+
       pageSize: 'LETTER',
       // [izquierda, arriba, derecha, abajo]. El de arriba es mayor porque ahí
       // va la cabecera; el de abajo, lo justo para el pie y su filete.
