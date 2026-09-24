@@ -257,27 +257,34 @@ export class InformePdfService {
               ],
             },
 
-      footer: (pagina: number, total: number) => ({
-        margin: [50, 12, 50, 0],
-        stack: [
-          this.filete([0, 0, 0, 5]),
-          {
-            columns: [
-              {
-                text: 'Resolución 40595 de 2022 · Plan Estratégico de Seguridad Vial',
-                fontSize: 7,
-                color: '#aaa',
-              },
-              {
-                text: `${pagina} de ${total}`,
-                fontSize: 7,
-                color: '#aaa',
-                alignment: 'right',
-              },
-            ],
-          },
-        ],
-      }),
+      // La portada va limpia también por abajo: un pie de página sobre el
+      // diseño de la cubierta lo estropea, y no numera nada que haga falta
+      // buscar. Por eso la cuenta empieza en la hoja siguiente, que pasa a
+      // ser la uno, y el total descuenta la portada.
+      footer: (pagina: number, total: number) =>
+        pagina === 1
+          ? null
+          : {
+              margin: [50, 12, 50, 0],
+              stack: [
+                this.filete([0, 0, 0, 5]),
+                {
+                  columns: [
+                    {
+                      text: 'Resolución 40595 de 2022 · Plan Estratégico de Seguridad Vial',
+                      fontSize: 7,
+                      color: '#aaa',
+                    },
+                    {
+                      text: `${pagina - 1} de ${Math.max(1, total - 1)}`,
+                      fontSize: 7,
+                      color: '#aaa',
+                      alignment: 'right',
+                    },
+                  ],
+                },
+              ],
+            },
 
       // La introducción abre el documento, antes incluso de la metodología:
       // sitúa al lector en el problema antes de darle la primera cifra.
