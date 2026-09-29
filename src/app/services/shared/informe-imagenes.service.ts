@@ -74,6 +74,9 @@ export class InformeImagenesService {
     const usadas = new Set<string>();
 
     return (hueco: number) => {
+      // Lo que queda una vez descontado el aire que separa el texto de la
+      // imagen. Quien decide es la prueba de si alguna cabe aquí debajo; el
+      // mínimo es solo un suelo para no pegar una tira en un hueco ridículo.
       const disponible = hueco - AIRE_RELLENO;
       if (disponible < HUECO_MINIMO) return null;
 

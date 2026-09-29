@@ -61,10 +61,17 @@ export const TAMANO_PORTADA = { ancho: 1700, alto: 2200 };
 /**
  * Por debajo de este hueco no se rellena nada.
  *
- * Una tira aplastada al pie de la página no parece un diseño, parece que algo
- * salió mal al maquetar. Más vale el blanco.
+ * Es solo un suelo de seguridad, por si algún día se añade una imagen muy
+ * baja: una tira aplastada al pie no parece un diseño, parece que algo salió
+ * mal al maquetar.
+ *
+ * **Tiene que quedar por debajo de la imagen más baja del catálogo.** Estuvo
+ * en 130 con la más baja en 102, y el resultado es que ninguna página con un
+ * hueco de entre 118 y 146 puntos se rellenaba: cabía de sobra, pero el
+ * umbral la descartaba antes de mirar. Quien decide de verdad es la prueba de
+ * si la imagen cabe, no este número.
  */
-export const HUECO_MINIMO = 130;
+export const HUECO_MINIMO = 100;
 
 /** Lo que se deja respirar entre el final del texto y la imagen. */
 export const AIRE_RELLENO = 16;
