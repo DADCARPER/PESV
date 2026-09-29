@@ -152,6 +152,35 @@ export class EncuestaParametrosComponent implements OnInit {
     }
   }
 
+  /** Se pregunta antes de desmontar: se pierde la configuración de módulos. */
+  confirmandoDesmontaje = signal(false);
+
+  /**
+   * Deja el periodo sin cuestionario.
+   *
+   * Es el camino para cambiar de encuesta: se desmonta la que hay y la
+   * pantalla vuelve al estado inicial, con su selector. Se podría reactivar
+   * otra encima, pero entonces habría dos sitios para hacer lo mismo y ninguno
+   * de los dos diría que la copia anterior se tira entera.
+   */
+  async desmontar() {
+    if (!this.editable || this.fijada()) return;
+
+    this.guardando.set(true);
+    try {
+      await this._empresaEncuesta.desmontar();
+      this.confirmandoDesmontaje.set(false);
+      this._alerta.showSuccess('Encuesta desmontada. Ya puedes elegir otra.');
+      await this.cargar();
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'No se pudo desmontar';
+      console.error('[EncuestaParametros] desmontar:', error);
+      this._alerta.showError(msg);
+    } finally {
+      this.guardando.set(false);
+    }
+  }
+
   /** Un módulo entra o sale del cuestionario. Los fijos no se tocan. */
   async alternarModulo(modulo: ModelsEncuestas.Modulo) {
     const copia = this.activa();

@@ -217,6 +217,35 @@ export class EncuestaEmpresaService {
   }
 
   /**
+   * Quita el cuestionario del periodo y deja a la empresa sin encuesta.
+   *
+   * Es el camino para cambiar de cuestionario: se desmonta el que hay y se
+   * elige otro desde cero. Antes se podia reactivar encima, pero eso dejaba
+   * dos sitios distintos para hacer lo mismo y escondia lo que de verdad
+   * pasaba, que es que la copia anterior se tira entera con la configuracion
+   * de modulos que tuviera.
+   *
+   * Se cierra el enlace antes de borrar la copia y no al reves: en el orden
+   * contrario, quien abriera el enlace en ese instante encontraria una
+   * encuesta abierta y sin preguntas.
+   */
+  async desmontar(): Promise<void> {
+    const nit = this.nit();
+    const periodo = this._auth.periodo();
+
+    const respuestas = await this.contarRespuestas(periodo);
+    if (respuestas > 0) {
+      throw new Error(
+        `Este periodo ya tiene ${respuestas} respuestas. Para desmontar el ` +
+        'cuestionario hay que eliminarlas primero desde Resultados de encuesta.'
+      );
+    }
+
+    await this.sincronizarPublico(nit, periodo, false);
+    await this._firestore.deleteDocument(this.rutaPeriodo(nit, periodo));
+  }
+
+  /**
    * Cambia qué módulos se preguntan, o abre y cierra el enlace público.
    *
    * Los módulos solo se pueden tocar mientras no haya respuestas: si a mitad
