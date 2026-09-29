@@ -57,6 +57,21 @@ export namespace ModelsEncuestas {
     campoOtro?: string;
     condicion?: Condicion | null;
     /**
+     * La pregunta ya no se hace, pero su identificador sigue ocupado.
+     *
+     * Una pregunta retirada desaparece del cuestionario, de la encuesta
+     * pública y del informe, y no viaja a la copia de ninguna empresa. Lo
+     * único que queda de ella es el nombre, y eso es justo lo que hay que
+     * conservar: las respuestas ya recogidas se guardaron bajo esa clave.
+     *
+     * Si el identificador se liberara y alguien lo reutilizara años después
+     * para otra pregunta, las respuestas viejas y las nuevas quedarían
+     * mezcladas bajo el mismo nombre significando cosas distintas. No fallaría
+     * nada: los datos históricos empezarían a decir otra cosa, y nadie se
+     * enteraría. Por eso se retira y no se borra.
+     */
+    retirada?: boolean;
+    /**
      * Campo de la ficha de colaborador que alimenta esta respuesta.
      *
      * Es lo que permite que quien contesta la encuesta aparezca en la Lista de

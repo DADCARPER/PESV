@@ -267,15 +267,57 @@ export class GestorEncuestasComponent implements OnInit {
     }];
   }
 
-  quitarPregunta(modulo: ModelsEncuestas.Modulo, indice: number) {
-    modulo.preguntas = modulo.preguntas.filter((_, i) => i !== indice);
+  /**
+   * Retira una pregunta: deja de hacerse, pero su identificador no se libera.
+   *
+   * No se borra nunca. Las respuestas ya recogidas se guardaron bajo esa
+   * clave, y reutilizarla años después para otra pregunta mezclaría datos
+   * viejos y nuevos bajo el mismo nombre sin que nada fallara ni nadie se
+   * enterara. Es reversible: volver a preguntarla es un clic.
+   */
+  retirarPregunta(pregunta: ModelsEncuestas.Pregunta) {
+    pregunta.retirada = true;
   }
 
-  moverPregunta(modulo: ModelsEncuestas.Modulo, indice: number, salto: number) {
-    const destino = indice + salto;
-    if (destino < 0 || destino >= modulo.preguntas.length) return;
-    const copia = [...modulo.preguntas];
-    [copia[indice], copia[destino]] = [copia[destino], copia[indice]];
+  volverAPreguntar(pregunta: ModelsEncuestas.Pregunta) {
+    delete pregunta.retirada;
+  }
+
+  /** Las que se van a preguntar de verdad. */
+  vigentes(modulo: ModelsEncuestas.Modulo): ModelsEncuestas.Pregunta[] {
+    return modulo.preguntas.filter(p => !p.retirada);
+  }
+
+  retiradas(modulo: ModelsEncuestas.Modulo): ModelsEncuestas.Pregunta[] {
+    return modulo.preguntas.filter(p => p.retirada);
+  }
+
+  /**
+   * Sube o baja una pregunta una posición de las que se ven.
+   *
+   * Trabaja sobre la pregunta y no sobre su índice en pantalla: las retiradas
+   * siguen dentro del módulo pero no se muestran, así que la posición tercera
+   * de la lista visible puede ser la quinta del array. Y al buscar destino se
+   * salta lo retirado, porque moverse "una posición" tiene que significar una
+   * de las que el administrador está viendo.
+   */
+  moverPregunta(
+    modulo: ModelsEncuestas.Modulo,
+    pregunta: ModelsEncuestas.Pregunta,
+    salto: number,
+  ) {
+    const preguntas = modulo.preguntas;
+    const desde = preguntas.indexOf(pregunta);
+    if (desde < 0) return;
+
+    let hasta = desde + salto;
+    while (hasta >= 0 && hasta < preguntas.length && preguntas[hasta].retirada) {
+      hasta += salto;
+    }
+    if (hasta < 0 || hasta >= preguntas.length) return;
+
+    const copia = [...preguntas];
+    [copia[desde], copia[hasta]] = [copia[hasta], copia[desde]];
     modulo.preguntas = copia;
   }
 
@@ -352,7 +394,9 @@ export class GestorEncuestasComponent implements OnInit {
 
   /** Cuántas preguntas tiene una encuesta, sumando sus módulos. */
   totalPreguntas(encuesta: ModelsEncuestas.Encuesta): number {
-    return encuesta.modulos.reduce((n, m) => n + m.preguntas.length, 0);
+    // Lo retirado no se pregunta, así que no cuenta: el número tiene que
+    // decir lo que va a tardar en responderse la encuesta.
+    return encuesta.modulos.reduce((n, m) => n + this.vigentes(m).length, 0);
   }
 
   /**
@@ -371,16 +415,19 @@ export class GestorEncuestasComponent implements OnInit {
       if (!modulo.titulo.trim()) fallos.push('Hay un módulo sin título.');
 
       for (const pregunta of modulo.preguntas) {
-        if (!pregunta.etiqueta.trim()) {
-          fallos.push(`"${modulo.titulo}": hay una pregunta sin enunciado.`);
-        }
-        // El id es la clave con la que se guarda la respuesta: repetirlo haria
-        // que una pregunta pisara la respuesta de otra.
+        // El identificador se comprueba también en las retiradas: es lo que
+        // impide que una pregunta nueva se quede con el nombre de una vieja.
         if (vistos.has(pregunta.id)) {
           fallos.push(`El identificador "${pregunta.id}" está repetido.`);
         }
         vistos.add(pregunta.id);
 
+        // Lo demás solo se le exige a lo que se va a preguntar.
+        if (pregunta.retirada) continue;
+
+        if (!pregunta.etiqueta.trim()) {
+          fallos.push(`"${modulo.titulo}": hay una pregunta sin enunciado.`);
+        }
         if (this.llevaOpciones(pregunta) && !(pregunta.opciones ?? []).some(o => o.etiqueta.trim())) {
           fallos.push(`"${pregunta.etiqueta || pregunta.id}" no tiene opciones.`);
         }

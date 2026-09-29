@@ -205,7 +205,13 @@ export class EncuestaEmpresaService {
       version: encuesta.version,
       nombre: encuesta.nombre,
       descripcion: encuesta.descripcion,
-      modulos: encuesta.modulos,
+      // Lo retirado se queda en el catálogo. La copia es lo que esta empresa
+      // va a preguntar, así que aquí no tiene sitio: si viajara, la encuesta
+      // pública lo mostraría y el informe creería que se preguntó.
+      modulos: encuesta.modulos.map(m => ({
+        ...m,
+        preguntas: m.preguntas.filter(p => !p.retirada),
+      })),
       periodo,
       modulosActivos,
       mostrarEncuesta: false,
