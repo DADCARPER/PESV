@@ -68,6 +68,11 @@
           ‹ Volver a la lista
         </button>
         <div class="flex items-center gap-2">
+          <button type="button" (click)="vistaPrevia.set(true)"
+            title="Cómo se verá para quien la responda"
+            class="rounded border border-gray-300 px-4 py-2 text-xs font-bold uppercase text-gray-700 transition-colors hover:bg-gray-100">
+            Vista previa
+          </button>
           <button type="button" (click)="guardar(false)" [disabled]="guardando()"
             class="rounded border border-gray-300 px-4 py-2 text-xs font-bold uppercase text-gray-700 transition-colors hover:bg-gray-100 disabled:opacity-50">
             {{ guardando() ? 'Guardando...' : 'Guardar borrador' }}
@@ -340,3 +345,119 @@
     }
   </div>
 </div>
+
+<!-- ── Vista previa del cuestionario ───────────────────────────────────────
+     Lo que verá quien responda, sin poder responder. Sale de lo que hay en el
+     editor y no de lo guardado: sirve para revisar antes de publicar. -->
+@if (vistaPrevia() && edicion(); as encuesta) {
+  <div (click)="vistaPrevia.set(false)" class="fixed inset-0 z-40 bg-black opacity-25"></div>
+
+  <div class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden outline-none focus:outline-none">
+    <div (click)="$event.stopPropagation()" class="relative mx-auto my-6 w-full max-w-3xl rounded-lg bg-white shadow-lg">
+
+      <div class="flex items-start justify-between gap-3 rounded-t border-b p-5">
+        <div class="min-w-0">
+          <h3 class="text-xl font-semibold text-gray-900">Vista previa</h3>
+          <p class="mt-1 text-sm text-gray-500">
+            {{ encuesta.nombre || 'Sin nombre' }} · v{{ encuesta.version }} ·
+            {{ encuesta.modulos.length }} módulos ·
+            {{ totalPreguntas(encuesta) }} preguntas
+          </p>
+        </div>
+        <button type="button" (click)="vistaPrevia.set(false)"
+          class="shrink-0 rounded px-3 py-1 text-sm font-bold uppercase text-gray-400 hover:text-gray-700">
+          Cerrar
+        </button>
+      </div>
+
+      <div class="max-h-[70vh] overflow-y-auto bg-gray-50 p-6">
+        <p class="mb-5 rounded-lg border border-sky-200 bg-sky-50 p-3 text-xs text-sky-800">
+          Así se verá seguida. Es lo que hay ahora en el editor, esté guardado o no.
+          Aquí no se puede responder: los campos van apagados a propósito.
+          Cada empresa elige después qué módulos deja puestos, así que puede que no
+          los vea todos.
+        </p>
+
+        @if (encuesta.descripcion) {
+          <p class="mb-5 text-sm leading-relaxed text-gray-600">{{ encuesta.descripcion }}</p>
+        }
+
+        @for (modulo of encuesta.modulos; track modulo.id) {
+          <div class="mb-5 rounded-lg border border-gray-200 bg-white p-5">
+            <div class="flex items-start justify-between gap-3">
+              <p class="text-base font-semibold text-gray-900">
+                {{ modulo.titulo || 'Módulo sin título' }}
+              </p>
+              @if (modulo.fijo) {
+                <span class="shrink-0 rounded bg-gray-200 px-2 py-1 text-xs font-semibold text-gray-600"
+                  title="Identifica a quien responde: se pregunta siempre">
+                  Siempre
+                </span>
+              }
+            </div>
+            @if (modulo.descripcion) {
+              <p class="mt-1 text-sm text-gray-500">{{ modulo.descripcion }}</p>
+            }
+
+            @if (!modulo.preguntas.length) {
+              <p class="mt-3 text-sm italic text-gray-400">Todavía no tiene preguntas.</p>
+            }
+
+            <div class="mt-4 space-y-5">
+              @for (pregunta of modulo.preguntas; track pregunta.id) {
+                <div>
+                  <p class="text-sm font-medium text-gray-800">
+                    {{ pregunta.etiqueta || 'Pregunta sin enunciado' }}
+                    @if (pregunta.obligatoria) {
+                      <span class="text-red-500">*</span>
+                    }
+                  </p>
+
+                  @if (pregunta.ayuda) {
+                    <p class="mt-1 text-xs leading-relaxed text-gray-500">{{ pregunta.ayuda }}</p>
+                  }
+
+                  @if (condicionDe(pregunta); as aviso) {
+                    <p class="mt-1 text-xs italic text-amber-700">{{ aviso }}</p>
+                  }
+
+                  @if (esDeOpciones(pregunta)) {
+                    <div class="mt-2 space-y-1.5">
+                      @for (opcion of pregunta.opciones; track $index) {
+                        <label class="flex items-start gap-2 text-sm text-gray-700">
+                          <input [type]="pregunta.tipo === 'multiple' ? 'checkbox' : 'radio'"
+                            disabled class="mt-0.5 shrink-0">
+                          <span>{{ opcion.etiqueta || 'Opción sin texto' }}</span>
+                        </label>
+                      }
+                      @if (pregunta.campoOtro) {
+                        <input type="text" disabled placeholder="¿Cuál?"
+                          class="mt-1 w-full rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm">
+                      }
+                    </div>
+
+                  } @else if (pregunta.tipo === 'textoLargo') {
+                    <textarea disabled rows="3" [placeholder]="marcador(pregunta)"
+                      class="mt-2 w-full rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm"></textarea>
+
+                  } @else {
+                    <input type="text" disabled [placeholder]="marcador(pregunta)"
+                      class="mt-2 w-full rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm">
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="flex items-center justify-end border-t p-5">
+        <button type="button" (click)="vistaPrevia.set(false)"
+          class="rounded bg-color1 px-6 py-2 text-sm font-bold uppercase text-white shadow transition-opacity hover:opacity-90">
+          Cerrar
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

@@ -298,6 +298,58 @@ export class GestorEncuestasComponent implements OnInit {
     this.edicion.set({ ...encuesta });
   }
 
+  // ── Vista previa ──────────────────────────────────────────────────────
+
+  /**
+   * Enseña el cuestionario como lo verá quien lo responda.
+   *
+   * El editor se lee por campos: un enunciado aquí, un tipo allá, las opciones
+   * plegadas en otra fila. Eso está bien para construir, pero no deja ver lo
+   * único que importa de verdad —si la encuesta se entiende seguida, si una
+   * pregunta se pisa con la anterior, si el módulo es más largo de lo que nadie
+   * va a aguantar—. Para eso hace falta verla como la ve quien contesta.
+   *
+   * Sale de lo que hay en el editor, sin guardar: sirve para revisar antes de
+   * publicar, que es justo cuando todavía se puede cambiar.
+   */
+  vistaPrevia = signal(false);
+
+  /** Con qué control se pinta cada pregunta en la vista previa. */
+  esDeOpciones(pregunta: ModelsEncuestas.Pregunta): boolean {
+    return this.llevaOpciones(pregunta);
+  }
+
+  /** El texto del marcador de un campo, según lo que pida. */
+  marcador(pregunta: ModelsEncuestas.Pregunta): string {
+    switch (pregunta.tipo) {
+      case 'textoLargo': return 'Respuesta larga...';
+      case 'numero': return '0';
+      case 'fecha': return 'dd/mm/aaaa';
+      case 'email': return 'nombre@empresa.com';
+      case 'telefono': return '300 000 0000';
+      default: return 'Respuesta corta...';
+    }
+  }
+
+  /**
+   * Qué hace falta contestar antes para que aparezca esta pregunta.
+   *
+   * En la vista previa salen todas seguidas, y sin la aclaración parece que se
+   * le van a preguntar cosas a quien nunca las verá: a alguien que acaba de
+   * decir que no conduce no se le pide la licencia.
+   */
+  condicionDe(pregunta: ModelsEncuestas.Pregunta): string {
+    const condicion = pregunta.condicion;
+    if (!condicion) return '';
+
+    const dueña = (this.edicion()?.modulos ?? [])
+      .flatMap(m => m.preguntas)
+      .find(p => p.id === condicion.pregunta);
+
+    const enunciado = dueña?.etiqueta || condicion.pregunta;
+    return `Solo si en "${enunciado}" responde: ${condicion.valores.join(' o ')}`;
+  }
+
   /** Cuántas preguntas tiene una encuesta, sumando sus módulos. */
   totalPreguntas(encuesta: ModelsEncuestas.Encuesta): number {
     return encuesta.modulos.reduce((n, m) => n + m.preguntas.length, 0);
