@@ -20,11 +20,11 @@ export const MARCA = {
  * el color llegue a significar nada, que es lo correcto —aquí la categoría ya
  * la dice la etiqueta, y un color por categoría sería ruido—.
  *
- * Van oscuros a propósito: son los que llevan el número encima y tienen que
- * aguantar el contraste en papel.
+ * Son los dos de la marca, sin apagar. El naranja se probó oscurecido, que
+ * aguanta algo mejor la impresión, pero al lado del azul perdía la fuerza que
+ * le da sentido a estar ahí.
  */
-export const NARANJA_OSCURO = '#a9390b';
-export const PAR_CONTRASTE = [NARANJA_OSCURO, MARCA.azul];
+export const PAR_CONTRASTE = [MARCA.naranja, MARCA.azul];
 
 /**
  * La paleta de las gráficas.
