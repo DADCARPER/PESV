@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import ApexCharts from 'apexcharts';
 import { ModelsInforme } from '../../interfaces/informe.interface';
+import { PALETA_GRAFICAS } from '../../data/colores-informe';
 
 /**
  * Convierte los repartos del informe en imágenes para el PDF.
@@ -23,10 +24,7 @@ export class InformeGraficasService {
   /** Ancho de captura. Al doble del que ocupa en el PDF, para que no pixele. */
   private static readonly ANCHO = 900;
 
-  private static readonly COLORES = [
-    '#f46c2d', '#202e48', '#f0a202', '#3d5a80', '#98c1d9',
-    '#ee6c4d', '#293241', '#c1a57b', '#6b9080', '#a4c3b2',
-  ];
+  private static readonly COLORES = PALETA_GRAFICAS;
 
   /**
    * Dibuja cada reparto que lleve gráfica y devuelve su imagen en base64.

@@ -4,6 +4,7 @@ import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { ModelsInforme } from '../../interfaces/informe.interface';
 import { InformeGraficasService } from './informe-graficas.service';
 import { recortarImagen } from '../../data/imagenes';
+import { MARCA } from '../../data/colores-informe';
 import { InformeImagenesService } from './informe-imagenes.service';
 
 (pdfMake as any).vfs = (pdfFonts as any).vfs ?? (pdfFonts as any).pdfMake?.vfs;
@@ -26,7 +27,10 @@ export class InformePdfService {
   private _imagenes = inject(InformeImagenesService);
 
   private static readonly NARANJA = '#f46c2d';
-  private static readonly AZUL = '#202e48';
+  // El azul pasa a ser el de la marca. Era #202e48, que a ojo es el mismo,
+  // pero tener dos casi iguales solo invita a que uno se quede atrás cuando
+  // el otro cambie.
+  private static readonly AZUL = MARCA.azul;
   private static readonly GRIS = '#e5e7eb';
 
   /** El gris muy claro de las filas pares. Marca sin llamar la atención. */
