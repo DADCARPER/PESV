@@ -49,8 +49,18 @@ export class EncuestasService {
     return snap.exists() ? snap.data() : null;
   }
 
+  /**
+   * Crea una encuesta en el catálogo.
+   *
+   * El `estado` se vuelve a escribir después a propósito. El CRUD compartido
+   * lo usa para el borrado lógico y pone "Activo" en todo lo que crea, con lo
+   * que una encuesta recién duplicada nacía en un estado que no es ninguno de
+   * los suyos: ni borrador ni publicada, y por tanto invisible para las
+   * empresas y sin forma de saber por qué.
+   */
   async crear(encuesta: Omit<ModelsEncuestas.Encuesta, 'id'>): Promise<void> {
-    await this._firestore.createDocument(COLECCION, { ...encuesta });
+    const id = await this._firestore.createDocumentDevolverId(COLECCION, { ...encuesta });
+    await this._firestore.updateDocument(`${COLECCION}/${id}`, { estado: encuesta.estado });
   }
 
   /**

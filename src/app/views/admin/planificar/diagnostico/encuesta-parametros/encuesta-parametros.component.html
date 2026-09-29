@@ -52,6 +52,14 @@
             Versión {{ copia.version }} · {{ preguntasActivas() }} preguntas activas
             · periodo {{ copia.periodo }}
           </p>
+          <!-- La fecha dice de un vistazo si la copia se rehizo o sigue siendo
+               la de antes, que es lo unico que distingue "no se guardo" de
+               "se guardo pero esta empresa aun no lo ha recogido". -->
+          @if (copia.fechaActivacion) {
+            <p class="mt-0.5 text-xs text-gray-400">
+              Copia tomada el {{ copia.fechaActivacion | date: 'dd/MM/yyyy, HH:mm' }}
+            </p>
+          }
         </div>
         <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold"
           [ngClass]="copia.mostrarEncuesta ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-200 text-gray-600'">
