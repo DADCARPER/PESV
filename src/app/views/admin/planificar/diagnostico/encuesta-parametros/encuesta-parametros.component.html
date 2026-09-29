@@ -85,7 +85,8 @@
             <p class="font-semibold text-amber-900">Hay una versión más reciente</p>
             <p class="mt-1 text-sm text-amber-800">
               Puedes seguir con la tuya: repetir el mismo cuestionario es lo que permite
-              comparar este año con el anterior. Cambia solo si la norma cambió.
+              comparar este año con el anterior. Cambia solo si la norma cambió, con el
+              selector del final de esta página.
             </p>
           </div>
         </div>
@@ -121,6 +122,42 @@
           </div>
         }
       </div>
+
+      <!-- ── Cambiar de cuestionario ───────────────────────────────────
+           Mientras no haya respuestas nada esta comprometido, asi que se
+           puede volver a elegir. Antes el selector solo existia cuando no
+           habia ninguna encuesta activa, de modo que quien activaba una por
+           error se quedaba con ella para el resto del periodo: el aviso de
+           mas arriba le decia que borrase las respuestas y al borrarlas no
+           habia adonde ir. -->
+      @if (editable && !fijada() && disponibles().length) {
+        <div class="mt-6 rounded-lg border border-dashed border-gray-300 p-5">
+          <p class="font-semibold text-gray-900">Cambiar de cuestionario</p>
+          <p class="mt-1 text-sm text-gray-500">
+            Todavía no hay respuestas, así que puedes elegir otro. Se guardará una
+            copia nueva y los módulos volverán a quedar todos activos. Elegir el
+            mismo vuelve a copiarlo, que es la forma de recoger una versión más
+            reciente.
+          </p>
+
+          <div class="mt-4 flex flex-wrap items-end gap-3">
+            <div class="min-w-64 flex-1">
+              <label class="mb-1 block text-xs font-bold uppercase text-gray-600">Cuestionario</label>
+              <select [value]="seleccionada()" (change)="seleccionada.set($any($event.target).value)"
+                class="w-full rounded border border-gray-300 px-3 py-2 text-sm">
+                @for (e of disponibles(); track e.id) {
+                  <option [value]="e.id">{{ e.nombre }} (v{{ e.version }})</option>
+                }
+              </select>
+            </div>
+            <button type="button" (click)="activar()"
+              [disabled]="guardando() || !seleccionada()"
+              class="rounded border border-amber-500 px-6 py-2 text-sm font-bold uppercase text-amber-700 transition-colors hover:bg-amber-50 disabled:opacity-50">
+              {{ guardando() ? 'Cambiando...' : 'Cambiar' }}
+            </button>
+          </div>
+        </div>
+      }
 
     } @else {
 
