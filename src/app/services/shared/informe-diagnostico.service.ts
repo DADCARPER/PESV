@@ -187,6 +187,23 @@ export class InformeDiagnosticoService {
       .sort((a, b) => (b.version ?? 0) - (a.version ?? 0));
   }
 
+  /**
+   * Los identificadores de las preguntas que el cuestionario llego a hacer.
+   *
+   * Es lo que distingue "se pregunto y nadie lo senalo" de "no se pregunto",
+   * que en un informe son cosas opuestas: lo primero es un hallazgo y lo
+   * segundo es un silencio.
+   *
+   * Sin esta distincion, retirar una pregunta no dejaba una grafica vacia:
+   * hacia que el informe afirmara la ausencia de algo que nunca se midio. Un
+   * cuestionario sin las preguntas de salud escribia "no se reportan
+   * condiciones de salud que comprometan la conduccion", que es una frase
+   * falsa y firmada.
+   */
+  private preguntadas(modulo: any): Set<string> {
+    return new Set(((modulo?.preguntas ?? []) as any[]).map(p => String(p.id)));
+  }
+
   // ── Secciones ─────────────────────────────────────────────────────────────
 
   /**
@@ -369,6 +386,7 @@ export class InformeDiagnosticoService {
 
     this.emparejarCondicionesLaborales(repartos, respuestas.length);
 
+    const sePreguntoGenero = preguntas.some(p => p.id === 'genero');
     const hombres = respuestas.filter(r => r['genero'] === 'Masculino').length;
     const mujeres = respuestas.filter(r => r['genero'] === 'Femenino').length;
     const base = respuestas.length || 1;
@@ -376,7 +394,9 @@ export class InformeDiagnosticoService {
     return {
       id: 'personas',
       titulo: 'Caracterización de la población',
-      texto: this.textoPoblacion(respuestas.length, hombres, mujeres, empresa),
+      texto: this.textoPoblacion(
+        respuestas.length, hombres, mujeres, empresa, sePreguntoGenero,
+      ),
       // La mitad de la plantilla no es un umbral estadistico, es un criterio
       // practico: por debajo de ahi, atribuir al conjunto lo que dice la
       // muestra empieza a ser dificil de sostener ante quien pregunte.
@@ -416,7 +436,8 @@ export class InformeDiagnosticoService {
     muestra: number,
     hombres: number,
     mujeres: number,
-    empresa: { nombre: string; poblacion: number; cobertura: number }
+    empresa: { nombre: string; poblacion: number; cobertura: number },
+    sePreguntoGenero: boolean,
   ): string {
     if (!muestra) return '';
 
@@ -437,10 +458,16 @@ export class InformeDiagnosticoService {
         ? `una predominancia masculina con ${hombres} hombres (${pctH}%) frente a ${mujeres} mujeres (${pctM}%)`
         : `una predominancia femenina con ${mujeres} mujeres (${pctM}%) frente a ${hombres} hombres (${pctH}%)`;
 
-    return `La encuesta de percepción del riesgo vial y movilidad fue diligenciada por los `
-      + `trabajadores directos de ${nombre}. La muestra obtenida fue de ${muestra} personas`
-      + `${cobertura}.` + '\n\n'
-      + `En la distribución por género se observa ${mayoria} de los ${muestra} encuestados.`;
+    const apertura = `La encuesta de percepción del riesgo vial y movilidad fue `
+      + `diligenciada por los trabajadores directos de ${nombre}. La muestra obtenida `
+      + `fue de ${muestra} personas${cobertura}.`;
+
+    // Sin la pregunta de genero los dos recuentos son cero, y hablar de un
+    // "reparto equilibrado" seria describir algo que no se midio.
+    return sePreguntoGenero
+      ? apertura + '\n\n'
+        + `En la distribución por género se observa ${mayoria} de los ${muestra} encuestados.`
+      : apertura;
   }
 
   /**
@@ -689,9 +716,11 @@ export class InformeDiagnosticoService {
 
       // Cada modulo tiene su lectura: que cifras importan y como se pintan.
       // Los que todavia no la tienen salen con el reparto simple de siempre.
-      if (modulo.id === 'modulo2') this.enriquecerSalud(seccion, respuestas.length);
+      const hechas = this.preguntadas(modulo);
+
+      if (modulo.id === 'modulo2') this.enriquecerSalud(seccion, respuestas.length, hechas);
       if (modulo.id === 'modulo3') this.enriquecerConduccion(seccion, modulo, respuestas);
-      if (modulo.id === 'modulo4') this.enriquecerDesplazamientos(seccion, respuestas);
+      if (modulo.id === 'modulo4') this.enriquecerDesplazamientos(seccion, respuestas, hechas);
       if (modulo.id === 'modulo5') this.enriquecerRiesgos(seccion, respuestas);
       if (modulo.id === 'modulo6') this.enriquecerMejora(seccion, respuestas);
 
@@ -708,7 +737,11 @@ export class InformeDiagnosticoService {
    * y las limitaciones fisicas reducen la capacidad de reaccion, y por eso la
    * Resolucion la mira dentro del diagnostico vial.
    */
-  private enriquecerSalud(seccion: ModelsInforme.Seccion, muestra: number): void {
+  private enriquecerSalud(
+    seccion: ModelsInforme.Seccion,
+    muestra: number,
+    hechas: Set<string>,
+  ): void {
     const buscar = (id: string) => seccion.repartos.find(r => r.id === id);
 
     const estado = buscar('estadoGeneral');
@@ -718,7 +751,12 @@ export class InformeDiagnosticoService {
     const incapacidades = buscar('incapacidades');
     const actividad = buscar('actividadFisica');
 
-    seccion.texto = this.textoSalud(muestra, { estado, limitacion, dolor });
+    seccion.texto = this.textoSalud(
+      muestra,
+      { estado, limitacion, dolor },
+      // Si no se pregunto por ninguna de las tres, no hay nada que afirmar.
+      ['estadoGeneral', 'limitacionFisica', 'dolorMolestia'].some(id => hechas.has(id)),
+    );
 
     // Cuatro categorias que son partes de un todo: se lee mejor en anillo.
     if (estado) {
@@ -800,6 +838,13 @@ export class InformeDiagnosticoService {
     respuestas: Record<string, any>[]
   ): void {
     const muestra = respuestas.length;
+
+    // Toda la lectura de este modulo cuelga de saber quien conduce. Si esa
+    // pregunta se retiro, el resto de cifras no tienen base sobre la que
+    // calcularse y cualquier frase seria inventada: se dejan los repartos
+    // simples, que siguen siendo ciertos.
+    if (!this.preguntadas(modulo).has('conduceVehiculos')) return;
+
     const conductores = respuestas.filter(
       r => /^s[ií]$/i.test(String(r['conduceVehiculos'] ?? '').trim())
     );
@@ -954,7 +999,8 @@ export class InformeDiagnosticoService {
    */
   private enriquecerDesplazamientos(
     seccion: ModelsInforme.Seccion,
-    respuestas: Record<string, any>[]
+    respuestas: Record<string, any>[],
+    hechas: Set<string>,
   ): void {
     const muestra = respuestas.length;
     const buscar = (id: string) => seccion.repartos.find(r => r.id === id);
@@ -1006,10 +1052,12 @@ export class InformeDiagnosticoService {
       realiza.texto = this.textoEnMision(enMision.length, muestra);
     }
 
-    seccion.texto = this.textoDesplazamientos(muestra, enMision.length, {
-      incidentes,
-      estado,
-    });
+    seccion.texto = this.textoDesplazamientos(
+      muestra,
+      enMision.length,
+      { incidentes, estado },
+      hechas.has('desplazamientosJornada'),
+    );
 
     // Sin nadie que se desplace en jornada no hay base sobre la que recalcular.
     if (!enMision.length) return;
@@ -1620,7 +1668,8 @@ export class InformeDiagnosticoService {
   private textoDesplazamientos(
     muestra: number,
     enMision: number,
-    r: { incidentes?: ModelsInforme.Reparto; estado?: ModelsInforme.Reparto }
+    r: { incidentes?: ModelsInforme.Reparto; estado?: ModelsInforme.Reparto },
+    sePreguntoPorLaJornada: boolean,
   ): string {
     if (!muestra) return '';
 
@@ -1631,9 +1680,13 @@ export class InformeDiagnosticoService {
       + 'de lleno dentro del alcance del PESV.',
     ];
 
-    partes.push(`De las ${muestra} personas encuestadas, ${enMision} `
-      + `(${this.pct(enMision, muestra)}%) se desplazan u operan algún vehículo durante `
-      + `la jornada laboral.`);
+    // Sin esa pregunta, `enMision` es cero porque nadie pudo contestarla, no
+    // porque nadie se desplace. Decirlo seria afirmar lo contrario del dato.
+    if (sePreguntoPorLaJornada) {
+      partes.push(`De las ${muestra} personas encuestadas, ${enMision} `
+        + `(${this.pct(enMision, muestra)}%) se desplazan u operan algún vehículo durante `
+        + `la jornada laboral.`);
+    }
 
     const hallazgos: string[] = [];
 
@@ -2001,7 +2054,8 @@ export class InformeDiagnosticoService {
   /** Resume el modulo entero, con las tres cifras que mas pesan. */
   private textoSalud(
     muestra: number,
-    r: { estado?: ModelsInforme.Reparto; limitacion?: ModelsInforme.Reparto; dolor?: ModelsInforme.Reparto }
+    r: { estado?: ModelsInforme.Reparto; limitacion?: ModelsInforme.Reparto; dolor?: ModelsInforme.Reparto },
+    seMidio: boolean,
   ): string {
     if (!muestra) return '';
 
@@ -2021,8 +2075,12 @@ export class InformeDiagnosticoService {
       + 'reducen la capacidad de reacción.';
 
     if (!hallazgos.length) {
-      return `${base} De las ${muestra} personas encuestadas no se reportan condiciones `
-        + `de salud que comprometan la conducción.`;
+      // La frase habla de lo que se pregunto, no de la salud en general: si el
+      // cuestionario no llevaba estas preguntas, callarse es lo unico honesto.
+      return seMidio
+        ? `${base} De las ${muestra} personas encuestadas, ninguna señaló las `
+          + `condiciones de salud por las que se preguntó.`
+        : base;
     }
 
     const listado = hallazgos.length > 1
