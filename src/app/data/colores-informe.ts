@@ -13,6 +13,20 @@ export const MARCA = {
 };
 
 /**
+ * Los dos colores con que se pintan las barras y las cifras destacadas.
+ *
+ * Se alternan: una barra de cada color. Con un solo color, seis columnas
+ * iguales se leen como un bloque; alternando, el ojo separa cada una sin que
+ * el color llegue a significar nada, que es lo correcto —aquí la categoría ya
+ * la dice la etiqueta, y un color por categoría sería ruido—.
+ *
+ * Van oscuros a propósito: son los que llevan el número encima y tienen que
+ * aguantar el contraste en papel.
+ */
+export const NARANJA_OSCURO = '#a9390b';
+export const PAR_CONTRASTE = [NARANJA_OSCURO, MARCA.azul];
+
+/**
  * La paleta de las gráficas.
  *
  * Son tres colores de marca y no dan para un anillo de ocho porciones, así

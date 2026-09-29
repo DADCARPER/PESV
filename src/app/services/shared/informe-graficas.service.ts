@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import ApexCharts from 'apexcharts';
 import { ModelsInforme } from '../../interfaces/informe.interface';
-import { PALETA_GRAFICAS } from '../../data/colores-informe';
+import { PALETA_GRAFICAS, PAR_CONTRASTE } from '../../data/colores-informe';
 
 /**
  * Convierte los repartos del informe en imágenes para el PDF.
@@ -113,13 +113,22 @@ export class InformeGraficasService {
         // crecen a lo ancho y no lo necesitan.
         height: horizontal ? 160 + reparto.filas.length * 46 : 420,
       },
+      // Los dos colores se alternan barra a barra. `distributed` es lo que
+      // hace que el color se aplique por dato y no por serie: sin él, las seis
+      // columnas saldrían del mismo color y se leerían como un bloque.
+      colors: PAR_CONTRASTE,
       series: [{ name: reparto.unidad || 'Personas', data: valores }],
       xaxis: {
         categories: etiquetas,
         labels: { style: { fontSize: '12px' }, trim: false },
       },
       plotOptions: {
-        bar: { horizontal, borderRadius: 3, dataLabels: { position: 'top' } },
+        bar: {
+          horizontal,
+          distributed: true,
+          borderRadius: 3,
+          dataLabels: { position: 'top' },
+        },
       },
       legend: { show: false },
     };

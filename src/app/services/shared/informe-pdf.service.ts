@@ -4,7 +4,7 @@ import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { ModelsInforme } from '../../interfaces/informe.interface';
 import { InformeGraficasService } from './informe-graficas.service';
 import { recortarImagen } from '../../data/imagenes';
-import { MARCA } from '../../data/colores-informe';
+import { MARCA, PAR_CONTRASTE } from '../../data/colores-informe';
 import { InformeImagenesService } from './informe-imagenes.service';
 
 (pdfMake as any).vfs = (pdfFonts as any).vfs ?? (pdfFonts as any).pdfMake?.vfs;
@@ -558,13 +558,16 @@ export class InformePdfService {
       table: {
         widths: destacados.map(() => '*'),
         body: [
-          destacados.map((d) => ({
+          // Se alternan los dos colores, como las barras. Todas del mismo
+          // naranja, las cifras de hombres y mujeres parecian dos partes de un
+          // mismo dato en vez de dos mitades que se comparan.
+          destacados.map((d, i) => ({
             text: [
               {
                 text: `${d.valor}\n`,
                 fontSize: 20,
                 bold: true,
-                color: InformePdfService.NARANJA,
+                color: PAR_CONTRASTE[i % PAR_CONTRASTE.length],
               },
               { text: `${d.etiqueta}\n`, fontSize: 9, color: '#555' },
               { text: `${d.porcentaje}%`, fontSize: 9, color: '#888' },
