@@ -78,15 +78,24 @@
         </div>
       }
 
-      @if (hayVersionNueva() && !fijada()) {
+      @if (hayCambios()) {
         <div class="mb-4 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
           <iconify-icon icon="hugeicons:alert-02" width="20" height="20" class="mt-0.5 shrink-0 text-amber-600"></iconify-icon>
           <div>
-            <p class="font-semibold text-amber-900">Hay una versión más reciente</p>
+            <p class="font-semibold text-amber-900">
+              El cuestionario del catálogo ha cambiado
+            </p>
             <p class="mt-1 text-sm text-amber-800">
-              Puedes seguir con la tuya: repetir el mismo cuestionario es lo que permite
-              comparar este año con el anterior. Cambia solo si la norma cambió, con el
-              selector del final de esta página.
+              Tu copia es la que se tomó el día que lo activaste y no cambia sola: es lo
+              que garantiza que nadie responda a unas preguntas y el informe hable de
+              otras.
+              @if (fijada()) {
+                Como ya tienes {{ respuestas() }} respuestas, se queda como está. Para
+                recoger los cambios habría que eliminarlas primero.
+              } @else {
+                Para recoger los cambios, vuelve a elegirlo en el selector del final de
+                esta página.
+              }
             </p>
           </div>
         </div>

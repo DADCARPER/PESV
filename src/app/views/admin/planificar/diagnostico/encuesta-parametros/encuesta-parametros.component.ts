@@ -64,13 +64,45 @@ export class EncuestaParametrosComponent implements OnInit {
    */
   readonly fijada = computed(() => this.respuestas() > 0);
 
-  /** Hay una versión más reciente de la encuesta que esta empresa activó. */
-  readonly hayVersionNueva = computed(() => {
+  /**
+   * El catálogo cambió después de que esta empresa se llevara su copia.
+   *
+   * Mira dos cosas y no una. La versión sube cuando el administrador duplica
+   * la encuesta, que era el camino previsto; pero también puede editar y
+   * publicar la misma sin tocar el número, y entonces la copia de la empresa
+   * se queda atrás en silencio. Comparar además la fecha de la última
+   * modificación del catálogo con la de activación recoge ese caso.
+   */
+  readonly hayCambios = computed(() => {
     const copia = this.activa();
     if (!copia) return false;
+
     const enCatalogo = this.disponibles().find(e => e.id === copia.encuestaId);
-    return !!enCatalogo && enCatalogo.version > copia.version;
+    if (!enCatalogo) return false;
+
+    if (enCatalogo.version > copia.version) return true;
+
+    const tocado = this.enMilisegundos(enCatalogo.docActualizado);
+    const copiado = copia.fechaActivacion ? Date.parse(copia.fechaActivacion) : 0;
+
+    return !!tocado && !!copiado && tocado > copiado;
   });
+
+  /**
+   * Una fecha de Firestore en milisegundos, venga como venga.
+   *
+   * Sale marca de tiempo del servidor, pero tras una escritura reciente puede
+   * llegar nula, y de un documento antiguo puede venir como texto. Sin esto,
+   * un `undefined` se compara como cero y el aviso no aparece nunca.
+   */
+  private enMilisegundos(valor: unknown): number {
+    if (!valor) return 0;
+    const marca = valor as { toMillis?: () => number; seconds?: number };
+    if (typeof marca.toMillis === 'function') return marca.toMillis();
+    if (typeof marca.seconds === 'number') return marca.seconds * 1000;
+    if (typeof valor === 'string') return Date.parse(valor) || 0;
+    return 0;
+  }
 
   async ngOnInit() {
     await this.cargar();
