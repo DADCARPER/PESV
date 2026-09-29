@@ -189,6 +189,65 @@ export class EncuestaParametrosComponent implements OnInit {
     }
   }
 
+  // ── Vista previa ──────────────────────────────────────────────────────
+
+  /**
+   * Enseña el cuestionario tal como lo verá quien responda.
+   *
+   * Hace falta porque el enlace público solo sirve con la encuesta abierta, y
+   * el momento en que uno quiere ver cómo va quedando es justo el anterior:
+   * mientras decide qué módulos deja puestos y todavía no la ha abierto.
+   *
+   * Se pinta desde la copia ya cargada, sin ir a ningún sitio ni exponer nada.
+   */
+  vistaPrevia = signal(false);
+
+  /** Los módulos que se van a preguntar, en el orden en que se preguntan. */
+  readonly modulosVisibles = computed(() =>
+    (this.activa()?.modulos ?? []).filter(m => this.estaActivo(m))
+  );
+
+  /**
+   * Con qué control se pinta cada pregunta.
+   *
+   * La vista previa no valida ni guarda nada, así que solo necesita saber si
+   * va como lista de opciones o como campo de escritura.
+   */
+  esDeOpciones(pregunta: ModelsEncuestas.Pregunta): boolean {
+    return pregunta.tipo === 'unica' || pregunta.tipo === 'multiple';
+  }
+
+  /** El texto del marcador de un campo, según lo que pida. */
+  marcador(pregunta: ModelsEncuestas.Pregunta): string {
+    switch (pregunta.tipo) {
+      case 'textoLargo': return 'Respuesta larga...';
+      case 'numero': return '0';
+      case 'fecha': return 'dd/mm/aaaa';
+      case 'email': return 'nombre@empresa.com';
+      case 'telefono': return '300 000 0000';
+      default: return 'Respuesta corta...';
+    }
+  }
+
+  /**
+   * Qué hace falta contestar antes para que aparezca esta pregunta.
+   *
+   * Se enseña porque en la vista previa salen todas seguidas, y sin la
+   * aclaración parece que se le van a preguntar cosas a quien nunca las verá:
+   * a alguien que no conduce no se le pide la licencia.
+   */
+  condicionDe(pregunta: ModelsEncuestas.Pregunta): string {
+    const condicion = pregunta.condicion;
+    if (!condicion) return '';
+
+    const dueña = (this.activa()?.modulos ?? [])
+      .flatMap(m => m.preguntas)
+      .find(p => p.id === condicion.pregunta);
+
+    const enunciado = dueña?.etiqueta ?? condicion.pregunta;
+    return `Solo si en "${enunciado}" responde: ${condicion.valores.join(' o ')}`;
+  }
+
   /** Cuántas preguntas se van a hacer de verdad, contando solo lo activo. */
   preguntasActivas(): number {
     const copia = this.activa();
