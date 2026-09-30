@@ -353,6 +353,17 @@ export const ENCUESTA_PESV_BASE: Omit<ModelsEncuestas.Encuesta, 'id'> = {
           mapaColaborador: 'estadoPagoInfracciones',
         },
         {
+          id: 'accidenteUltimoAno',
+          etiqueta: '¿Ha tenido accidentes de tránsito en el último año?',
+          tipo: 'unica',
+          obligatoria: false,
+          opciones: [
+            { valor: 'Sí', etiqueta: 'Sí' },
+            { valor: 'No', etiqueta: 'No' },
+          ],
+          condicion: { pregunta: 'conduceVehiculos', valores: ['Sí'] },
+        },
+        {
           id: 'accidenteEnJornada',
           etiqueta: '¿El accidente ha ocurrido durante la jornada laboral?',
           tipo: 'unica',
@@ -361,7 +372,7 @@ export const ENCUESTA_PESV_BASE: Omit<ModelsEncuestas.Encuesta, 'id'> = {
             { valor: 'Sí', etiqueta: 'Sí' },
             { valor: 'No', etiqueta: 'No' },
           ],
-          condicion: { pregunta: 'infraccionesTransito', valores: ['Sí'] },
+          condicion: { pregunta: 'accidenteUltimoAno', valores: ['Sí'] },
         },
         {
           id: 'experienciaConduccion',
@@ -374,17 +385,6 @@ export const ENCUESTA_PESV_BASE: Omit<ModelsEncuestas.Encuesta, 'id'> = {
             { valor: '4 a 10 años', etiqueta: '4 a 10 años' },
             { valor: 'Más de 10 años', etiqueta: 'Más de 10 años' },
             { valor: 'No aplica', etiqueta: 'No aplica' },
-          ],
-          condicion: { pregunta: 'conduceVehiculos', valores: ['Sí'] },
-        },
-        {
-          id: 'accidenteUltimoAno',
-          etiqueta: '¿Ha tenido accidentes de tránsito en el último año?',
-          tipo: 'unica',
-          obligatoria: false,
-          opciones: [
-            { valor: 'Sí', etiqueta: 'Sí' },
-            { valor: 'No', etiqueta: 'No' },
           ],
           condicion: { pregunta: 'conduceVehiculos', valores: ['Sí'] },
         },
