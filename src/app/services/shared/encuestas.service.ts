@@ -59,8 +59,17 @@ export class EncuestasService {
    * empresas y sin forma de saber por qué.
    */
   async crear(encuesta: Omit<ModelsEncuestas.Encuesta, 'id'>): Promise<void> {
-    const id = await this._firestore.createDocumentDevolverId(COLECCION, { ...encuesta });
-    await this._firestore.updateDocument(`${COLECCION}/${id}`, { estado: encuesta.estado });
+    // Pese a su nombre, `createDocumentDevolverId` devuelve el documento
+    // entero y no el identificador: este sale de su campo `id`.
+    const creado = await this._firestore.createDocumentDevolverId(
+      COLECCION,
+      { ...encuesta },
+    );
+
+    await this._firestore.updateDocument(
+      `${COLECCION}/${creado.id}`,
+      { estado: encuesta.estado },
+    );
   }
 
   /**
