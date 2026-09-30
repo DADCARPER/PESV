@@ -6,6 +6,11 @@ import { Router, RouterLink } from '@angular/router';
 import { EncuestasService } from '../../../../services/shared/encuestas.service';
 import { AuthenticacionService } from '../../../../services/shared/authenticacion.service';
 import { ModelsEncuestas } from '../../../../interfaces/encuestas.interface';
+import {
+  ANALISIS_POR_PREGUNTA,
+  MODULOS_NUCLEO,
+  PREGUNTAS_BASE,
+} from '../../../../data/analisis-encuesta';
 import { RUTA_LOGIN } from '../../../../guards/auth.guard';
 
 /** Cómo se llama cada tipo de pregunta en la interfaz. */
@@ -265,6 +270,66 @@ export class GestorEncuestasComponent implements OnInit {
       tipo: 'texto',
       obligatoria: false,
     }];
+  }
+
+  /**
+   * Un módulo de la Resolución, que no se puede borrar.
+   *
+   * Se reconocen por su identificador y no por una marca guardada, para que
+   * las encuestas que ya están en Firestore queden protegidas sin migrar
+   * nada: una duplicada conserva los mismos identificadores, y con ellos la
+   * protección.
+   */
+  esNucleo(modulo: ModelsEncuestas.Modulo): boolean {
+    return MODULOS_NUCLEO.includes(modulo.id);
+  }
+
+  /** La pregunta que se está a punto de retirar, mientras se confirma. */
+  retirando = signal<ModelsEncuestas.Pregunta | null>(null);
+
+  /**
+   * Qué deja de escribir el informe si esta pregunta se retira.
+   *
+   * Vacío cuando no cuelga ningún análisis de ella: entonces retirarla solo
+   * quita una gráfica y no hay nada que advertir.
+   */
+  analisisQueApaga(pregunta: ModelsEncuestas.Pregunta): string {
+    return ANALISIS_POR_PREGUNTA[pregunta.id] ?? '';
+  }
+
+  /** Aviso mayor: de esta pregunta cuelga la lectura entera de su módulo. */
+  esPreguntaBase(pregunta: ModelsEncuestas.Pregunta): string {
+    return PREGUNTAS_BASE[pregunta.id] ?? '';
+  }
+
+  /** Qué alimenta esta pregunta fuera del informe. */
+  alimentaColaboradores(pregunta: ModelsEncuestas.Pregunta): boolean {
+    return !!pregunta.mapaColaborador;
+  }
+
+  /**
+   * Pide confirmación solo cuando hay algo que advertir.
+   *
+   * Preguntar siempre entrena a decir que sí sin leer, y entonces el aviso
+   * deja de servir justo el día que importa.
+   */
+  pedirRetiro(pregunta: ModelsEncuestas.Pregunta) {
+    const hayQueAvisar = this.analisisQueApaga(pregunta)
+      || this.esPreguntaBase(pregunta)
+      || this.alimentaColaboradores(pregunta);
+
+    if (hayQueAvisar) {
+      this.retirando.set(pregunta);
+      return;
+    }
+
+    this.retirarPregunta(pregunta);
+  }
+
+  confirmarRetiro() {
+    const pregunta = this.retirando();
+    if (pregunta) this.retirarPregunta(pregunta);
+    this.retirando.set(null);
   }
 
   /**

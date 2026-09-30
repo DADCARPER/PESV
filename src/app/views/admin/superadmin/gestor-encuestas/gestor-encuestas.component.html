@@ -152,8 +152,15 @@
               </button>
 
               @if (!modulo.fijo) {
-                <button type="button" (click)="quitarModulo(iModulo)"
-                  class="text-xs font-semibold text-red-600 hover:underline">Eliminar módulo</button>
+                @if (esNucleo(modulo)) {
+                  <span class="text-xs font-semibold text-gray-400"
+                    title="Es uno de los módulos de la Resolución: sus preguntas se pueden retirar, pero el módulo no se borra">
+                    Módulo de la Resolución
+                  </span>
+                } @else {
+                  <button type="button" (click)="quitarModulo(iModulo)"
+                    class="text-xs font-semibold text-red-600 hover:underline">Eliminar módulo</button>
+                }
               }
             </div>
 
@@ -184,7 +191,7 @@
                           title="Subir" class="rounded px-2 py-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700">↑</button>
                         <button type="button" (click)="moverPregunta(modulo, pregunta, 1)"
                           title="Bajar" class="rounded px-2 py-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700">↓</button>
-                        <button type="button" (click)="retirarPregunta(pregunta)"
+                        <button type="button" (click)="pedirRetiro(pregunta)"
                           title="Retirar: deja de preguntarse, pero su identificador queda reservado"
                           class="rounded px-2 py-1 text-xs font-semibold text-red-500 hover:bg-red-50 hover:text-red-700">
                           Retirar
@@ -380,6 +387,63 @@
     }
   </div>
 </div>
+
+<!-- ── Confirmar el retiro de una pregunta ───────────────────────────────
+     Solo aparece cuando hay algo que advertir. Preguntar siempre entrena a
+     decir que si sin leer, y entonces el aviso deja de servir justo el dia
+     que importa. -->
+@if (retirando(); as pregunta) {
+  <div (click)="retirando.set(null)" class="fixed inset-0 z-40 bg-black opacity-25"></div>
+
+  <div class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden outline-none focus:outline-none">
+    <div (click)="$event.stopPropagation()" class="relative mx-auto my-6 w-full max-w-lg rounded-lg bg-white shadow-lg">
+
+      <div class="border-b p-5">
+        <h3 class="text-xl font-semibold text-gray-900">Retirar esta pregunta</h3>
+        <p class="mt-1 truncate text-sm text-gray-500">{{ pregunta.etiqueta }}</p>
+      </div>
+
+      <div class="p-6">
+        @if (esPreguntaBase(pregunta); as aviso) {
+          <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
+            <p class="text-sm font-semibold text-red-900">De esta pregunta cuelga el módulo entero</p>
+            <p class="mt-1 text-sm leading-relaxed text-red-800">{{ aviso }}</p>
+          </div>
+        }
+
+        @if (analisisQueApaga(pregunta); as apaga) {
+          <p class="text-sm leading-relaxed text-gray-700">
+            Al retirarla, el informe dejará de escribir <strong>{{ apaga }}</strong>.
+          </p>
+        }
+
+        @if (alimentaColaboradores(pregunta)) {
+          <p class="mt-3 text-sm leading-relaxed text-gray-700">
+            También desaparecerá su columna de la <strong>Lista de Colaboradores</strong>,
+            que se arma con las preguntas de este módulo.
+          </p>
+        }
+
+        <p class="mt-4 rounded-lg border border-sky-200 bg-sky-50 p-3 text-xs text-sky-800">
+          Las respuestas ya recogidas no se tocan y el identificador queda reservado, así
+          que nadie podrá reutilizarlo. Puedes volver a preguntarla cuando quieras.
+        </p>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 border-t p-5">
+        <button type="button" (click)="retirando.set(null)"
+          class="px-4 py-2 text-sm font-bold uppercase text-gray-500 hover:text-gray-800">
+          Cancelar
+        </button>
+        <button type="button" (click)="confirmarRetiro()"
+          class="rounded bg-red-600 px-6 py-2 text-sm font-bold uppercase text-white shadow transition-colors hover:bg-red-700">
+          Retirar
+        </button>
+      </div>
+
+    </div>
+  </div>
+}
 
 <!-- ── Vista previa del cuestionario ───────────────────────────────────────
      Lo que verá quien responda, sin poder responder. Sale de lo que hay en el
