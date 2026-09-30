@@ -362,6 +362,7 @@ export const ENCUESTA_PESV_BASE: Omit<ModelsEncuestas.Encuesta, 'id'> = {
             { valor: 'No', etiqueta: 'No' },
           ],
           condicion: { pregunta: 'conduceVehiculos', valores: ['Sí'] },
+          mapaColaborador: 'haTenidoSiniestros',
         },
         {
           id: 'accidenteEnJornada',
@@ -371,6 +372,20 @@ export const ENCUESTA_PESV_BASE: Omit<ModelsEncuestas.Encuesta, 'id'> = {
           opciones: [
             { valor: 'Sí', etiqueta: 'Sí' },
             { valor: 'No', etiqueta: 'No' },
+          ],
+          condicion: { pregunta: 'accidenteUltimoAno', valores: ['Sí'] },
+        },
+        {
+          id: 'accidenteTransito',
+          etiqueta: '¿Qué consecuencias tuvo el accidente?',
+          ayuda: 'Si tuvo varias, señale la más grave: así se clasifica un '
+            + 'siniestro en las estadísticas de seguridad vial.',
+          tipo: 'unica',
+          obligatoria: false,
+          opciones: [
+            { valor: 'Solo daños materiales', etiqueta: 'Solo daños materiales' },
+            { valor: 'Con personas lesionadas', etiqueta: 'Con personas lesionadas' },
+            { valor: 'Con personas fallecidas', etiqueta: 'Con personas fallecidas' },
           ],
           condicion: { pregunta: 'accidenteUltimoAno', valores: ['Sí'] },
         },
@@ -387,20 +402,6 @@ export const ENCUESTA_PESV_BASE: Omit<ModelsEncuestas.Encuesta, 'id'> = {
             { valor: 'No aplica', etiqueta: 'No aplica' },
           ],
           condicion: { pregunta: 'conduceVehiculos', valores: ['Sí'] },
-        },
-        {
-          id: 'accidenteTransito',
-          etiqueta: '¿Ha estado involucrado en un accidente de tránsito en el último año?',
-          tipo: 'unica',
-          obligatoria: false,
-          opciones: [
-            { valor: 'No', etiqueta: 'No' },
-            { valor: 'Sí con lesionados', etiqueta: 'Sí con lesionados' },
-            { valor: 'Sí con personas fallecidas', etiqueta: 'Sí con personas fallecidas' },
-            { valor: 'Sí con daños materiales', etiqueta: 'Sí con daños materiales' },
-          ],
-          condicion: { pregunta: 'conduceVehiculos', valores: ['Sí'] },
-          mapaColaborador: 'haTenidoSiniestros',
         },
         {
           id: 'conocimientoNormas',

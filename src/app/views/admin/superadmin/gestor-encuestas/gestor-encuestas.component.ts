@@ -287,6 +287,15 @@ export class GestorEncuestasComponent implements OnInit {
   /** La pregunta que se está a punto de retirar, mientras se confirma. */
   retirando = signal<ModelsEncuestas.Pregunta | null>(null);
 
+  /** De qué módulo es, para saber qué más alimenta. */
+  moduloEnRetiro: ModelsEncuestas.Modulo | null = null;
+
+  /** Si lo que se va a retirar es columna de la Lista de Colaboradores. */
+  retiroTocaColaboradores(pregunta: ModelsEncuestas.Pregunta): boolean {
+    return !!this.moduloEnRetiro
+      && this.alimentaColaboradores(this.moduloEnRetiro, pregunta);
+  }
+
   /**
    * Qué deja de escribir el informe si esta pregunta se retira.
    *
@@ -302,9 +311,19 @@ export class GestorEncuestasComponent implements OnInit {
     return PREGUNTAS_BASE[pregunta.id] ?? '';
   }
 
-  /** Qué alimenta esta pregunta fuera del informe. */
-  alimentaColaboradores(pregunta: ModelsEncuestas.Pregunta): boolean {
-    return !!pregunta.mapaColaborador;
+  /**
+   * La pregunta alimenta una columna de la Lista de Colaboradores.
+   *
+   * Solo las del módulo fijo: esa lista se arma con las preguntas de
+   * información personal y laboral. Otras preguntas llevan `mapaColaborador`
+   * declarado, pero hoy nada lo consume, así que avisar de una columna que no
+   * existe seria peor que no avisar.
+   */
+  alimentaColaboradores(
+    modulo: ModelsEncuestas.Modulo,
+    pregunta: ModelsEncuestas.Pregunta,
+  ): boolean {
+    return !!modulo.fijo && !!pregunta.mapaColaborador;
   }
 
   /**
@@ -313,10 +332,12 @@ export class GestorEncuestasComponent implements OnInit {
    * Preguntar siempre entrena a decir que sí sin leer, y entonces el aviso
    * deja de servir justo el día que importa.
    */
-  pedirRetiro(pregunta: ModelsEncuestas.Pregunta) {
+  pedirRetiro(modulo: ModelsEncuestas.Modulo, pregunta: ModelsEncuestas.Pregunta) {
+    this.moduloEnRetiro = modulo;
+
     const hayQueAvisar = this.analisisQueApaga(pregunta)
       || this.esPreguntaBase(pregunta)
-      || this.alimentaColaboradores(pregunta);
+      || this.alimentaColaboradores(modulo, pregunta);
 
     if (hayQueAvisar) {
       this.retirando.set(pregunta);
