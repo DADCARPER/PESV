@@ -404,14 +404,23 @@ export const ENCUESTA_PESV_BASE: Omit<ModelsEncuestas.Encuesta, 'id'> = {
           condicion: { pregunta: 'conduceVehiculos', valores: ['Sí'] },
         },
         {
+          /**
+           * Retirada. Se guarda por su identificador, que no se reutiliza.
+           *
+           * Preguntaba dos cosas a la vez —conocer y aplicar— y la encuesta es
+           * nominal: nadie firma con su nombre y su cedula que no aplica las
+           * normas de transito. Todo el mundo respondia "Si, completamente", y
+           * con eso el diagnostico no podia decir nada.
+           */
           id: 'conocimientoNormas',
           etiqueta: '¿Conoce y aplica las normas de tránsito vigentes?',
           tipo: 'unica',
           obligatoria: false,
+          retirada: true,
           opciones: [
             { valor: 'No', etiqueta: 'No' },
-            { valor: 'Sí, en parte', etiqueta: 'Sí, en parte' },
-            { valor: 'Sí, completamente', etiqueta: 'Sí, completamente' },
+            { valor: 'Sí en parte', etiqueta: 'Sí en parte' },
+            { valor: 'Sí completamente', etiqueta: 'Sí completamente' },
           ],
           condicion: { pregunta: 'conduceVehiculos', valores: ['Sí'] },
         },
