@@ -134,11 +134,24 @@ export class EncuestaVistaComponent implements OnInit {
     this.formulario = this.fb.group(controles);
   }
 
-  /** La pregunta se muestra: no tiene condición, o la condición se cumple. */
+  /**
+   * La pregunta se muestra: no tiene condición, o la condición se cumple.
+   *
+   * La pregunta de la que depende puede ser de varias opciones, y entonces su
+   * valor no es una cadena sino una lista. Comparar la lista entera contra los
+   * valores esperados no acierta nunca, así que una condición apoyada en una
+   * pregunta de ese tipo dejaba la dependiente oculta para siempre, sin que
+   * nada avisara.
+   */
   visible(pregunta: ModelsEncuestas.Pregunta): boolean {
-    if (!pregunta.condicion) return true;
-    const valor = this.formulario.get(pregunta.condicion.pregunta)?.value;
-    return pregunta.condicion.valores.includes(valor);
+    const condicion = pregunta.condicion;
+    if (!condicion) return true;
+
+    const valor = this.formulario.get(condicion.pregunta)?.value;
+
+    return Array.isArray(valor)
+      ? valor.some((v) => condicion.valores.includes(v))
+      : condicion.valores.includes(valor);
   }
 
   arrayDe(pregunta: ModelsEncuestas.Pregunta): FormArray {

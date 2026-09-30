@@ -38,7 +38,7 @@ export const ENCUESTA_PESV_BASE: Omit<ModelsEncuestas.Encuesta, 'id'> = {
         },
         {
           id: 'genero',
-          etiqueta: 'Genero',
+          etiqueta: 'Sexo',
           tipo: 'unica',
           obligatoria: false,
           opciones: [
@@ -297,7 +297,6 @@ export const ENCUESTA_PESV_BASE: Omit<ModelsEncuestas.Encuesta, 'id'> = {
           opciones: [
             { valor: 'No', etiqueta: 'No' },
             { valor: 'Sí', etiqueta: 'Sí' },
-            { valor: 'No aplica', etiqueta: 'No aplica' },
           ],
           condicion: { pregunta: 'conduceVehiculos', valores: ['Sí'] },
           mapaColaborador: 'tieneLicencia',
@@ -325,7 +324,7 @@ export const ENCUESTA_PESV_BASE: Omit<ModelsEncuestas.Encuesta, 'id'> = {
           etiqueta: 'Vigencia de la licencia',
           tipo: 'fecha',
           obligatoria: false,
-          condicion: { pregunta: 'conduceVehiculos', valores: ['Sí'] },
+          condicion: { pregunta: 'licenciaConduccion', valores: ['Sí'] },
           mapaColaborador: 'vigenciaLicencia',
         },
         {
@@ -350,7 +349,7 @@ export const ENCUESTA_PESV_BASE: Omit<ModelsEncuestas.Encuesta, 'id'> = {
             { valor: 'Acuerdo de pago', etiqueta: 'Acuerdo de pago' },
             { valor: 'No gestionada', etiqueta: 'No gestionada' },
           ],
-          condicion: { pregunta: 'conduceVehiculos', valores: ['Sí'] },
+          condicion: { pregunta: 'infraccionesTransito', valores: ['Sí'] },
           mapaColaborador: 'estadoPagoInfracciones',
         },
         {
@@ -362,7 +361,7 @@ export const ENCUESTA_PESV_BASE: Omit<ModelsEncuestas.Encuesta, 'id'> = {
             { valor: 'Sí', etiqueta: 'Sí' },
             { valor: 'No', etiqueta: 'No' },
           ],
-          condicion: { pregunta: 'conduceVehiculos', valores: ['Sí'] },
+          condicion: { pregunta: 'infraccionesTransito', valores: ['Sí'] },
         },
         {
           id: 'experienciaConduccion',
