@@ -302,6 +302,14 @@ export const ENCUESTA_PESV_BASE: Omit<ModelsEncuestas.Encuesta, 'id'> = {
           mapaColaborador: 'tieneLicencia',
         },
         {
+          id: 'vigenciaLicencia',
+          etiqueta: 'Vigencia de la licencia',
+          tipo: 'fecha',
+          obligatoria: false,
+          condicion: { pregunta: 'licenciaConduccion', valores: ['Sí'] },
+          mapaColaborador: 'vigenciaLicencia',
+        },
+        {
           id: 'categoriaLicencia',
           etiqueta: '¿En qué categoría está su licencia?',
           tipo: 'multiple',
@@ -318,14 +326,6 @@ export const ENCUESTA_PESV_BASE: Omit<ModelsEncuestas.Encuesta, 'id'> = {
             { valor: 'No tiene licencia', etiqueta: 'No tiene licencia' },
           ],
           condicion: { pregunta: 'conduceVehiculos', valores: ['Sí'] },
-        },
-        {
-          id: 'vigenciaLicencia',
-          etiqueta: 'Vigencia de la licencia',
-          tipo: 'fecha',
-          obligatoria: false,
-          condicion: { pregunta: 'licenciaConduccion', valores: ['Sí'] },
-          mapaColaborador: 'vigenciaLicencia',
         },
         {
           id: 'infraccionesTransito',
