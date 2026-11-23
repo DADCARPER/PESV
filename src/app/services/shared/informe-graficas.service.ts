@@ -24,6 +24,9 @@ export class InformeGraficasService {
   /** Ancho de captura. Al doble del que ocupa en el PDF, para que no pixele. */
   private static readonly ANCHO = 900;
 
+  /** Cuántos píxeles de imagen por píxel de gráfica. */
+  private static readonly ESCALA = 3;
+
   private static readonly COLORES = PALETA_GRAFICAS;
 
   /**
@@ -69,7 +72,13 @@ export class InformeGraficasService {
 
     try {
       await grafica.render();
-      const { imgURI } = await grafica.dataURI() as { imgURI: string };
+      // A escala 1 la imagen sale con los píxeles justos de pantalla, y en el
+      // PDF se encoge a la mitad: el texto quedaba a unos seis puntos con poca
+      // resolución, que es lo que se veía borroso. Al triple aguanta la
+      // impresión.
+      const { imgURI } = await grafica.dataURI({
+        scale: InformeGraficasService.ESCALA,
+      }) as { imgURI: string };
       return imgURI;
     } finally {
       grafica.destroy();
@@ -85,7 +94,11 @@ export class InformeGraficasService {
       chart: {
         width: InformeGraficasService.ANCHO,
         animations: { enabled: false },
-        toolbar: { show: false },
+        // La escala tiene que ir también aquí. `dataURI({ scale })` agranda el
+        // lienzo, pero el dibujo solo lo agranda si la lee de esta opción:
+        // con una sola de las dos, la gráfica sale a su tamaño en una esquina
+        // de un lienzo tres veces mayor, y en el PDF se ve diminuta.
+        toolbar: { show: false, export: { scale: InformeGraficasService.ESCALA } },
         fontFamily: 'Helvetica, Arial, sans-serif',
       },
       colors: InformeGraficasService.COLORES,
@@ -122,12 +135,23 @@ export class InformeGraficasService {
         categories: etiquetas,
         labels: { style: { fontSize: '12px' }, trim: false },
       },
+      // En las horizontales, las etiquetas del eje son los nombres de las
+      // categorías: se leen en el PDF a la mitad de tamaño y necesitan más.
+      ...(horizontal && {
+        yaxis: { labels: { style: { fontSize: '14px' }, maxWidth: 320 } },
+      }),
+      // El número va en blanco y dentro de la barra. En la punta ('top') la
+      // horizontal lo dejaba sobre el borde o fuera, blanco sobre blanco.
+      dataLabels: {
+        enabled: true,
+        style: { colors: ['#fff'], fontSize: horizontal ? '15px' : '13px', fontWeight: 700 },
+      },
       plotOptions: {
         bar: {
           horizontal,
           distributed: true,
           borderRadius: 3,
-          dataLabels: { position: 'top' },
+          dataLabels: { position: horizontal ? 'center' : 'top' },
         },
       },
       legend: { show: false },

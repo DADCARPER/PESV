@@ -109,6 +109,21 @@ export class InformeImagenesService {
    */
   private static readonly SANGRADO = 12;
 
+  /**
+   * Lo que la imagen se queda por encima del borde exacto del hueco.
+   *
+   * Sin esto, la imagen se colocaba para ocupar el hueco al punto, y pdfMake
+   * solo la deja en la página si `disponible >= alto`. Los dos números
+   * deberían ser iguales, pero salen de cuentas distintas con decimales: el
+   * hueco se reconstruye de una proporción y el alto de una regla de tres. Si
+   * el redondeo caía del lado malo, la imagen "no cabía" por una millonésima
+   * de punto y saltaba a la página siguiente con todo su margen encima. Por
+   * eso unas entraban y otras no, sin patrón aparente.
+   *
+   * Dos puntos no se ven y absorben cualquier redondeo.
+   */
+  private static readonly HOLGURA = 2;
+
   /** Cómo se pinta una imagen de relleno, al pie de la página. */
   bloque(relleno: Relleno, hueco: number): any {
     return {
@@ -120,7 +135,7 @@ export class InformeImagenesService {
         -50,
         // El superior la empuja hasta abajo del todo: el hueco se nota al pie
         // de la página, y es ahí donde una imagen la cierra.
-        Math.max(0, hueco - relleno.alto),
+        Math.max(0, hueco - relleno.alto - InformeImagenesService.HOLGURA),
         -50,
         // El inferior la deja bajar por debajo del área de texto. Como el
         // alto que consume es menor que el hueco medido, sigue cabiendo.
@@ -165,7 +180,9 @@ export class InformeImagenesService {
       datos,
       // Lo que importa no son los píxeles sino la proporción: la imagen se
       // pinta siempre a lo ancho de la hoja, y el alto sale de ahí.
-      alto: (medida.alto / medida.ancho) * InformeImagenesService.ANCHO_HOJA,
+      // En el mismo orden que pdfMake (DocMeasure.measureImage), para que los
+      // dos lleguen al mismo número y no a dos que difieren en el decimal.
+      alto: medida.alto * InformeImagenesService.ANCHO_HOJA / medida.ancho,
     };
   }
 

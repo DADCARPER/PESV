@@ -97,6 +97,9 @@ export class InformeDiagnosticoComponent {
         this._informe.reunir(),
         this.cargarHistorial(),
       ]);
+      // Por defecto va lo que tiene datos. Una sección vacía se puede marcar
+      // igual, pero quien la quiera en el documento tiene que pedirla.
+      for (const s of datos.secciones) s.incluir = !s.sinDatos;
       this.datos.set(datos);
     } catch (error: unknown) {
       console.error('[InformeDiagnostico] reunir:', error);
@@ -151,14 +154,36 @@ export class InformeDiagnosticoComponent {
    * el informe cambia de orden.
    */
   private ubicacionDelResponsable() {
+    return this.ubicacionDe('responsable');
+  }
+
+  /** Dónde está un dato de identificación, buscado por su clave. */
+  private ubicacionDe(clave: 'razonSocial' | 'nit' | 'responsable') {
     const secciones = this.datos()?.secciones ?? [];
 
     for (let i = 0; i < secciones.length; i++) {
-      const dato = secciones[i].identificacion?.find(d => d.editable);
+      const dato = secciones[i].identificacion?.find(d => d.clave === clave);
       if (dato) return { indice: i, dato };
     }
 
     return null;
+  }
+
+  /**
+   * El NIT tal como sale en el documento.
+   *
+   * Es solo lo que se imprime. El informe se sigue guardando bajo el NIT de
+   * la empresa, que es el que lo encuentra en el historial.
+   */
+  nitDelInforme(): string {
+    const escrito = (this.ubicacionDe('nit')?.dato.valor ?? '').trim();
+    return escrito || this.datos()?.nitEmpresa || '';
+  }
+
+  /** La razón social tal como sale en el documento. Igual que el NIT. */
+  nombreDelInforme(): string {
+    const escrito = (this.ubicacionDe('razonSocial')?.dato.valor ?? '').trim();
+    return escrito || this.datos()?.nombreEmpresa || '';
   }
 
   /** Quién firma el informe: el dato que el asistente propone y deja cambiar. */
@@ -184,9 +209,28 @@ export class InformeDiagnosticoComponent {
       return;
     }
 
+    const incluidas = datos.secciones.filter(s => s.incluir !== false);
+    if (!incluidas.length) {
+      this._alerta.showWarning('Marca al menos una sección para incluir en el informe.');
+      return;
+    }
+
     this.emitiendo.set(true);
     try {
-      await this._informe.emitir(datos, firma);
+      // Se guarda solo lo que va en el documento: el informe emitido es la
+      // copia de lo que se presentó, y lo desmarcado no se presentó.
+      // El NIT y la razón social editados pasan a la portada y a la cabecera.
+      // La ruta donde se guarda no los usa: sale del NIT de la empresa en
+      // sesión.
+      await this._informe.emitir(
+        {
+          ...datos,
+          nitEmpresa: this.nitDelInforme(),
+          nombreEmpresa: this.nombreDelInforme(),
+          secciones: incluidas,
+        },
+        firma,
+      );
       await this.cargarHistorial();
       this.asistente.set(false);
       this._alerta.showSuccess('Informe emitido. El anterior queda archivado.');
@@ -277,16 +321,28 @@ export class InformeDiagnosticoComponent {
     return this.derivadosDe(reparto).valores;
   }
 
-  /** Secciones sin ningún dato: lo que habría que llenar antes de emitir. */
+  /** Secciones que van en el informe. */
+  private incluidas(): ModelsInforme.Seccion[] {
+    return (this.datos()?.secciones ?? []).filter(s => s.incluir !== false);
+  }
+
+  /** Secciones marcadas para el informe pero sin datos: saldrían vacías. */
   seccionesVacias(): string[] {
-    return (this.datos()?.secciones ?? [])
+    return this.incluidas()
       .filter(s => s.sinDatos)
       .map(s => s.titulo);
   }
 
-  /** Cifras marcadas como alerta en todo el informe, para verlas juntas. */
+  /** Secciones que quien emite dejó fuera del informe. */
+  seccionesExcluidas(): string[] {
+    return (this.datos()?.secciones ?? [])
+      .filter(s => s.incluir === false)
+      .map(s => s.titulo);
+  }
+
+  /** Cifras marcadas como alerta en el informe, para verlas juntas. */
   alertas(): { seccion: string; cifra: ModelsInforme.Cifra }[] {
-    return (this.datos()?.secciones ?? []).flatMap(s =>
+    return this.incluidas().flatMap(s =>
       s.cifras.filter(c => c.alerta).map(cifra => ({ seccion: s.titulo, cifra }))
     );
   }

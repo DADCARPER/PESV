@@ -137,6 +137,15 @@ export namespace ModelsInforme {
     /** Vacía cuando la sección no tiene datos que mostrar. */
     sinDatos?: boolean;
     /**
+     * Si la sección va en el informe. Lo decide quien emite.
+     *
+     * No todas las empresas tienen flota, contratistas o rutas, y una sección
+     * que existe solo para decir "no hay datos" estorba más que informa.
+     * Ausente cuenta como incluida: los informes emitidos antes de que
+     * existiera este campo salen como salían.
+     */
+    incluir?: boolean;
+    /**
      * Datos de identificación, cuando la sección los lleva.
      *
      * `largo` marca los que traen texto de varias líneas: van a ancho completo
@@ -154,6 +163,13 @@ export namespace ModelsInforme {
        * operativos y el que abre la pantalla no tiene por que ser quien firma.
        */
       editable?: boolean;
+      /**
+       * Para encontrar el dato sin depender de su posición ni de su etiqueta.
+       *
+       * Hay más de un editable: buscar "el primero" confundía el NIT con el
+       * responsable que firma.
+       */
+      clave?: 'razonSocial' | 'nit' | 'responsable';
     }[];
     /** Solo la sección de organización: una ficha por sede. */
     sedes?: FichaSede[];

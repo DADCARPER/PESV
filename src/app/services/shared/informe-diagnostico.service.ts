@@ -285,9 +285,22 @@ export class InformeDiagnosticoService {
 
       // Quien es la empresa: lo primero que tiene que decir un informe.
       identificacion: [
-        { etiqueta: 'Razón social', valor: empresa.nombre || 'Sin registrar' },
-        { etiqueta: 'NIT', valor: empresa.nit },
-        { etiqueta: 'Responsable del informe', valor: empresa.responsable, editable: true },
+        // Editables para poder escribirlos como se presentan (la razón social
+        // completa, el NIT con dígito de verificación) sin tocar los datos de
+        // la empresa ni el NIT con el que se guarda el informe.
+        {
+          etiqueta: 'Razón social',
+          valor: empresa.nombre || '',
+          editable: true,
+          clave: 'razonSocial',
+        },
+        { etiqueta: 'NIT', valor: empresa.nit, editable: true, clave: 'nit' },
+        {
+          etiqueta: 'Responsable del informe',
+          valor: empresa.responsable,
+          editable: true,
+          clave: 'responsable',
+        },
         { etiqueta: 'Actividad económica', valor: empresa.actividad || 'Sin registrar', largo: true },
       ],
 

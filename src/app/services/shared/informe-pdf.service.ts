@@ -104,6 +104,12 @@ export class InformePdfService {
 
   /** Arma el documento y lo descarga. */
   async descargar(informe: ModelsInforme.Datos & { version?: number }): Promise<void> {
+    // Lo desmarcado no se maqueta, ni se grafica, ni se le buscan fotos.
+    informe = {
+      ...informe,
+      secciones: informe.secciones.filter((s) => s.incluir !== false),
+    };
+
     const [imagenes, fotos, repartir, portada] = await Promise.all([
       this._graficas.imagenes(informe.secciones),
       this.fotosDeSedes(informe.secciones),
@@ -149,9 +155,19 @@ export class InformePdfService {
    * contenido, y lo que queda por debajo es el hueco.
    */
   private finDeSeccion(id: string): any {
-    // Un texto vacío puede no llegar a producir bloque, y sin bloque no hay
-    // posición que leer. Un espacio a un punto sí lo produce y no se ve.
-    return { text: ' ', fontSize: 1, id: `fin-${id}`, pageBreak: 'after' };
+    // Un trazo de alto cero: produce posición, que es lo que se lee, y cabe
+    // siempre, incluso con la página llena hasta el último punto.
+    //
+    // Antes era un espacio a un punto de letra. Ese punto y pico de alto era
+    // el problema: cuando el contenido acababa justo al pie, el marcador no
+    // cabía y saltaba solo a una página nueva. El hueco medido era entonces la
+    // página entera, el relleno pedía todo ese margen en una hoja que ya no
+    // tenía sitio, y acababa en una página para él solo.
+    return {
+      canvas: [{ type: 'line', x1: 0, y1: 0, x2: 0, y2: 0, lineWidth: 0 }],
+      id: `fin-${id}`,
+      pageBreak: 'after',
+    };
   }
 
   /**
@@ -174,7 +190,10 @@ export class InformePdfService {
         const id: string = nodo?.id ?? '';
         const posicion = nodo?.startPosition;
 
-        if (id.startsWith('fin-') && posicion) {
+        // Un marcador en lo alto de una hoja no cierra nada en ella: la
+        // sección terminó al pie de la anterior. Rellenar ahí es pintar una
+        // página entera para una imagen.
+        if (id.startsWith('fin-') && posicion && posicion.verticalRatio > 0) {
           const sobra = posicion.pageInnerHeight * (1 - posicion.verticalRatio);
           huecos.set(id.slice(4), sobra);
         }
@@ -899,7 +918,25 @@ export class InformePdfService {
         bloques.push(this.tablaReparto(reparto.emparejado));
     }
 
-    return bloques;
+    const filas = reparto.filas.length + (reparto.emparejado?.filas.length ?? 0);
+    return this.juntos(bloques, imagen ? 0 : filas);
+  }
+
+  /** Hasta cuántas filas una tabla se mantiene entera con su título. */
+  private static readonly FILAS_SIN_CORTE = 12;
+
+  /**
+   * Mantiene en la misma página un título, su texto y lo que presentan.
+   *
+   * Sin esto, pdfMake corta donde caiga: el título y la cabecera de una tabla
+   * se quedaban al pie de una hoja y las filas en la siguiente, con la
+   * cabecera repetida. Una tabla larga sí se deja partir, porque entera no
+   * cabría; esas al menos no dejan la cabecera sola (`keepWithHeaderRows`).
+   */
+  private juntos(bloques: any[], filas: number): any[] {
+    return filas <= InformePdfService.FILAS_SIN_CORTE
+      ? [{ stack: bloques, unbreakable: true }]
+      : bloques;
   }
 
   private tablaReparto(reparto: ModelsInforme.Reparto): any {
@@ -907,6 +944,8 @@ export class InformePdfService {
       style: 'celda',
       table: {
         headerRows: 1,
+        // La cabecera nunca se queda sola al pie: baja con su primera fila.
+        keepWithHeaderRows: 1,
         widths: ['*', 'auto', 'auto'],
         body: [
           [
@@ -934,12 +973,13 @@ export class InformePdfService {
   private tabla(tabla: ModelsInforme.Tabla): any[] {
     if (!tabla.filas.length) return [];
 
-    return [
+    return this.juntos([
       { text: tabla.titulo, style: 'subtitulo', margin: [0, 6, 0, 4] },
       {
         style: 'celda',
         table: {
           headerRows: 1,
+          keepWithHeaderRows: 1,
           widths: tabla.columnas.map(() => '*'),
           body: [
             tabla.columnas.map((c) => ({
@@ -954,7 +994,7 @@ export class InformePdfService {
         layout: this.layoutTabla(),
         margin: [0, 0, 0, 12],
       },
-    ];
+    ], tabla.filas.length);
   }
 
   private recomendaciones(texto: string): any {
